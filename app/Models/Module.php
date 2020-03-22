@@ -1,0 +1,78 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Auth;
+
+/**
+ * @property integer $id
+ * @property string $name
+ * @property integer $parent_id
+ * @property boolean $is_active
+ * @property string $created_at
+ * @property string $updated_at
+ * @property CompanyModule[] $companyModules
+ * @property ModuleRolePermission[] $moduleRolePermissions
+ * @property Permission[] $permissions
+ */
+class   Module extends Model
+{
+
+    /**
+     * The "type" of the auto-incrementing ID.
+     *
+     * @var string
+     */
+    protected $keyType = 'integer';
+
+    /**
+     * @var array
+     */
+    protected $fillable = ['name', 'parent_id', 'is_active', 'created_at', 'updated_at'];
+
+    /**
+     * @return HasMany
+     */
+    public function companyModules()
+    {
+        return $this->hasMany('App\Models\CompanyModule');
+    }
+
+    /**
+     * @return HasMany
+     */
+    public function moduleRolePermissions()
+    {
+        return $this->hasMany('App\Models\ModuleRolePermission');
+    }
+
+    /**
+     * @return HasMany
+     */
+    public function permissions()
+    {
+        return $this->hasMany('App\Models\Permission');
+    }
+
+
+    /**
+     * @return BelongsToMany
+     */
+    public function permissionsByModule()
+    {
+        return $this->belongsToMany('App\Models\Permission', 'module_role_permissions', 'module_id', 'permission_id')
+            ->where('role_id', Auth::user()->role_id);
+    }
+
+    /**
+     * @return HasMany
+     */
+    public function subModules()
+    {
+        return $this->hasMany('App\Models\Module', 'parent_id', 'id')
+            ->with(['subModules:id,name,parent_id', 'permissionsByModule:permissions.id,permissions.name']);
+    }
+}

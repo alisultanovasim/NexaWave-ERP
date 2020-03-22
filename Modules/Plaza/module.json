@@ -1,0 +1,13 @@
+{
+    "name": "Plaza",
+    "alias": "plaza",
+    "description": "",
+    "keywords": [],
+    "order": 0,
+    "providers": [
+        "Modules\\Plaza\\Providers\\PlazaServiceProvider"
+    ],
+    "aliases": {},
+    "files": [],
+    "requires": []
+}

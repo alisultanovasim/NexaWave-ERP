@@ -1,0 +1,25 @@
+{
+    "name": "nwidart/plaza",
+    "description": "",
+    "authors": [
+        {
+            "name": "Nicolas Widart",
+            "email": "n.widart@gmail.com"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Modules\\Modules\Plaza\\Providers\\PlazaServiceProvider"
+            ],
+            "aliases": {
+
+            }
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\Modules\Plaza\\": ""
+        }
+    }
+}

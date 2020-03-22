@@ -1,0 +1,13 @@
+{
+    "name": "Esd",
+    "alias": "esd",
+    "description": "",
+    "keywords": [],
+    "order": 0,
+    "providers": [
+        "Modules\\Esd\\Providers\\EsdServiceProvider"
+    ],
+    "aliases": {},
+    "files": [],
+    "requires": []
+}
