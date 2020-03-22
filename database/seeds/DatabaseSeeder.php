@@ -12,5 +12,17 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         // $this->call(UsersTableSeeder::class);
+
+
+        $roles = [
+            'super_admin',
+            'employee',
+            'office',
+            'dev'
+        ];
+        foreach ($roles as $role)
+        \App\Models\Role::create([
+            'name' => $role
+        ]);
     }
 }

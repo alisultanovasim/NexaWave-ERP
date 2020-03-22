@@ -17,6 +17,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Str;
+use Modules\Hr\Entities\Employee\Employee;
+use Modules\Plaza\Entities\OfficeUser;
 
 /**
  * Class UserController
@@ -26,12 +28,13 @@ class UserController extends Controller
 {
     use ApiResponse;
 
-    public function login(Request $request){
-        $this->validate($request , [
-            'username' => ['required' , 'string'],
-            'password' => ['required' , 'min:6']
+    public function login(Request $request)
+    {
+        $this->validate($request, [
+            'username' => ['required', 'string'],
+            'password' => ['required', 'min:6']
         ]);
-        if(!Auth::attempt($request->only('username', 'password'))){
+        if (!Auth::attempt($request->only('username', 'password'))) {
             return $this->errorResponse(trans('response.invalidLoginOrPassword'));
         }
         $token = Auth::user()->createToken('authToken')->accessToken;
@@ -55,6 +58,27 @@ class UserController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    public function profile(Request $request)
+    {
+        $user = Auth::user();
+        $office = null;
+
+        if ($user->role_id = User::OFFICE)
+            $office = OfficeUser::with(['office:id,image'])->where('user_id',$user)->get();
+
+//        $companies = Employee::with(['company' , 'contracts' => function($q){
+//            $q->where('is_active', true);
+//        }])->active()
+//            ->where('user_id', Auth::id())
+//            ->get();
+
+        return $this->successResponse([
+            'user' => $user,
+//            'companies' => $companies,
+            'office' => $office
+        ]);
     }
 
     /**
@@ -84,7 +108,8 @@ class UserController extends Controller
      * @return JsonResponse|Response|ResponseFactory
      * @throws ValidationException
      */
-    public function sendResetLinkToEmail(Request $request){
+    public function sendResetLinkToEmail(Request $request)
+    {
         $this->validate($request, [
             'email' => 'required|exists:users,email'
         ]);
@@ -111,7 +136,8 @@ class UserController extends Controller
      * @param $hash
      * @return JsonResponse|Response|ResponseFactory
      */
-    public function checkResetHashExists($hash){
+    public function checkResetHashExists($hash)
+    {
         $hash = UserReset::where('hash', $hash)->notExpired()->exists();
         return $hash
             ? $this->successResponse(['exists' => true])
@@ -124,10 +150,11 @@ class UserController extends Controller
      * @throws ValidationException
      * @throws \Throwable
      */
-    public function reset(Request $request){
+    public function reset(Request $request)
+    {
         $this->validate($request, [
             'password' => 'required|min:6',
-            'password_match' =>  'required|min:6',
+            'password_match' => 'required|min:6',
             'hash' => 'required'
         ]);
         if ($request->get('password') !== $request->get('password_match'))
@@ -135,7 +162,7 @@ class UserController extends Controller
         $userReset = UserReset::notExpired()->where('hash', $request->get('hash'))->first(['email', 'hash']);
         if (!$userReset)
             return $this->errorResponseBase(trans('responses.invalid_reset_token'), 400);
-        return DB::transaction(function () use ($request, $userReset){
+        return DB::transaction(function () use ($request, $userReset) {
             User::where('email', $userReset->email)->update([
                 'password' => Hash::make($request->get('password'))
             ]);

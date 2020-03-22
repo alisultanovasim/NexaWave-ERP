@@ -1,10 +1,10 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
-class CreateHumansTable extends Migration
+class CreateUserDetailsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,7 +13,7 @@ class CreateHumansTable extends Migration
      */
     public function up()
     {
-        Schema::create('humans', function (Blueprint $table) {
+        Schema::create('user_details', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('fin');
             $table->string('name');
@@ -29,7 +29,7 @@ class CreateHumansTable extends Migration
             $table->unsignedBigInteger('birthday_region_id')->nullable()->nullable();
             $table->unsignedBigInteger('blood_id')->nullable();
             $table->unsignedBigInteger('eye_color_id')->nullable();
-
+            $table->unsignedBigInteger('user_id')->nullable();
 
 
             $table->foreign('nationality_id')->references('id')->on('nationalities');
@@ -39,6 +39,7 @@ class CreateHumansTable extends Migration
             $table->foreign('birthday_region_id')->references('id')->on('regions');
             $table->foreign('blood_id')->references('id')->on('blood_groups');
             $table->foreign('eye_color_id')->references('id')->on('colors');
+            $table->foreign('user_id')->references('id')->on('users');
 
 
             $table->string('passport_seria')->nullable();
@@ -64,6 +65,6 @@ class CreateHumansTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('humans');
+        Schema::dropIfExists('user_details');
     }
 }
