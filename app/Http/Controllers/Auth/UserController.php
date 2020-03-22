@@ -49,15 +49,20 @@ class UserController extends Controller
         $this->validate($request, [
             'email' => 'required|unique:users,email',
             'fin' => 'required',
+            'voen' => 'required',
             'password' => 'required|min:6',
             'name' => 'required|min:3|max:50',
             'surname' => 'required|min:3|max:50',
             'gender' => [
                 'required',
                 Rule::in(['m', 'f'])
-            ]
+            ],
+            'company_name' => 'required|min:3'
         ]);
 
+        DB::transaction(function () use ($request){
+
+        });
     }
 
     public function index(Request $request)
