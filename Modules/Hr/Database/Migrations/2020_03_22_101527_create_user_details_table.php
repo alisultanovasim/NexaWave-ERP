@@ -16,10 +16,9 @@ class CreateUserDetailsTable extends Migration
         Schema::create('user_details', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('fin');
-            $table->string('name');
-            $table->string('surname');
-            $table->string('father_name')->nullable();
+
             $table->date('birthday')->nullable();
+            $table->string('father_name')->nullable();
             $table->enum('gender' ,['m','f']);
 
             $table->unsignedBigInteger('nationality_id')->nullable();
@@ -49,7 +48,6 @@ class CreateUserDetailsTable extends Migration
             $table->string('passport_expire_at')->nullable();
 
 
-            $table->string('email')->nullable();
 
             $table->unique('fin');
 
