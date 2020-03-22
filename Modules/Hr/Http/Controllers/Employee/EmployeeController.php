@@ -26,20 +26,20 @@ class EmployeeController extends Controller
         $this->validate($request, [
             'company_id' => ['required', 'integer'],
             'paginateCount' => ['sometimes', 'required', 'integer'],
-            'state' => ['nullable', 'integer', 'in:0,1,2'],
-            'name' => ['nullable', 'string', 'max:255'],
-            'department_id' => ['nullable', 'integer'],
-            'position_id' => ['nullable', 'integer'],
-            'section_id' => ['nullable', 'integer'],
-            'sector_id' => ['nullable', 'integer'],
+//            'state' => ['nullable', 'integer', 'in:0,1,2'],
+//            'name' => ['nullable', 'string', 'max:255'],
+//            'department_id' => ['nullable', 'integer'],
+//            'position_id' => ['nullable', 'integer'],
+//            'section_id' => ['nullable', 'integer'],
+//            'sector_id' => ['nullable', 'integer'],
         ]);
         try {
 
-            if ($notExists = $this->companyInfo($request->get('company_id'), $request->only([
-                'department_id', 'profession_id', 'section_id', 'sector_id'
-            ]))) return $this->errorResponse($notExists);
+//            if ($notExists = $this->companyInfo($request->get('company_id'), $request->only([
+//                'department_id', 'profession_id', 'section_id', 'sector_id'
+//            ]))) return $this->errorResponse($notExists);
 
-            $employees = Employee::with(['human:id,name,surname', 'contracts' => function ($q) {
+            $employees = Employee::with(['user:id,name,surname', 'contracts' => function ($q) {
                 $q->with(['department:id,name', 'section:id,name', 'sector:id,name', 'position:id,name'])->where('is_active', true)->select();
             }])->where('company_id', $request->get('company_id'));
 
