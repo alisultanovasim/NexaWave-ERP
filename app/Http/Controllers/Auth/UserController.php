@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 
 
 use App\Http\Controllers\Controller;
+use App\Models\Company;
 use App\Models\User;
 use App\Models\UserReset;
 use App\Traits\ApiResponse;
@@ -19,7 +20,11 @@ use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Str;
 use Modules\Hr\Entities\Employee\Employee;
+use Modules\Hr\Entities\Positions;
 use Modules\Plaza\Entities\OfficeUser;
+use Modules\Hr\Entities\UserDetail;
+use Modules\Hr\Entities\EmployeeContract;
+
 
 /**
  * Class UserController
@@ -45,10 +50,16 @@ class UserController extends Controller
         ]);
     }
 
+
+    /**
+     * @param Request $request
+     * @return mixed
+     * @throws ValidationException
+     */
     public function register(Request $request){
         $this->validate($request, [
             'email' => 'required|unique:users,email',
-            'fin' => 'required',
+            'fin' => 'required|unique:user_details,fin',
             'voen' => 'required',
             'password' => 'required|min:6',
             'name' => 'required|min:3|max:50',
@@ -60,8 +71,39 @@ class UserController extends Controller
             'company_name' => 'required|min:3'
         ]);
 
-        DB::transaction(function () use ($request){
-
+        return DB::transaction(function () use ($request){
+            $user = new User();
+            $user->fill([
+                'name' => $request->get('name'),
+                'username' => $request->get('fin'),
+                'email' => $request->get('email'),
+                'voen' => $request->get('voen'),
+                'password' => $request->get('password'),
+                'role_id' => User::EMPLOYEE,
+            ]);
+            $user->save();
+            UserDetail::create([
+                'user_id' => $user->getKey(),
+                'fin' => $request->get('fin'),
+                'gender' => $request->get('gender'),
+            ]);
+            $company = new Company();
+            $company->fill([
+                'name' => $request->get('company_name')
+            ]);
+            $company->save();
+            $employee = new Employee();
+            $employee->fill([
+                'company_id' => $company->getKey(),
+                'user_id' => $user->getKey()
+            ]);
+            $employee->save();
+            EmployeeContract::create([
+                'employee_id' => $employee->getKey(),
+                'position_id' => Positions::DIRECTOR,
+            ]);
+            $request->merge(['username' => $request->get('fin')]);
+            return $this->login($request);
         });
     }
 
