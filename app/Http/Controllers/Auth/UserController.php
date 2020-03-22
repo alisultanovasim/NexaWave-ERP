@@ -26,6 +26,20 @@ class UserController extends Controller
 {
     use ApiResponse;
 
+    public function login(Request $request){
+        $this->validate($request , [
+            'username' => ['required' , 'string'],
+            'password' => ['required' , 'min:6']
+        ]);
+        if(!Auth::attempt($request->only('username', 'password'))){
+            return $this->errorResponse(trans('response.invalidLoginOrPassword'));
+        }
+        $token = Auth::user()->createToken('authToken')->accessToken;
+        return $this->successResponse([
+            'access_token' => $token,
+            'user' => Auth::user()
+        ]);
+    }
 
     public function index(Request $request)
     {
