@@ -18,7 +18,7 @@ class ModulePermissionController extends Controller
 
 
     /**
-     * @return \Illuminate\Http\Response|\Laravel\Lumen\Http\ResponseFactory
+     * @return JsonResponse
      */
     public function getModuleAndPermissionList()
     {

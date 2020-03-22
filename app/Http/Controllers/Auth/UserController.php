@@ -15,6 +15,7 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Str;
 use Modules\Hr\Entities\Employee\Employee;
@@ -42,6 +43,21 @@ class UserController extends Controller
             'access_token' => $token,
             'user' => Auth::user()
         ]);
+    }
+
+    public function register(Request $request){
+        $this->validate($request, [
+            'email' => 'required|unique:users,email',
+            'fin' => 'required',
+            'password' => 'required|min:6',
+            'name' => 'required|min:3|max:50',
+            'surname' => 'required|min:3|max:50',
+            'gender' => [
+                'required',
+                Rule::in(['m', 'f'])
+            ]
+        ]);
+
     }
 
     public function index(Request $request)
