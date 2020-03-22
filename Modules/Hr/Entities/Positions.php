@@ -9,5 +9,7 @@ class Positions extends Model
 {
     use SoftDeletes;
 
+    const DIRECTOR = 1;
+
     protected $guarded = [];
 }

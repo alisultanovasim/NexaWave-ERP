@@ -2,8 +2,49 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="f108eeb6-1f97-44d6-a374-9960a433636d" name="Default Changelist" comment="">
+<<<<<<< HEAD
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+<<<<<<< HEAD
+      <change beforePath="$PROJECT_DIR$/.idea/oneOffice.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/oneOffice.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/composer.json" beforeDir="false" afterPath="$PROJECT_DIR$/composer.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/composer.lock" beforeDir="false" afterPath="$PROJECT_DIR$/composer.lock" afterDir="false" />
+=======
+=======
+>>>>>>> 6f600bc0119de954fc274addff40b0f1819a6bf0
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+<<<<<<< HEAD
+      <change beforePath="$PROJECT_DIR$/Modules/Esd/Routes/api.php" beforeDir="false" afterPath="$PROJECT_DIR$/Modules/Esd/Routes/api.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Modules/Hr/Database/Migrations/2020_03_17_153000_create_humans_table.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Modules/Hr/Database/Migrations/2020_03_17_161817_create_employees_table.php" beforeDir="false" afterPath="$PROJECT_DIR$/Modules/Hr/Database/Migrations/2020_03_17_161817_create_employees_table.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Modules/Hr/Entities/Employee/Employee.php" beforeDir="false" afterPath="$PROJECT_DIR$/Modules/Hr/Entities/Employee/Employee.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Modules/Plaza/Http/Controllers/FloorController.php" beforeDir="false" afterPath="$PROJECT_DIR$/Modules/Plaza/Http/Controllers/FloorController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Modules/Plaza/Routes/api.php" beforeDir="false" afterPath="$PROJECT_DIR$/Modules/Plaza/Routes/api.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Auth/UserController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Auth/UserController.php" afterDir="false" />
+<<<<<<< HEAD
+      <change beforePath="$PROJECT_DIR$/app/Providers/AuthServiceProvider.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Providers/AuthServiceProvider.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Providers/RouteServiceProvider.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Providers/RouteServiceProvider.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Traits/ApiResponse.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Traits/ApiResponse.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/auth.php" beforeDir="false" afterPath="$PROJECT_DIR$/config/auth.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/migrations/2018_10_28_115847_create_roles_table.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/migrations/2018_10_28_115847_create_roles_table.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/database/migrations/2019_10_28_075442_create_users_table.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/migrations/2019_10_28_075442_create_users_table.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/migrations/2019_12_13_075418_create_module_role_permissions_table.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/migrations/2020_01_23_102318_add_expired_at_and_employer_id_to_users.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/migrations/2020_03_15_101726_create_company_role_users_table.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/migrations/2020_03_21_215207_add_send_mail_field.php" beforeDir="false" />
+>>>>>>> 2066256da1fded9e0fbb64e035a2a37be849a61a
+=======
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/ProfileController.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Kernel.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Kernel.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Middleware/CompanyIdValidator.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Middleware/CompanyIdValidator.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Models/Role.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Models/Role.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Models/User.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Models/User.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/seeds/DatabaseSeeder.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/seeds/DatabaseSeeder.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/routes/api.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/api.php" afterDir="false" />
+>>>>>>> 6f600bc0119de954fc274addff40b0f1819a6bf0
+=======
+      <change beforePath="$PROJECT_DIR$/database/migrations/2019_10_28_075442_create_users_table.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/migrations/2019_10_28_075442_create_users_table.php" afterDir="false" />
+>>>>>>> 1f85fccf587dbfa6017825d622b2c17b8ecb420a
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -180,8 +221,20 @@
       <option name="presentableId" value="Default" />
       <updated>1584828303633</updated>
       <workItem from="1584828305104" duration="7374000" />
+<<<<<<< HEAD
+<<<<<<< HEAD
+      <workItem from="1584861788830" duration="253000" />
+      <workItem from="1584862933396" duration="2275000" />
+=======
+      <workItem from="1584861788830" duration="7977000" />
+>>>>>>> 2066256da1fded9e0fbb64e035a2a37be849a61a
+=======
       <workItem from="1584861788830" duration="19215000" />
+<<<<<<< HEAD
+>>>>>>> 6f600bc0119de954fc274addff40b0f1819a6bf0
+=======
       <workItem from="1584898907650" duration="1780000" />
+>>>>>>> 1f85fccf587dbfa6017825d622b2c17b8ecb420a
     </task>
     <servers />
   </component>

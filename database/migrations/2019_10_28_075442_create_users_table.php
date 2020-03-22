@@ -20,7 +20,7 @@ class CreateUsersTable extends Migration
             $table->string("username");
             $table->string("voen")->nullable();
             $table->string("email")->nullable();
-            $table->boolean('role_id');
+            $table->unsignedBigInteger('role_id');
             $table->string("password");
 
             $table->boolean('is_blocked')->default(false);
