@@ -3,10 +3,34 @@
   <component name="ChangeListManager">
     <list default="true" id="f108eeb6-1f97-44d6-a374-9960a433636d" name="Default Changelist" comment="">
       <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+<<<<<<< HEAD
       <change beforePath="$PROJECT_DIR$/.idea/oneOffice.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/oneOffice.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/composer.json" beforeDir="false" afterPath="$PROJECT_DIR$/composer.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/composer.lock" beforeDir="false" afterPath="$PROJECT_DIR$/composer.lock" afterDir="false" />
+=======
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Modules/Esd/Database/Migrations/2018_11_23_111725_create_regions_table.php" beforeDir="false" afterPath="$PROJECT_DIR$/Modules/Esd/Database/Migrations/2018_11_23_111725_create_esd_regions_table.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Modules/Esd/Database/Migrations/2019_08_30_060122_create_sections_table.php" beforeDir="false" afterPath="$PROJECT_DIR$/Modules/Esd/Database/Migrations/2019_08_30_060122_create_document_sections_table.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Modules/Esd/Database/Migrations/2019_09_17_085649_create_documents_table.php" beforeDir="false" afterPath="$PROJECT_DIR$/Modules/Esd/Database/Migrations/2019_09_17_085649_create_documents_table.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Modules/Esd/Database/Migrations/2019_11_21_103422_create_citizen_docs_table.php" beforeDir="false" afterPath="$PROJECT_DIR$/Modules/Esd/Database/Migrations/2019_11_21_103422_create_citizen_docs_table.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Modules/Esd/Entities/Region.php" beforeDir="false" afterPath="$PROJECT_DIR$/Modules/Esd/Entities/Region.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Modules/Hr/Routes/api.php" beforeDir="false" afterPath="$PROJECT_DIR$/Modules/Hr/Routes/api.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Modules/Plaza/Database/Migrations/2019_11_16_201601_create_contracts_table.php" beforeDir="false" afterPath="$PROJECT_DIR$/Modules/Plaza/Database/Migrations/2019_11_16_201601_create_office_contracts_table.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Modules/Plaza/Entities/Contract.php" beforeDir="false" afterPath="$PROJECT_DIR$/Modules/Plaza/Entities/Contract.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Modules/Plaza/Routes/api.php" beforeDir="false" afterPath="$PROJECT_DIR$/Modules/Plaza/Routes/api.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Auth/UserController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Auth/UserController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Providers/AuthServiceProvider.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Providers/AuthServiceProvider.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Providers/RouteServiceProvider.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Providers/RouteServiceProvider.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Traits/ApiResponse.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Traits/ApiResponse.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/auth.php" beforeDir="false" afterPath="$PROJECT_DIR$/config/auth.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/migrations/2018_10_28_115847_create_roles_table.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/migrations/2018_10_28_115847_create_roles_table.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/migrations/2019_10_28_075442_create_users_table.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/migrations/2019_10_28_075442_create_users_table.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/migrations/2019_12_13_075418_create_module_role_permissions_table.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/migrations/2020_01_23_102318_add_expired_at_and_employer_id_to_users.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/migrations/2020_03_15_101726_create_company_role_users_table.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/migrations/2020_03_21_215207_add_send_mail_field.php" beforeDir="false" />
+>>>>>>> 2066256da1fded9e0fbb64e035a2a37be849a61a
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -138,6 +162,7 @@
     </include_path>
   </component>
   <component name="ProjectId" id="1ZSMzSByQr6cWMxTVuTeslc8THq" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showExcludedFiles" value="true" />
@@ -147,22 +172,22 @@
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/app/Traits" />
     <property name="nodejs_package_manager_path" value="npm" />
   </component>
   <component name="RecentsManager">
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="D:\Projects\tutorials\laravel-modules\oneOffice\database\migrations" />
-      <recent name="D:\Projects\tutorials\laravel-modules\oneOffice\app\Models" />
-      <recent name="D:\Projects\tutorials\laravel-modules\oneOffice\app\Http\Controllers" />
-      <recent name="D:\Projects\tutorials\laravel-modules\oneOffice\app\Http\Middleware" />
-      <recent name="D:\Projects\tutorials\laravel-modules\oneOffice\Modules\Esd\Config" />
-    </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="D:\Projects\tutorials\laravel-modules\oneOffice\database\migrations" />
       <recent name="D:\Projects\tutorials\laravel-modules\oneOffice\Modules\Esd\Database\Migrations" />
       <recent name="D:\Projects\tutorials\laravel-modules\oneOffice\Modules\Esd\Config" />
       <recent name="D:\Projects\tutorials\laravel-modules\oneOffice\app\Moldes" />
+    </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\Projects\tutorials\laravel-modules\oneOffice\app\Traits" />
+      <recent name="D:\Projects\tutorials\laravel-modules\oneOffice\Modules\Hr\Http\Controllers" />
+      <recent name="D:\Projects\tutorials\laravel-modules\oneOffice\Modules\Hr\Entities" />
+      <recent name="D:\Projects\tutorials\laravel-modules\oneOffice\Modules\Hr\Routes" />
+      <recent name="D:\Projects\tutorials\laravel-modules\oneOffice\Modules\Hr\Database\Migrations" />
     </key>
   </component>
   <component name="RunManager">
@@ -182,8 +207,12 @@
       <option name="presentableId" value="Default" />
       <updated>1584828303633</updated>
       <workItem from="1584828305104" duration="7374000" />
+<<<<<<< HEAD
       <workItem from="1584861788830" duration="253000" />
       <workItem from="1584862933396" duration="2275000" />
+=======
+      <workItem from="1584861788830" duration="7977000" />
+>>>>>>> 2066256da1fded9e0fbb64e035a2a37be849a61a
     </task>
     <servers />
   </component>
@@ -191,10 +220,14 @@
     <option name="version" value="1" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="499" y="167" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog" timestamp="1584832894470">
+    <state x="531" y="215" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1584866664956">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state x="499" y="167" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/0.0.1536.824@0.0.1536.824" timestamp="1584832894470" />
+    <state x="531" y="215" key="#com.intellij.fileTypes.FileTypeChooser/0.0.1536.824@0.0.1536.824" timestamp="1584866664956" />
+    <state x="499" y="167" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog" timestamp="1584866652723">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="499" y="167" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/0.0.1536.824@0.0.1536.824" timestamp="1584866652723" />
     <state x="549" y="167" key="FileChooserDialogImpl" timestamp="1584835209958">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
@@ -203,10 +236,10 @@
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state x="480" y="227" key="NewPhpClassDialog/0.0.1536.824@0.0.1536.824" timestamp="1584833198649" />
-    <state x="462" y="144" width="740" height="606" key="find.popup" timestamp="1584834443500">
+    <state x="462" y="144" width="740" height="606" key="find.popup" timestamp="1584866367876">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state x="462" y="144" width="740" height="606" key="find.popup/0.0.1536.824@0.0.1536.824" timestamp="1584834443500" />
+    <state x="462" y="144" width="740" height="606" key="find.popup/0.0.1536.824@0.0.1536.824" timestamp="1584866367876" />
     <state x="431" y="145" width="672" height="678" key="search.everywhere.popup" timestamp="1584833923241">
       <screen x="0" y="0" width="1536" height="824" />
     </state>

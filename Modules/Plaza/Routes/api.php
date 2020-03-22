@@ -3,7 +3,8 @@
 use Illuminate\Support\Facades\Route;
 
 Route::group([
-    'prefix' => 'v1/plaza'
+    'prefix' => 'v1/plaza',
+    'middleware' =>   'auth:api'
 ], function ($route) {
 
     Route::group([

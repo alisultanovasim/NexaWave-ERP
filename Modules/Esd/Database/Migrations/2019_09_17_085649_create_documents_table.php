@@ -36,7 +36,7 @@ class CreateDocumentsTable extends Migration
             $table->unsignedTinyInteger("status")->default(0);
             $table->unsignedTinyInteger('inner_inspect')->default(0);
             $table->unsignedTinyInteger('send_to_user')->default(0);
-            $table->foreign("section_id")->references("id")->on("sections")->onDelete("restrict");
+            $table->foreign("section_id")->references("id")->on("document_sections")->onDelete("restrict");
             $table->foreign("parent_id")->references("id")->on("documents")->onDelete("restrict");
             $table->foreign("send_type")->references("id")->on("send_types");
             $table->foreign("send_form")->references("id")->on("send_forms");

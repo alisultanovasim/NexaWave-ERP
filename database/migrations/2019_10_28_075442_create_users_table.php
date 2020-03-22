@@ -17,11 +17,11 @@ class CreateUsersTable extends Migration
             $table->bigIncrements('id');
             $table->string("username");
             $table->string("email");
-            $table->boolean('is_office')->default(false);
+            $table->boolean('role_id');
             $table->boolean('human_id')->nullable();
             $table->string("password");
-            $table->boolean("is_verified")->default(true);
             $table->boolean('is_blocked')->default(false);
+//            $table->foreign('role_id')->references('id')->on('roles')->onDelete('cascade');
             $table->timestamps();
         });
     }
