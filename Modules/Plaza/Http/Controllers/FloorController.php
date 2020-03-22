@@ -19,10 +19,6 @@ class FloorController extends Controller
 {
     use ApiResponse  , ValidatesRequests;
 
-    /**
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function index(Request $request)
     {
         $this->validate($request, [
@@ -41,10 +37,6 @@ class FloorController extends Controller
         }
     }
 
-    /**
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function store(Request $request)
     {
         $this->validate($request, [
@@ -75,11 +67,6 @@ class FloorController extends Controller
         }
     }
 
-    /**
-     * @param UploadedFile $file
-     * @param $company_id int
-     * @return string
-     */
     public function uploadImage(UploadedFile $file, int $company_id, $str = "floors"): string
     {
         $filename = time() . rand(0, 100) . "." . $file->extension();
@@ -109,10 +96,6 @@ class FloorController extends Controller
         }
     }
 
-    /**
-     * @param Request $request
-     * @param $id - floor id
-     */
     public function update(Request $request, $id)
     {
         $this->validate($request, [
@@ -160,12 +143,6 @@ class FloorController extends Controller
 
     }
 
-    /**
-     * @param Request $request
-     * @param $id integer
-     * @return \Illuminate\Http\JsonResponse
-     * @throws \Illuminate\Validation\ValidationException
-     */
     public function destroy(Request $request, $id)
     {
         $this->validate($request, [

@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Route;
 Route::group([
     'prefix' => 'v1'
 ] , function ($router) {
-    Route::get('/profile', 'ProfileController@info');
+    Route::get('/profile', 'Auth\UserController@profile')->middleware('auth:api');
 
     Route::group([
         'prefix' => 'logs',
@@ -18,36 +18,37 @@ Route::group([
 
     Route::group([
         'prefix' => "auth",
+        'namespace' => 'Auth'
     ], function () {
-        Route::get("/module/permissions", "Auth\ModulePermissionController@getModuleAndPermissionList");
-        Route::post("/role", "Auth\RoleController@store");
-        Route::put("/role/{id}", "Auth\RoleController@update");
-        Route::delete("/role/{id}", "Auth\RoleController@destroy");
+        Route::get("/module/permissions", "ModulePermissionController@getModuleAndPermissionList");
+        Route::post("/role", "RoleController@store");
+        Route::put("/role/{id}", "RoleController@update");
+        Route::delete("/role/{id}", "RoleController@destroy");
 
-        Route::post("/users", "Auth\UserController@store");
-        Route::delete("/users/{id}", "Auth\UserController@destroy");
-        Route::get("/users", "Auth\UserController@index");
-        Route::put("/password/change", "Auth\UserController@changePassword");
+        Route::post("/users", "UserController@store");
+        Route::delete("/users/{id}", "UserController@destroy");
+        Route::get("/users", "UserController@index");
+        Route::put("/password/change", "UserController@changePassword");
 
-        Route::post('/forgot', 'Auth\UserController@sendResetLinkToEmail');
-        Route::post('/validate/hash/{hash}', 'Auth\UserController@checkResetHashExists');
-        Route::post('/reset/password', 'Auth\UserController@reset');
+        Route::post('/forgot', 'UserController@sendResetLinkToEmail');
+        Route::post('/validate/hash/{hash}', 'UserController@checkResetHashExists');
+        Route::post('/reset/password', 'UserController@reset');
 
-        Route::post('/login' , 'Auth\UserController@login');
-        Route::post('/register' , 'Auth\UserController@register');
+        Route::post('/login' , 'UserController@login');
+        Route::post('/register' , 'UserController@register');
     });
 
 });
 
 
-//todo need to delete
-Route::group([], function ($route) {
-    Route::get('/v1/users', function () {
-        $users = User::where('company_id', Auth::user()->company_id)->get(['username', 'id']);
-        return response($users, 200)->header('Content-Type', 'application/json');
-    });
-    Route::get('/v1/part', function () {
-        $parts = config('static-data.part');
-        return response($parts, 200)->header('Content-Type', 'application/json');
-    });
-});
+////todo need to delete
+//Route::group([], function ($route) {
+//    Route::get('/v1/users', function () {
+//        $users = User::where('company_id', Auth::user()->company_id)->get(['username', 'id']);
+//        return response($users, 200)->header('Content-Type', 'application/json');
+//    });
+//    Route::get('/v1/part', function () {
+//        $parts = config('static-data.part');
+//        return response($parts, 200)->header('Content-Type', 'application/json');
+//    });
+//});

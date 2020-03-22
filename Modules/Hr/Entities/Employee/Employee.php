@@ -8,7 +8,7 @@ class Employee extends Model
 {
 
     protected $fillable = [
-        'human_id',
+        'user_id',
         'company_id',
         'is_active',
     ];
@@ -20,7 +20,14 @@ class Employee extends Model
         return $this->belongsTo('Modules\Hr\Entities\Employee\Human', 'human_id', 'id');
     }
 
-    public function contracts(){
+    public function contracts()
+    {
         return $this->hasMany('Modules\Hr\Entities\Employee\Contract');
+    }
+
+
+    public function scopeActive($q)
+    {
+        return $q->where('is_active', true);
     }
 }
