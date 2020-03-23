@@ -9,6 +9,7 @@
     "license": "MIT",
     "require": {
         "php": "^7.2.5",
+        "ext-json": "*",
         "doctrine/dbal": "^2.10",
         "fideloper/proxy": "^4.2",
         "fruitcake/laravel-cors": "^1.0",
@@ -16,8 +17,8 @@
         "laravel/framework": "^7.0",
         "laravel/passport": "^8.4",
         "laravel/tinker": "^2.0",
-        "nwidart/laravel-modules": "^6.2",
-        "ext-json": "*"
+        "lorisleiva/laravel-deployer": "^0.3.0",
+        "nwidart/laravel-modules": "^6.2"
     },
     "require-dev": {
         "facade/ignition": "^2.0",
