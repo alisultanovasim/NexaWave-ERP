@@ -16,12 +16,10 @@ class CompanyIdValidator
     use ApiResponse;
 
 
-    /**
-     */
     public function handle(Request $request, Closure $next)
     {
 
-        $company_id = $request->hasHeader('company_id')?$request->header('company_id'):$request->get('company_id');
+        $company_id = $request->hasHeader('company_id') ? $request->header('company_id') : $request->get('company_id');
         Validator::validate(['company_id' => $company_id] , [
             'company_id' => ['required' , 'integer']
         ]);

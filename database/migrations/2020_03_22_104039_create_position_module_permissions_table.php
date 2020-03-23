@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreatePositionModulePermissionsTalbe extends Migration
+class CreatePositionModulePermissionsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,7 +13,7 @@ class CreatePositionModulePermissionsTalbe extends Migration
      */
     public function up()
     {
-        Schema::create('position_module_permissions_talbe', function (Blueprint $table) {
+        Schema::create('position_module_permissions', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('position_id');
             $table->unsignedBigInteger('module_id');

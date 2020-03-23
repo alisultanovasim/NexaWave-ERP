@@ -13,6 +13,7 @@ class Employee extends Model
         'company_id',
         'is_active',
     ];
+
     protected $table = 'employees';
 
 

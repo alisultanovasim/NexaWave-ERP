@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 
 
 use App\Http\Controllers\Controller;
+use App\Models\Company;
 use App\Models\User;
 use App\Models\UserReset;
 use App\Traits\ApiResponse;
@@ -15,10 +16,15 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Str;
 use Modules\Hr\Entities\Employee\Employee;
+use Modules\Hr\Entities\Employee\UserDetail;
+use Modules\Hr\Entities\Positions;
+use Modules\Plaza\Entities\Contact;
 use Modules\Plaza\Entities\OfficeUser;
+
 
 /**
  * Class UserController
@@ -42,6 +48,63 @@ class UserController extends Controller
             'access_token' => $token,
             'user' => Auth::user()
         ]);
+    }
+
+
+    /**
+     * @param Request $request
+     * @return mixed
+     * @throws ValidationException
+     */
+    public function register(Request $request){
+        $this->validate($request, [
+            'email' => 'required|unique:users,email',
+            'fin' => 'required|unique:user_details,fin',
+            'voen' => 'required',
+            'password' => 'required|min:6',
+            'name' => 'required|min:3|max:50',
+            'surname' => 'required|min:3|max:50',
+            'gender' => [
+                'required',
+                Rule::in(['m', 'f'])
+            ],
+            'company_name' => 'required|min:3'
+        ]);
+
+        return DB::transaction(function () use ($request){
+            $user = new User();
+            $user->fill([
+                'name' => $request->get('name'),
+                'username' => $request->get('fin'),
+                'email' => $request->get('email'),
+                'voen' => $request->get('voen'),
+                'password' => $request->get('password'),
+                'role_id' => User::EMPLOYEE,
+            ]);
+            $user->save();
+            UserDetail::create([
+                'user_id' => $user->getKey(),
+                'fin' => $request->get('fin'),
+                'gender' => $request->get('gender'),
+            ]);
+            $company = new Company();
+            $company->fill([
+                'name' => $request->get('company_name')
+            ]);
+            $company->save();
+            $employee = new Employee();
+            $employee->fill([
+                'company_id' => $company->getKey(),
+                'user_id' => $user->getKey()
+            ]);
+            $employee->save();
+            Contact::create([
+                'employee_id' => $employee->getKey(),
+                'position_id' => Positions::DIRECTOR,
+            ]);
+            $request->merge(['username' => $request->get('fin')]);
+            return $this->login($request);
+        });
     }
 
     public function index(Request $request)
@@ -89,9 +152,10 @@ class UserController extends Controller
         ]);
     }
 
+
     /**
      * @param Request $request
-     * @return JsonResponse|Response|ResponseFactory
+     * @return JsonResponse
      * @throws ValidationException
      */
     public function changePassword(Request $request)
@@ -102,18 +166,19 @@ class UserController extends Controller
             'password_match' => 'required|min:6',
         ]);
         if (!Hash::check($request->get('current_password'), Auth::user()->getAttribute('password')))
-            return $this->errorResponseBase(trans('responses.current_password_is_not_valid'), 400);
+            return $this->errorResponse(trans('responses.current_password_is_not_valid'), 400);
         if ($request->get('password') !== $request->get('password_match'))
-            return $this->errorResponseBase(trans('responses.passwords_doesnt_match'), 400);
+            return $this->errorMessage(trans('responses.passwords_doesnt_match'), 400);
         $isUpdated = User::where('id', Auth::id())->update(['password' => Hash::make($request->get('password'))]);
         return $isUpdated
             ? $this->successResponse(['success' => trans('responses.password_updated')])
-            : $this->errorResponseBase(trans('responses.password_not_updated'), 500);
+            : $this->errorResponse(trans('responses.password_not_updated'), 500);
     }
+
 
     /**
      * @param Request $request
-     * @return JsonResponse|Response|ResponseFactory
+     * @return JsonResponse
      * @throws ValidationException
      */
     public function sendResetLinkToEmail(Request $request)
@@ -124,7 +189,7 @@ class UserController extends Controller
         $userReset = new UserReset();
         $resetCountForToday = $userReset->today()->where('email', $request->get('email'))->count();
         if ($resetCountForToday >= $userReset->getDailyResetCount())
-            return $this->errorResponseBase(trans('responses.extend_daily_reset_limit'), 400);
+            return $this->errorResponse(trans('responses.extend_daily_reset_limit'), 400);
         $userReset->fill([
             'id' => Str::uuid(),
             'email' => $request->get('email'),
@@ -137,26 +202,27 @@ class UserController extends Controller
         //send email here
         return $userReset
             ? $this->successResponse(['success' => trans('responses.reset_link_sent')])
-            : $this->errorResponseBase(trans('responses.reset_link_not_sent'), 500);
+            : $this->errorResponse(trans('responses.reset_link_not_sent'), 500);
     }
+
 
     /**
      * @param $hash
-     * @return JsonResponse|Response|ResponseFactory
+     * @return JsonResponse
      */
     public function checkResetHashExists($hash)
     {
         $hash = UserReset::where('hash', $hash)->notExpired()->exists();
         return $hash
             ? $this->successResponse(['exists' => true])
-            : $this->errorResponseBase(trans('responses.not_found'), 404);
+            : $this->errorResponse(trans('responses.not_found'), 404);
     }
+
 
     /**
      * @param Request $request
-     * @return Response|ResponseFactory|mixed
+     * @return JsonResponse|mixed
      * @throws ValidationException
-     * @throws \Throwable
      */
     public function reset(Request $request)
     {
@@ -166,10 +232,10 @@ class UserController extends Controller
             'hash' => 'required'
         ]);
         if ($request->get('password') !== $request->get('password_match'))
-            return $this->errorResponseBase(trans('responses.passwords_doesnt_match'), 400);
+            return $this->errorResponse(trans('responses.passwords_doesnt_match'), 400);
         $userReset = UserReset::notExpired()->where('hash', $request->get('hash'))->first(['email', 'hash']);
         if (!$userReset)
-            return $this->errorResponseBase(trans('responses.invalid_reset_token'), 400);
+            return $this->errorResponse(trans('responses.invalid_reset_token'), 400);
         return DB::transaction(function () use ($request, $userReset) {
             User::where('email', $userReset->email)->update([
                 'password' => Hash::make($request->get('password'))

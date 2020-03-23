@@ -18,6 +18,9 @@ class CreateEmployeeContractsTable extends Migration
             $table->decimal('salary' , 10 , 2);
             $table->date('start_date')->nullable();
             $table->date('end_date')->nullable();
+
+            $table->decimal('salary' , 10 , 2)->nullable()->default(null);
+
             $table->boolean('is_active')->default(true);
             $table->string('contract')->nullable();
 
