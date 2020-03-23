@@ -4,7 +4,9 @@
 namespace Modules\Plaza\Http\Controllers;
 
 
+use App\Models\User;
 use Illuminate\Foundation\Validation\ValidatesRequests;
+use Illuminate\Support\Facades\Hash;
 use Modules\Plaza\Entities\Contact;
 use Modules\Plaza\Entities\Contract;
 use Modules\Plaza\Entities\Document;
@@ -84,6 +86,7 @@ class OfficeController extends Controller
             if($ex->errorInfo[1] == 1054){
                 return $this->errorMessage(['order_by' => ['not valid data']], Response::HTTP_UNPROCESSABLE_ENTITY);
             }
+
             return $this->errorResponse(trans('apiResponse.tryLater'), Response::HTTP_INTERNAL_SERVER_ERROR);
 
         }
@@ -672,7 +675,7 @@ class OfficeController extends Controller
     public function documentAdd(Request $request, $id){
         $this->validate($request , [
             'company_id' => 'required|integer',
-            'user_id' => 'required|integer',
+
             'documents' => 'required|array',
             'documents.*' => 'required|mimes::jpeg,png,jpg,gif,svg,pdf,docx,doc,txt,xls,xlsx'
         ]);
@@ -697,7 +700,7 @@ class OfficeController extends Controller
     public function documentUpdate(Request $request, $id){
         $this->validate($request , [
             'company_id' => 'required|integer',
-            'user_id' => 'required|integer',
+
             'document_id' => 'required|integer',
             'document'=> 'required|mimes::jpeg,png,jpg,gif,svg,pdf,docx,doc,txt,xls,xlsx'
         ]);
@@ -721,7 +724,7 @@ class OfficeController extends Controller
     public function documentDestroy(Request $request, $id){
         $this->validate($request , [
             'company_id' => 'required|integer',
-            'user_id' => 'required|integer',
+
             'document_id' => 'required|integer'
         ]);
         try{
@@ -856,20 +859,16 @@ class OfficeController extends Controller
     {
         $this->validate($request, [
             'company_id' => 'required|integer',
-            'user_id' => 'required|integer',
-            'user' => 'sometimes|required|integer',
             'office_id' => 'sometimes|required|integer',
+            'per_page' => 'sometimes|required|integer'
         ]);
         try {
 
-            $data = OfficeUser::with('office:id,name,image')->where('company_id', $request->company_id);
-            if ($request->has('user')) {
-                $data->where('user_id', $request->user);
-            }
-            if ($request->has('office_id')) {
+            $data = OfficeUser::with(['office:id,name' ,  'user'])->where('company_id', $request->company_id);
+            if ($request->has('office_id'))
                 $data->where('office_id', $request->office_id);
-            }
-            $data = $data->get();
+
+            $data = $data->paginate($request->get('per_page'));
 
             return $this->successResponse($data);
         } catch (\Exception $e) {
@@ -877,26 +876,73 @@ class OfficeController extends Controller
         }
     }
 
+
     public function addUser(Request $request, $id)
     {
         $this->validate($request, [
             'company_id' => 'required|integer',
-            'user_id' => 'required|integer',
-            'user' => 'required|integer',
+            'username' => ['required' , 'string' , 'max:255'],
+            'password' => ['required' , 'string' ,"min:6" ,  'max:255'],
+            'name' => ['sometimes' , 'string' , 'max:255'],
+            'surname' => ['sometimes' , 'required' , 'string' , 'max:255'],
         ]);
 
         try {
+            DB::beginTransaction();
             $check = Office::where('company_id', $request->company_id)->where('id', $id)->exists();
             if (!$check) return $this->errorResponse('apiResponse.unProcess');
 
+            $users = User::create([
+                'role_id' => User::OFFICE,
+                'name' => $request->get('name'),
+                'password' => Hash::make($request->get('password')),
+                'username' => $request->get('username')
+            ]);
+
             $check = OfficeUser::insert([
                 'office_id' => $id,
-                'user_id' => $request->user,
+                'user_id' => $users->id,
                 'company_id' => $request->company_id
             ]);
             if (!$check) return $this->errorResponse('apiResponse.unProcess');
+            DB::commit();
             return $this->successResponse('OK');
         } catch (\Exception $e) {
+            DB::rollBack();
+            return $this->errorResponse(trans('apiResponse.tryLater'), Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+    public function updateUser(Request $request, $id)
+    {
+        $this->validate($request, [
+            'company_id' => 'required|integer',
+            'user_id' => ['required' , 'integer'],
+            'username' => ['sometimes' , 'required' , 'string' , 'max:255'],
+            'password' => ['sometimes' , 'required' , 'string' ,"min:6" ,  'max:255'],
+            'name' => ['sometimes' , 'string' , 'max:255'],
+            'surname' => [ 'sometimes',  'required' , 'string' , 'max:255'],
+        ]);
+
+        $data = $request->only(['username' ,'password' , 'name', 'surname' ]);
+        if (!$data) return $this->errorResponse(trans('response.nothing'));
+        try {
+            DB::beginTransaction();
+
+            $check = OfficeUser::whereHas('office' , function ($q)use($id,$request){
+                    $q->where('id' ,$id)->where('company_id' , $request->get('company_id'));
+            })->where('company_id' , $request->get('company_id'))
+                ->where('user_id' , $request->get('user_id'))
+                ->first(['id']);
+            if (!$check) return $this->errorResponse(trans('response.userNotFound') , 404);
+
+
+            if ($request->has('password')) $data['password'] = Hash::make($data['password']);
+
+            User::where('id' , $request->get('user_id'))->update($data);
+            DB::commit();
+            return $this->successResponse('OK');
+        } catch (\Exception $e) {
+            DB::rollBack();
             return $this->errorResponse(trans('apiResponse.tryLater'), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
@@ -906,25 +952,31 @@ class OfficeController extends Controller
         $this->validate($request, [
             'company_id' => 'required|integer',
             'user_id' => 'required|integer',
-            'user' => 'required|integer',
         ]);
         try {
-            $check = Office::where('company_id', $request->company_id)->where('id', $id)->exists();
-            if (!$check) return $this->errorResponse('apiResponse.unProcess');
+            DB::beginTransaction();
 
-            $check = OfficeUser::where([
-                'office_id' => $id,
-                'user_id' => $request->user,
-                'company_id' => $request->company_id
-            ])->delete();
-            if (!$check) return $this->errorResponse('apiResponse.unProcess');
+            $officeUser = OfficeUser::whereHas('office' , function ($q)use($id,$request){
+                $q->where('id' ,$id)->where('company_id' , $request->get('company_id'));
+            })->where('company_id' , $request->get('company_id'))
+                ->where('user_id' , $request->get('user_id'))
+                ->first(['id' , 'user_id']);
+            if (!$officeUser) return $this->errorResponse(trans('response.userNotFound') , 404);
+
+            User::where('id' , $officeUser->user_id)->delete();
+            OfficeUser::where('id' , $officeUser->id)->delete();
+
+            DB::commit();
 
             return $this->successResponse('OK');
         } catch (\Exception $e) {
+            DB::rollBack();
             return $this->errorResponse(trans('apiResponse.tryLater'), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
     }
+
+
 
     protected function officeExists($id , $company_id){
         $office = Office::where([

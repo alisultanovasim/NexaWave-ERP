@@ -113,7 +113,7 @@ class WorkerController extends Controller
             'gender'=>'required|in:1,2',
             'office_id' => 'required|integer',
             'role_id' => 'required|integer',
-            'user_id' => 'required|integer',
+
             'description' => 'sometimes|required',
             'card' => 'sometimes|required|integer'
         ]);
@@ -156,7 +156,7 @@ class WorkerController extends Controller
             'company_id' => 'required|integer',
             'name' => 'sometimes|required|min:2|max:255',
             'gender'=> 'sometimes|required|in:1,2',
-            'user_id' => 'required|integer',
+
             'office_id' => 'required|integer',
             'description' => 'sometimes|required|string',
             'role_id' => 'sometimes|required|integer',
@@ -192,7 +192,7 @@ class WorkerController extends Controller
     public function delete(Request $request, $id)
     {
         $this->validate($request, [
-            'user_id' => 'required|integer',
+
             'company_id' => 'required|integer',
             'office_id' => 'required|integer',
         ]);
@@ -214,7 +214,7 @@ class WorkerController extends Controller
     public function getRoles(Request $request)
     {
         $this->validate($request, [
-            'user_id' => 'required|integer',
+
             'company_id' => 'required|integer',
             'office_id' => 'required|integer',
         ]);
@@ -232,7 +232,7 @@ class WorkerController extends Controller
     public function showRole(Request $request , $id)
     {
         $this->validate($request, [
-            'user_id' => 'required|integer',
+
             'company_id' => 'required|integer',
             'office_id' => 'required|integer',
         ]);
@@ -251,7 +251,7 @@ class WorkerController extends Controller
     public function storeRole(Request $request)
     {
         $this->validate($request, [
-            'user_id' => 'required|integer',
+
             'company_id' => 'required|integer',
             'office_id' => 'required|integer',
             'name' => 'required|min:2,max:255'
@@ -272,7 +272,7 @@ class WorkerController extends Controller
     public function updateRole(Request $request, $id)
     {
         $this->validate($request, [
-            'user_id' => 'required|integer',
+
             'company_id' => 'required|integer',
             'office_id' => 'required|integer',
             'name' => 'required|min:2,max:255'
@@ -293,7 +293,7 @@ class WorkerController extends Controller
     public function deleteRole(Request $request, $id)
     {
         $this->validate($request, [
-            'user_id' => 'required|integer',
+
             'company_id' => 'required|integer',
             'office_id' => 'required|integer',
         ]);

@@ -16,8 +16,8 @@ class CreateEmployeeContractsTable extends Migration
         Schema::create('employee_contracts', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->decimal('salary' , 10 , 2);
-            $table->date('to')->nullable();
-            $table->date('from')->nullable();
+            $table->date('start_date')->nullable();
+            $table->date('end_date')->nullable();
             $table->boolean('is_active')->default(true);
             $table->string('contract')->nullable();
 

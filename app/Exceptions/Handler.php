@@ -2,11 +2,15 @@
 
 namespace App\Exceptions;
 
+use App\Traits\ApiResponse;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Http\Response;
+use Illuminate\Validation\ValidationException;
 use Throwable;
 
 class Handler extends ExceptionHandler
 {
+    use ApiResponse;
     /**
      * A list of the exception types that are not reported.
      *
@@ -25,6 +29,11 @@ class Handler extends ExceptionHandler
         'password',
         'password_confirmation',
     ];
+
+    public function invalidJson($request, ValidationException $exception)
+    {
+        return $this->errorResponse($exception->errors(),Response::HTTP_UNPROCESSABLE_ENTITY);
+    }
 
     /**
      * Report or log an exception.

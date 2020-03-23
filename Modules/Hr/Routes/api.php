@@ -14,7 +14,8 @@
 use Illuminate\Support\Facades\Route;
 
 Route::group([
-    'prefix' => "v1"
+    'prefix' => "v1/hr",
+    'middleware' => ['auth:api' , 'company']
 ], function ($route) {
     Route::post("organizationType", "OrganizationTypeController@store");
     Route::get("organizationType", "OrganizationTypeController@index");
@@ -352,41 +353,29 @@ Route::group([
         'namespace' => 'Employee'
     ], function ($router) {
         Route::get("/", 'EmployeeController@index');
-        Route::get("/{id:[0-9]+}", 'EmployeeController@show');
+        Route::get("/{id}", 'EmployeeController@show')->where('id' , '[0-9]+');
         Route::post("/", 'EmployeeController@store');
-        Route::put("/{id:[0-9]+}", 'EmployeeController@update');
-        Route::delete("/{id:[0-9]+}", 'EmployeeController@delete');
+        Route::put("/{id}", 'EmployeeController@update')->where('id' , '[0-9]+');
+        Route::delete("/{id}", 'EmployeeController@delete')->where('id' , '[0-9]+');
 
-
-
-        Route::post("/make/in/{id:[0-9]+}", 'EmployeeController@makeIn');
-        Route::post("/make/out/{id:[0-9]+}", 'EmployeeController@makeOut');
+//
+//
+//        Route::post("/make/in/{id}", 'EmployeeController@makeIn');
+//        Route::post("/make/out/{id}", 'EmployeeController@makeOut');
 
 
         Route::group([
             'prefix' => 'contracts'
         ],function ($route){
             Route::get("/", 'ContractController@index');
-            Route::get("/{id:[0-9]+}", 'ContractController@show');
+            Route::get("/{id}", 'ContractController@show');
             Route::post("/", 'ContractController@store');
-            Route::post("/update/{id:[0-9]+}", 'ContractController@update');
-            Route::delete("/{id:[0-9]+}", 'ContractController@delete');
+            Route::post("/update/{id}", 'ContractController@update');
+            Route::delete("/{id}", 'ContractController@delete');
         });
     });
 
-    Route::group([
-            'prefix' => "humans",
-        'namespace' => 'Employee'
-    ], function ($router) {
-        Route::get("/", 'HumanController@index');
-        Route::get("/me", 'HumanController@me');
-        Route::get("/{id:[0-9]+}", 'HumanController@show');
-        Route::post("/", 'HumanController@store');
-        Route::put("/{id:[0-9]+}", 'HumanController@update');
-        Route::delete("/{id:[0-9]+}", 'HumanController@delete');
-        Route::get("/search", 'HumanController@search');
 
-    });
 
     Route::group(['prefix' => 'workplaces'], function ($router) {
         Route::get('/', 'WorkplaceController@index');

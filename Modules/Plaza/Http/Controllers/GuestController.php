@@ -20,7 +20,7 @@ class GuestController extends Controller
     public  function index(Request $request){
         $this->validate($request , [
             'company_id' => 'required|integer',
-            'user_id' => 'required|integer',
+
             'from' => 'sometimes|required|date|date_format:Y-m-d H:i:s',
             'to' => 'sometimes|required|date|date_format:Y-m-d H:i:s',
             'per_page' => 'sometimes|integer',
@@ -58,7 +58,7 @@ class GuestController extends Controller
     public  function show(Request $request , $id){
         $this->validate($request , [
             'company_id' => 'required|integer',
-            'user_id' => 'required|integer',
+
         ]);
         try{
             $quests = Guest::where('id' , $id)->where('company_id' , $request->company_id)->first();
@@ -77,7 +77,7 @@ class GuestController extends Controller
             'name' => 'required|min:2|max:255',
             'come_at' => 'required|date|date_format:Y-m-d H:i:s',
             'description' => 'sometimes|required',
-            'user_id' => 'required|integer',
+
             'office_id' => 'sometimes|required|integer',
             'company_id' => 'required|integer',
             'worker_id' => ['sometimes' , 'required' , 'integer']
@@ -111,7 +111,7 @@ class GuestController extends Controller
             'name' => 'sometimes|required|min:2|max:255',
             'come_at' => 'sometimes|required|date|date_format:Y-m-d H:i:s',
             'description' => 'sometimes|sometimes|required',
-            'user_id' => 'required|integer',
+
             'office_id' => 'sometimes|required|integer',
             'company_id' => 'required|integer',
             'status'=>'sometimes|required|in:1,0'

@@ -64,19 +64,27 @@ class UserController extends Controller
     {
         $user = Auth::user();
         $office = null;
+        $companies = null;
 
-        if ($user->role_id = User::OFFICE)
-            $office = OfficeUser::with(['office:id,image'])->where('user_id',$user)->get();
+        switch ($user->role_id){
 
-//        $companies = Employee::with(['company' , 'contracts' => function($q){
-//            $q->where('is_active', true);
-//        }])->active()
-//            ->where('user_id', Auth::id())
-//            ->get();
+            case User::OFFICE:
+                $office = OfficeUser::with(['office:id,name,image'])->where('user_id',$user->id)->get();
+                break;
+
+            case User::EMPLOYEE:
+                $companies = Employee::with(['company' , 'contracts' => function($q){
+                    $q->where('is_active', true);
+                } , 'contracts.position'])->active()
+                    ->where('user_id', Auth::id())
+                    ->get();
+                break;
+        }
+
 
         return $this->successResponse([
             'user' => $user,
-//            'companies' => $companies,
+            'companies' => $companies,
             'office' => $office
         ]);
     }
