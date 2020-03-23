@@ -12,7 +12,6 @@ use App\Traits\ApiResponse;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -22,7 +21,7 @@ use Illuminate\Support\Str;
 use Modules\Hr\Entities\Employee\Employee;
 use Modules\Hr\Entities\Employee\UserDetail;
 use Modules\Hr\Entities\Positions;
-use Modules\Plaza\Entities\Contact;
+use Modules\Hr\Entities\Employee\Contract as EmployeeContract;
 use Modules\Plaza\Entities\OfficeUser;
 
 
@@ -98,7 +97,7 @@ class UserController extends Controller
                 'user_id' => $user->getKey()
             ]);
             $employee->save();
-            Contact::create([
+            EmployeeContract::create([
                 'employee_id' => $employee->getKey(),
                 'position_id' => Positions::DIRECTOR,
             ]);

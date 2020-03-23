@@ -17,9 +17,7 @@ class HrDatabaseSeeder extends Seeder
     {
         Model::unguard();
 
-        Positions::create([
-            'name' => 'Director'
-        ]);
+
         // $this->call("OthersTableSeeder");
     }
 }

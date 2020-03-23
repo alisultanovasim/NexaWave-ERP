@@ -14,6 +14,10 @@ class DatabaseSeeder extends Seeder
         // $this->call(UsersTableSeeder::class);
 
 
+        \Modules\Hr\Entities\Positions::create([
+            'name' => 'Director',
+            'short_name' => 'Director'
+        ]);
         $roles = [
             'super_admin',
             'employee',
