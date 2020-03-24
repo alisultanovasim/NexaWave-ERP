@@ -17,7 +17,9 @@ class CreateProductsTable extends Migration
             $table->bigIncrements('id');
             $table->string('name');
             $table->string('code');
-            $table->unsignedInteger('count')->default(1);
+            $table->unsignedInteger('unit_id');
+            $table->double('amount');
+            $table->foreign('unit_id')->references('id')->on('units')->onDelete('cascade');
             $table->timestamps();
         });
     }

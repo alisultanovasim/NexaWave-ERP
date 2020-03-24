@@ -14,6 +14,17 @@ class DatabaseSeeder extends Seeder
         // $this->call(UsersTableSeeder::class);
 
 
+        $kinds = [
+            'təbrik',
+            'şikayət',
+            'təklif',
+        ];
+        foreach ($kinds as $kind)
+            \Modules\Plaza\Entities\Kind::create([
+                'title' => $kind
+            ]);
+
+
         \Modules\Hr\Entities\Positions::create([
             'name' => 'Director',
             'short_name' => 'Director'

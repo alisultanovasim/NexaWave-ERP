@@ -20,4 +20,8 @@ class Dialog extends Model
     public function office(){
         return $this->belongsTo('Modules\Plaza\Entities\Office');
     }
+
+    public function user(){
+        return $this->belongsTo('App\Models\User' , 'assigned_user' , "id");
+    }
 }

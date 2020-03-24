@@ -39,8 +39,10 @@ class UserController extends Controller
             'username' => ['required', 'string'],
             'password' => ['required', 'min:6']
         ]);
+
         if (!Auth::attempt($request->only('username', 'password'))) {
             return $this->errorResponse(trans('response.invalidLoginOrPassword'));
+
         }
         $token = Auth::user()->createToken('authToken')->accessToken;
         return $this->dataResponse([
@@ -78,7 +80,7 @@ class UserController extends Controller
                 'username' => $request->get('fin'),
                 'email' => $request->get('email'),
                 'voen' => $request->get('voen'),
-                'password' => $request->get('password'),
+                'password' => Hash::make($request->get('password')),
                 'role_id' => User::EMPLOYEE,
             ]);
             $user->save();
@@ -133,7 +135,7 @@ class UserController extends Controller
         switch ($user->role_id) {
 
             case User::OFFICE:
-                $office = OfficeUser::with(['office:id,name,image'])->where('user_id', $user->id)->get();
+                $office = OfficeUser::with(['office:id,name,image,company_id'])->where('user_id', $user->id)->get();
                 break;
 
             case User::EMPLOYEE:

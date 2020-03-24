@@ -881,9 +881,9 @@ class OfficeController extends Controller
     {
         $this->validate($request, [
             'company_id' => 'required|integer',
-            'username' => ['required' , 'string' , 'max:255'],
+            'username' => ['required' , 'string' , 'max:255' , 'unique:users,username'],
             'password' => ['required' , 'string' ,"min:6" ,  'max:255'],
-            'name' => ['sometimes' , 'string' , 'max:255'],
+            'name' => ['required' , 'string' , 'max:255'],
             'surname' => ['sometimes' , 'required' , 'string' , 'max:255'],
         ]);
 
@@ -899,7 +899,7 @@ class OfficeController extends Controller
                 'username' => $request->get('username')
             ]);
 
-            $check = OfficeUser::insert([
+            $check = OfficeUser::create([
                 'office_id' => $id,
                 'user_id' => $users->id,
                 'company_id' => $request->company_id
