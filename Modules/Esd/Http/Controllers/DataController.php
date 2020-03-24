@@ -20,7 +20,7 @@ class DataController extends Controller
     {
         $conf = config('esd.document.data');
         $this->validate($request, [
-            'user_id' => ['required', 'integer'],
+
             'company_id' => ['required', 'integer'],
             'data' => ['required', 'array'],
             'data.*' => ['required', 'string', 'max:255',

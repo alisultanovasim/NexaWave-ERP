@@ -37,7 +37,7 @@ class DocumentController extends Controller
         $this->validate($request, [
             'company_id' => 'required|integer',
             'theme' => 'sometimes|required',
-            'user_id' => 'required|integer',
+
             "per_page" => "sometimes|required|integer",
             "status" => "sometimes|required|array",
             "status.*" => "sometimes|required|in:0,1,3,4",
@@ -143,9 +143,9 @@ class DocumentController extends Controller
 
             $data = [DB::raw('documents.*')];
             if (isset($table)) {
-                foreach (config("modules.tables.{$table}") as $column)
+                foreach (config("esd.tables.{$table}") as $column)
                     array_push($data, "$table.$column");
-                $documents->with(config("modules.table_relations.{$table}"));
+                $documents->with(config("esd.table_relations.{$table}"));
             }
 
             if ($request->has('order_by')){
@@ -160,9 +160,12 @@ class DocumentController extends Controller
         } catch (QueryException $ex){
             if($ex->errorInfo[1] == 1054)
                 return $this->errorMessage(['order_by' => ['not valid data']], Response::HTTP_UNPROCESSABLE_ENTITY);
+
             return $this->errorResponse(trans('apiResponse.tryLater'), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
         catch (\Exception $e) {
+            dd($e);
+
             return $this->errorResponse(trans('apiResponse.tryLater'), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
@@ -179,7 +182,7 @@ class DocumentController extends Controller
             'section_id' => 'required|integer',
             'description' => 'sometimes|required',
             'register_time' => 'sometimes|required|date|date_format:Y-m-d',
-            'user_id' => 'required|integer',
+
             'company_id' => 'required|integer',
             'parent_id' => 'sometimes|required|integer',
             'page_count' => 'sometimes|required|integer',
@@ -399,7 +402,7 @@ class DocumentController extends Controller
             'inner_inspect' => 'sometimes|required|integer|in:0,1',
 //            'end_time' => 'sometimes|required|date|date_format:Y-m-d',
             'register_time' => 'sometimes|required|date|date_format:Y-m-d',
-            'user_id' => 'required|integer',
+
             'company_id' => 'required|integer',
             'parent_id' => 'sometimes|required|integer',
             'page_count' => 'sometimes|required|integer',
@@ -438,7 +441,6 @@ class DocumentController extends Controller
             $document->save();
 
             $table = Section::RULES[$document->section_id];
-//            $table = Section::where('id', $document->section_id)->first('table')->table;
 
 
             $data = $this->dataBySection($request, $document, $table);
@@ -575,7 +577,7 @@ class DocumentController extends Controller
         $this->validate($request, [
             'status' => 'required|integer|in:0,1,3,4',
             'company_id' => 'required|integer',
-            'user_id' => 'required|integer',
+
             'has_permission' => 'sometimes|required|in:0,1'
         ]);
         try {

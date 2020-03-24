@@ -93,7 +93,7 @@ class AssignmentController extends Controller
     {
         $this->validate($request, [
             'company_id' => 'required|integer',
-            'user_id' => 'required|integer',
+
             "description" => "sometimes|required",
             "expire_time" => "sometimes|required|date|date_format:Y-m-d",
             'user_ids' => 'sometimes|required|array',
@@ -172,7 +172,7 @@ class AssignmentController extends Controller
     {
         $this->validate($request, [
             'company_id' => 'required|integer',
-            'user_id' => 'required|integer',
+
         ]);
         $company_id = $request->company_id;
         try {
@@ -196,7 +196,7 @@ class AssignmentController extends Controller
     public function addUsersByMainAssignment(Request $request, $id)
     {
         $this->validate($request, [
-            'user_id' => ['required', 'integer'],
+
             'company_id' => ['required', 'integer'],
             'user_ids' => ['required', 'array', 'max:255'],
             'user_ids.*' => ['required', 'integer']
@@ -244,7 +244,7 @@ class AssignmentController extends Controller
     public function show(Request $request, $id)
     {
         $this->validate($request, [
-            'user_id' => 'required|integer',
+
             'company_id' => 'required|integer',
         ]);
         $company_id = $request->company_id;
@@ -268,7 +268,7 @@ class AssignmentController extends Controller
         $this->validate($request, [
             "per_page" => "sometimes|required|integer",
             "finished_at" => "sometimes|required|date|date_format:Y-m-d",
-            'user_id' => 'required|integer',
+
             'company_id' => 'required|integer',
             'tome' => 'sometimes|required|integer|int:1,0'
 
@@ -301,7 +301,7 @@ class AssignmentController extends Controller
         $this->validate($request, [
             "notes" => "required|array",
             "notes.*" => "required",
-            'user_id' => 'required|integer',
+
             'company_id' => 'required|integer'
         ]);
         $company_id = $request->company_id;
@@ -338,7 +338,7 @@ class AssignmentController extends Controller
         $this->validate($request, [
             "note" => "required",
             "note_id" => "required|integer",
-            'user_id' => 'required|integer',
+
             'company_id' => 'required|integer',
         ]);
         $company_id = $request->company_id;
@@ -437,7 +437,7 @@ class AssignmentController extends Controller
     public function markAsRead(Request $request, $id)
     {
         $this->validate($request, [
-            'user_id' => 'required|integer',
+
             'company_id' => 'required|integer'
         ]);
         $company_id = $request->company_id;
@@ -471,7 +471,7 @@ class AssignmentController extends Controller
     public function done(Request $request, $id)
     {
         $this->validate($request, [
-            'user_id' => 'required|integer',
+
             'company_id' => 'required|integer',
             'return' => 'sometimes|required|boolean'
         ]);
@@ -521,7 +521,7 @@ class AssignmentController extends Controller
     public function changeStatus(Request $request, $id)
     {
         $this->validate($request, [
-            'user_id' => 'required|integer',
+
             'company_id' => 'required|integer',
             'return' => 'sometimes|required|boolean',
             'status' => 'required|integer|in:1,2,3'

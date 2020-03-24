@@ -34,7 +34,7 @@ class DraftController extends Controller
     public function index(Request $request)
     {
         $this->validate($request, [
-            'user_id' => 'required|integer',
+
             'company_id' => 'required|integer',
             "per_page" => "sometimes|required|integer",
             "section_id" => "sometimes|required|integer",
@@ -90,7 +90,7 @@ class DraftController extends Controller
             'section_id' => 'required|integer',
             'description' => 'sometimes|sometimes|required',
             'register_time' => 'sometimes|sometimes|required|date|date_format:Y-m-d',
-            'user_id' => 'required|integer',
+
             'company_id' => 'required|integer',
             'parent_id' => 'sometimes|required|integer',
             'page_count' => 'sometimes|required|integer',
@@ -192,7 +192,7 @@ class DraftController extends Controller
     public function show(Request $request, $id)
     {
         $this->validate($request, [
-            'user_id' => 'required|integer',
+
             'company_id' => 'required|integer',
         ]);
         try {
@@ -236,7 +236,7 @@ class DraftController extends Controller
             'sub_documents.*' => 'sometimes|required',
             'description' => 'sometimes|sometimes|required',
             'register_time' => 'sometimes|sometimes|required|date|date_format:Y-m-d',
-            'user_id' => 'required|integer',
+
             'company_id' => 'required|integer',
             'parent_id' => 'sometimes|required|integer',
             'page_count' => 'sometimes|required|integer',
@@ -298,7 +298,7 @@ class DraftController extends Controller
     public function destroy(Request $request, $id)
     {
         $this->validate($request, [
-            'user_id' => 'required|integer',
+
             'company_id' => 'required|integer',
         ]);
         try {
@@ -358,7 +358,7 @@ class DraftController extends Controller
     {
         $this->validate($request, [
             'doc_id' => 'required|integer',
-            'user_id' => 'required|integer',
+
             'company_id' => 'required|integer',
         ]);
 
@@ -399,7 +399,7 @@ class DraftController extends Controller
         $this->validate($request, [
             'document' => 'required',
             'doc_id' => 'required|integer',
-            'user_id' => 'required|integer',
+
             'company_id' => 'required|integer',
         ]);
         $company_id = $request->company_id;
@@ -434,7 +434,7 @@ class DraftController extends Controller
     public function makeRealDocument(Request $request, $id)
     {
         $this->validate($request, [
-            'user_id' => 'required|integer',
+
             'company_id' => 'required|integer',
         ]);
         $company_id = $request->company_id;

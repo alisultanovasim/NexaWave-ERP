@@ -72,6 +72,16 @@ class Document extends Model
     {
         return $this->belongsTo('Modules\Entities\senderCompanyRole');
     }
+    public function companyUser(){
+        return $this->belongsTo('App\Models\User' , 'company_user' , 'id');
+    }
+    public function toInOurCompany(){
+        return $this->belongsTo('App\Models\User' , 'to_in_our_company' , 'id');
+    }
+    public function fromInOurCompany(){
+        return $this->belongsTo('App\Models\User' , 'from_in_our_company' , 'id');
+    }
+
 
 
 }

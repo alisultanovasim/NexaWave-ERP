@@ -235,8 +235,8 @@ return [
         'structure_docs' => ['sender_company_id', 'sender_company_role_id', 'sender_company_user_id']
     ],
     'table_relations' => [
-        'in_company_docs' => [],
-        'citizen_docs' => ['region'],
-        'structure_docs' => ['senderCompany', 'senderCompanyUser', 'senderCompanyRole']
+        'in_company_docs' => ['fromInOurCompany' , 'toInOurCompany'],
+        'citizen_docs' => ['region' , 'companyUser'],
+        'structure_docs' => ['senderCompany', 'senderCompanyUser', 'senderCompanyRole' , 'companyUser']
     ]
 ];

@@ -58,8 +58,12 @@ class CompanyIdValidator
 
     private function employee(Request $request)
     {
-        $company_id = $request->hasHeader('company_id') ? $request->header('company_id') : $request->get('company_id');
-
+        if ($request->hasHeader('company_id')){
+            $company_id = $request->header('company_id');
+        }else{
+            $headers = apache_request_headers();
+            $company_id =  array_key_exists('company_id' , (array)$headers) ? $headers['company_id'] : $request->get('company_id');
+        }
         Validator::validate(['company_id' => $company_id] , [
             'company_id' => ['required' , 'integer']
         ]);

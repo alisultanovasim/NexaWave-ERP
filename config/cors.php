@@ -15,7 +15,7 @@ return [
     |
     */
 
-    'paths' => ['api/*'],
+    'paths' => ['v1/*'],
 
     'allowed_methods' => ['*'],
 
@@ -25,10 +25,11 @@ return [
 
     'allowed_headers' => ['*'],
 
-    'exposed_headers' => false,
+    'exposed_headers' => ['x-company_id', 'company_id'], //['x-company_id' , 'company_id'],
 
     'max_age' => false,
 
-    'supports_credentials' => false,
+    'supports_credentials' => ['x-company_id', 'company_id'],
+
 
 ];

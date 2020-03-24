@@ -4,5 +4,12 @@ return [
     'department_id' => 'departments',
     'section_id' => 'sections',
     'sector_id' =>'sectors',
-    'position_id' => 'positions'
+    'position_id' => 'positions',
+    'company_user' => 'employees',
+    'region_id' => 'regions',
+    'from_in_our_company' => 'esd_regions',
+    'to_in_our_company' => 'employees',
+    'sender_company_id' => 'sender_companies',
+    'sender_company_role_id' => 'sender_company_roles',
+    'sender_company_user_id' => 'sender_company_users',
 ];

@@ -19,7 +19,7 @@ class  AdjustmentController extends Controller
 
     public function index(Request $request){
         $this->validate($request , [
-            'user_id' => 'required|integer',
+
             'company_id' => 'required|integer',
             'section_type' => 'required|integer',
         ]);
@@ -58,7 +58,7 @@ class  AdjustmentController extends Controller
 
     public function update(Request $request){
         $this->validate($request , [
-            'user_id' => 'required|integer',
+
             'company_id' => 'required|integer',
             'data'=> 'required|array',
             'data.*.name' => 'required|string|max:255',
