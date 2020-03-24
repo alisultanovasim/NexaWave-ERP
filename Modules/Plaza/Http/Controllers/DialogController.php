@@ -22,7 +22,7 @@ class DialogController extends Controller
     {
         $this->validate($request, [
             'company_id' => 'required|integer',
-            'user_id' => 'required|integer',
+
             'office_id' => 'sometimes|required|integer',
             'kind_id' => 'sometimes|required|integer',
             'from_office' => 'sometimes|required|in:0,1',
@@ -68,7 +68,7 @@ class DialogController extends Controller
     {
         $this->validate($request, [
             'company_id' => 'required|integer',
-            'user_id' => 'required|integer',
+
             'per_page' => 'sometimes|required|integer'
         ]);
         try {
@@ -120,7 +120,7 @@ class DialogController extends Controller
     {
         $this->validate($request, [
             'company_id' => 'required|integer',
-            'user_id' => 'required|integer',
+
             'office_id' => 'required|integer',
             'kind_id' => 'required|integer',
             'body' => 'required|string',
@@ -164,7 +164,7 @@ class DialogController extends Controller
             'note' => 'sometimes',
             'end_time' => 'sometimes|required|date|date_format:Y-m-d',
             'company_id' => 'sometimes|required|integer',
-            'user_id' => 'required|integer',
+
             'status' => 'sometimes|required|integer|in:0,1'
         ]);
         try {
@@ -184,7 +184,7 @@ class DialogController extends Controller
     {
         $this->validate($request, [
             'company_id' => 'required|integer',
-            'user_id' => 'required|integer',
+
             'body' => 'required|string'
         ]);
         try {
@@ -201,7 +201,7 @@ class DialogController extends Controller
     {
         $this->validate($request, [
             'company_id' => 'required|integer',
-            'user_id' => 'required|integer',
+
             'office_id' => 'required|required|integer',
             'kind_id' => 'sometimes|required|integer',
             'per_page' => 'sometimes|required|integer',
@@ -246,7 +246,7 @@ class DialogController extends Controller
     {
         $this->validate($request, [
             'company_id' => 'required|integer',
-            'user_id' => 'required|integer',
+
             'office_id' => 'required|integer',
             'per_page' => 'sometimes|required|integer'
         ]);
@@ -272,7 +272,7 @@ class DialogController extends Controller
     {
         $this->validate($request, [
             'company_id' => 'required|integer',
-            'user_id' => 'required|integer',
+
             'office_id' => 'required|integer',
             'kind_id' => 'required|integer',
             'body' => 'required|string',
@@ -318,7 +318,7 @@ class DialogController extends Controller
     {
         $this->validate($request, [
             'company_id' => 'required|integer',
-            'user_id' => 'required|integer',
+
             'body' => 'required|string'
         ]);
         try {

@@ -19,13 +19,13 @@ class StatisticsController extends  Controller
             'company_id' => 'required|integer',
 
         ]);
-        $statistics =  Document::where('documents.status' , "!=" , config('modules.document.status.draft'))
+        $statistics =  Document::where('documents.status' , "!=" , config('esd.document.status.draft'))
             ->where('documents.company_id' , $request->company_id)
             ->join('sections' , 'sections.id' , '=' , 'documents.section_id')
             ->groupBy(['sections.name' , 'sections.id'])
             ->get(DB::raw('count(documents.id) as count , sections.name as section , sections.id as section_id '));
 
-//        $total = Document::where('status' , "!=" , config('modules.document.status.draft'))
+//        $total = Document::where('status' , "!=" , config('esd.document.status.draft'))
 //            ->where('company_id' , $request->company_id)
 //            ->get(DB::raw("count(*) as count"));
         return $this->successResponse([

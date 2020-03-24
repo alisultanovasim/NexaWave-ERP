@@ -17,16 +17,19 @@ class Contract extends Model
         return $this->belongsTo('Modules\Hr\Entities\Employee\Employee' , 'employee_id', 'id');
     }
     public function department(){
-        return $this->belongsTo('Modules\Hr\EntitiesDepartment' );
+        return $this->belongsTo('Modules\Hr\Entities\Department' );
     }
     public function section(){
-        return $this->belongsTo('Modules\Hr\EntitiesSection' );
+        return $this->belongsTo('Modules\Hr\Entities\Section' );
     }
     public function sector(){
-        return $this->belongsTo('Modules\Hr\EntitiesSector' );
+        return $this->belongsTo('Modules\Hr\Entities\Sector' );
     }
     public function position(){
-        return $this->belongsTo('Modules\Hr\EntitiesPositions' );
+        return $this->belongsTo('Modules\Hr\Entities\Positions' );
+    }
+    public function scopeActive($q){
+        return $q -> where('is_active' , true);
     }
 
 }

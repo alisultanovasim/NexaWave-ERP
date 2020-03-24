@@ -12,18 +12,17 @@ use App\Traits\ApiResponse;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
-use Illuminate\Support\Str;
+use Modules\Hr\Entities\Employee\Contract as EmployeeContract;
 use Modules\Hr\Entities\Employee\Employee;
+use Modules\Hr\Entities\Employee\UserDetail;
 use Modules\Hr\Entities\Positions;
 use Modules\Plaza\Entities\OfficeUser;
-use Modules\Hr\Entities\UserDetail;
-use Modules\Hr\Entities\EmployeeContract;
 
 
 /**
@@ -44,21 +43,22 @@ class UserController extends Controller
             return $this->errorResponse(trans('response.invalidLoginOrPassword'));
         }
         $token = Auth::user()->createToken('authToken')->accessToken;
-        return $this->successResponse([
+        return $this->dataResponse([
+            'token_type' => 'Bearer',
             'access_token' => $token,
             'user' => Auth::user()
         ]);
     }
-
 
     /**
      * @param Request $request
      * @return mixed
      * @throws ValidationException
      */
-    public function register(Request $request){
+    public function register(Request $request)
+    {
         $this->validate($request, [
-            'email' => 'required|unique:users,email',
+            'email' => 'required|email|unique:users,email',
             'fin' => 'required|unique:user_details,fin',
             'voen' => 'required',
             'password' => 'required|min:6',
@@ -71,7 +71,7 @@ class UserController extends Controller
             'company_name' => 'required|min:3'
         ]);
 
-        return DB::transaction(function () use ($request){
+        return DB::transaction(function () use ($request) {
             $user = new User();
             $user->fill([
                 'name' => $request->get('name'),
@@ -129,23 +129,32 @@ class UserController extends Controller
     {
         $user = Auth::user();
         $office = null;
+        $companies = null;
+        $modules = null;
 
-        if ($user->role_id = User::OFFICE)
-            $office = OfficeUser::with(['office:id,image'])->where('user_id',$user)->get();
+        switch ($user->role_id) {
 
-//        $companies = Employee::with(['company' , 'contracts' => function($q){
-//            $q->where('is_active', true);
-//        }])->active()
-//            ->where('user_id', Auth::id())
-//            ->get();
+            case User::OFFICE:
+                $office = OfficeUser::with(['office:id,name,image'])->where('user_id', $user->id)->get();
+                break;
 
-        return $this->successResponse([
+            case User::EMPLOYEE:
+                $companies = Employee::with(['company', 'contracts' => function ($q) {
+                    $q->where('is_active', true);
+                }, 'contracts.position'])->active()
+                    ->where('user_id', Auth::id())
+                    ->get();
+                break;
+        }
+
+
+        return $this->dataResponse([
             'user' => $user,
-//            'companies' => $companies,
+            'companies' => $companies,
+            'modules' => $modules,
             'office' => $office
         ]);
     }
-
 
     /**
      * @param Request $request

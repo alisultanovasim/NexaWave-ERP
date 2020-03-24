@@ -16,8 +16,6 @@ class CompanyIdValidator
     use ApiResponse;
 
 
-    /**
-     */
     public function handle(Request $request, Closure $next)
     {
 
@@ -29,7 +27,7 @@ class CompanyIdValidator
         $request->request->set('company_id' , $company_id);
 
         $inThisCompany = Employee::where('company_id' , $request->get('company_id'))
-            ->where('user_id' , $request->get('user_id'))
+            ->where('user_id' , Auth::id())
             ->exists();
         if ($inThisCompany) return $next($request);
         return $this->errorMessage(['error' => trans('response.notYouCompany')] , 400);

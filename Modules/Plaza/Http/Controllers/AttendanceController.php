@@ -114,7 +114,7 @@ class AttendanceController extends Controller
 
     private  function oneValidator(Request $request){
         $this->validate($request, [
-            'user_id' => ['required', 'integer'],
+
             'company_id' => ['required', 'integer'],
             'card_id' => ['sometimes', 'required'],
             'date' => ['sometimes', 'required', 'date', 'date_format:Y-m-d'],

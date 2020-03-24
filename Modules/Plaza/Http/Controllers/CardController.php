@@ -23,7 +23,7 @@ class CardController extends Controller
     {
         $this->validate($request, [
             'company_id' => 'required|integer',
-            'user_id' => 'required|integer',
+
             'with_workers' => 'sometimes|boolean'
         ]);
 
@@ -40,7 +40,7 @@ class CardController extends Controller
     {
         $this->validate($request, [
             'company_id' => 'required|integer',
-            'user_id' => 'required|integer',
+
             'with_workers' => 'sometimes|boolean'
         ]);
         try {
@@ -60,7 +60,7 @@ class CardController extends Controller
     {
         $this->validate($request, [
             'company_id' => 'required|integer',
-            'user_id' => 'required|integer',
+
             'alias' => 'required|string|max:255'
         ]);
 
@@ -81,7 +81,7 @@ class CardController extends Controller
     {
         $this->validate($request, [
             'company_id' => 'required|integer',
-            'user_id' => 'required|integer',
+
             'alias' => 'required|string|max:255'
         ]);
         try {
@@ -102,7 +102,7 @@ class CardController extends Controller
     {
         $this->validate($request, [
             'company_id' => 'required|integer',
-            'user_id' => 'required|integer',
+
         ]);
         try {
             $check = Card::where('company_id', $request->company_id)->where('id', $id)->delete();

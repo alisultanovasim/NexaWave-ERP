@@ -4,6 +4,7 @@ namespace Modules\Hr\Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Database\Eloquent\Model;
+use Modules\Hr\Entities\Positions;
 
 class HrDatabaseSeeder extends Seeder
 {
@@ -15,6 +16,7 @@ class HrDatabaseSeeder extends Seeder
     public function run()
     {
         Model::unguard();
+
 
         // $this->call("OthersTableSeeder");
     }

@@ -12,9 +12,9 @@ Route::group([
     ], function () {
             Route::get('/', 'FloorController@index');
             Route::post('/', 'FloorController@store');
-            Route::get('/{id:[0-9]+}', 'FloorController@show');
-            Route::post('/{id:[0-9]+}/update', 'FloorController@update');
-            Route::post('/{id:[0-9]+}/destroy'  ,'FloorController@destroy');
+            Route::get('/{id}', 'FloorController@show');
+            Route::post('/update/{id}', 'FloorController@update');
+            Route::post('/destroy/{id}'  ,'FloorController@destroy');
         }); //floors
 
     Route::group([
@@ -26,42 +26,43 @@ Route::group([
 //        Route::get('/my', 'OfficeController@my'); //  if we need to ty office then ->  my offices in office controller
 
         Route::post('/', 'OfficeController@store');
-        Route::get('/{id:[0-9]+}', 'OfficeController@show');
-        Route::post('/{id:[0-9]+}/update', 'OfficeController@update');
-        Route::post('/{id:[0-9]+}/delete', 'OfficeController@delete');
+        Route::get('/{id}', 'OfficeController@show');
+        Route::post('/{id}/update', 'OfficeController@update');
+        Route::post('/{id}/delete', 'OfficeController@delete');
 
-        Route::post("/{id:[0-9]+}/contact/add", 'OfficeController@contactAdd');
-        Route::post("/{id:[0-9]+}/contact/update", 'OfficeController@contactUpdate');
-        Route::post("/{id:[0-9]+}/contact/delete", 'OfficeController@contactDelete');
+        Route::post("/contact/add/{id}", 'OfficeController@contactAdd');
+        Route::post("/contact/update/{id}", 'OfficeController@contactUpdate');
+        Route::post("/contact/delete/{id}", 'OfficeController@contactDelete');
 
-        Route::post("/{id:[0-9]+}/location/add", 'OfficeController@locationAdd');
-        Route::post("/{id:[0-9]+}/location/update", 'OfficeController@locationUpdate');
-        Route::post("/{id:[0-9]+}/location/delete", 'OfficeController@locationDestroy');
+        Route::post("/location/add/{id}", 'OfficeController@locationAdd');
+        Route::post("/location/update/{id}", 'OfficeController@locationUpdate');
+        Route::post("/location/delete/{id}", 'OfficeController@locationDestroy');
 
-        Route::post("/{id:[0-9]+}/users/add", 'OfficeController@addUser');
-        Route::post("/{id:[0-9]+}/users/remove", 'OfficeController@removeUser');
+        Route::post("/users/add/{id}", 'OfficeController@addUser');
+        Route::post("/users/update/{id}", 'OfficeController@updateUser');
+        Route::post("/users/remove/{id}", 'OfficeController@removeUser');
         Route::get("/users", 'OfficeController@getOfficeAssignedToUser');
 
 
         Route::group([
-            'prefix' => '{id:[0-9]+}/documents'
+            'prefix' => 'documents'
         ], function () {
-            Route::post('/add', 'OfficeController@documentAdd');
-            Route::post('/update', 'OfficeController@documentUpdate');
-            Route::post('/delete', 'OfficeController@documentDestroy');
+            Route::post('/add/{id}', 'OfficeController@documentAdd');
+            Route::post('/update/{id}/', 'OfficeController@documentUpdate');
+            Route::post('/delete/{id}/', 'OfficeController@documentDestroy');
 
         }); //documents
 
 
         Route::group([
-            'prefix' => '{id:[0-9]+}/payments'
+            'prefix' => 'payments'
         ], function () {
-            Route::get('/', 'PaymentController@index');
-            Route::post('/', 'PaymentController@pay');
-            Route::post('/punishment', 'PaymentController@payForPunishment');
-            Route::post('/punishment/add', 'PaymentController@createAdditive');
-            Route::post('/punishment/update', 'PaymentController@updateAdditive');
-            Route::post('/punishment/delete', 'PaymentController@deleteAdditive');
+            Route::get('/{id}', 'PaymentController@index');
+            Route::post('/{id}', 'PaymentController@pay');
+            Route::post('/punishment/{id}', 'PaymentController@payForPunishment');
+            Route::post('/punishment/add/{id}', 'PaymentController@createAdditive');
+            Route::post('/punishment/update/{id}', 'PaymentController@updateAdditive');
+            Route::post('/punishment/delete/{id}', 'PaymentController@deleteAdditive');
 
         }); //payments
 
@@ -74,9 +75,9 @@ Route::group([
         Route::get('/' , 'WorkerController@index');
         Route::get('/all' , 'WorkerController@all');
         Route::post('/' , 'WorkerController@store');
-        Route::get('/{id:[0-9]+}' , 'WorkerController@show');
-        Route::post('/{id:[0-9]+}/update' , 'WorkerController@update');
-        Route::post('/{id:[0-9]+}/delete' , 'WorkerController@delete');
+        Route::get('/{id}' , 'WorkerController@show');
+        Route::post('/update/{id}' , 'WorkerController@update');
+        Route::post('/delete/{id}' , 'WorkerController@delete');
     }); //workers
 
     Route::group([
@@ -93,9 +94,9 @@ Route::group([
     ], function ($route) {
         Route::get('/' , 'WorkerController@getRoles');
         Route::post('/' , 'WorkerController@storeRole');
-        Route::get('/{id:[0-9]+}' , 'WorkerController@showRole');
-        Route::post('/{id:[0-9]+}/update' , 'WorkerController@updateRole');
-        Route::post('/{id:[0-9]+}/delete' , 'WorkerController@deleteRole');
+        Route::get('/{id}' , 'WorkerController@showRole');
+        Route::post('/update/{id}' , 'WorkerController@updateRole');
+        Route::post('/delete/{id}' , 'WorkerController@deleteRole');
     }); //roles
 
     Route::group([
@@ -103,9 +104,9 @@ Route::group([
     ], function ($route) {
         Route::get('/' , 'CardController@index');
         Route::post('/' , 'CardController@store');
-        Route::get('/{id:[0-9]+}' , 'CardController@show');
-        Route::post('/{id:[0-9]+}/update' , 'CardController@update');
-        Route::post('/{id:[0-9]+}/delete' , 'CardController@delete');
+        Route::get('/{id}' , 'CardController@show');
+        Route::post('/update/{id}' , 'CardController@update');
+        Route::post('/delete/{id}' , 'CardController@delete');
     }); //roles
 
     Route::group([
@@ -119,21 +120,21 @@ Route::group([
             ], function () {
                 Route::get('/', 'MeetingRoomImageController@index');
                 Route::post('/', 'MeetingRoomImageController@store');
-                Route::post('/delete/{id:[0-9]+}', 'MeetingRoomImageController@delete');
+                Route::post('/delete/{id}', 'MeetingRoomImageController@delete');
             });
             Route::get('/', 'MeetingRoomController@getAllRooms');
             Route::post('/', 'MeetingRoomController@storeRooms');
-            Route::get('/{id:[0-9]+}', 'MeetingRoomController@showRooms');
-            Route::post('/{id:[0-9]+}/update', 'MeetingRoomController@updateRoom');
-            Route::post('/{id:[0-9]+}/delete', 'MeetingRoomController@deleteRoom');
+            Route::get('/{id}', 'MeetingRoomController@showRooms');
+            Route::post('/update/{id}', 'MeetingRoomController@updateRoom');
+            Route::post('/delete/{id}', 'MeetingRoomController@deleteRoom');
         });
 
         Route::get('/', 'MeetingRoomController@index');
-        Route::get('/{id:[0-9]+}', 'MeetingRoomController@show');
-        Route::post('/{id:[0-9]+}/update/for/plaza', 'MeetingRoomController@updateForPlaza');
+        Route::get('/{id}', 'MeetingRoomController@show');
+        Route::post('/{id}/update/for/plaza', 'MeetingRoomController@updateForPlaza');
         Route::post('/', 'MeetingRoomController@store');
-        Route::post('/{id:[0-9]+}/update', 'MeetingRoomController@update');
-        Route::post('/{id:[0-9]+}/delete', 'MeetingRoomController@delete');
+        Route::post('/update/{id}', 'MeetingRoomController@update');
+        Route::post('/delete/{id}', 'MeetingRoomController@delete');
     }); //meeting
 
     Route::group([
@@ -141,20 +142,20 @@ Route::group([
     ], function () {
 
         Route::get('/', 'GuestController@index');
-        Route::get('/{id:[0-9]+}', 'GuestController@show');
+        Route::get('/{id}', 'GuestController@show');
         Route::post('/', 'GuestController@store');
-        Route::post('/{id:[0-9]+}/update', 'GuestController@update');
-        Route::post('/{id:[0-9]+}/delete', 'GuestController@delete');
+        Route::post('/update/{id}', 'GuestController@update');
+        Route::post('/delete/{id}', 'GuestController@delete');
     }); //guests
 
     Route::group([
         'prefix' => 'offers'
     ], function () {
         Route::get('/', 'OffersController@index');
-        Route::get('/{id:[0-9]+}', 'OffersController@show');
+        Route::get('/{id}', 'OffersController@show');
         Route::post('/', 'OffersController@store');
-        Route::post('/{id:[0-9]+}/update', 'OffersController@update');
-        Route::post('/{id:[0-9]+}/delete', 'OffersController@delete');
+        Route::post('/update/{id}', 'OffersController@update');
+        Route::post('/delete/{id}', 'OffersController@delete');
     }); //offers
 
     Route::group([
@@ -163,19 +164,19 @@ Route::group([
 
         Route::group(['prefix'=>'offices'] , function(){
             Route::get('/' , 'DialogController@getDialogWithPlaza');
-            Route::get('/{id:[0-9]+}' , 'DialogController@showDialogWithPlaza');
-            Route::post('/{id:[0-9]+}/update' , 'DialogController@updateDialogForOffice');
+            Route::get('/{id}' , 'DialogController@showDialogWithPlaza');
+            Route::post('/update/{id}' , 'DialogController@updateDialogForOffice');
 
             Route::post('/' , 'DialogController@createToPlaza');
-            Route::post('/{id:[0-9]+}/message' , 'DialogController@addMessageFromOffice');
+            Route::post('/message/{id}' , 'DialogController@addMessageFromOffice');
         });
 
         Route::group(['prefix'=>'plaza'] , function(){
             Route::get('/' , 'DialogController@getDialogWithOffices');
-            Route::get('/{id:[0-9]+}' , 'DialogController@showDialogWithOffices');
-            Route::post('/{id:[0-9]+}/assign' , 'DialogController@updateDialogForPlaza');
+            Route::get('/{id}' , 'DialogController@showDialogWithOffices');
+            Route::post('/assign/{id}' , 'DialogController@updateDialogForPlaza');
             Route::post('/' , 'DialogController@createToOffice');
-            Route::post('/{id:[0-9]+}/message' , 'DialogController@addMessageFromPlaza');
+            Route::post('/message/{id}' , 'DialogController@addMessageFromPlaza');
         });
         Route::get('/kinds' , 'KindController@index');
 
@@ -184,11 +185,11 @@ Route::group([
         'prefix' => 'specializations'
     ], function () {
         Route::get('/' , 'SpecializationController@index');
-        Route::get('/{id:[0-9]+}' , 'SpecializationController@show');
+        Route::get('/{id}' , 'SpecializationController@show');
 
         Route::post('/' , 'SpecializationController@store');
-        Route::post('/{id:[0-9]+}/update' , 'SpecializationController@update');
-        Route::post('/{id:[0-9]+}/delete' , 'SpecializationController@delete');
+        Route::post('/update/{id}' , 'SpecializationController@update');
+        Route::post('/delete/{id}' , 'SpecializationController@delete');
 
     }); //specializations
 

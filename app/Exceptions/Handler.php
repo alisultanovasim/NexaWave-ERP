@@ -3,13 +3,13 @@
 namespace App\Exceptions;
 
 use App\Traits\ApiResponse;
+use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Http\Response;
+use Illuminate\Validation\ValidationException;
 use GuzzleHttp\Exception\ClientException;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
-use Illuminate\Http\Response;
-use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Throwable;
 
@@ -34,6 +34,11 @@ class Handler extends ExceptionHandler
         'password',
         'password_confirmation',
     ];
+
+    public function invalidJson($request, ValidationException $exception)
+    {
+        return $this->errorResponse($exception->errors(),Response::HTTP_UNPROCESSABLE_ENTITY);
+    }
 
     /**
      * Report or log an exception.

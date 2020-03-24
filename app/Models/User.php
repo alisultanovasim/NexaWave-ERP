@@ -7,7 +7,8 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Passport\HasApiTokens;
-use Modules\Hr\Entities\UserDetail;
+use Modules\Hr\Entities\Employee\UserDetail;
+
 
 class User extends Authenticatable
 {
@@ -45,13 +46,10 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-
-    /**
-     * @return HasOne
-     */
     public function details(){
-        return $this->hasOne('Modules\Hr\Entities\UserDetail', 'user_id', 'id');
+        return $this->hasOne(UserDetail::class);
     }
+
 
     /**
      * @param $password

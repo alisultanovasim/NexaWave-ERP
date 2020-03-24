@@ -18,7 +18,7 @@ class DataController extends Controller
     use ApiResponse  ,ValidatesRequests;
     public function index(Request $request)
     {
-        $conf = config('modules.document.data');
+        $conf = config('esd.document.data');
         $this->validate($request, [
             'user_id' => ['required', 'integer'],
             'company_id' => ['required', 'integer'],
