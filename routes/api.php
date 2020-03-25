@@ -38,6 +38,13 @@ Route::group([
         Route::post('/register' , 'UserController@register');
     });
 
+    Route::group(['prefix' => 'permissions'], function (){
+        Route::post('set', 'PermissionController@setPositionPermissions');
+        Route::get('modules', 'PermissionController@getModules');
+        Route::get('permissions', 'PermissionController@getPermissions');
+        Route::get('', 'PermissionController@getPositions');
+    });
+
 });
 
 

@@ -14,7 +14,7 @@ class CreatePositionModulePermissionsTable extends Migration
     public function up()
     {
         Schema::create('position_module_permissions', function (Blueprint $table) {
-            $table->id();
+            $table->uuid('id');
             $table->unsignedBigInteger('position_id');
             $table->unsignedBigInteger('module_id');
             $table->unsignedBigInteger('permission_id');
