@@ -21,36 +21,36 @@ Route::group([
         Route::get("/", "DocumentController@index");
         Route::get("/{id}", "DocumentController@show");
 
-        Route::post("/{id}/add/documents", "DocumentController@addDocument");
-        Route::post("/{id}/update/document", "DocumentController@updateDocument");
+        Route::post("/add/documents/{id}", "DocumentController@addDocument");
+        Route::post("/update/document/{id}", "DocumentController@updateDocument");
 
         Route::post("/{id}", "DocumentController@show");
 
         Route::post("/", "DocumentController@store");
-        Route::post("/{id}/delete", "DocumentController@destroy");
-        Route::post("/{id}/update", "DocumentController@update");
+        Route::post("/delete/{id}", "DocumentController@destroy");
+        Route::post("/update/{id}", "DocumentController@update");
 
-        Route::post("/{id}/admin/update", "DocumentController@updateForAdmin");
+        Route::post("/admin/update/{id}", "DocumentController@updateForAdmin");
         //  Route::get("/tome" , "DocumentController@getDocumentToMe");
 
         /**  start  assignment */
-            Route::post("/{id}/to", "AssignmentController@store");
-            Route::post("/{id}/update/assignment", "AssignmentController@update");
-            Route::post('/{id}/remove/assignment', 'AssignmentController@delete');
+            Route::post("/to/{id}", "AssignmentController@store");
+            Route::post("/update/assignment/{id}", "AssignmentController@update");
+            Route::post('/remove/assignment/{id}', 'AssignmentController@delete');
 
 
             Route::post("/{id}/add/user", "AssignmentController@addUser");
             Route::post("/{id}/remove/user", "AssignmentController@removeUser");
 
 
-            Route::post("/{id}/mark/done", "AssignmentController@done");
-            Route::post("/{id}/tome/add/notes", "AssignmentController@addNotes");
-            Route::post("/{id}/tome/update/note", "AssignmentController@updateNote");
-            Route::post("/{id}/tome/remove/note", "AssignmentController@deleteNote");
+            Route::post("/mark/done/{id}", "AssignmentController@done");
+            Route::post("/tome/add/notes/{id}", "AssignmentController@addNotes");
+            Route::post("/tome/update/note/{id}", "AssignmentController@updateNote");
+            Route::post("/tome/remove/note/{id}", "AssignmentController@deleteNote");
 
-            Route::post("/{id}/mark/read", "AssignmentController@markAsRead");
+            Route::post("/mark/read/{id}", "AssignmentController@markAsRead");
 
-            Route::post('/{id}/add/helper/user', 'AssignmentController@addUsersByMainAssignment');
+            Route::post('/add/helper/user/{id}', 'AssignmentController@addUsersByMainAssignment');
 
 
 
@@ -62,7 +62,7 @@ Route::group([
             Route::post('/templates/update', 'AssignmentTemplates@update');
             Route::post('/templates/delete', 'AssignmentTemplates@delete');
 
-                Route::post("/{id}/change/status", "AssignmentController@changeStatus");
+                Route::post("/change/status/{id}", "AssignmentController@changeStatus");
                 Route::get('/', 'AssignmentController@index');
                 Route::get('/{id}', 'AssignmentController@show');
 
@@ -71,7 +71,7 @@ Route::group([
         /** end assignment */
 
 
-        Route::post("/{id}/activate", "DocumentController@makeActive");
+        Route::post("/activate/{id}", "DocumentController@makeActive");
 
         Route::get("/sections", "SectionController@index");
 
@@ -83,10 +83,10 @@ Route::group([
         Route::get("/register_number", "DocumentController@getDocumentsRegNo");
 
 
-        Route::post('/{id}/change/status', 'DocumentController@changeStatus');
+        Route::post('/change/status', '/{id}DocumentController@changeStatus');
         Route::post('/make/archive', 'ArchiveController@store');
 
-        Route::post('/{id}/archive/update', 'ArchiveController@update');
+        Route::post('/archive/update/{id}', 'ArchiveController@update');
 
         Route::group(['prefix' => 'adjustments'], function () {
             Route::get('/', 'AdjustmentController@index');
@@ -121,14 +121,14 @@ Route::group([
         Route::get("/", "DraftController@index");
         Route::post("/", "DraftController@store");
         Route::get("/{id}", "DraftController@show");
-        Route::post("/{id}/update", "DraftController@update");
-        Route::post("/{id}/delete", "DraftController@destroy");
+        Route::post("/update/{id}", "DraftController@update");
+        Route::post("/delete/{id}", "DraftController@destroy");
 
-        Route::post("/{id}/add/documents", "DraftController@addDocument");
-        Route::post("/{id}/remove/documents", "DraftController@removeDocument");
-        Route::post("/{id}/update/documents", "DraftController@updateDocument");
+        Route::post("/add/documents/{id}", "DraftController@addDocument");
+        Route::post("/remove/documents/{id}", "DraftController@removeDocument");
+        Route::post("/update/documents/{id}", "DraftController@updateDocument");
 
-        Route::post("/{id}/make/document", "DraftController@makeRealDocument");
+        Route::post("/make/document/{id}", "DraftController@makeRealDocument");
     });//draft
 
 

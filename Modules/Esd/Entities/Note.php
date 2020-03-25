@@ -1,16 +1,21 @@
 <?php
 
-namespace Modules\Entities;
+namespace Modules\Esd\Entities;
 
 use Illuminate\Database\Eloquent\Model;
 
 class Note extends Model
 {
+
     protected $guarded = ["id"];
 
+
+    const FILE = 1;
+    const EDITOR = 1;
+
     public function getResourceAttribute($value){
-        if ($this->type == config('esd.document.type.file') and $value)
-            return env('API_GATEWAY_STATIC_FILES') . 'Esd?path=' . 'documents/' .  $value;
+        if ($this->type == self::FILE and $value)
+            return env('APP_URL') . '/documents/'  .  $value;
         return $value;
     }
 }

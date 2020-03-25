@@ -3,12 +3,12 @@ namespace Modules\Esd\Http\Controllers;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller;
 
-use Modules\Entities\sendForm;
-use Modules\Entities\sendType;
+use Modules\Esd\Entities\sendForm;
+use Modules\Esd\Entities\sendType;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Modules\Entities\Section;
+use Modules\Esd\Entities\Section;
 use Illuminate\Support\Facades\DB;
 
 class SectionController extends Controller

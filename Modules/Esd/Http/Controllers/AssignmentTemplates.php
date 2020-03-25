@@ -5,7 +5,7 @@ namespace Modules\Esd\Http\Controllers;
 
 
 use Illuminate\Foundation\Validation\ValidatesRequests;
-use Modules\Entities\AssignmentTemplate;
+use Modules\Esd\Entities\AssignmentTemplate;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;

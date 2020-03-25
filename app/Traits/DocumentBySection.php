@@ -6,7 +6,7 @@ namespace App\Traits;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Modules\Entities\senderCompany;
+use Modules\Esd\Entities\senderCompany;
 
 trait DocumentBySection
 {
@@ -22,11 +22,24 @@ trait DocumentBySection
                     'company_user' => 'sometimes|required|integer'
                 ]);
 
-                if ($noteExists = $this->companyInfo(
-                    $request->get('company_id'),
-                    $request->only(['sender_company_id' , 'sender_company_role_id' , 'sender_company_user_id' , 'company_user'])))
-                        return $noteExists;
+//                if ($noteExists = $this->companyInfo(
+//                    $request->get('company_id'),
+//                    $request->only(['sender_company_id' , 'sender_company_role_id' , 'sender_company_user_id' , 'company_user'])))
+//                        return $noteExists;
 
+                $check = senderCompany::whereHas('roles' , function ($q) use ($request) {
+                        $q->whereHas('users' , function ($q) use ($request) {
+                            $q->where(DB::raw("1") , "1" );
+                            if ($request->has('sender_company_user_id'))
+                                $q->where('id' ,$request->get('sender_company_user_id'));
+                        })->where(DB::raw("1") , "1" );
+                        if ($request->has('sender_company_role_id'))
+                            $q->where('id' ,$request->get('sender_company_role_id'));
+                })
+                    ->where('company_id' , $request->get('company_id'))
+                    ->where('id', $request->get('sender_company_id'))
+                    ->exists();
+                if (!$check) return $this->errorResponse(trans('response.unProcess') ,422);
                 return array_merge($request->only([
                     'sender_company_role_id', 'sender_company_id', 'sender_company_user_id'
                 ]),['document_id' => $document->id]);
@@ -40,7 +53,7 @@ trait DocumentBySection
                 ]);
                 if ($noteExists = $this->companyInfo(
                     $request->get('company_id'),
-                    $request->only(['region_id' , 'company_user' ])))
+                    $request->only(['company_user' ])))
                     return $noteExists;
 
                 return array_merge($request->only('name', 'region_id', 'address'), ['document_id' => $document->id]);
@@ -88,10 +101,20 @@ trait DocumentBySection
                 ]);
                 $arr = $request->only('name', 'region_id', 'address');
                 if ($arr) {
-                    if ($noteExists = $this->companyInfo(
-                        $request->get('company_id'),
-                        $request->only(['region_id' , 'company_user'])))
-                        return $noteExists;
+                    $check = senderCompany::whereHas('roles' , function ($q) use ($request) {
+                        $q->whereHas('users' , function ($q) use ($request) {
+                            $q->where(DB::raw("1") , "1" );
+                            if ($request->has('sender_company_user_id'))
+                                $q->where('id' ,$request->get('sender_company_user_id'));
+                        })->where(DB::raw("1") , "1" );
+                        if ($request->has('sender_company_role_id'))
+                            $q->where('id' ,$request->get('sender_company_role_id'));
+                    })
+                        ->where('company_id' , $request->get('company_id'));
+                    if ($request->has('company_user')) $check
+                        ->where('id', $request->get('sender_company_id'));
+                    $bool = $check->exists();
+                    if (!$bool) return $this->errorResponse(trans('response.unProcess') ,422);
                     return $arr;
                 }
                 return false;

@@ -7,8 +7,8 @@
 //use Illuminate\Support\Facades\DB;
 //use Illuminate\Support\Facades\File;
 //use Illuminate\Validation\Rules\In;
-//use Modules\Entities\Document;
-//use Modules\Entities\Inbox;
+//use Modules\Esd\Entities\Document;
+//use Modules\Esd\Entities\Inbox;
 //use Monolog\Handler\SyslogUdp\UdpSocket;
 //
 //class InboxController extends Controller

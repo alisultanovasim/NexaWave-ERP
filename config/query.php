@@ -6,6 +6,8 @@ return [
     'sector_id' =>'sectors',
     'position_id' => 'positions',
     'company_user' => 'employees',
+    'send_type_id' => 'send_types',
+    'send_form_id' => 'send_forms',
     'region_id' => 'regions',
     'from_in_our_company' => 'esd_regions',
     'to_in_our_company' => 'employees',

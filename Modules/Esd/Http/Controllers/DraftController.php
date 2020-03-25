@@ -4,11 +4,11 @@
 namespace Modules\Esd\Http\Controllers;
 
 use Illuminate\Foundation\Validation\ValidatesRequests;
-use Modules\Entities\Citizen;
-use Modules\Entities\InCompany;
-use Modules\Entities\Section;
-use Modules\Entities\senderCompany;
-use Modules\Entities\Structure;
+use Modules\Esd\Entities\Citizen;
+use Modules\Esd\Entities\InCompany;
+use Modules\Esd\Entities\Section;
+use Modules\Esd\Entities\senderCompany;
+use Modules\Esd\Entities\Structure;
 use App\Traits\ApiResponse;
 use App\Traits\DocumentBySection;
 use App\Traits\DocumentUploader;
@@ -18,8 +18,8 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
-use Modules\Entities\Doc;
-use Modules\Entities\Document;
+use Modules\Esd\Entities\Doc;
+use Modules\Esd\Entities\Document;
 use Illuminate\Routing\Controller;
 
 class DraftController extends Controller
@@ -47,7 +47,7 @@ class DraftController extends Controller
 
         $draft = Document::with(['section:id,name'])
             ->where("company_id", $request->company_id)
-            ->where("status", config("modules.document.status.draft"))
+            ->where("status", config("esd.document.status.draft"))
             ->where("from", $request->user_id);
 
         if ($request->has("theme"))
@@ -120,13 +120,13 @@ class DraftController extends Controller
             $document = new Document;
 
             if ($request->has('parent_id')) {
-                $check = Document::where('id', $request->parent_id)->where('company_id', $company_id)->where('status', '!=', config("modules.document.status.draft"))->exists();
+                $check = Document::where('id', $request->parent_id)->where('company_id', $company_id)->where('status', '!=', config("esd.document.status.draft"))->exists();
                 if (!$check)
                     return $this->errorResponse(trans('apiResponse.parentNotFound'));
             }
 
             $document->fill(array_merge($arr, [
-                "status" => config("modules.document.status.draft"),
+                "status" => config("esd.document.status.draft"),
                 "from" => $request->user_id,
                 "company_id" => $company_id,
             ]));
@@ -197,7 +197,7 @@ class DraftController extends Controller
         ]);
         try {
             $draft = Document::where("id", $id)
-                ->where("status", config("modules.document.status.draft"))
+                ->where("status", config("esd.document.status.draft"))
                 ->where("company_id", $request->company_id)
                 ->where('from' ,$request->user_id )
                 ->first(['section_id']);
@@ -211,10 +211,10 @@ class DraftController extends Controller
 
             $data = [DB::raw('documents.*')];
 
-            foreach (config("modules.tables.{$table}") as $column )
+            foreach (config("esd.tables.{$table}") as $column )
                 array_push($data, "$table.$column");
 
-            $draft->with(config("modules.table_relations.{$table}"));
+            $draft->with(config("esd.table_relations.{$table}"));
 
             $draft = $draft->first($data);
 
@@ -269,7 +269,7 @@ class DraftController extends Controller
                 ->first(['id' , 'status', 'section_id']);
             if (!$document)
                 return $this->errorResponse(trans("apiResponse.unProcess"));
-            if ($document->status != config("modules.document.status.draft"))
+            if ($document->status != config("esd.document.status.draft"))
                 return $this->errorResponse(trans("apiResponse.docStatusError", ["status" => $document->status]));
             if ($request->has('parent_id')) {
                 $check = Document::where('id', $request->parent_id)->where('company_id', $company_id)->exists();
@@ -304,7 +304,7 @@ class DraftController extends Controller
         try {
             $check = Document::where([
                 "id" => $id,
-                "status" => config("modules.document.status.draft"),
+                "status" => config("esd.document.status.draft"),
                 "company_id" => $request->company_id,
                 "from" => $request->user_id
             ])->delete();
@@ -371,7 +371,7 @@ class DraftController extends Controller
                 ->first('id', 'status');
             if (!$document)
                 return $this->errorResponse(trans("apiResponse.unProcess"));
-            if ($document->status != config("modules.document.draft"))
+            if ($document->status != config("esd.document.draft"))
                 return $this->errorResponse(trans("apiResponse.docStatusError", ["status" => $document->status]));
 
 
@@ -410,10 +410,10 @@ class DraftController extends Controller
                 ->first('id', 'status');
             if (!$document)
                 return $this->errorResponse(trans("apiResponse.unProcess"));
-            if ($document->status != config("modules.document.draft"))
+            if ($document->status != config("esd.document.draft"))
                 return $this->errorResponse(trans("apiResponse.docStatusError" . ["status" => $document->status]), [
                     "current_status" => $document->status,
-                    "status" => config("modules.document.status")
+                    "status" => config("esd.document.status")
                 ]);
 
             $check = Doc::where('id', $request->doc_id)->where('document_id', $id)->exists();
@@ -440,7 +440,7 @@ class DraftController extends Controller
         $company_id = $request->company_id;
         try {
             $document = Document::where([
-                "status" => config("modules.document.status.draft"),
+                "status" => config("esd.document.status.draft"),
                 "company_id" => $company_id,
                 "from" => $request->user_id,
                 "id" => $id
@@ -461,7 +461,7 @@ class DraftController extends Controller
                 return $this->errorResponse(trans('apiResponse.baseHas'));
 
             $check = Document::where(["id" => $id])->update([
-                "status" => config("modules.document.status.wait")
+                "status" => config("esd.document.status.wait")
             ]);
 
 

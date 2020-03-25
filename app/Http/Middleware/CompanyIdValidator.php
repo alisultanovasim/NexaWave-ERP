@@ -64,6 +64,7 @@ class CompanyIdValidator
             $headers = apache_request_headers();
             $company_id =  array_key_exists('company_id' , (array)$headers) ? $headers['company_id'] : $request->get('company_id');
         }
+
         Validator::validate(['company_id' => $company_id] , [
             'company_id' => ['required' , 'integer']
         ]);

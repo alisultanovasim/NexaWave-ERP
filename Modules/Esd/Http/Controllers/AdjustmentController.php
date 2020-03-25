@@ -5,7 +5,7 @@ namespace Modules\Esd\Http\Controllers;
 
 
 use Illuminate\Foundation\Validation\ValidatesRequests;
-use Modules\Entities\Adjustment;
+use Modules\Esd\Entities\Adjustment;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -32,7 +32,7 @@ class  AdjustmentController extends Controller
                 'type'
             ]);
             if ($adjustments->count() == 0){
-                $arr = config("modules.document.adjustments.initial_rules.coulmns{$request->section_type}");
+                $arr = config("esd.document.adjustments.initial_rules.coulmns{$request->section_type}");
                 if($arr == null) return $this->successResponse([]);
                 $sendArr = [];
                 foreach ($arr  as $k => $v) {

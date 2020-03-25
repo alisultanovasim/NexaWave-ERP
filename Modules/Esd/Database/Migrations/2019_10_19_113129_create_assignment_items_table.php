@@ -17,7 +17,7 @@ class CreateAssignmentItemsTable extends Migration
             $table->bigIncrements('id');
             $table->unsignedBigInteger("assignment_id");
             $table->unsignedBigInteger("user_id");
-            $table->unsignedTinyInteger("status")->default(config("modules.document.assignment.not_seen"));
+            $table->unsignedTinyInteger("status")->default(\Modules\Esd\Entities\AssignmentItem::NOT_SEEN);
             $table->unsignedTinyInteger("is_base")->default(0);
             $table->timestamp("created_at")->useCurrent();
             $table->foreign("assignment_id")->references("id")->on("assignments")->onDelete("cascade");

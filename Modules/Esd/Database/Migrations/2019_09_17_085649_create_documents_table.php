@@ -27,7 +27,7 @@ class CreateDocumentsTable extends Migration
             $table->unsignedSmallInteger('send_form')->nullable();
 
                 /**
-             * In /config/modules.php
+             * In /config/esd.php
              * in document key
              */
             $table->string('folder')->nullable();

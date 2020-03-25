@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Modules\Entities;
+namespace Modules\Esd\Entities;
 
 
 use Illuminate\Database\Eloquent\Model;
@@ -16,9 +16,9 @@ class senderCompany extends  Model
     protected $guarded = ['id'];
 
     public function users(){
-        return $this->hasMany('Modules\Entities\senderCompanyUser');
+        return $this->hasMany('Modules\Esd\Entities\senderCompanyUser');
     }
     public function roles(){
-        return $this->hasMany('Modules\Entities\senderCompanyRole');
+        return $this->hasMany('Modules\Esd\Entities\senderCompanyRole');
     }
 }

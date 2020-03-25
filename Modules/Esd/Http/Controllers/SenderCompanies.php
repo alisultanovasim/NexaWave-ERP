@@ -5,7 +5,7 @@ namespace Modules\Esd\Http\Controllers;
 
 
 use Illuminate\Foundation\Validation\ValidatesRequests;
-use Modules\Entities\senderCompany;
+use Modules\Esd\Entities\senderCompany;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -86,7 +86,7 @@ class SenderCompanies extends  Controller
 
 
     public function  getAllRegions(Request $request){
-        $regions = DB::table('regions')->get();
+        $regions = DB::table('esd_regions')->get();
         return $this->successResponse($regions);
     }
 }

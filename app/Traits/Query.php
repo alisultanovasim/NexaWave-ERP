@@ -33,10 +33,10 @@ trait Query
         } catch (QueryException $e) {
             if ($e->errorInfo[1] === 1146) {
                 if (env('APP_DEBUG')) return ['error' => 'table in config/query.php is not exists'];
-                return $this->errorResponse([
-                    'error' => 'server error'
-                ], 500);
             }
+            return [
+                'error' => 'server error'
+            ];
         }
 
         foreach ($res as $k => $v)
