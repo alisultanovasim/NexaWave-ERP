@@ -24,7 +24,7 @@ class  AdjustmentController extends Controller
             'section_type' => 'required|integer',
         ]);
         try{
-            $adjustments = Adjustment::with([])->where('user_id' ,$request->user_id)->where('section_type' , $request->section_type)->get([
+            $adjustments = Adjustment::with([])->where('user_id' ,Auth::id())->where('section_type' , $request->section_type)->get([
                 'name',
                 'field',
                 'is_active',
@@ -41,7 +41,7 @@ class  AdjustmentController extends Controller
                     $arr[$k]['position'] = (int)$arr[$k]['position'];
 
                     $sendArr[$k] = $arr[$k];
-                    $arr[$k]['user_id'] = $request->user_id;
+                    $arr[$k]['user_id'] = Auth::id();
                     $arr[$k]['section_type'] = $request->section_type;
                 }
 
@@ -69,10 +69,10 @@ class  AdjustmentController extends Controller
             'section_type' => 'sometimes|integer'
         ]);
         try{
-            Adjustment::where('user_id' , $request->user_id)->where('section_type' , $request->section_type)->delete();
+            Adjustment::where('user_id' ,Auth::id())->where('section_type' , $request->section_type)->delete();
             $arr = $request->data;
             foreach ($arr  as $k => $v) {
-                $arr[$k]['user_id'] = $request->user_id;
+                $arr[$k]['user_id'] = Auth::id();
                 $arr[$k]['section_type'] = $request->section_type;
             }
             Adjustment::insert($arr);

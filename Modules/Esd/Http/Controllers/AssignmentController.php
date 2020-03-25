@@ -6,6 +6,7 @@ namespace Modules\Esd\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Foundation\Validation\ValidatesRequests;
+use Illuminate\Support\Facades\Auth;
 use Modules\Esd\Entities\Assignment;
 use Modules\Esd\Entities\AssignmentItem;
 use Modules\Esd\Entities\Document;
@@ -298,9 +299,9 @@ class AssignmentController extends Controller
             if ($request->has('tome')) {
                 $assignments->whereHas('items', function ($q) use ($request) {
                     if ($request->tome)
-                        $q->where('user_id', $request->user_id);
+                        $q->where('user_id', Auth::id());
                     else
-                        $q->where('user_id', "!=", $request->user_id);
+                        $q->where('user_id', "!=", Auth::id());
                 });
             }
             $assignments = $assignments->paginate($request->per_page ?? 10);
@@ -335,7 +336,7 @@ class AssignmentController extends Controller
 
 
             $assignmentItem = AssignmentItem::where('assignment_id', $assignment->id)
-                ->where('user_id', $request->user_id)
+                ->where('user_id', Auth::id())
                 ->first('id');
             if (!$assignmentItem)
                 return $this->errorResponse(trans('apiResponse.itemNotFound'));
@@ -373,7 +374,7 @@ class AssignmentController extends Controller
 
 
             $assignmentItem = AssignmentItem::where('assignment_id', $assignment->id)
-                ->where('user_id', $request->user_id)
+                ->where('user_id',  Auth::id())
                 ->first('id');
 
             if (!$assignmentItem) return $this->errorResponse(trans('apiResponse.assignmentItemNotFound'));
@@ -411,7 +412,7 @@ class AssignmentController extends Controller
     {
         $this->validate($request, [
             'company_id' => 'required|integer',
-            'user_id' => 'required|integer'
+//            'user_id' => 'required|integer'
 
         ]);
         try {
@@ -429,7 +430,7 @@ class AssignmentController extends Controller
 
 
             $assignmentItem = AssignmentItem::where('assignment_id', $assignment->id)
-                ->where('user_id', $request->user_id)
+                ->where('user_id', Auth::id())
                 ->first('id');
 
             if (!$assignmentItem)
@@ -469,7 +470,7 @@ class AssignmentController extends Controller
 
 
             $check = AssignmentItem::where('assignment_id', $assignment->id)
-                ->where('user_id', $request->user_id)
+                ->where('user_id', Auth::id())
                 ->update([
                     'status' => AssignmentItem::WAIT
                 ]);
@@ -504,7 +505,7 @@ class AssignmentController extends Controller
                 return $this->errorResponse(trans("apiResponse.unProcess"));
 
             $assignmentItem = AssignmentItem::where('assignment_id', $assignment->id)
-                ->where('user_id', $request->user_id)
+                ->where('user_id',  Auth::id())
                 ->first(['id', 'is_base']);
 
             if (!$assignmentItem)
@@ -554,7 +555,7 @@ class AssignmentController extends Controller
                 return $this->errorResponse(trans("apiResponse.unProcess"));
 
             $assignmentItem = AssignmentItem::where('assignment_id', $assignment->id)
-                ->where('user_id', $request->user_id)
+                ->where('user_id', Auth::id())
                 ->first(['id', 'is_base']);
             if (!$assignmentItem)
                 return $this->errorResponse(trans("apiResponse.unProcess"));

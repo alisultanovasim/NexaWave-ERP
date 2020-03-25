@@ -4,6 +4,7 @@
 namespace Modules\Esd\Http\Controllers;
 
 use Illuminate\Foundation\Validation\ValidatesRequests;
+use Illuminate\Support\Facades\Auth;
 use Modules\Esd\Entities\Citizen;
 use Modules\Esd\Entities\InCompany;
 use Modules\Esd\Entities\Section;
@@ -48,7 +49,7 @@ class DraftController extends Controller
         $draft = Document::with(['section:id,name'])
             ->where("company_id", $request->company_id)
             ->where("status", config("esd.document.status.draft"))
-            ->where("from", $request->user_id);
+            ->where("from",  Auth::id());
 
         if ($request->has("theme"))
             $draft->where("theme", 'like', $request->theme . "%");
@@ -127,7 +128,7 @@ class DraftController extends Controller
 
             $document->fill(array_merge($arr, [
                 "status" => config("esd.document.status.draft"),
-                "from" => $request->user_id,
+                "from" => Auth::id(),
                 "company_id" => $company_id,
             ]));
 
@@ -199,7 +200,7 @@ class DraftController extends Controller
             $draft = Document::where("id", $id)
                 ->where("status", config("esd.document.status.draft"))
                 ->where("company_id", $request->company_id)
-                ->where('from' ,$request->user_id )
+                ->where('from' , Auth::id())
                 ->first(['section_id']);
             if (!$draft)
                 return $this->errorResponse(trans("apiResponse.unProcess"));
@@ -265,7 +266,7 @@ class DraftController extends Controller
 
             $document = Document::where("id", $id)
                 ->where("company_id", $company_id)
-                ->where("from", $request->user_id)
+                ->where("from", Auth::id())
                 ->first(['id' , 'status', 'section_id']);
             if (!$document)
                 return $this->errorResponse(trans("apiResponse.unProcess"));
@@ -306,7 +307,7 @@ class DraftController extends Controller
                 "id" => $id,
                 "status" => config("esd.document.status.draft"),
                 "company_id" => $request->company_id,
-                "from" => $request->user_id
+                "from" => Auth::id()
             ])->delete();
             if (!$check)
                 return $this->errorResponse(trans("apiResponse.unProcess"));
@@ -325,13 +326,12 @@ class DraftController extends Controller
             "documents" => "required|array",
             "documents.*" => "required",
             'company_id' => 'required|integer',
-            'user_id' => 'required|integer'
         ]);
         $company_id = $request->company_id;
         try {
             $document = Document::where("id", $id)
                 ->where("company_id", $company_id)
-                ->where("from", $request->user_id)
+                ->where("from",  Auth::id())
                 ->first(['id', 'status']);
             if (!$document)
                 return $this->errorResponse(trans("apiResponse.unProcess"));
@@ -367,7 +367,7 @@ class DraftController extends Controller
         try {
             $document = Document::where("id", $id)
                 ->where("company_id", $company_id)
-                ->where("from", $request->user_id)
+                ->where("from", Auth::id())
                 ->first('id', 'status');
             if (!$document)
                 return $this->errorResponse(trans("apiResponse.unProcess"));
@@ -406,7 +406,7 @@ class DraftController extends Controller
         try {
             $document = Document::where("id", $id)
                 ->where("company_id", $company_id)
-                ->where("from", $request->user_id)
+                ->where("from",  Auth::id())
                 ->first('id', 'status');
             if (!$document)
                 return $this->errorResponse(trans("apiResponse.unProcess"));
@@ -442,7 +442,7 @@ class DraftController extends Controller
             $document = Document::where([
                 "status" => config("esd.document.status.draft"),
                 "company_id" => $company_id,
-                "from" => $request->user_id,
+                "from" =>  Auth::id(),
                 "id" => $id
             ])->first();
             if (!$document)
