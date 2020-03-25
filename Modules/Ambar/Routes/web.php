@@ -11,6 +11,6 @@
 |
 */
 
-Route::prefix('ambar')->group(function() {
-    Route::get('/', 'AmbarController@index');
-});
+//Route::prefix('ambar')->group(function() {
+//    Route::get('/', 'AmbarController@index');
+//});

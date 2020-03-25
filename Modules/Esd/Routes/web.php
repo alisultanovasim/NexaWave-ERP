@@ -11,6 +11,6 @@
 |
 */
 
-Route::prefix('esd')->group(function() {
-    Route::get('/', 'EsdController@index');
-});
+//Route::prefix('esd')->group(function() {
+//    Route::get('/', 'EsdController@index');
+//});

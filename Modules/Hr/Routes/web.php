@@ -11,6 +11,6 @@
 |
 */
 
-Route::prefix('hr')->group(function() {
-    Route::get('/', 'HrController@index');
-});
+//Route::prefix('hr')->group(function() {
+//    Route::get('/', 'HrController@index');
+//});

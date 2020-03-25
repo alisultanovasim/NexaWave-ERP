@@ -16,7 +16,7 @@ class User extends Authenticatable
 
     const OFFICE = 3;
     const SUPER_ADMIN = 1;
-    const EMPLOYEE = 1;
+    const EMPLOYEE = 2;
     const DEV = 4;
 
     /**
@@ -48,6 +48,9 @@ class User extends Authenticatable
 
     public function details(){
         return $this->hasOne(UserDetail::class);
+    }
+    public function role(){
+        return $this->belongsTo('App\Models\Role');
     }
 
 

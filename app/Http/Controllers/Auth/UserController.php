@@ -127,7 +127,7 @@ class UserController extends Controller
 
     public function profile(Request $request)
     {
-        $user = Auth::user();
+        $user = Auth::user()->load('role:id,name');
         $office = null;
         $companies = null;
         $modules = null;
