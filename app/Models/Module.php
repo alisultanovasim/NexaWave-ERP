@@ -57,15 +57,19 @@ class   Module extends Model
         return $this->hasMany('App\Models\Permission');
     }
 
-
     /**
      * @return BelongsToMany
      */
-    public function permissionsByModule()
+    public function positionPermissions()
     {
-        return $this->belongsToMany('App\Models\Permission', 'module_role_permissions', 'module_id', 'permission_id')
-            ->where('role_id', Auth::user()->role_id);
+        return $this->belongsToMany(
+            'App\Models\Permission',
+            'position_module_permissions',
+            'module_id',
+            'permission_id'
+        );
     }
+
 
     /**
      * @return HasMany
@@ -73,6 +77,13 @@ class   Module extends Model
     public function subModules()
     {
         return $this->hasMany('App\Models\Module', 'parent_id', 'id')
-            ->with(['subModules:id,name,parent_id', 'permissionsByModule:permissions.id,permissions.name']);
+            ->with(['subModules:id,name,parent_id']);
+    }
+
+    public function scopeHasCompany($query, $companyId){
+        return $query->whereHas('companyModules', function ($query) use ($companyId){
+            $query->where('company_id', $companyId);
+            $query->where('is_active', true);
+        });
     }
 }
