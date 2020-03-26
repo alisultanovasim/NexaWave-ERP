@@ -270,12 +270,11 @@ class AssignmentController extends Controller
                 ->exists();
             if (!$document)
                 return $this->errorResponse(trans("apiResponse.documentNotExists"));
-            $assignment = Assignment::with(['items', 'items.notes', 'items.users:id,name,surname'])
+            $assignment = Assignment::with(['items', 'items.notes', 'items.users'])
                 ->where('document_id', $id)->first();
             return $this->successResponse($assignment);
         } catch (\Exception $e) {
-            dd($e);
-            //return $this->errorResponse(trans("apiResponse.tryLater"), Response::HTTP_INTERNAL_SERVER_ERROR);
+            return $this->errorResponse(trans("apiResponse.tryLater"), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -594,7 +593,7 @@ class AssignmentController extends Controller
 
     private function checkUser(array $helper, Request $request)
     {
-        $employees = Employee::whereIn('user_id' , $helper)
+        $employees = Employee::whereIn('id' , $helper)
             ->where('company_id', $request->get('company_id'))
             ->where('is_active' , true)
             ->count();

@@ -86,7 +86,6 @@ class EmployeeController extends Controller
             'salary' => ['required', 'numeric'],
             'from' => ['sometimes', 'required', 'date'],
             'to' => ['sometimes', 'required', 'date'],
-
         ]);
         try {
 

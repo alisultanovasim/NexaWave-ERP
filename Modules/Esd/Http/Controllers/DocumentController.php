@@ -59,7 +59,9 @@ class DocumentController extends Controller
 
         try {
             $perPage = $request->has("per_page") ? $request->per_page : 10;
-            $documents = Document::with(['section:id,name', 'sendForm', 'sendType' , 'companyUser:id,name'])->where("company_id", $request->company_id)
+            $documents = Document::with([
+                'section:id,name', 'sendForm', 'sendType'
+            ])->where("company_id", $request->company_id)
                 ->where("status", "!=",Document::DRAFT);
 
             /**  Start filter  */
@@ -132,18 +134,19 @@ class DocumentController extends Controller
                     $documents->join($table, "documents.id", '=', "$table.document_id");
                 }
             }
+
             /** End filter  */
 
             $data = [DB::raw('documents.*')];
             if (isset($table)) {
                 foreach (config("esd.tables.{$table}") as $column)
                     array_push($data, "$table.$column");
-                $documents->with(config("esd.table_relations.{$table}"));
+                $documents->WithAllRelations();
             }
 
             if ($request->has('order_by')){
                 $direction = $request->direction ?? 'desc';
-                $documents->orderBy($request->order_by , $direction);
+                $documents->orderBy($request->get('order_by') , $direction);
             }else{
                 $documents->orderBy("documents.id", "DESC");
             }
@@ -157,6 +160,7 @@ class DocumentController extends Controller
             return $this->errorResponse(trans('apiResponse.tryLater'), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
         catch (\Exception $e) {
+
 
             return $this->errorResponse(trans('apiResponse.tryLater'), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
@@ -210,6 +214,7 @@ class DocumentController extends Controller
                 if (!$check)
                     return $this->errorResponse(trans('apiResponse.parentNotFound'));
             }
+            if ('in_company_docs' == Section::RULES[$request->get('section_id')]) $arr['company_user'] = null;
             $document->fill($arr);
             $document->save();
 
@@ -223,7 +228,6 @@ class DocumentController extends Controller
             $data = $this->saveBySection($request, $document, $table);
 
             if ($data instanceof JsonResponse) return $data;
-
            DB::table($table)->insert($data);
 
             DB::commit();
@@ -360,7 +364,7 @@ class DocumentController extends Controller
             /**
              * , 'docs.subDocs'
              */
-            $document = Document::with(['section', 'docs', 'sendType', 'sendType', 'sendForm', 'parent', 'assignment', 'assignment.items', 'assignment.items.users:id,name,surname', 'assignment.items.notes'])->where(["documents.id" => $id])
+            $document = Document::with(['section', 'docs', 'sendType', 'sendType', 'sendForm', 'parent', 'assignment', 'assignment.items', 'assignment.items.users.user:id,name,surname', 'assignment.items.notes'])->where(["documents.id" => $id])
                 ->where("status", "!=", Document::DRAFT)
                 ->join($table, "documents.id", '=', "$table.document_id");
 
@@ -368,13 +372,12 @@ class DocumentController extends Controller
             foreach (config("esd.tables.{$table}") as $column)
                 array_push($data, "$table.$column");
 
-            $document->with(config("esd.table_relations.{$table}"));
+            $document->WithAllRelations();
 
             $document = $document->first($data);
             return $this->successResponse($document);
         } catch (\Exception $e) {
             dd($e);
-            return $this->errorResponse(trans('apiResponse.tryLater'), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -419,10 +422,10 @@ class DocumentController extends Controller
             else
                 $document->where("status", "!=", Document::DRAFT);
 
-            $document = $document->first();
+            $document = $document->first(['id' , 'section_id']);
             if (!$document)
                 return $this->errorResponse(trans("apiResponse.unProcess"));
-
+            if ('in_company_docs' == Section::RULES[$document->section]) $arr['company_user'] = null;
 
             $document->fill($arr);
 

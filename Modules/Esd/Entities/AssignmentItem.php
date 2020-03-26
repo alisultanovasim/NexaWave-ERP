@@ -26,7 +26,7 @@ class AssignmentItem extends Model
     }
 
     public function users(){
-        return $this->belongsTo('App\Models\User' , 'user_id' , 'id');
+        return $this->belongsTo('Modules\Hr\Entities\Employee\Employee' , 'user_id' , 'id');
     }
 
     public function assignment()

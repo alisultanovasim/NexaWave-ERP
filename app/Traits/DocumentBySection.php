@@ -53,7 +53,7 @@ trait DocumentBySection
                 ]);
                 if ($noteExists = $this->companyInfo(
                     $request->get('company_id'),
-                    $request->only(['company_user' ])))
+                    $request->only(['company_user'])))
                     return $noteExists;
 
                 return array_merge($request->only('name', 'region_id', 'address'), ['document_id' => $document->id]);

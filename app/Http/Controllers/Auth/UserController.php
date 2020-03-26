@@ -109,19 +109,6 @@ class UserController extends Controller
         });
     }
 
-    
-
-    public function index(Request $request)
-    {
-        //
-    }
-
-    public function store(Request $request)
-    {
-        //
-    }
-
-
     public function destroy($id)
     {
         //
@@ -180,7 +167,6 @@ class UserController extends Controller
             : $this->errorResponse(trans('responses.password_not_updated'), 500);
     }
 
-
     /**
      * @param Request $request
      * @return JsonResponse
@@ -210,7 +196,6 @@ class UserController extends Controller
             : $this->errorResponse(trans('responses.reset_link_not_sent'), 500);
     }
 
-
     /**
      * @param $hash
      * @return JsonResponse
@@ -222,7 +207,6 @@ class UserController extends Controller
             ? $this->successResponse(['exists' => true])
             : $this->errorResponse(trans('responses.not_found'), 404);
     }
-
 
     /**
      * @param Request $request
@@ -250,4 +234,18 @@ class UserController extends Controller
         });
     }
 
+
+    public function index(Request $request)
+    {
+        //
+    }
+
+    public function store(Request $request)
+    {
+        //
+    }
+
+    public function update(){
+        //
+    }
 }

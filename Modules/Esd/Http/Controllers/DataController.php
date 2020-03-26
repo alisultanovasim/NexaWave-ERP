@@ -34,7 +34,6 @@ class DataController extends Controller
                     $data[$table] = DB::table($table)->where('company_id', $request->company_id)->get();
                 else
                     $data[$table] = DB::table($table)->get();
-
             }
             return $this->successResponse($data);
         } catch (\Exception $exception) {

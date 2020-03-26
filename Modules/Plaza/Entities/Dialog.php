@@ -22,6 +22,6 @@ class Dialog extends Model
     }
 
     public function user(){
-        return $this->belongsTo('App\Models\User' , 'assigned_user' , "id");
+        return $this->belongsTo('Modules\Hr\Entities\Employee\Employee' , 'assigned_user' , "id");
     }
 }

@@ -34,7 +34,7 @@ class DialogController extends Controller
         ]);
         try {
             DB::beginTransaction();
-            $dialog = Dialog::with(['office:id,name', 'kind:id,title' , 'user:id,name'])->where('company_id', $request->company_id);
+            $dialog = Dialog::with(['office:id,name', 'kind:id,title' , 'user.user:id,name'])->where('company_id', $request->company_id);
 
             if ($request->has('kind_id')) $dialog->where('kind_id', $request->kind_id);
             if ($request->has('office_id')) $dialog->where('office_id', $request->office_id);
@@ -62,7 +62,7 @@ class DialogController extends Controller
         ]);
         try {
 
-            $check = Dialog::with(['kind:id,title', 'office:id,name' , "user:id,name"])->where('company_id', $request->company_id)->where('id', $id)->first();
+            $check = Dialog::with(['kind:id,title', 'office:id,name' , "user.user:id,name"])->where('company_id', $request->company_id)->where('id', $id)->first();
             if (!$check) return $this->errorResponse(trans('apiResponse.DialogNotFound'));
 
             if ($check->status  == 2){
@@ -161,7 +161,7 @@ class DialogController extends Controller
             if (!$check) return $this->errorResponse('apiResponse.DialogNotFound' ,404);
 
             if ($request->has('assigned_user')){
-                $check = Employee::where('user_id' , $request->get('assigned_user'))
+                $check = Employee::where('id' , $request->get('assigned_user'))
                     ->where('company_id' , $request->get('assigned_user'))
                     ->where('is_active' , true)
                     ->exists();

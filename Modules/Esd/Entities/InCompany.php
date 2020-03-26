@@ -15,5 +15,4 @@ class InCompany extends Model
 
     protected  $guarded = ['id'];
 
-
 }

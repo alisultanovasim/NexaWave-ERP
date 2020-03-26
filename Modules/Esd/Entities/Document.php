@@ -73,13 +73,29 @@ class Document extends Model
         return $this->belongsTo('Modules\Esd\Entities\senderCompanyRole');
     }
     public function companyUser(){
-        return $this->belongsTo('App\Models\User' , 'company_user' , 'id');
+        return $this->belongsTo('Modules\Hr\Entities\Employee\Employee' , 'company_user' , 'id');
     }
     public function toInOurCompany(){
-        return $this->belongsTo('App\Models\User' , 'to_in_our_company' , 'id');
+        return $this->belongsTo('Modules\Hr\Entities\Employee\Employee'  , 'to_in_our_company' , 'id');
     }
     public function fromInOurCompany(){
-        return $this->belongsTo('App\Models\User' , 'from_in_our_company' , 'id');
+        return $this->belongsTo('Modules\Hr\Entities\Employee\Employee' , 'from_in_our_company' , 'id');
+    }
+
+    public function scopeWithAllRelations($q , $all = false){
+        $relations = [
+            'companyUser' ,'companyUser.user:id,name,surname' ,'toInOurCompany'  ,'toInOurCompany.user:id,name,surname' , 'fromInOurCompany' , 'fromInOurCompany.user:id,name,surname' ,'senderCompany', 'senderCompanyUser', 'senderCompanyRole' , 'region'
+        ];
+        if ($all){
+            $func = function ($q){
+                $q->with('position:id,name')->active()->select(['id' , 'position_id']);
+            };
+            $relations['companyUser.contracts'] = $func;
+            $relations['toInOurCompany.contracts'] = $func;
+            $relations['fromInOurCompany.contracts'] = $func;
+        }
+
+        return $q->with($relations);
     }
 
 
