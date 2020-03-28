@@ -226,8 +226,8 @@ class DocumentController extends Controller
             $table = Section::RULES[$request->section_id];
 
             $data = $this->saveBySection($request, $document, $table);
-
             if ($data instanceof JsonResponse) return $data;
+
            DB::table($table)->insert($data);
 
             DB::commit();
@@ -293,7 +293,7 @@ class DocumentController extends Controller
             return $this->successResponse("OK");
 
         } catch (\Exception $e) {
-            return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+            return $this->errorResponse(trans('response.tryLater'), Response::HTTP_INTERNAL_SERVER_ERROR);
 
         }
     }
@@ -377,7 +377,7 @@ class DocumentController extends Controller
             $document = $document->first($data);
             return $this->successResponse($document);
         } catch (\Exception $e) {
-            dd($e);
+            return $this->errorResponse(trans('response.tryLater'), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 

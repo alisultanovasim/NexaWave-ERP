@@ -14,4 +14,5 @@ return [
     'sender_company_id' => 'sender_companies',
     'sender_company_role_id' => 'sender_company_roles',
     'sender_company_user_id' => 'sender_company_users',
+    'military_state_id' => 'military_states'
 ];

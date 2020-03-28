@@ -2,9 +2,13 @@
 
 namespace Modules\Hr\Http\Controllers\Employee;
 
+use App\Http\Controllers\Auth\UserController;
+use App\Jobs\SendMailCreatePassword;
 use App\Models\User;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 use Modules\Hr\Entities\Employee\Contract;
 use Modules\Hr\Entities\Employee\Employee;
 use App\Traits\ApiResponse;
@@ -87,54 +91,22 @@ class EmployeeController extends Controller
             'from' => ['sometimes', 'required', 'date'],
             'to' => ['sometimes', 'required', 'date'],
         ]);
+        $created = false;
         try {
-
-
             DB::beginTransaction();
 
-            if (!$request->has('user_id')) {
-                //todo change to user controller
-                $this->validate($request, $this->getUserValidateRules());
-
-                //todo generate password and send to email
-                //in job please
-                $user = User::create(array_merge(
-                    $request->only(['name', 'email', 'surname', 'voen']),
-                    [
-                        'username' => $request->get('fin'),
-                        'password' => Hash::make($request->get('fin') . "2020"),
-                        'role_id' => User::EMPLOYEE
-                    ]
-                ));
-                $user->details()->create($request->only([
-                    'fin',
-                    'birthday',
-                    'father_name',
-                    'gender',
-                    'nationality_id',
-                    'citizen_id',
-                    'birthday_country_id',
-                    'birthday_city_id',
-                    'birthday_region_id',
-                    'blood_id',
-                    'eye_color_id',
-                    'user_id',
-                    'passport_seria',
-                    'passport_number',
-                    'passport_from_organ',
-                    'passport_get_at',
-                    'passport_expire_at',
-                ]));
-            } else {
+            if ($request->has('user_id')) {
                 $user = User::where('id', $request->get('user_id'))->first(['id']);
                 if (!$user) return $this->errorResponse(trans('response.userNotFound'));
+            } else{
+                $created = true;
+                $user = UserController::createUser($request);
             }
 
             $employee = Employee::create([
                 'company_id' => $request->get('company_id'),
                 'user_id' => $user->id,
             ]);
-
 
             $relations = $request->only(['department_id', 'section_id', 'sector_id', 'position_id']);
 
@@ -147,14 +119,27 @@ class EmployeeController extends Controller
 
             Contract::create(array_merge($relations, $request->only(['salary', 'start_date', 'end_date'])));
 
+
+
+            if ($created) SendMailCreatePassword::dispatch([
+                'password' => $user->generatedPassword ,
+                'username' => $user->username,
+                'name' => $user->name,
+                'surname' => $user->username,
+                'email' => $user->email
+            ]);
+
+
             DB::commit();
+
+
             return $this->successResponse('ok');
         } catch (QueryException  $exception) {
-            dd($exception);
 
             DB::rollBack();
             if ($exception->errorInfo[1] == 1062)
                 return $this->errorResponse(['fin' => trans('response.alreadyExists')], 422);
+
             return $this->errorResponse(trans('response.tryLater'), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
@@ -163,29 +148,33 @@ class EmployeeController extends Controller
     {
         $this->validate($request, [
             'is_active' => ['sometimes', 'required', 'boolean'],
-            'company_id' => ['required', 'integer']
+            'company_id' => ['required', 'integer'],
+            'update_user' => ['sometimes' , 'boolean']
         ]);
-        $data = $request->only(['is_active']);
+        $data = $request->only(['is_active' , 'update_user']);
         if (!$data) return $this->errorResponse(trans('response.nothing'));
 
         DB::beginTransaction();
-
 
         $employee = Employee::where('company_id', $request->get('company_id'))
             ->where('id', $id)
             ->first(['id', 'user_id', 'is_active']);
 
         if (!$employee) return $this->errorResponse(trans('response.employeeNotFound'), 404);
+//         todo
+//        if ($request->has('is_active'))
+//           if (!$request->get('is_active') and $employee->is_active)
+//                Contact::where('employee_id', $employee->id)->update(['is_active' => false]);
 
-        //if ($request->has('is_active'))
-        //   if (!$request->get('is_active') and $employee->is_active)
-        //        Contact::where('employee_id', $employee->id)->update(['is_active' => false]);
+        Employee::where('id', $id)->update($request->get('is_active'));
 
-        Employee::where('id', $id)->update($data);
+        if ($request->get('update_user')){
+            //todo some condition
+            UserController::updateUser($request , $employee->use_id);
+        }
 
         DB::commit();
         return $this->successResponse('ok');
-
     }
 
     public function delete(Request $request, $id)
@@ -207,31 +196,6 @@ class EmployeeController extends Controller
         }
     }
 
-    public function getUserValidateRules()
-    {
-        return [
-            'name' => ['required', 'string', 'max:255'],
-            'surname' => ['required', 'string', 'max:255'],
-            'voen' => ['nullable', 'string', 'max:255'],
-            'email' => ['required', 'email', 'max:255'],
-            'fin' => ['required', 'string', 'max:255'],
-            'birthday' => ['nullable', 'date', 'date_format:dd-mm-YYYY'],
-            'father_name' => ['nullable', 'string', 'max:255'],
-            'gender' => ['required', 'string', 'in:f,m'],
-            'nationality_id' => ['nullable', 'integer'],
-            'citizen_id' => ['nullable', 'integer'],
-            'birthday_country_id' => ['nullable', 'integer'],
-            'birthday_city_id' => ['nullable', 'integer'],
-            'birthday_region_id' => ['nullable', 'integer'],
-            'blood_id' => ['nullable', 'integer'],
-            'eye_color_id' => ['nullable', 'integer'],
-            'passport_seria' => ['nullable', 'string', 'max:255'],
-            'passport_number' => ['nullable', 'string', 'max:255'],
-            'passport_from_organ' => ['nullable', 'string', 'max:255'],
-            'passport_get_at' => ['nullable', 'date', 'date_format:dd-mm-YYYY'],
-            'passport_expire_at' => ['nullable', 'date', 'date_format:dd-mm-YYYY'],
-        ];
-    }
 
 
 }

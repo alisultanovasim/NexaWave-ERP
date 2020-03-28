@@ -7,6 +7,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Passport\HasApiTokens;
+use Modules\Hr\Entities\Employee\Employee;
 use Modules\Hr\Entities\Employee\UserDetail;
 
 
@@ -25,7 +26,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password', 'username', 'voen', 'role_id'
+        'name', 'email', 'password', 'username', 'voen', 'role_id' , 'surname'
     ];
 
     /**
@@ -46,12 +47,18 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
+
     public function details(){
         return $this->hasOne(UserDetail::class);
     }
     public function role(){
         return $this->belongsTo('App\Models\Role');
     }
+    public function employment(){
+        return $this->hasMany(Employee::class);
+    }
 
+
+    public $generatedPassword = null;
 
 }

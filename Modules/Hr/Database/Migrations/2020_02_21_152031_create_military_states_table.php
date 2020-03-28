@@ -18,7 +18,6 @@ class CreateMilitaryStatesTable extends Migration
             $table->string('name');
             $table->char('code', 50);
             $table->bigInteger('position');
-            $table->unsignedBigInteger('company_id');
             $table->timestamps();
             $table->softDeletes();
         });

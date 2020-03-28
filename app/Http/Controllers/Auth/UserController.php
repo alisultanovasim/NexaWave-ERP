@@ -5,16 +5,19 @@ namespace App\Http\Controllers\Auth;
 
 
 use App\Http\Controllers\Controller;
+use App\Jobs\SendMailCreatePassword;
 use App\Models\Company;
 use App\Models\User;
 use App\Models\UserReset;
 use App\Traits\ApiResponse;
+use App\Traits\DocumentUploader;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
@@ -32,6 +35,8 @@ use Modules\Plaza\Entities\OfficeUser;
 class UserController extends Controller
 {
     use ApiResponse;
+
+
 
     public function login(Request $request)
     {
@@ -112,37 +117,6 @@ class UserController extends Controller
     public function destroy($id)
     {
         //
-    }
-
-    public function profile(Request $request)
-    {
-        $user = Auth::user()->load('role:id,name');
-        $office = null;
-        $companies = null;
-        $modules = null;
-
-        switch ($user->role_id) {
-
-            case User::OFFICE:
-                $office = OfficeUser::with(['office:id,name,image,company_id'])->where('user_id', $user->id)->get();
-                break;
-
-            case User::EMPLOYEE:
-                $companies = Employee::with(['company', 'contracts' => function ($q) {
-                    $q->where('is_active', true);
-                }, 'contracts.position'])->active()
-                    ->where('user_id', Auth::id())
-                    ->get();
-                break;
-        }
-
-
-        return $this->dataResponse([
-            'user' => $user,
-            'companies' => $companies,
-            'modules' => $modules,
-            'office' => $office
-        ]);
     }
 
     /**
@@ -234,18 +208,203 @@ class UserController extends Controller
         });
     }
 
-
     public function index(Request $request)
     {
-        //
+        $this->validate($request , [
+           'paginateCount' => ['sometimes' , 'required' , 'integer'],
+            'name'=> ['sometimes' ,'string' , 'max:255'],
+        ]);
+
+        $user = User::orderBy('id' , 'desc');
+
+        if ($request->has('name') and $request->get('name'))
+            $user->where('name' , $request->get('name'));
+
+        $user = $user->paginate($request->get('paginateCount'));
+
+        return $this->successResponse($user);
     }
 
     public function store(Request $request)
     {
-        //
+        $user = self::createUser($request);
+
+         SendMailCreatePassword::dispatch($user);
+
+        return $this->successResponse('ok');
     }
 
-    public function update(){
-        //
+    public function update(Request $request , $id)
+    {
+        self::updateUser($request , $id);
+
+        return $this->successResponse('ok');
     }
+
+    public function show(Request $request , $id){
+        $user = User::findOrFail($id);
+        $user->load([
+            'employment'  , 'employment.contracts' , 'employment.contracts.position' , 'employment.company' , 'details' , 'details.nationality' , 'details.citizen' ,'details.birthdayCity' ,'details.birthdayCountry' ,'details.birthdayRegion'
+        ]);
+        return $this->successResponse($user);
+    }
+
+    public function searchByFin(Request $request ){
+        $this->validate($request , [
+            'fin' => ['required' , 'string' , 'max:255']
+        ]);
+        $user = User::whereHas('details' , function ($q) use ($request){
+            $q->where('fin' , $request->get('fin'));
+        })->first();
+        return $this->successResponse($user);
+    }
+
+    public static function rules()
+    {
+        return [
+            'name' => ['required', 'string', 'max:255'],
+            'surname' => ['required', 'string', 'max:255'],
+            'voen' => ['nullable', 'string', 'max:255'],
+            'email' => ['required', 'email', 'max:255'],
+            'fin' => ['required', 'string', 'max:255'],
+            'birthday' => ['nullable', 'date', 'date_format:dd-mm-YYYY'],
+            'father_name' => ['nullable', 'string', 'max:255'],
+            'gender' => ['required', 'string', 'in:f,m'],
+            'nationality_id' => ['nullable', 'integer'],
+            'citizen_id' => ['nullable', 'integer'],
+            'birthday_country_id' => ['nullable', 'integer'],
+            'birthday_city_id' => ['nullable', 'integer'],
+            'birthday_region_id' => ['nullable', 'integer'],
+            'blood_id' => ['nullable', 'integer'],
+            'eye_color_id' => ['nullable', 'integer'],
+            'passport_seria' => ['nullable', 'string', 'max:255'],
+            'passport_number' => ['nullable', 'string', 'max:255'],
+            'passport_from_organ' => ['nullable', 'string', 'max:255'],
+            'passport_get_at' => ['nullable', 'date', 'date_format:dd-mm-YYYY'],
+            'passport_expire_at' => ['nullable', 'date', 'date_format:dd-mm-YYYY'],
+
+            'military_status' => ['nullable' , 'string' , 'max:255'],
+            'military_start_at' => ['nullable' , 'date', 'date_format:dd-mm-YYYY'],
+            'military_end_at' => ['nullable' , 'date', 'date_format:dd-mm-YYYY'],
+            'military_state_id' => ['nullable' , 'string' , 'max:255'],
+            'military_passport_number' => ['nullable' , 'string' , 'max:255'],
+            'military_place' => ['nullable' , 'string' , 'max:255'],
+            'driving_license_number' => ['nullable' , 'string' , 'max:255'],
+            'driving_license_categories' => ['nullable' , 'string' , 'max:255'],
+            'driving_license_organ' => ['nullable' , 'string' , 'max:255'],
+            'driving_license_get_at' => ['nullable' , 'date', 'date_format:dd-mm-YYYY'],
+            'driving_license_expire_at' => ['nullable' , 'date', 'date_format:dd-mm-YYYY'],
+            'foreign_passport_number' => ['nullable' , 'string' , 'max:255'],
+            'foreign_passport_organ' => ['nullable' , 'string' , 'max:255'],
+            'foreign_passport_get_at' => ['nullable' , 'date', 'date_format:dd-mm-YYYY'],
+            'foreign_passport_expire_at' => ['nullable' , 'date', 'date_format:dd-mm-YYYY'],
+            'family_status_document_number' => ['nullable' , 'string' , 'max:255'],
+            'family_status_state' => ['nullable' , 'string' , 'max:255'],
+            'family_status_register_at' => ['nullable' , 'date', 'date_format:dd-mm-YYYY'],
+            'avatar' => ['nullable' , 'mimes:png,jpg,jpeg'],
+        ];
+    }
+
+    public static function updateRules()
+    {
+        return [
+            'name' => ['nullable', 'string', 'max:255'],
+            'surname' => ['nullable', 'string', 'max:255'],
+            'voen' => ['nullable', 'string', 'max:255'],
+            'email' => ['nullable', 'email', 'max:255'],
+//            'fin' => ['nullable', 'string', 'max:255'],
+            'birthday' => ['nullable', 'date', 'date_format:dd-mm-YYYY'],
+            'father_name' => ['nullable', 'string', 'max:255'],
+            'gender' => ['nullable', 'string', 'in:f,m'],
+            'nationality_id' => ['nullable', 'integer'],
+            'citizen_id' => ['nullable', 'integer'],
+            'birthday_country_id' => ['nullable', 'integer'],
+            'birthday_city_id' => ['nullable', 'integer'],
+            'birthday_region_id' => ['nullable', 'integer'],
+            'blood_id' => ['nullable', 'integer'],
+            'eye_color_id' => ['nullable', 'integer'],
+            'passport_seria' => ['nullable', 'string', 'max:255'],
+            'passport_number' => ['nullable', 'string', 'max:255'],
+            'passport_from_organ' => ['nullable', 'string', 'max:255'],
+            'passport_get_at' => ['nullable', 'date', 'date_format:dd-mm-YYYY'],
+            'passport_expire_at' => ['nullable', 'date', 'date_format:dd-mm-YYYY'],
+
+            'military_status' => ['nullable' , 'string' , 'max:255'],
+            'military_start_at' => ['nullable' , 'date', 'date_format:dd-mm-YYYY'],
+            'military_end_at' => ['nullable' , 'date', 'date_format:dd-mm-YYYY'],
+            'military_state_id' => ['nullable' , 'string' , 'max:255'],
+            'military_passport_number' => ['nullable' , 'string' , 'max:255'],
+            'military_place' => ['nullable' , 'string' , 'max:255'],
+            'driving_license_number' => ['nullable' , 'string' , 'max:255'],
+            'driving_license_categories' => ['nullable' , 'string' , 'max:255'],
+            'driving_license_organ' => ['nullable' , 'string' , 'max:255'],
+            'driving_license_get_at' => ['nullable' , 'date', 'date_format:dd-mm-YYYY'],
+            'driving_license_expire_at' => ['nullable' , 'date', 'date_format:dd-mm-YYYY'],
+            'foreign_passport_number' => ['nullable' , 'string' , 'max:255'],
+            'foreign_passport_organ' => ['nullable' , 'string' , 'max:255'],
+            'foreign_passport_get_at' => ['nullable' , 'date', 'date_format:dd-mm-YYYY'],
+            'foreign_passport_expire_at' => ['nullable' , 'date', 'date_format:dd-mm-YYYY'],
+            'family_status_document_number' => ['nullable' , 'string' , 'max:255'],
+            'family_status_state' => ['nullable' , 'string' , 'max:255'],
+            'family_status_register_at' => ['nullable' , 'date', 'date_format:dd-mm-YYYY'],
+            'avatar' => ['nullable' , 'mimes:png,jpg,jpeg'],
+        ];
+    }
+
+    public static function createUser(Request $request)
+    {
+        Validator::make($request->all(),self::rules())->validate();
+
+
+        $password = Str::random(9);
+        $user = User::create(array_merge(
+            $request->only(['name', 'email', 'surname', 'voen']),
+            [
+                'username' => $request->get('fin'),
+                'password' => Hash::make($password),
+                'role_id' => User::EMPLOYEE
+            ]
+        ));
+
+        $data = $request->all();
+        if ($request->hasFile('avatar')){
+            $name = "{$user->id}.{$request->file('avatar')->getClientOriginalExtension()}";
+            $request->file('avatar')->move(public_path('users')  , $name);
+            $data['avatar'] = $name;
+        }
+
+        $user->details()->create($request->all());
+
+        $user->generatedPassword = $password;
+
+        return $user;
+    }
+
+    public static function updateUser(Request $request , $id)
+    {
+        Validator::make($request->all(), self::updateRules())->validate();
+        $data = $request->only('name' , 'email' , 'voen' , 'surname');
+
+        if ($data)
+            User::where('id' ,$id)->update($data);
+
+        $data = $request->all();
+        if ($request->hasFile('avatar')){
+            $name = "$id.{$request->file('avatar')->getClientOriginalExtension()}";
+            $request->file('avatar')->move(public_path('users')  , $name);
+            $data['avatar'] = $name;
+        }
+
+
+        $userDetail = UserDetail::whereHas('user' , function ($q) use ($id) {
+            $q->where('id' , $id);
+        })->first(['id']);
+
+        $userDetail->fill($request->all());
+
+        return true;
+    }
+
+
+
 }

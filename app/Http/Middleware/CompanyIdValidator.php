@@ -8,6 +8,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Modules\Hr\Entities\Employee\Employee;
 use Modules\Plaza\Entities\OfficeUser;
@@ -21,7 +22,6 @@ class CompanyIdValidator
 
     public function handle(Request $request, Closure $next)
     {
-
         switch (Auth::user()->role_id){
             case User::OFFICE:
                     $err =  $this->office();

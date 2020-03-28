@@ -24,20 +24,21 @@ class GlobalLogs
     {
 
         //todo
-        //except login routes
-//        $response = $next($request);
-
+        return $next($request);
         /**
          * sometimes we as a programmers test routes
          * but we dont want to log this action
          * send no_log params as 1
          */
-        if ($request->no_log == 1)
-            return $next($request);
 
-
-        if ($this->NotLoggingUrls($request))
-            return $next($request);
+//        if ($request->get('no_log') == 1)
+//            return $next($request);
+//
+//        if (!Auth::check())
+//            return $next($request);
+//
+//        if ($this->NotLoggingUrls($request))
+//            return $next($request);
 
         /**
          * OPTIONS , failed requests and logs requests dont need logs
@@ -45,7 +46,7 @@ class GlobalLogs
 //        if ($request->method() != 'OPTIONS' and $response->isSuccessful() and isset($request->segments()[1]) and $request->segments()[1] != 'logs')
 //            return $this->setLog($response, $request);
 
-        return $next($request);
+//        return $next($request);
     }
 
     private function setLog($res, Request $req)

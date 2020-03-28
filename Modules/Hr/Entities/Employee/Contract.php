@@ -32,4 +32,11 @@ class Contract extends Model
         return $q -> where('is_active' , true);
     }
 
+
+    public function getContractAttribute($value)
+    {
+        if ($value) return env('APP_URL')."/".$value;
+        return $value;
+    }
+
 }

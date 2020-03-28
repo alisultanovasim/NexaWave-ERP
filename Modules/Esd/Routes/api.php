@@ -31,7 +31,7 @@ Route::group([
         Route::post("/update/{id}", "DocumentController@update");
 
         Route::post("/admin/update/{id}", "DocumentController@updateForAdmin");
-        //  Route::get("/tome" , "DocumentController@getDocumentToMe");
+        //  Route::get("/tome" , "Do    cumentController@getDocumentToMe");
 
         /**  start  assignment */
             Route::post("/to/{id}", "AssignmentController@store");
