@@ -23,7 +23,12 @@ class ProfileController extends Controller
         switch ($user->role_id) {
 
             case User::OFFICE:
-                $office = OfficeUser::with(['office:id,name,image,company_id'])->where('user_id', $user->id)->get();
+                $office = OfficeUser::with(['office:id,name,image,company_id'])->where('user_id', $user->id)->first()->office;
+                $companies = [
+                    [
+                        "company_id" => $office->company_id
+                    ]
+                ];
                 break;
 
             case User::EMPLOYEE:

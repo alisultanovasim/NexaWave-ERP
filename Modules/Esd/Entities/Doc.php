@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Doc extends Model
 {
     const FILE = 1;
-    const EDITOR = 1;
+    const EDITOR = 2;
     protected $guarded = ["id"];
 
     protected $table = "docs";
@@ -24,7 +24,7 @@ class Doc extends Model
 
     public function getResourceAttribute($value){
         if ($this->type == self::FILE and $value)
-            return env('APP_URL') . '/documents/'  .  $value;
+        return env('APP_URL','http://office-backend.vac.az') . '/documents/'  .  $value;
         return $value;
     }
 

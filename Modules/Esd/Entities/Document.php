@@ -16,6 +16,7 @@ class Document extends Model
     const WAIT_FOR_ACCEPTANCE = 5;
 
     use SoftDeletes;
+
     protected $guarded = ["id"];
 
     public function section()
@@ -72,23 +73,30 @@ class Document extends Model
     {
         return $this->belongsTo('Modules\Esd\Entities\senderCompanyRole');
     }
-    public function companyUser(){
-        return $this->belongsTo('Modules\Hr\Entities\Employee\Employee' , 'company_user' , 'id');
-    }
-    public function toInOurCompany(){
-        return $this->belongsTo('Modules\Hr\Entities\Employee\Employee'  , 'to_in_our_company' , 'id');
-    }
-    public function fromInOurCompany(){
-        return $this->belongsTo('Modules\Hr\Entities\Employee\Employee' , 'from_in_our_company' , 'id');
+
+    public function companyUser()
+    {
+        return $this->belongsTo('Modules\Hr\Entities\Employee\Employee', 'company_user', 'id');
     }
 
-    public function scopeWithAllRelations($q , $all = false){
+    public function toInOurCompany()
+    {
+        return $this->belongsTo('Modules\Hr\Entities\Employee\Employee', 'to_in_our_company', 'id');
+    }
+
+    public function fromInOurCompany()
+    {
+        return $this->belongsTo('Modules\Hr\Entities\Employee\Employee', 'from_in_our_company', 'id');
+    }
+
+    public function scopeWithAllRelations($q, $all = false)
+    {
         $relations = [
-            'companyUser' ,'companyUser.user:id,name,surname' ,'toInOurCompany'  ,'toInOurCompany.user:id,name,surname' , 'fromInOurCompany' , 'fromInOurCompany.user:id,name,surname' ,'senderCompany', 'senderCompanyUser', 'senderCompanyRole' , 'region'
+            'companyUser', 'companyUser.user:id,name,surname', 'toInOurCompany', 'toInOurCompany.user:id,name,surname', 'fromInOurCompany', 'fromInOurCompany.user:id,name,surname', 'senderCompany', 'senderCompanyUser', 'senderCompanyRole', 'region'
         ];
-        if ($all){
-            $func = function ($q){
-                $q->with('position:id,name')->active()->select(['id' , 'position_id']);
+        if ($all) {
+            $func = function ($q) {
+                $q->with('position:id,name')->active()->select(['id', 'position_id']);
             };
             $relations['companyUser.contracts'] = $func;
             $relations['toInOurCompany.contracts'] = $func;
@@ -97,7 +105,6 @@ class Document extends Model
 
         return $q->with($relations);
     }
-
 
 
 }

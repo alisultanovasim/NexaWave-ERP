@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateStoragesTable extends Migration
+class CreateUnitsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,14 +13,11 @@ class CreateStoragesTable extends Migration
      */
     public function up()
     {
-        Schema::create('storages', function (Blueprint $table) {
-            $table->bigIncrements('id');
+        Schema::create('units', function (Blueprint $table) {
+            $table->increments('id');
             $table->string('name');
-            $table->string('location')->nullable();
-            $table->unsignedBigInteger('company_id');
-            $table->timestamps();
-            $table->softDeletes();
-
+            $table->string('full_name')->nullable();
+            $table->string('column_type')->nullable();
         });
     }
 
@@ -31,6 +28,6 @@ class CreateStoragesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('storages');
+        Schema::dropIfExists('units');
     }
 }

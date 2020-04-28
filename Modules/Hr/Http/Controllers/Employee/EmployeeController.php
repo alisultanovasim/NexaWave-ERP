@@ -25,7 +25,6 @@ use Modules\Plaza\Entities\Contact;
 class EmployeeController extends Controller
 {
     use ApiResponse, Query, DocumentUploader, ValidatesRequests;
-
     public function index(Request $request)
     {
         $this->validate($request, [
@@ -38,24 +37,24 @@ class EmployeeController extends Controller
             'section_id' => ['nullable', 'integer'],
             'sector_id' => ['nullable', 'integer'],
         ]);
-        try {
 
-            if ($notExists = $this->companyInfo($request->get('company_id'), $request->only(['profession_id']))) return $this->errorResponse($notExists);
+        if ($notExists = $this->companyInfo($request->get('company_id'), $request->only(['profession_id']))) return $this->errorResponse($notExists);
 
-            $employees = Employee::with(['user:id,name,surname', 'contracts' => function ($q) {
-                $q->with(['department:id,name', 'section:id,name', 'sector:id,name', 'position:id,name'])->active();
-            }])->where('company_id', $request->get('company_id'));
+        $employees = Employee::with([
+            'user:id,name,surname',
+            'contract',
+            'contract.currency'
 
-            if ($request->has('state') and $request->get('state') != '2')
-                $employees->where('is_active', $request->get('state'));
-            else $employees->where('is_active', true);
+        ])->where('company_id', $request->get('company_id'));
 
-            $employees = $employees->paginate($request->get('paginateCount'));
+        if ($request->has('state') and $request->get('state') != '2')
+            $employees->where('is_active', $request->get('state'));
+        else $employees->where('is_active', true);
 
-            return $this->successResponse($employees);
-        } catch (\Exception $exception) {
-            return $this->errorResponse(trans('response.tryLater'), Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
+        $employees = $employees->orderBy('id' , 'desc')->paginate($request->get('paginateCount'));
+
+        return $this->successResponse($employees);
+
     }
 
     public function show(Request $request, $id)
@@ -64,7 +63,11 @@ class EmployeeController extends Controller
             'company_id' => ['required', 'integer'],
         ]);
         $employees = Employee::with([
-            'user', 'contracts', 'contracts.department:id,name', 'contracts.section:id,name', 'contracts.sector:id,name', 'contracts.position:id,name'
+            'user', 'contracts',
+            'contracts.department:id,name',
+            'contracts.section:id,name',
+            'contracts.sector:id,name',
+            'contracts.position:id,name'
         ])
             ->where('id', $id)
             ->where('company_id', $request->get('company_id'))
@@ -82,63 +85,46 @@ class EmployeeController extends Controller
             'company_id' => ['required', 'integer'],
             'is_active' => ['sometimes', 'required', 'boolean'],
             'user_id' => ['sometimes', 'required', 'integer'],
-            'contract' => ['sometimes', 'required', 'file', 'mimes:pdf,doc,docx'],
-            'department_id' => ['sometimes', 'required', 'integer'],
-            'section_id' => ['sometimes', 'required', 'integer'],
-            'sector_id' => ['sometimes', 'required', 'integer'],
-            'position_id' => ['required', 'integer'],
-            'salary' => ['required', 'numeric'],
-            'from' => ['sometimes', 'required', 'date'],
-            'to' => ['sometimes', 'required', 'date'],
+            'create_contract' => ['required', 'boolean']
         ]);
-        $created = false;
+
         try {
             DB::beginTransaction();
 
             if ($request->has('user_id')) {
                 $user = User::where('id', $request->get('user_id'))->first(['id']);
                 if (!$user) return $this->errorResponse(trans('response.userNotFound'));
-            } else{
-                $created = true;
+            } else {
                 $user = UserController::createUser($request);
             }
 
-            $employee = Employee::create([
+            Employee::create([
                 'company_id' => $request->get('company_id'),
                 'user_id' => $user->id,
             ]);
 
-            $relations = $request->only(['department_id', 'section_id', 'sector_id', 'position_id']);
+            if ($request->get('create_contract')) {
 
-            if ($notExists = $this->companyInfo($request->get('company_id'), $relations)) return $this->errorResponse($notExists);
+                $this->validate($request, ContractController::getValidateRules());
 
-            if ($request->hasFile('contract'))
-                $relations['contract'] = $this->save($request->file('contract'), $request->get('company_id'), 'contracts');
+                $relations = $request->only(['department_id', 'section_id', 'sector_id', 'position_id']);
 
-            $relations['employee_id'] = $employee->id;
+                if ($notExists = $this->companyInfo($request->get('company_id'), $relations)) return $this->errorResponse($notExists);
 
-            Contract::create(array_merge($relations, $request->only(['salary', 'start_date', 'end_date'])));
-
-
-
-            if ($created) SendMailCreatePassword::dispatch([
-                'password' => $user->generatedPassword ,
-                'username' => $user->username,
-                'name' => $user->name,
-                'surname' => $user->username,
-                'email' => $user->email
-            ]);
-
+            }
 
             DB::commit();
 
 
             return $this->successResponse('ok');
         } catch (QueryException  $exception) {
-
-            DB::rollBack();
-            if ($exception->errorInfo[1] == 1062)
+            if ($exception->errorInfo[1] == 1062){
+                if (strpos($exception->errorInfo[2], 'employees_user_id_company_id_unique') !== false)
+                    return $this->errorResponse(['user_id' => trans('response.userAlreadyWorkOn')], 422);
                 return $this->errorResponse(['fin' => trans('response.alreadyExists')], 422);
+            }
+            if ($exception->errorInfo[1] == 1452)
+                return $this->errorResponse([trans('response.SomeFiledIsNotFoundInDatabase')], 422);
 
             return $this->errorResponse(trans('response.tryLater'), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
@@ -149,9 +135,9 @@ class EmployeeController extends Controller
         $this->validate($request, [
             'is_active' => ['sometimes', 'required', 'boolean'],
             'company_id' => ['required', 'integer'],
-            'update_user' => ['sometimes' , 'boolean']
+            'update_user' => ['sometimes', 'boolean']
         ]);
-        $data = $request->only(['is_active' , 'update_user']);
+        $data = $request->only(['is_active', 'update_user']);
         if (!$data) return $this->errorResponse(trans('response.nothing'));
 
         DB::beginTransaction();
@@ -161,17 +147,11 @@ class EmployeeController extends Controller
             ->first(['id', 'user_id', 'is_active']);
 
         if (!$employee) return $this->errorResponse(trans('response.employeeNotFound'), 404);
-//         todo
-//        if ($request->has('is_active'))
-//           if (!$request->get('is_active') and $employee->is_active)
-//                Contact::where('employee_id', $employee->id)->update(['is_active' => false]);
 
         Employee::where('id', $id)->update($request->get('is_active'));
 
-        if ($request->get('update_user')){
-            //todo some condition
-            UserController::updateUser($request , $employee->use_id);
-        }
+        if ($request->get('update_user'))
+            UserController::updateUser($request, $employee->use_id);
 
         DB::commit();
         return $this->successResponse('ok');
@@ -195,7 +175,6 @@ class EmployeeController extends Controller
             return $this->errorResponse(trans('response.tryLater'), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
-
 
 
 }

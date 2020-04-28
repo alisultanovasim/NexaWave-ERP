@@ -35,7 +35,7 @@ class City extends Model
      */
     public function country()
     {
-        return $this->belongsTo('Modules\Hr\EntitiesCountry');
+        return $this->belongsTo('Modules\Hr\Entities\Country');
     }
 
     /**
@@ -43,6 +43,6 @@ class City extends Model
      */
     public function regions()
     {
-        return $this->hasMany('Modules\Hr\EntitiesRegion');
+        return $this->hasMany('Modules\Hr\Entities\Region');
     }
 }

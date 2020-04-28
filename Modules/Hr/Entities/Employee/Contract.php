@@ -28,14 +28,15 @@ class Contract extends Model
     public function position(){
         return $this->belongsTo('Modules\Hr\Entities\Positions' );
     }
+    public function currency(){
+        return $this->belongsTo('Modules\Hr\Entities\Currency' );
+    }
     public function scopeActive($q){
         return $q -> where('is_active' , true);
     }
-
-
     public function getContractAttribute($value)
     {
-        if ($value) return env('APP_URL')."/".$value;
+        if ($value) return env('APP_URL' , "http://office-backend.vac.az")."/documents/".$value;
         return $value;
     }
 

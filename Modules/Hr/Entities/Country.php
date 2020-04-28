@@ -40,7 +40,7 @@ class Country extends Model
      */
     public function cities()
     {
-        return $this->hasMany('Modules\Hr\EntitiesCity');
+        return $this->hasMany('Modules\Hr\Entities\City');
     }
 
     /**
@@ -48,6 +48,6 @@ class Country extends Model
      */
     public function organizations()
     {
-        return $this->hasMany('Modules\Hr\EntitiesOrganization');
+        return $this->hasMany('Modules\Hr\Entities\Organization');
     }
 }

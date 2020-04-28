@@ -20,7 +20,6 @@ class WorkerController extends Controller
     public function all(Request $request){
         $this->validate($request, [
             'company_id' => 'required|integer',
-            'office_id' => 'sometimes|required|integer',
             'name'=> 'sometimes|nullable|string|max:255',
             'has_card'=>'sometimes|required|in:1,0'
         ]);
@@ -52,16 +51,20 @@ class WorkerController extends Controller
     {
         $this->validate($request, [
             'company_id' => 'required|integer',
-            'office_id' => 'required|integer',
             'role_id' => 'sometimes|required|integer',
             'has_card'=> 'sometimes|required|in:0,1'
         ]);
 
         try {
-            $check = Office::where('company_id', $request->company_id)->where('id', $request->office_id)->exists();
-            if (!$check) return $this->errorResponse(trans('apiResponse.unProcess'));
 
-            $workers = Worker::with(['card:id,alias','role:id,name' , 'office:id,name'])->where("office_id", $request->office_id);
+            $workers = Worker::with(['card:id,alias','role:id,name' , 'office:id,name']);
+            if ($request->has('office_id') and $request->get('office_id') != "null"){
+
+                $check = Office::where('company_id', $request->company_id)->where('id', $request->office_id)->exists();
+                if (!$check) return $this->errorResponse(trans('apiResponse.unProcess'));
+
+                $workers->where("office_id", $request->office_id);
+            }
 
 
             if ($request->has('name'))

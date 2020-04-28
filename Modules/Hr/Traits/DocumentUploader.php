@@ -8,7 +8,7 @@ use Illuminate\Http\UploadedFile;
 trait DocumentUploader
 {
 
-    protected function save($file , $company , $subFolder)
+    protected static function save($file , $company , $subFolder)
     {
         if ($file instanceof  UploadedFile){
             $filename = rand(1, 10000) . time() . "." . $file->extension();
@@ -16,4 +16,5 @@ trait DocumentUploader
             return "$company/$subFolder/$filename";
         }
     }
+
 }

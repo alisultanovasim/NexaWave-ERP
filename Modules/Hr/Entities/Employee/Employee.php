@@ -21,6 +21,12 @@ class Employee extends Model
     {
         return $this->hasMany('Modules\Hr\Entities\Employee\Contract');
     }
+    public function contract()
+    {
+        return $this->hasOne('Modules\Hr\Entities\Employee\Contract')->active();
+    }
+
+
     public function company(){
         return $this->belongsTo('App\Models\Company');
     }

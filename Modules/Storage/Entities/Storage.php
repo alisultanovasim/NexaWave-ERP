@@ -3,8 +3,14 @@
 namespace Modules\Storage\Entities;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Storage extends Model
 {
-    protected $fillable = [];
+    use SoftDeletes;
+    protected $guarded = ['id'];
+
+    public function products(){
+        return $this->hasMany(ProductTitle::class);
+    }
 }

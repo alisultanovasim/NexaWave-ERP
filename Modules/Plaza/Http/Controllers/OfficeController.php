@@ -323,7 +323,7 @@ class OfficeController extends Controller
                 'company_id' => $company_id
             ])->first();
             if (!$office)
-                return $this->errorResponse('apiResponse.officeNotFound');
+                return $this->errorResponse('apiResponse.officeNotFound' , 404);
             if ($request->has('payed_month_count')) {
                 if ($request->has('month_count'))
                     if ($request->payed_month_count > $request->month_count) return $this->errorResponse(['payed_month_count' => 'less than month_count']);
@@ -357,8 +357,6 @@ class OfficeController extends Controller
                         'contract' => $this->uploadImage($request->company_id, $request->contract, 'contracts'),
                         'versions' => "[]"
                     ]);
-
-
                 } else {
                     $versions = json_decode($contract->versions, true);
                     $addingVersions = [
@@ -390,7 +388,6 @@ class OfficeController extends Controller
                         'name' => $phone['name'],
                         'contact' => $phone['contact'],
                         'type' => config('plaza.office.contact.phone'),
-
                     ];
 
             if ($contacts) DB::table('offices_contacts')->insert($contacts);

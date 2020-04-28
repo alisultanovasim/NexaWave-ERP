@@ -79,14 +79,6 @@ trait DocumentUploader
         }
         return $item;
     }
-    /**
-     * for documents and logic where have pasrent id
-     * @param $baseDocument
-     * @param $document
-     * @param $request
-     * @param string $str
-     * @return array
-     */
     private function BaseDocumentBuilder($baseDocument, $document, $request, $str = 'documents')
     {
         if ($baseDocument instanceof UploadedFile) {

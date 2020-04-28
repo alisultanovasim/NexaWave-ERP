@@ -176,11 +176,13 @@ class AssignmentController extends Controller
         }
     }
 
+    /**
+     * todo derkenari silme meselesin danisariq
+     */
     public function delete(Request $request, $id)
     {
         $this->validate($request, [
             'company_id' => 'required|integer',
-
         ]);
         $company_id = $request->company_id;
         try {
@@ -270,7 +272,7 @@ class AssignmentController extends Controller
                 ->exists();
             if (!$document)
                 return $this->errorResponse(trans("apiResponse.documentNotExists"));
-            $assignment = Assignment::with(['items', 'items.notes', 'items.users'])
+            $assignment = Assignment::with(['items', 'items.notes', 'items.employee.user'])
                 ->where('document_id', $id)->first();
             return $this->successResponse($assignment);
         } catch (\Exception $e) {
@@ -289,7 +291,7 @@ class AssignmentController extends Controller
 
         ]);
         try {
-            $assignments = Assignment::with(['items' ,'items.users'  ])
+            $assignments = Assignment::with(['items' ,'items.employee.user'  ])
                 ->whereHas('document', function ($q) use ($request) {
                     $q->where('company_id', $request->company_id);
                     if ($request->has('finished_at'))

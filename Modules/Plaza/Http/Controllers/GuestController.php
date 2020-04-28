@@ -78,7 +78,7 @@ class GuestController extends Controller
             'come_at' => 'required|date|date_format:Y-m-d H:i:s',
             'description' => 'sometimes|required',
 
-            'office_id' => 'sometimes|required|integer',
+            'office_id' => 'nullable',
             'company_id' => 'required|integer',
             'worker_id' => ['sometimes' , 'required' , 'integer']
         ]);
@@ -86,7 +86,7 @@ class GuestController extends Controller
         if ($request->come_at < $now ) return $this->errorResponse(trans('apiResponse.TimeError'));
 
         try{
-            if ($request->has('office_id')){
+            if ($request->has('office_id') and $request->get('office_id') !== "null"){
                 $check = Office::where('id' , $request->office_id)
                     ->where('company_id' ,  $request->company_id)->exists();
                 if (!$check) return $this->errorResponse(trans('apiResponse.officeNotFound'));
@@ -101,7 +101,6 @@ class GuestController extends Controller
 
             return $this->successResponse('OK');
         }catch (\Exception $exception){
-            dd($exception);
             return $this->errorResponse(trans('apiResponse.tryLater') , Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }

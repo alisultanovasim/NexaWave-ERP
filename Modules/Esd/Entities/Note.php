@@ -15,7 +15,8 @@ class Note extends Model
 
     public function getResourceAttribute($value){
         if ($this->type == self::FILE and $value)
-            return env('APP_URL') . '/documents/'  .  $value;
+            return env('APP_URL','http://office-backend.vac.az') . '/documents/'  .  $value;
+
         return $value;
     }
 }

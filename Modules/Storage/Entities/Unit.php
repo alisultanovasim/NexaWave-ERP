@@ -6,5 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class Unit extends Model
 {
-    protected $fillable = [];
+    public $timestamps = false;
+    protected $guarded = ['id'];
 }

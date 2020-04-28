@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateStoragesTable extends Migration
+class CreateCurrencyTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,14 +13,12 @@ class CreateStoragesTable extends Migration
      */
     public function up()
     {
-        Schema::create('storages', function (Blueprint $table) {
+        Schema::create('currency', function (Blueprint $table) {
             $table->bigIncrements('id');
+            $table->string('char');
             $table->string('name');
-            $table->string('location')->nullable();
-            $table->unsignedBigInteger('company_id');
+            $table->unsignedInteger('code');
             $table->timestamps();
-            $table->softDeletes();
-
         });
     }
 
@@ -31,6 +29,6 @@ class CreateStoragesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('storages');
+        Schema::dropIfExists('currency');
     }
 }

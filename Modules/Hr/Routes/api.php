@@ -383,5 +383,13 @@ Route::group([
         Route::put('/{id}', 'WorkplaceController@update');
         Route::delete('/{id}', 'WorkplaceController@destroy');
     });
+
+    Route::group(['prefix' => 'currency'], function ($router) {
+        Route::get('/', 'CurrencyController@index');
+        Route::get('/{id}', 'CurrencyController@show');
+        Route::post('/', 'CurrencyController@store');
+        Route::put('/{id}', 'CurrencyController@update');
+        Route::delete('/{id}', 'CurrencyController@destroy');
+    });
 });
 

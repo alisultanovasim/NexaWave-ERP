@@ -204,7 +204,7 @@ class DialogController extends Controller
             'from_office' => 'sometimes|required|in:0,1',
         ]);
         try {
-            $dialog = Dialog::with('office:id,name', 'kind:id,title' , "user:id,name")->where('company_id', $request->company_id)->where('office_id', $request->office_id);
+            $dialog = Dialog::with('office:id,name', 'kind:id,title')->where('company_id', $request->company_id)->where('office_id', $request->office_id);
 
             if ($request->has('kind_id')) $dialog->where('kind_id', $request->kind_id);
             if ($request->has('from_office')) $dialog->where('from_office', $request->from_office);
@@ -247,7 +247,7 @@ class DialogController extends Controller
             'per_page' => 'sometimes|required|integer'
         ]);
         try {
-            $check = Dialog::with(['kind:id,title', 'office:id,name' , "user:id,name"])->where('company_id', $request->company_id)->where('office_id', $request->office_id)->where('id', $id)->first();
+            $check = Dialog::with(['kind:id,title', 'office:id,name' ])->where('company_id', $request->company_id)->where('office_id', $request->office_id)->where('id', $id)->first();
             if (!$check) return $this->errorResponse(trans('apiResponse.DialogNotFound'));
 
             Message::where('dialog_id', $id)->where(['from_office' => 1])->update(['is_read' => 1]);

@@ -83,7 +83,7 @@ Route::group([
         Route::get("/register_number", "DocumentController@getDocumentsRegNo");
 
 
-        Route::post('/change/status', '/{id}DocumentController@changeStatus');
+        Route::post('/change/status/{id}', 'DocumentController@changeStatus');
         Route::post('/make/archive', 'ArchiveController@store');
 
         Route::post('/archive/update/{id}', 'ArchiveController@update');

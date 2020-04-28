@@ -72,10 +72,11 @@ class CompanyIdValidator
         $inThisCompany = Employee::where('company_id' , $company_id)
             ->where('user_id' , Auth::id())
             ->exists();
-        if (!$inThisCompany) $this->errorMessage(['error' => trans('response.notYouCompany')] , 400);
 
+        if (!$inThisCompany) return $this->errorMessage(['error' => trans('response.notYouCompany')] , 400);
 
         $this->company = $company_id;
+
 
         return null;
 

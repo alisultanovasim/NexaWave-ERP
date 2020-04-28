@@ -32,8 +32,8 @@ class DocumentController extends Controller
             'company_id' => 'required|integer',
             'theme' => 'sometimes|required',
             "per_page" => "sometimes|required|integer",
-            "status" => "sometimes|required|array",
-            "status.*" => "sometimes|required|in:0,1,3,4",
+            "status" => "sometimes|required|in:0,1,3,4",
+//            "status.*" => "sometimes|required|in:0,1,3,4",
             "time" => "sometimes|required|in:1,0",
             "section_id" => "sometimes|required|array",
             "section_id.*" => "sometimes|required|integer",
@@ -66,20 +66,17 @@ class DocumentController extends Controller
 
             /**  Start filter  */
             if ($request->has("status")) {
-                $documents->whereIn("status", $request->status);
+                $documents->where("status", $request->get('status'));
             }
             if ($request->has('year'))
                 $documents->where(DB::raw('YEAR(created_at)'), $request->year);
 
 
-            if ($request->has('send_type')) {
-
+            if ($request->has('send_type'))
                 $documents->where("send_type", $request->send_type);
-            }
 
-            if ($request->has('send_form')) {
+            if ($request->has('send_form'))
                 $documents->where("send_type", $request->send_form);
-            }
 
             if ($request->has("from"))
                 $documents->where("from", $request->from);
@@ -107,6 +104,7 @@ class DocumentController extends Controller
                 if ($request->has('page_operation')) $operation = $request->page_operation;
                 $documents->where("page_count", $operation, $request->page_count);
             }
+
             if ($request->has('copy_count')) {
                 $operation = "=";
                 if ($request->has('copy_operation')) $operation = $request->copy_operation;
@@ -160,8 +158,6 @@ class DocumentController extends Controller
             return $this->errorResponse(trans('apiResponse.tryLater'), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
         catch (\Exception $e) {
-
-
             return $this->errorResponse(trans('apiResponse.tryLater'), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
@@ -241,7 +237,6 @@ class DocumentController extends Controller
                     return $this->errorResponse([$info => trans('apiResponse.notExists')], Response::HTTP_UNPROCESSABLE_ENTITY);
                 }
             }
-
             if ($e->errorInfo[1] == 1062) {
                 if (preg_match("/documents_(.*)_unique/", $e->getMessage(), $find)) {
                     return $this->errorResponse([$find[1] => trans('apiResponse.alreadyExists')], Response::HTTP_UNPROCESSABLE_ENTITY);
@@ -364,7 +359,7 @@ class DocumentController extends Controller
             /**
              * , 'docs.subDocs'
              */
-            $document = Document::with(['section', 'docs', 'sendType', 'sendType', 'sendForm', 'parent', 'assignment', 'assignment.items', 'assignment.items.users.user:id,name,surname', 'assignment.items.notes'])->where(["documents.id" => $id])
+            $document = Document::with(['section', 'docs', 'sendType', 'sendType', 'sendForm', 'parent', 'assignment', 'assignment.items', 'assignment.items.employee.user:id,name,surname', 'assignment.items.notes'])->where(["documents.id" => $id])
                 ->where("status", "!=", Document::DRAFT)
                 ->join($table, "documents.id", '=', "$table.document_id");
 

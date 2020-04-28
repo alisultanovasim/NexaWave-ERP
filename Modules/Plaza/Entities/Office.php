@@ -27,6 +27,9 @@ class Office  extends Model
     public function workers(){
         return $this->hasMany('Modules\Plaza\Entities\Workers' , 'office_id' , 'id' );
     }
+    public function user(){
+        return $this->hasOne('Modules\Plaza\Entities\OfficeUser');
+    }
     public function documents(){
         return $this->hasMany('Modules\Plaza\Entities\Document');
     }
