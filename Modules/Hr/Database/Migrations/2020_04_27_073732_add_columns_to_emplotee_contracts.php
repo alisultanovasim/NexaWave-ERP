@@ -17,31 +17,31 @@ class AddColumnsToEmploteeContracts extends Migration
     public function up()
     {
         Schema::table('employee_contracts', function (Blueprint $table) {
-            $table->string('contract_no')->nullable();
+            $table->string('contract_no')->nullable();//muqavile nomresi
 
-            $table->unsignedBigInteger('acceptor_id')->nullable();
+            $table->unsignedBigInteger('acceptor_id')->nullable(); //ishe alan
 
 
-            $table->unsignedBigInteger('duration_type_id')->nullable();
+            $table->unsignedBigInteger('duration_type_id')->nullable(); // muqavile muddeti
             $table->foreign('duration_type_id')
                 ->references('id')
                 ->on('duration_types')
                 ->onDelete('cascade');
 
-            $table->text('description')->nullable();
-            $table->text('labor_protection_addition')->nullable();
-            $table->text('labor_meal_addition')->nullable();
-            $table->text('labor_sport_addition')->nullable();
+            $table->text('description')->nullable(); //qeyd
+            $table->text('labor_protection_addition')->nullable(); //Verilən mühafizə vasitələri
+            $table->text('labor_meal_addition')->nullable(); //Verilən qida məhsulları
+            $table->text('labor_sport_addition')->nullable();//Bədən tərbiyəsi və idman üzrə əlavə şərtlər
 
 
 
-            $table->unsignedInteger('main')->default(0);
-            $table->unsignedInteger('work_insurance')->default(0);
-            $table->unsignedInteger('work_envs')->default(0);
-            $table->unsignedInteger('for_child')->default(0);
-            $table->unsignedInteger('collective_contract')->default(0);
-            $table->unsignedInteger('total')->default(0);
-            $table->decimal('social_benefits')->nullable();
+            $table->unsignedInteger('vacation_main')->default(0);
+            $table->unsignedInteger('vacation_work_insurance')->default(0);
+            $table->unsignedInteger('vacation_work_envs')->default(0);
+            $table->unsignedInteger('vacation_for_child')->default(0);
+            $table->unsignedInteger('vacation_collective_contract')->default(0);
+            $table->unsignedInteger('vacation_total')->default(0);
+            $table->decimal('vacation_social_benefits')->nullable();
 
 
         });

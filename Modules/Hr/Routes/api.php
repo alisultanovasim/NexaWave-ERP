@@ -384,12 +384,29 @@ Route::group([
         Route::delete('/{id}', 'WorkplaceController@destroy');
     });
 
+
+    //additions
     Route::group(['prefix' => 'currency'], function ($router) {
         Route::get('/', 'CurrencyController@index');
         Route::get('/{id}', 'CurrencyController@show');
         Route::post('/', 'CurrencyController@store');
         Route::put('/{id}', 'CurrencyController@update');
         Route::delete('/{id}', 'CurrencyController@destroy');
+    });
+
+    Route::group(['prefix' => 'duration/types'], function ($router) {
+        Route::get('/', 'DurationTypeController@index');
+        Route::get('/{id}', 'DurationTypeController@show');
+        Route::post('/', 'DurationTypeController@store');
+        Route::put('/{id}', 'DurationTypeController@update');
+        Route::delete('/{id}', 'DurationTypeController@destroy');
+    });
+    Route::group(['prefix' => 'contract/types'], function ($router) {
+        Route::get('/', 'ContractTypeController@index');
+        Route::get('/{id}', 'ContractTypeController@show');
+        Route::post('/', 'ContractTypeController@store');
+        Route::put('/{id}', 'ContractTypeController@update');
+        Route::delete('/{id}', 'ContractTypeController@destroy');
     });
 });
 

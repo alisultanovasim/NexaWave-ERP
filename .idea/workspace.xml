@@ -3,56 +3,13 @@
   <component name="ChangeListManager">
     <list default="true" id="b30929d9-41f6-4a33-a130-c3679b863b12" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Modules/Esd/Entities/AssignmentItem.php" beforeDir="false" afterPath="$PROJECT_DIR$/Modules/Esd/Entities/AssignmentItem.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Modules/Esd/Entities/Doc.php" beforeDir="false" afterPath="$PROJECT_DIR$/Modules/Esd/Entities/Doc.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Modules/Esd/Entities/Document.php" beforeDir="false" afterPath="$PROJECT_DIR$/Modules/Esd/Entities/Document.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Modules/Esd/Entities/Note.php" beforeDir="false" afterPath="$PROJECT_DIR$/Modules/Esd/Entities/Note.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Modules/Esd/Http/Controllers/AssignmentController.php" beforeDir="false" afterPath="$PROJECT_DIR$/Modules/Esd/Http/Controllers/AssignmentController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Modules/Esd/Http/Controllers/DocumentController.php" beforeDir="false" afterPath="$PROJECT_DIR$/Modules/Esd/Http/Controllers/DocumentController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Modules/Esd/Http/Controllers/InboxController.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Modules/Esd/Http/Controllers/SenderCompaniesUser.php" beforeDir="false" afterPath="$PROJECT_DIR$/Modules/Esd/Http/Controllers/SenderCompaniesUser.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Modules/Esd/Routes/api.php" beforeDir="false" afterPath="$PROJECT_DIR$/Modules/Esd/Routes/api.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Modules/Hr/Database/Migrations/2020_02_03_142543_create_regions_table.php" beforeDir="false" afterPath="$PROJECT_DIR$/Modules/Hr/Database/Migrations/2020_02_03_142543_create_regions_table.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Modules/Hr/Database/Seeders/HrDatabaseSeeder.php" beforeDir="false" afterPath="$PROJECT_DIR$/Modules/Hr/Database/Seeders/HrDatabaseSeeder.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Modules/Hr/Entities/City.php" beforeDir="false" afterPath="$PROJECT_DIR$/Modules/Hr/Entities/City.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Modules/Hr/Entities/Country.php" beforeDir="false" afterPath="$PROJECT_DIR$/Modules/Hr/Entities/Country.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Modules/Hr/Database/Migrations/2020_03_27_113736_create_duration_types_table.php" beforeDir="false" afterPath="$PROJECT_DIR$/Modules/Hr/Database/Migrations/2020_03_27_113736_create_duration_types_table.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Modules/Hr/Database/Migrations/2020_04_27_073732_add_columns_to_emplotee_contracts.php" beforeDir="false" afterPath="$PROJECT_DIR$/Modules/Hr/Database/Migrations/2020_04_27_073732_add_columns_to_emplotee_contracts.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Modules/Hr/Entities/Employee/Contract.php" beforeDir="false" afterPath="$PROJECT_DIR$/Modules/Hr/Entities/Employee/Contract.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Modules/Hr/Entities/Employee/Employee.php" beforeDir="false" afterPath="$PROJECT_DIR$/Modules/Hr/Entities/Employee/Employee.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Modules/Hr/Entities/Region.php" beforeDir="false" afterPath="$PROJECT_DIR$/Modules/Hr/Entities/Region.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Modules/Hr/Http/Controllers/CountryController.php" beforeDir="false" afterPath="$PROJECT_DIR$/Modules/Hr/Http/Controllers/CountryController.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Modules/Hr/Http/Controllers/Employee/ContractController.php" beforeDir="false" afterPath="$PROJECT_DIR$/Modules/Hr/Http/Controllers/Employee/ContractController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Modules/Hr/Http/Controllers/Employee/EmployeeController.php" beforeDir="false" afterPath="$PROJECT_DIR$/Modules/Hr/Http/Controllers/Employee/EmployeeController.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Modules/Hr/Routes/api.php" beforeDir="false" afterPath="$PROJECT_DIR$/Modules/Hr/Routes/api.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Modules/Hr/Traits/DocumentUploader.php" beforeDir="false" afterPath="$PROJECT_DIR$/Modules/Hr/Traits/DocumentUploader.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Modules/Plaza/Entities/Office.php" beforeDir="false" afterPath="$PROJECT_DIR$/Modules/Plaza/Entities/Office.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Modules/Plaza/Http/Controllers/DialogController.php" beforeDir="false" afterPath="$PROJECT_DIR$/Modules/Plaza/Http/Controllers/DialogController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Modules/Plaza/Http/Controllers/GuestController.php" beforeDir="false" afterPath="$PROJECT_DIR$/Modules/Plaza/Http/Controllers/GuestController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Modules/Plaza/Http/Controllers/OfficeController.php" beforeDir="false" afterPath="$PROJECT_DIR$/Modules/Plaza/Http/Controllers/OfficeController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Modules/Plaza/Http/Controllers/WorkerController.php" beforeDir="false" afterPath="$PROJECT_DIR$/Modules/Plaza/Http/Controllers/WorkerController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Modules/Plaza/Routes/api.php" beforeDir="false" afterPath="$PROJECT_DIR$/Modules/Plaza/Routes/api.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Modules/Storage/Database/Migrations/2020_03_25_141704_create_units_table.php" beforeDir="false" afterPath="$PROJECT_DIR$/Modules/Storage/Database/Migrations/2020_02_25_141704_create_units_table.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Modules/Storage/Database/Migrations/2020_03_25_141850_create_storages_table.php" beforeDir="false" afterPath="$PROJECT_DIR$/Modules/Storage/Database/Migrations/2020_03_25_141850_create_storages_table.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Modules/Storage/Database/Migrations/2020_03_25_141857_create_products_table.php" beforeDir="false" afterPath="$PROJECT_DIR$/Modules/Storage/Database/Migrations/2020_03_25_141857_create_products_table.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Modules/Storage/Database/Migrations/2020_03_25_143929_create_incomes_table.php" beforeDir="false" afterPath="$PROJECT_DIR$/Modules/Storage/Database/Migrations/2020_03_25_143929_create_incomes_table.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Modules/Storage/Database/Migrations/2020_03_25_143934_create_outcomes_table.php" beforeDir="false" afterPath="$PROJECT_DIR$/Modules/Storage/Database/Migrations/2020_03_25_143934_create_outcomes_table.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Modules/Storage/Database/Seeders/StorageDatabaseSeeder.php" beforeDir="false" afterPath="$PROJECT_DIR$/Modules/Storage/Database/Seeders/StorageDatabaseSeeder.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Modules/Storage/Entities/Consumers.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Modules/Storage/Entities/Income.php" beforeDir="false" afterPath="$PROJECT_DIR$/Modules/Storage/Entities/Income.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Modules/Storage/Entities/Outcome.php" beforeDir="false" afterPath="$PROJECT_DIR$/Modules/Storage/Entities/Outcome.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Modules/Storage/Entities/Product.php" beforeDir="false" afterPath="$PROJECT_DIR$/Modules/Storage/Entities/Product.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Modules/Storage/Entities/Storage.php" beforeDir="false" afterPath="$PROJECT_DIR$/Modules/Storage/Entities/Storage.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Modules/Storage/Entities/Suppliers.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Modules/Storage/Entities/Unit.php" beforeDir="false" afterPath="$PROJECT_DIR$/Modules/Storage/Entities/Unit.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Modules/Storage/Http/Controllers/StorageController.php" beforeDir="false" afterPath="$PROJECT_DIR$/Modules/Storage/Http/Controllers/StorageController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Modules/Storage/Http/Requests/.gitkeep" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Modules/Storage/Providers/RouteServiceProvider.php" beforeDir="false" afterPath="$PROJECT_DIR$/Modules/Storage/Providers/RouteServiceProvider.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Modules/Storage/Routes/api.php" beforeDir="false" afterPath="$PROJECT_DIR$/Modules/Storage/Routes/api.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Exceptions/Handler.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Exceptions/Handler.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Auth/ProfileController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Auth/ProfileController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Middleware/CompanyIdValidator.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Middleware/CompanyIdValidator.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Traits/DocumentUploader.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Traits/DocumentUploader.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Traits/Query.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Traits/Query.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config/query.php" beforeDir="false" afterPath="$PROJECT_DIR$/config/query.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database/migrations/2020_01_28_081107_add_indexes_to_global_logs.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/migrations/2020_01_28_081107_add_indexes_to_global_logs.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -256,7 +213,9 @@
       <workItem from="1587972714634" duration="18554000" />
       <workItem from="1588059000095" duration="1814000" />
       <workItem from="1588061504719" duration="14009000" />
-      <workItem from="1588091547106" duration="6803000" />
+      <workItem from="1588091547106" duration="13379000" />
+      <workItem from="1588144230996" duration="1312000" />
+      <workItem from="1588145958062" duration="2820000" />
     </task>
     <servers />
   </component>
@@ -268,19 +227,19 @@
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state x="542" y="215" key="#com.intellij.fileTypes.FileTypeChooser/0.0.1536.824@0.0.1536.824" timestamp="1585413775449" />
-    <state x="499" y="167" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog" timestamp="1588098345392">
+    <state x="499" y="167" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog" timestamp="1588146313648">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state x="499" y="167" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/0.0.1536.824@0.0.1536.824" timestamp="1588098345392" />
+    <state x="499" y="167" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/0.0.1536.824@0.0.1536.824" timestamp="1588146313648" />
     <state x="452" y="67" width="645" height="689" key="#phpunit.xml" timestamp="1585089276832">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state x="452" y="67" width="645" height="689" key="#phpunit.xml/0.0.1536.824@0.0.1536.824" timestamp="1585089276832" />
-    <state x="549" y="167" key="FileChooserDialogImpl" timestamp="1588060814479">
+    <state x="549" y="167" key="FileChooserDialogImpl" timestamp="1588145543057">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state x="549" y="167" key="FileChooserDialogImpl/0.0.1536.824/-1920.0.1920.1040@0.0.1536.824" timestamp="1588060814479" />
-    <state x="549" y="167" key="FileChooserDialogImpl/0.0.1536.824@0.0.1536.824" timestamp="1587816239262" />
+    <state x="549" y="167" key="FileChooserDialogImpl/0.0.1536.824@0.0.1536.824" timestamp="1588145543057" />
     <state x="0" y="0" key="FileDocumentManager.FileCacheConflict" timestamp="1585414341084">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
@@ -289,10 +248,10 @@
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state width="498" height="446" key="SwitcherDM/0.0.1536.824@0.0.1536.824" timestamp="1585091851664" />
-    <state x="465" y="236" key="com.intellij.ide.util.TipDialog" timestamp="1588091955819">
+    <state x="465" y="236" key="com.intellij.ide.util.TipDialog" timestamp="1588144281211">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state x="465" y="236" key="com.intellij.ide.util.TipDialog/0.0.1536.824@0.0.1536.824" timestamp="1588091955819" />
+    <state x="465" y="236" key="com.intellij.ide.util.TipDialog/0.0.1536.824@0.0.1536.824" timestamp="1588144281211" />
     <state x="406" y="27" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser" timestamp="1585406228376">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
@@ -305,15 +264,15 @@
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state x="761" y="104" width="738" height="606" key="find.popup/0.0.1536.824@0.0.1536.824" timestamp="1585306812580" />
-    <state x="425" y="187" key="run.anything.popup" timestamp="1587763926074">
+    <state x="425" y="187" key="run.anything.popup" timestamp="1588147906009">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state x="425" y="187" key="run.anything.popup/0.0.1536.824@0.0.1536.824" timestamp="1587763926074" />
-    <state x="431" y="145" width="672" height="678" key="search.everywhere.popup" timestamp="1588097569727">
+    <state x="425" y="187" key="run.anything.popup/0.0.1536.824@0.0.1536.824" timestamp="1588147906009" />
+    <state x="431" y="145" width="672" height="678" key="search.everywhere.popup" timestamp="1588144963605">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state x="-1381" y="183" width="840" height="856" key="search.everywhere.popup/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1587988797780" />
     <state x="431" y="145" width="672" height="678" key="search.everywhere.popup/0.0.1536.824/-1920.0.1920.1040@0.0.1536.824" timestamp="1588079379144" />
-    <state x="431" y="145" width="672" height="678" key="search.everywhere.popup/0.0.1536.824@0.0.1536.824" timestamp="1588097569727" />
+    <state x="431" y="145" width="672" height="678" key="search.everywhere.popup/0.0.1536.824@0.0.1536.824" timestamp="1588144963605" />
   </component>
 </project>

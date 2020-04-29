@@ -31,8 +31,17 @@ class Contract extends Model
     public function currency(){
         return $this->belongsTo('Modules\Hr\Entities\Currency' );
     }
+    public function contract_type(){
+        return $this->belongsTo('Modules\Hr\Entities\ContractType' );
+    }
+    public function duration_type(){
+        return $this->belongsTo('Modules\Hr\Entities\DurationType' );
+    }
     public function scopeActive($q){
         return $q -> where('is_active' , true);
+    }
+    public function acceptor(){
+        return $this->belongsTo('Modules\Hr\Entities\Employee\Employee');
     }
     public function getContractAttribute($value)
     {

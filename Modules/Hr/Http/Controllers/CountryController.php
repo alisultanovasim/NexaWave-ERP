@@ -20,9 +20,6 @@ class CountryController extends Controller
     use ApiResponse,ValidatesRequests;
 
 
-    /**
-     * @return JsonResponse
-     */
     public function index(Request $request)
     {
         $this->validate($request, [

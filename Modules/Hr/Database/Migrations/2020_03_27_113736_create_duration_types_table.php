@@ -15,7 +15,7 @@ class CreateDurationTypesTable extends Migration
     {
         Schema::create('duration_types', function (Blueprint $table) {
             $table->bigIncrements('id');
-
+            $table->string('name');
             $table->timestamps();
         });
     }
