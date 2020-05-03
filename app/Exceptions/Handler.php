@@ -55,7 +55,6 @@ class Handler extends ExceptionHandler
         parent::report($exception);
     }
 
-
     /**
      * @param \Illuminate\Http\Request $request
      * @param Throwable $exception

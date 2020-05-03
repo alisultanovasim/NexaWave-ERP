@@ -19,13 +19,12 @@ class EducationPlaceController extends Controller
     public function index(Request $request)
     {
         $this->validate($request , [
-            'company_id' => ['required' , 'integer'],
             'paginateCount' => ['sometimes','required' , 'integer'],
             'country_id' => ['sometimes', 'required' , 'integer'],
             'cit_id' => ['sometimes'  , 'required' , 'integer'],
             'region_id' => ['sometimes'  , 'required' , 'integer'],
         ]);
-        $result = EducationPlace::with(['country:id,name,short_name' , 'city:id,name' , 'region:id,name'])->where('company_id' , $request->get('company_id'));
+        $result = EducationPlace::with(['country:id,name,short_name' , 'city:id,name' , 'region:id,name']);
 
         if ($request->has('country_id')) $result->where('country_id' , $request->get('country_id'));
         if ($request->has('cit_id')) $result->where('cit_id' , $request->get('cit_id'));
@@ -42,8 +41,6 @@ class EducationPlaceController extends Controller
         if ($error)
             return $this->errorResponse($error, 422);
 
-        if ($notExists = $this->companyInfo($request->get('company_id') , $request->only('country_id' , 'city_id' , 'region_id')))
-            return $this->errorResponse($notExists, 422) ;
 
        try
         {
@@ -57,7 +54,6 @@ class EducationPlaceController extends Controller
                 'country_id' => $request->get('country_id'),
                 'city_id' => $request->get('city_id'),
                 'region_id' => $request->get('region_id'),
-                'company_id' => $request->get('company_id')
             ]);
             DB::commit();
         }
@@ -77,13 +73,12 @@ class EducationPlaceController extends Controller
         if ($error)
             return $this->errorResponse($error, 422);
 
-        if ($notExists = $this->companyInfo($request->get('company_id') , $request->only('country_id' , 'city_id' , 'region_id')))
-            return $this->errorResponse($notExists, 422) ;
+
         try
         {
             DB::beginTransaction();
             $saved = true;
-            $educationPlace = EducationPlace::where('id', $id)->where('company_id' , $request->get('company_id'))->first(['id']);
+            $educationPlace = EducationPlace::where('id', $id)->first(['id']);
             if (!$educationPlace)
                 return $this->errorResponse(trans('messages.not_found'), 404);
             $educationPlace->update([
@@ -109,7 +104,7 @@ class EducationPlaceController extends Controller
 
     public function destroy(Request $request , $id)
     {
-        return EducationPlace::where('id', $id)->where('company_id' , $request->get('company_id') )->delete()
+        return EducationPlace::where('id', $id)->delete()
             ? $this->successResponse(trans('messages.saved'))
             : $this->errorResponse(trans('messages.not_saved'));
     }

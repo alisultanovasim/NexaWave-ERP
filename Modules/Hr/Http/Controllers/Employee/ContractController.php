@@ -21,7 +21,7 @@ class ContractController extends Controller
 
     public static function storeContract(Request $request)
     {
-        $data = [
+        $data = $request->only([
             'department_id' ,
             'section_id' ,
             'sector_id' ,
@@ -58,7 +58,7 @@ class ContractController extends Controller
             'vacation_collective_contract' ,
             'vacation_total' ,
             'vacation_social_benefits' ,
-        ];
+        ]);
 
 
         if ($request->has('contract') and $request->hasFile('contract'))
@@ -187,6 +187,7 @@ class ContractController extends Controller
         } catch (QueryException $exception) {
             if ($exception->errorInfo[1] == 1452)
                 return $this->errorResponse([trans('response.SomeFiledIsNotFoundInDatabase')], 422);
+            dd($exception);
             return $this->errorResponse(trans('response.tryLater'), 500);
         }
     }

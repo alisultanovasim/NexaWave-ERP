@@ -18,10 +18,9 @@ class LanguageLevelController extends Controller
     public function index(Request $request)
     {
         $this->validate($request , [
-            'company_id' => ['required' , 'integer'],
             'paginateCount' => ['sometimes','required' , 'integer'],
         ]);
-        $result = LanguageLevel::where('company_id' , $request->get('company_id'))->paginate($request->get('company_id'));
+        $result = LanguageLevel::paginate($request->get('company_id'));
 
         return $this->dataResponse($result);
     }
@@ -39,7 +38,6 @@ class LanguageLevelController extends Controller
                 'name' => $request->get('name'),
                 'code' => $request->get('code'),
                 'position' => $request->get('position'),
-                'company_id' => $request->get('company_id'),
             ]);
             DB::commit();
         }
@@ -63,7 +61,7 @@ class LanguageLevelController extends Controller
             DB::beginTransaction();
             $saved = true;
             $languageLevel = LanguageLevel::where('id', $id)
-                ->where('company_id' , $request->get('company_id'))->first(['id']);
+               ->first(['id']);
             if (!$languageLevel)
                 return $this->errorResponse(trans('messages.not_found'), 404);
             $languageLevel->update([
@@ -85,7 +83,7 @@ class LanguageLevelController extends Controller
 
     public function destroy(Request $request , $id)
     {
-        return LanguageLevel::where('id', $id)->where('company_id', $request->get('company_id'))->delete()
+        return LanguageLevel::where('id', $id)->delete()
             ? $this->successResponse(trans('messages.saved'))
             : $this->errorResponse(trans('messages.not_saved'));
     }
@@ -95,7 +93,6 @@ class LanguageLevelController extends Controller
             'name' => 'required|max:256',
             'code' => 'required|max:50',
             'position' => 'required|numeric',
-            'company_id' => ['required' , 'integer'],
         ];
         $validator = \Validator::make($input, $validationArray);
 

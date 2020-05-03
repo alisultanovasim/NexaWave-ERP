@@ -21,7 +21,7 @@ class LanguageController extends Controller
             'company_id' => ['required' , 'integer'],
             'paginateCount' => ['sometimes','required' , 'integer'],
         ]);
-        $result = Language::where('company_id' , $request->get('company_id'))->paginate($request->get('paginateCount'));
+        $result = Language::paginate($request->get('paginateCount'));
 
         return $this->dataResponse($result);
     }
@@ -39,8 +39,7 @@ class LanguageController extends Controller
                 'name' => $request->get('name'),
                 'code' => $request->get('code'),
                 'iso' => $request->get('iso'),
-                'position' => $request->get('position'),
-                'company_id' => $request->get('company_id')
+                'position' => $request->get('position')
             ]);
             DB::commit();
         }
@@ -63,7 +62,7 @@ class LanguageController extends Controller
         {
             DB::beginTransaction();
             $saved = true;
-            $language = Language::where('id', $id)->where('company_id' , $request->get('company_id'))->first(['id']);
+            $language = Language::where('id', $id)->first(['id']);
             if (!$language)
                 return $this->errorResponse(trans('messages.not_found'), 404);
             $language->update([
@@ -86,7 +85,7 @@ class LanguageController extends Controller
 
     public function destroy(Request $request , $id)
     {
-        return Language::where('id', $id)->where('company_id' , $request->get('company_id'))->delete()
+        return Language::where('id', $id)->delete()
             ? $this->successResponse(trans('messages.saved'))
             : $this->errorResponse(trans('messages.not_saved'));
     }
@@ -97,7 +96,6 @@ class LanguageController extends Controller
             'code' => 'required|max:50',
             'iso' => 'max:10',
             'position' => 'required|numeric',
-            'company_id' => ['required' , 'integer'],
         ];
         $validator = \Validator::make($input, $validationArray);
 

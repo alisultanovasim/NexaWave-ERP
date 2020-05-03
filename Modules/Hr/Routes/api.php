@@ -393,7 +393,6 @@ Route::group([
         Route::put('/{id}', 'CurrencyController@update');
         Route::delete('/{id}', 'CurrencyController@destroy');
     });
-
     Route::group(['prefix' => 'duration/types'], function ($router) {
         Route::get('/', 'DurationTypeController@index');
         Route::get('/{id}', 'DurationTypeController@show');
@@ -401,6 +400,7 @@ Route::group([
         Route::put('/{id}', 'DurationTypeController@update');
         Route::delete('/{id}', 'DurationTypeController@destroy');
     });
+
     Route::group(['prefix' => 'contract/types'], function ($router) {
         Route::get('/', 'ContractTypeController@index');
         Route::get('/{id}', 'ContractTypeController@show');
@@ -408,5 +408,27 @@ Route::group([
         Route::put('/{id}', 'ContractTypeController@update');
         Route::delete('/{id}', 'ContractTypeController@destroy');
     });
+
+    Route::group([
+        'namespace' => 'User'
+    ],function ($router){
+        Route::group(['prefix' => 'users/education'], function ($router) {
+            Route::get('/', 'UserEducationController@index');
+            Route::get('/{id}', 'UserEducationController@show');
+            Route::post('/', 'UserEducationController@store');
+            Route::put('/{id}', 'UserEducationController@update');
+            Route::delete('/{id}', 'UserEducationController@delete');
+        });
+
+        Route::group(['prefix' => 'users/language/skills'], function ($router) {
+            Route::get('/', 'UserLanguageSkillController@index');
+            Route::get('/{id}', 'UserLanguageSkillController@show');
+            Route::post('/', 'UserLanguageSkillController@store');
+            Route::put('/{id}', 'UserLanguageSkillController@update');
+            Route::delete('/{id}', 'UserLanguageSkillController@delete');
+        });
+    });
+
+
 });
 

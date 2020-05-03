@@ -22,7 +22,6 @@ class CreateEducationPlacesTable extends Migration
             $table->unsignedBigInteger('country_id');
             $table->unsignedBigInteger('city_id')->nullable();
             $table->unsignedBigInteger('region_id')->nullable();
-            $table->unsignedBigInteger('company_id');
             $table->timestamps();
             $table->softDeletes();
 

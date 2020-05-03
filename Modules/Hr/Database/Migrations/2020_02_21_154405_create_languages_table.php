@@ -19,7 +19,6 @@ class CreateLanguagesTable extends Migration
             $table->char('code', 50);
             $table->char('iso', 10)->nullable();
             $table->bigInteger('position');
-            $table->unsignedBigInteger('company_id');
             $table->timestamps();
             $table->softDeletes();
         });

@@ -18,7 +18,6 @@ class EducationStateController extends Controller
     public function index(Request $request)
     {
         $this->validate($request , [
-            'company_id' => ['required' , 'integer'],
             'paginateCount' => ['sometimes','required' , 'integer'],
         ]);
 
@@ -40,7 +39,6 @@ class EducationStateController extends Controller
                 'name' => $request->get('name'),
                 'code' => $request->get('code'),
                 'position' => $request->get('position'),
-                'company_id' => $request->get('company_id')
             ]);
             DB::commit();
         }
@@ -64,7 +62,7 @@ class EducationStateController extends Controller
             DB::beginTransaction();
             $saved = true;
             $educationState = EducationState::where('id', $id)
-                ->where('company_id' , $request->get('company_id'))->first(['id']);
+              ->first(['id']);
             if (!$educationState)
                 return $this->errorResponse(trans('messages.not_found'), 404);
             $educationState->update([
@@ -86,7 +84,7 @@ class EducationStateController extends Controller
 
     public function destroy(Request $request , $id)
     {
-        return EducationState::where('id', $id)->where('company_id', $request->get('company_id'))->delete()
+        return EducationState::where('id', $id)->delete()
             ? $this->successResponse(trans('messages.saved'))
             : $this->errorResponse(trans('messages.not_saved'));
     }
