@@ -22,23 +22,21 @@ class UserEducation extends Model
         return $this->belongsTo(EducationSpecialty::class);
     }
     public function place(){
-        return $this->belongsTo(EducationPlace::class);
+        return $this->belongsTo(EducationPlace::class , 'education_place_id');
     }
     public function level(){
-        return $this->belongsTo(EducationLevel::class);
+        return $this->belongsTo(EducationLevel::class , 'education_level_id');
     }
     public function state(){
-        return $this->belongsTo(EducationState::class);
+        return $this->belongsTo(EducationState::class , 'education_state_id');
     }
     public function language(){
         return $this->belongsTo(Language::class);
     }
 
-    public function scopeCompany($q , $company_id){
-        return $q->whereHas('user' , function ($q) use($company_id){
-            $q->whereHas('employment' , function ($q) use ($company_id){
-                $q->where('company_id' , $company_id);
-            });
+    public function scopeCompany($q ){
+        return $q->whereHas('user' , function ($q){
+            $q->company();
         });
     }
 }

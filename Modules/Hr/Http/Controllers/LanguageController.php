@@ -39,7 +39,6 @@ class LanguageController extends Controller
                 'name' => $request->get('name'),
                 'code' => $request->get('code'),
                 'iso' => $request->get('iso'),
-                'position' => $request->get('position')
             ]);
             DB::commit();
         }
@@ -69,7 +68,6 @@ class LanguageController extends Controller
                 'name' => $request->get('name'),
                 'code' => $request->get('code'),
                 'iso' => $request->get('iso'),
-                'position' => $request->get('position'),
             ]);
             DB::commit();
         }
@@ -95,7 +93,6 @@ class LanguageController extends Controller
             'name' => 'required|max:256',
             'code' => 'required|max:50',
             'iso' => 'max:10',
-            'position' => 'required|numeric',
         ];
         $validator = \Validator::make($input, $validationArray);
 

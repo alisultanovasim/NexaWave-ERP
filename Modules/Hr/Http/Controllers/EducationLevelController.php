@@ -36,7 +36,6 @@ class EducationLevelController extends Controller
             EducationLevel::create([
                 'name' => $request->get('name'),
                 'code' => $request->get('code'),
-                'position' => $request->get('position'),
             ]);
             DB::commit();
         }
@@ -65,7 +64,6 @@ class EducationLevelController extends Controller
             $educationLevel->update([
                 'name' => $request->get('name'),
                 'code' => $request->get('code'),
-                'position' => $request->get('position'),
             ]);
             DB::commit();
         }
@@ -90,7 +88,6 @@ class EducationLevelController extends Controller
         $validationArray = [
             'name' => 'required|max:256',
             'code' => 'required|max:50',
-            'position' => 'required|numeric',
         ];
         $validator = \Validator::make($input, $validationArray);
 

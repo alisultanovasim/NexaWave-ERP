@@ -98,6 +98,11 @@ class DatabaseSeeder extends Seeder
             'gender' => 'm'
         ]);
 
+        \Modules\Hr\Entities\Language::create([
+            "name" => "Azerbaycan",
+            "code" => "AZE",
+            "iso" => "AZ"
+        ]);
 
 
 

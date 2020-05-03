@@ -47,6 +47,8 @@ class DocumentController extends Controller
             'to' => "sometimes|required|integer",
             'from' => "sometimes|required|integer",
             'time_from' => 'sometimes|required|date|date_format:Y-m-d',
+            'register_time' => 'sometimes|required|date|date_format:Y-m-d',
+            'expire_time' => 'sometimes|required|date|date_format:Y-m-d',
             'time_to' => 'sometimes|required|date|date_format:Y-m-d',
             'sender_comp_id' => "sometimes|required|integer",
             'folder' => 'sometimes|required',
@@ -334,6 +336,7 @@ class DocumentController extends Controller
 
             return $this->successResponse("OK");
         } catch (\Exception $e) {
+
             return $this->successResponse(trans("apiResponse.tryLater"), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 

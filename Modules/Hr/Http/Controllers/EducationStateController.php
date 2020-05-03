@@ -38,7 +38,6 @@ class EducationStateController extends Controller
             EducationState::create([
                 'name' => $request->get('name'),
                 'code' => $request->get('code'),
-                'position' => $request->get('position'),
             ]);
             DB::commit();
         }
@@ -68,7 +67,6 @@ class EducationStateController extends Controller
             $educationState->update([
                 'name' => $request->get('name'),
                 'code' => $request->get('code'),
-                'position' => $request->get('position')
             ]);
             DB::commit();
         }
@@ -94,7 +92,6 @@ class EducationStateController extends Controller
         $validationArray = [
             'name' => 'required|min:1|max:255',
             'code' => 'required|min:1|max:15',
-            'position' => 'nullable'
         ];
         $validator = \Validator::make($input, $validationArray);
 

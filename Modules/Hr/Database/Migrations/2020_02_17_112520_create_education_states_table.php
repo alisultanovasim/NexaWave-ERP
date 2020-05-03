@@ -17,8 +17,6 @@ class CreateEducationStatesTable extends Migration
             $table->bigIncrements('id');
             $table->text('name');
             $table->char('code', 255);
-            $table->bigInteger('position')->nullable()->default(null);
-            $table->unsignedBigInteger('company_id');
             $table->timestamps();
             $table->softDeletes();
         });
