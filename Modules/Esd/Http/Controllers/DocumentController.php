@@ -63,7 +63,9 @@ class DocumentController extends Controller
             $perPage = $request->has("per_page") ? $request->per_page : 10;
             $documents = Document::with([
                 'section:id,name', 'sendForm', 'sendType'
-            ])->where("company_id", $request->company_id)
+            ])
+                ->withCount('assignment as assignment')
+                ->where("company_id", $request->company_id)
                 ->where("status", "!=",Document::DRAFT);
 
             /**  Start filter  */
@@ -154,6 +156,7 @@ class DocumentController extends Controller
 
             return $this->successResponse($documents);
         } catch (QueryException $ex){
+            dd($ex);
             if($ex->errorInfo[1] == 1054)
                 return $this->errorMessage(['order_by' => ['not valid data']], Response::HTTP_UNPROCESSABLE_ENTITY);
 
