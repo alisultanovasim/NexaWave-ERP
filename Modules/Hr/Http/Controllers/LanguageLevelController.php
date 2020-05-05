@@ -37,7 +37,6 @@ class LanguageLevelController extends Controller
             LanguageLevel::create([
                 'name' => $request->get('name'),
                 'code' => $request->get('code'),
-                'position' => $request->get('position'),
             ]);
             DB::commit();
         }
@@ -67,7 +66,6 @@ class LanguageLevelController extends Controller
             $languageLevel->update([
                 'name' => $request->get('name'),
                 'code' => $request->get('code'),
-                'position' => $request->get('position'),
             ]);
             DB::commit();
         }
@@ -92,7 +90,6 @@ class LanguageLevelController extends Controller
         $validationArray = [
             'name' => 'required|max:256',
             'code' => 'required|max:50',
-            'position' => 'required|numeric',
         ];
         $validator = \Validator::make($input, $validationArray);
 

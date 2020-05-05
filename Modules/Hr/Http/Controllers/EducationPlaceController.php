@@ -41,30 +41,16 @@ class EducationPlaceController extends Controller
         if ($error)
             return $this->errorResponse($error, 422);
 
+        EducationPlace::create([
+            'name' => $request->get('name'),
+            'code' => $request->get('code'),
+            'note' => $request->get('note'),
+            'country_id' => $request->get('country_id'),
+            'city_id' => $request->get('city_id'),
+            'region_id' => $request->get('region_id'),
+        ]);
 
-       try
-        {
-            DB::beginTransaction();
-            $saved = true;
-            EducationPlace::create([
-                'name' => $request->get('name'),
-                'code' => $request->get('code'),
-                'note' => $request->get('note'),
-                'position' => $request->get('position'),
-                'country_id' => $request->get('country_id'),
-                'city_id' => $request->get('city_id'),
-                'region_id' => $request->get('region_id'),
-            ]);
-            DB::commit();
-        }
-        catch (\Exception $exception)
-        {
-            $saved = false;
-            DB::rollBack();
-        }
-        return $saved
-            ? $this->successResponse(trans('messages.saved'), 201)
-            : $this->errorResponse(trans('messages.not_saved'));
+        return $this->successResponse(trans('messages.saved'));
     }
 
     public function update(Request $request, $id)
@@ -85,7 +71,6 @@ class EducationPlaceController extends Controller
                 'name' => $request->get('name'),
                 'code' => $request->get('code'),
                 'note' => $request->get('note'),
-                'position' => $request->get('position'),
                 'country_id' => $request->get('country_id'),
                 'city_id' => $request->get('city_id'),
                 'region_id' => $request->get('region_id')
@@ -113,7 +98,6 @@ class EducationPlaceController extends Controller
         $validationArray = [
             'name' => 'required|max:256',
             'code' => 'required|max:50',
-            'position' => 'required|numeric',
             'country_id' => ['required' , 'integer'],
             'cit_id' => ['sometimes'  , 'required' , 'integer'],
             'region_id' => ['sometimes'  , 'required' , 'integer'],

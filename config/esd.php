@@ -68,7 +68,7 @@ return [
 
 
                 'coulmns1' => [
-                    ['name' => 'Bölmə', 'position' => '1', 'is_active' => '0', 'type' => '1', 'field' => 'section',],
+//                    ['name' => 'Bölmə', 'position' => '1', 'is_active' => '0', 'type' => '1', 'field' => 'section',],
                     ['name' => 'Qeydiyyat Nömrəsi', 'position' => '2', 'is_active' => '1', 'type' => '1', 'field' => 'register_number',],
                     ['name' => 'Status', 'position' => '3', 'is_active' => '1', 'type' => '1', 'field' => 'status',],
                     ['name' => 'Kimdən Ünvanlanıb', 'position' => '4', 'is_active' => '1', 'type' => '1', 'field' => 'sender_company_id_id',],
@@ -94,7 +94,7 @@ return [
 
 
                 'coulmns2' => [
-                    ['name' => 'Bölmə', 'position' => '1', 'is_active' => '0', 'type' => '1', 'field' => 'section',],
+//                    ['name' => 'Bölmə', 'position' => '1', 'is_active' => '0', 'type' => '1', 'field' => 'section',],
                     ['name' => 'Qeydiyyat Nömrəsi', 'position' => '2', 'is_active' => '1', 'type' => '1', 'field' => 'register_number',],
                     ['name' => 'Status', 'position' => '3', 'is_active' => '1', 'type' => '1', 'field' => 'status',],
                     ['name' => 'Kimdən Ünvanlanıb', 'position' => '4', 'is_active' => '1', 'type' => '1', 'field' => 'name',],
@@ -142,7 +142,8 @@ return [
                     ['name' => 'Adiyyatı üzrə göndər', 'position' => '7', 'is_active' => '0', 'type' => '2', 'field' => '/assets/images/svg/mail-send.svg',],],
 
 
-                'coulmns3' => [['name' => 'Bölmə', 'position' => '1', 'is_active' => '0', 'type' => '1', 'field' => 'section',],
+                'coulmns3' => [
+//                    ['name' => 'Bölmə', 'position' => '1', 'is_active' => '0', 'type' => '1', 'field' => 'section',],
                     ['name' => 'Qeydiyyat Nömrəsi', 'position' => '2', 'is_active' => '1', 'type' => '1', 'field' => 'register_number',],
                     ['name' => 'Status', 'position' => '3', 'is_active' => '1', 'type' => '1', 'field' => 'status',],
                     ['name' => 'Kimdən Ünvanlanıb', 'position' => '4', 'is_active' => '1', 'type' => '1', 'field' => 'company_user',],
@@ -167,7 +168,8 @@ return [
                 ],
 
 
-                'coulmns4' => [['name' => 'Bölmə', 'position' => '1', 'is_active' => '0', 'type' => '1', 'field' => 'section',],
+                'coulmns4' => [
+//                    ['name' => 'Bölmə', 'position' => '1', 'is_active' => '0', 'type' => '1', 'field' => 'section',],
                     ['name' => 'Qeydiyyat Nömrəsi', 'position' => '2', 'is_active' => '1', 'type' => '1', 'field' => 'register_number',],
                     ['name' => 'Status', 'position' => '3', 'is_active' => '1', 'type' => '1', 'field' => 'status',],
                     ['name' => 'Kimdən Ünvanlanıb', 'position' => '4', 'is_active' => '1', 'type' => '1', 'field' => 'company_user',],
@@ -193,7 +195,8 @@ return [
                     ['name' => 'Adiyyatı üzrə göndər', 'position' => '7', 'is_active' => '0', 'type' => '2', 'field' => '/assets/images/svg/mail-send.svg',],],
 
 
-                'coulmns5' => [['name' => 'Bölmə', 'position' => '1', 'is_active' => '0', 'type' => '1', 'field' => 'section',],
+                'coulmns5' => [
+//                    ['name' => 'Bölmə', 'position' => '1', 'is_active' => '0', 'type' => '1', 'field' => 'section',],
                     ['name' => 'Qeydiyyat Nömrəsi', 'position' => '2', 'is_active' => '1', 'type' => '1', 'field' => 'register_number',],
                     ['name' => 'Status', 'position' => '3', 'is_active' => '1', 'type' => '1', 'field' => 'status',],
                     ['name' => 'Kimdən Ünvanlanıb', 'position' => '4', 'is_active' => '1', 'type' => '1', 'field' => 'from_in_our_company',],

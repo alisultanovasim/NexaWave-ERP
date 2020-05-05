@@ -39,7 +39,6 @@ class FacultyController extends Controller
             Faculty::create([
                 'name' => $request->get('name'),
                 'code' => $request->get('code'),
-                'position' => $request->get('position'),
             ]);
             DB::commit();
         }
@@ -68,7 +67,6 @@ class FacultyController extends Controller
             $faculty->update([
                 'name' => $request->get('name'),
                 'code' => $request->get('code'),
-                'position' => $request->get('position'),
             ]);
             DB::commit();
         }
@@ -93,7 +91,6 @@ class FacultyController extends Controller
         $validationArray = [
             'name' => 'required|max:256',
             'code' => 'required|max:50',
-            'position' => 'required|numeric',
             'company_id' => ['required' , 'integer'],
         ];
         $validator = \Validator::make($input, $validationArray);

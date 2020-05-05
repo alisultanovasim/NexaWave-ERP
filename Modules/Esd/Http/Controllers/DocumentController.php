@@ -47,6 +47,8 @@ class DocumentController extends Controller
             'to' => "sometimes|required|integer",
             'from' => "sometimes|required|integer",
             'time_from' => 'sometimes|required|date|date_format:Y-m-d',
+            'register_time' => 'sometimes|required|date|date_format:Y-m-d',
+            'expire_time' => 'sometimes|required|date|date_format:Y-m-d',
             'time_to' => 'sometimes|required|date|date_format:Y-m-d',
             'sender_comp_id' => "sometimes|required|integer",
             'folder' => 'sometimes|required',
@@ -61,7 +63,9 @@ class DocumentController extends Controller
             $perPage = $request->has("per_page") ? $request->per_page : 10;
             $documents = Document::with([
                 'section:id,name', 'sendForm', 'sendType'
-            ])->where("company_id", $request->company_id)
+            ])
+                ->withCount('assignment as assignment')
+                ->where("company_id", $request->company_id)
                 ->where("status", "!=",Document::DRAFT);
 
             /**  Start filter  */
@@ -152,6 +156,7 @@ class DocumentController extends Controller
 
             return $this->successResponse($documents);
         } catch (QueryException $ex){
+            dd($ex);
             if($ex->errorInfo[1] == 1054)
                 return $this->errorMessage(['order_by' => ['not valid data']], Response::HTTP_UNPROCESSABLE_ENTITY);
 
@@ -334,6 +339,7 @@ class DocumentController extends Controller
 
             return $this->successResponse("OK");
         } catch (\Exception $e) {
+
             return $this->successResponse(trans("apiResponse.tryLater"), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 

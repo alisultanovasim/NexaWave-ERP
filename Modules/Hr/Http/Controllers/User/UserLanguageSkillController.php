@@ -3,12 +3,12 @@
 
 namespace Modules\Hr\Http\Controllers\User;
 
+use App\Models\User;
 use App\Traits\ApiResponse;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
-use Modules\Esd\Entities\User;
 use Modules\Hr\Entities\User\UserLanguageSkill;
 
 class UserLanguageSkillController extends Controller
@@ -20,14 +20,16 @@ class UserLanguageSkillController extends Controller
         $this->validate($request, [
             'per_page' => ['sometimes', 'required', 'integer']
         ]);
-        UserLanguageSkill::with([
+        $skills = UserLanguageSkill::with([
             'user:id,name,surname',
-            'language',
-            'listening',
-            'reading',
-            'comprehension',
-            'writing',
-        ])->company($request->get('company_id'))->paginate($request->get('per_page'));
+            'language:id,name',
+            'listening:id,name',
+            'reading:id,name',
+            'comprehension:id,name',
+            'writing:id,name',
+        ])->company()
+            ->paginate($request->get('per_page'));
+        return $this->successResponse($skills);
     }
 
     public function show(Request $request, $id)
@@ -55,15 +57,12 @@ class UserLanguageSkillController extends Controller
             'comprehension' => ['required' , 'integer'],
             'writing' => ['required' , 'integer'],
         ]);
-        //check if user able to
-        $exists = User::whereHas('employment' , function ($q) use ($request){
-            $q->where('company_id' , $request->get('company_id'));
-        })
+        $exists = User::company()
             ->where('id' , $request->get('user_id'))
             ->exists();
         if (!$exists) return $this->errorResponse(trans('response.userNotFound') , 404);
 
-        UserLanguageSkill::create($request->only($this->inserted()));
+        UserLanguageSkill::create($request->only($this->inserted()) + ['user_id' => $request->get('user_id')]);
         return $this->successResponse('ok');
     }
 
@@ -77,7 +76,7 @@ class UserLanguageSkillController extends Controller
             'writing' => ['nullable' , 'integer'],
         ]);
 
-        $check = UserLanguageSkill::company($request->get('company_id'))
+        $check = UserLanguageSkill::company()
             ->where('id' , $id)
             ->first(['id']);
         if (!$check) return $this->errorResponse(trans('response.userNotFound') ,404);
@@ -88,7 +87,7 @@ class UserLanguageSkillController extends Controller
     }
 
     public function delete(Request $request , $id){
-        $check = UserLanguageSkill::company($request->get('company_id'))
+        $check = UserLanguageSkill::company()
             ->where('id' , $id)
             ->first(['id']);
         if (!$check) return $this->errorResponse(trans('response.userNotFound') ,404);

@@ -17,7 +17,6 @@ class CreateLanguageLevelsTable extends Migration
             $table->bigIncrements('id');
             $table->string('name');
             $table->char('code', 50);
-            $table->bigInteger('position');
             $table->timestamps();
             $table->softDeletes();
         });

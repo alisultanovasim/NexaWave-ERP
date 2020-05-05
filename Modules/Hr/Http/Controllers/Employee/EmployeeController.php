@@ -51,6 +51,19 @@ class EmployeeController extends Controller
             $employees->where('is_active', $request->get('state'));
         else $employees->where('is_active', true);
 
+        if ($request->get('department_id'))
+            $employees->whereHas('contract' , function ($q) use ($request){
+                $q->where('department_id', $request->get('department_id'));
+            });
+
+        if ($request->get('section_id'))
+            $employees->whereHas('contract' , function ($q) use ($request){
+                $q->where('section_id', $request->get('section_id'));
+            });
+        if ($request->get('sector_id'))
+            $employees->whereHas('contract' , function ($q) use ($request){
+                $q->where('sector_id', $request->get('sector_id'));
+            });
         $employees = $employees->orderBy('id' , 'desc')->paginate($request->get('paginateCount'));
 
         return $this->successResponse($employees);

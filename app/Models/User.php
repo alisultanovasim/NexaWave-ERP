@@ -57,6 +57,11 @@ class User extends Authenticatable
     public function employment(){
         return $this->hasMany(Employee::class);
     }
+    public function scopeCompany($q){
+        return $q->whereHas('employment' , function ($q){
+            $q->where('company_id' , request('company_id'));
+        });
+    }
 
 
     public $generatedPassword = null;

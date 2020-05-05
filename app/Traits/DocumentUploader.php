@@ -26,7 +26,7 @@ trait DocumentUploader
             if (in_array($request->document->extension(), config("esd.document.extensions"))) {
                 $filesize = filesize($document->getRealPath());
                 $sub_documents = [
-                    "uploader" => $request->user_id,
+                    "uploader" => Auth::id(),
                     "resource" => $this->uploadFile($document, $request->company_id, $str),
                     "type" => config("esd.document.type.file"),
                     'size' => $filesize
@@ -38,7 +38,7 @@ trait DocumentUploader
                 ]);
         } else {
             $sub_documents = [
-                "uploader" => $request->user_id,
+                "uploader" => Auth::id(),
                 "resource" => $document,
                 "type" => config("esd.document.type.editor"),
                 'size' => strlen($document)

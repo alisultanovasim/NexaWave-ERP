@@ -63,6 +63,7 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Throwable $exception)
     {
+
         if ($exception instanceof HttpException) {
             $code = $exception->getStatusCode();
             $message = \Symfony\Component\HttpFoundation\Response::$statusTexts[$code];

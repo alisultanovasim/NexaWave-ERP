@@ -22,23 +22,21 @@ class UserLanguageSkill extends Model
         return $this->belongsTo(Language::class);
     }
     public function listening(){
-        return $this->belongsTo(LanguageLevel::class);
+        return $this->belongsTo(LanguageLevel::class  ,'listening');
     }
     public function reading(){
-        return $this->belongsTo(LanguageLevel::class);
+        return $this->belongsTo(LanguageLevel::class , 'reading');
     }
     public function comprehension(){
-        return $this->belongsTo(LanguageLevel::class);
+        return $this->belongsTo(LanguageLevel::class , 'comprehension');
     }
     public function writing(){
-        return $this->belongsTo(LanguageLevel::class);
+        return $this->belongsTo(LanguageLevel::class , 'writing');
     }
 
-    public function scopeCompany($q , $company_id){
-        return $q->whereHas('user' , function ($q) use($company_id){
-            $q->whereHas('employment' , function ($q) use ($company_id){
-                $q->where('company_id' , $company_id);
-            });
+    public function scopeCompany($q){
+        return $q->whereHas('user' , function ($q){
+            $q->company();
         });
     }
 }
