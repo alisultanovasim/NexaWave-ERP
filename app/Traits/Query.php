@@ -35,7 +35,7 @@ trait Query
                 if (env('APP_DEBUG')) return ['error' => 'table in config/query.php is not exists'];
             }
             return [
-                'error' => 'server error. Error code 111'
+                'error' => $e->getMessage()
             ];
         }
 

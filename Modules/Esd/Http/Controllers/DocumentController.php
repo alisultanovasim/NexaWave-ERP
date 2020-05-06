@@ -24,7 +24,7 @@ use Illuminate\Routing\Controller;
 
 class DocumentController extends Controller
 {
-    use  ApiResponse, DocumentUploader, DocumentBySection  ,ValidatesRequests;
+    use  ApiResponse, DocumentUploader, DocumentBySection, ValidatesRequests;
 
     public function index(Request $request)
     {
@@ -62,11 +62,19 @@ class DocumentController extends Controller
         try {
             $perPage = $request->has("per_page") ? $request->per_page : 10;
             $documents = Document::with([
-                'section:id,name', 'sendForm', 'sendType'
+                'section:id,name', 'sendForm', 'sendType',
+                'assignment' => function ($q) {
+                    $q->with(['item' => function ($q) {
+                        $q
+                            ->whereHas('employee' , function ($q){
+                                $q->where('user_id', Auth::id());
+                            })
+                            ->select(['assignment_id' , 'status']);
+                    }]);
+                },
             ])
-                ->withCount('assignment as assignment')
                 ->where("company_id", $request->company_id)
-                ->where("status", "!=",Document::DRAFT);
+                ->where("status", "!=", Document::DRAFT);
 
             /**  Start filter  */
             if ($request->has("status")) {
@@ -146,23 +154,19 @@ class DocumentController extends Controller
                 $documents->WithAllRelations();
             }
 
-            if ($request->has('order_by')){
+            if ($request->has('order_by')) {
                 $direction = $request->direction ?? 'desc';
-                $documents->orderBy($request->get('order_by') , $direction);
-            }else{
+                $documents->orderBy($request->get('order_by'), $direction);
+            } else {
                 $documents->orderBy("documents.id", "DESC");
             }
             $documents = $documents->paginate($perPage, $data);
 
             return $this->successResponse($documents);
-        } catch (QueryException $ex){
+        } catch (QueryException $ex) {
             dd($ex);
-            if($ex->errorInfo[1] == 1054)
+            if ($ex->errorInfo[1] == 1054)
                 return $this->errorMessage(['order_by' => ['not valid data']], Response::HTTP_UNPROCESSABLE_ENTITY);
-
-            return $this->errorResponse(trans('apiResponse.tryLater'), Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
-        catch (\Exception $e) {
             return $this->errorResponse(trans('apiResponse.tryLater'), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
@@ -193,7 +197,6 @@ class DocumentController extends Controller
             'company_user' => 'sometimes|required|integer'
         ]);
 
-
         $arr = $request->only(
             'inner_inspect',
             'register_number',
@@ -216,6 +219,7 @@ class DocumentController extends Controller
                     return $this->errorResponse(trans('apiResponse.parentNotFound'));
             }
             if ('in_company_docs' == Section::RULES[$request->get('section_id')]) $arr['company_user'] = null;
+//            else {/* check company_user  */}
             $document->fill($arr);
             $document->save();
 
@@ -224,12 +228,12 @@ class DocumentController extends Controller
             if ($request->has("sub_documents"))
                 Doc::insert($this->SubDocumentsBuilder($document, $request->sub_documents, $base, $request));
 
-            $table = Section::RULES[$request->section_id];
+            $table = Section::RULES[$document->section_id];
 
-            $data = $this->saveBySection($request, $document, $table);
+            $data = $this->saveBySection($request, $table);
             if ($data instanceof JsonResponse) return $data;
 
-           DB::table($table)->insert($data);
+            DB::table($table)->insert($data +  ['document_id' => $document->id]);
 
             DB::commit();
             return $this->successResponse("OK");
@@ -255,14 +259,11 @@ class DocumentController extends Controller
                     return $this->errorResponse([$find[0] => trans('apiResponse.inCorrectFormat')], Response::HTTP_UNPROCESSABLE_ENTITY);
                 }
             }
-
-             return $this->errorResponse(trans('apiResponse.tryLater'), Response::HTTP_INTERNAL_SERVER_ERROR);
-
+            return $this->errorResponse(trans('apiResponse.tryLater'), Response::HTTP_INTERNAL_SERVER_ERROR);
         } catch (ValidationException $exception) {
             return $this->errorResponse($exception->errors());
         } catch (\Exception $e) {
             DB::rollBack();
-
             return $this->errorResponse(trans("apiResponse.tryLater"), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
@@ -280,7 +281,7 @@ class DocumentController extends Controller
         try {
             $document = Document::where("id", $id)
                 ->where("company_id", $company_id)
-                ->whereIn("status",[Document::WAIT , Document::ACTIVE])
+                ->whereIn("status", [Document::WAIT, Document::ACTIVE])
                 ->first('id');
             if (!$document)
                 return $this->errorResponse(trans("apiResponse.docNotFound"), Response::HTTP_UNPROCESSABLE_ENTITY);
@@ -416,26 +417,28 @@ class DocumentController extends Controller
         try {
             DB::beginTransaction();
 
-            $document = Document::where("id", $id)
-                ->where("company_id", $company_id);
-            if (!$request->has_permission)
-                $document->where("status", "=", Document::WAIT);
-            else
-                $document->where("status", "!=", Document::DRAFT);
 
-            $document = $document->first(['id' , 'section_id']);
+            //todo check permission of update hr user
+            $document = Document::where("id", $id)
+                ->where("company_id", $company_id)
+                ->where("status", "=", Document::WAIT);
+
+
+            $document = $document->first(['id', 'section_id']);
             if (!$document)
-                return $this->errorResponse(trans("apiResponse.unProcess"));
-            if ('in_company_docs' == Section::RULES[$document->section]) $arr['company_user'] = null;
+                return $this->errorResponse(trans("apiResponse.documentNotInValidStatus"));
+
+
+            if ('in_company_docs' == Section::RULES[$document->section_id]) $arr['company_user'] = null;
 
             $document->fill($arr);
 
             $document->save();
 
+
             $table = Section::RULES[$document->section_id];
 
-
-            $data = $this->dataBySection($request, $document, $table);
+            $data = $this->saveBySection($request, $table);
 
             if ($data instanceof JsonResponse) return $data;
 
@@ -470,12 +473,14 @@ class DocumentController extends Controller
                     return $this->errorResponse([$find[0] => "incorrect format"], Response::HTTP_UNPROCESSABLE_ENTITY);
                 }
             }
+            dd($e);
 
             return $this->errorResponse(trans('apiResponse.tryLater'), Response::HTTP_INTERNAL_SERVER_ERROR);
         } catch (ValidationException $exception) {
             return $this->errorResponse($exception->errors());
         } catch (\Exception $e) {
             DB::rollBack();
+            dd($e);
             return $this->errorResponse(trans("apiResponse.tryLater"), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
@@ -488,7 +493,7 @@ class DocumentController extends Controller
         try {
             $check = Document::where("id", $id)
                 ->where("company_id", $request->company_id)
-                ->where("status", "=",Document::WAIT)
+                ->where("status", "=", Document::WAIT)
                 ->delete();
             if ($check)
                 return $this->errorResponse(trans("apiResponse.unProcess"));
@@ -526,7 +531,7 @@ class DocumentController extends Controller
             'theme' => 'sometimes|required',
         ]);
         $documents = Document::where("company_id", $request->company_id)
-            ->where("status", "!=",Document::DRAFT);
+            ->where("status", "!=", Document::DRAFT);
         if ($request->has('document_no'))
             $documents->where('document_no', 'like', $request->document_no . '%');
         if ($request->has('theme'))
@@ -579,17 +584,17 @@ class DocumentController extends Controller
             $update = ['status' => $request->status];
             if (!$document) return $this->errorResponse(trans('apiResponse.unProcess'));
 
-            if ($document->status == Document::WAIT_FOR_ACCEPTANCE and $request->status == Document::ACTIVE){
+            if ($document->status == Document::WAIT_FOR_ACCEPTANCE and $request->status == Document::ACTIVE) {
                 AssignmentItem::whereHas('assignment', function ($q) use ($id) {
-                    $q->where('document_id',$id);
+                    $q->where('document_id', $id);
                 })->update([
                     'status' => AssignmentItem::WAIT
                 ]);
             }
-            if ($request->status == Document::ARCHIVE and $request->has('folder')){
+            if ($request->status == Document::ARCHIVE and $request->has('folder')) {
                 $update['folder'] = $request->folder;
             }
-            Document::where('id' , $id)
+            Document::where('id', $id)
                 ->update($update);
 
             return $this->successResponse('OK');

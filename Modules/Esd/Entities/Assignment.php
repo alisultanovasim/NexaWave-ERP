@@ -16,5 +16,8 @@ class Assignment extends Model
     public function items(){
         return $this->hasMany('Modules\Esd\Entities\AssignmentItem' , 'assignment_id');
     }
+    public function item(){
+        return $this->hasOne('Modules\Esd\Entities\AssignmentItem' , 'assignment_id');
+    }
 
 }

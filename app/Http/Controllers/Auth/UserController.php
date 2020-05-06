@@ -47,7 +47,6 @@ class UserController extends Controller
 
         if (!Auth::attempt($request->only('username', 'password'))) {
             return $this->errorResponse(trans('response.invalidLoginOrPassword'));
-
         }
         $token = Auth::user()->createToken('authToken')->accessToken;
         return $this->dataResponse([
@@ -244,7 +243,26 @@ class UserController extends Controller
     public function show(Request $request , $id){
         $user = User::findOrFail($id);
         $user->load([
-            'employment'  , 'employment.contracts' , 'employment.contracts.position' , 'employment.company' , 'details' , 'details.nationality' , 'details.citizen' ,'details.birthdayCity' ,'details.birthdayCountry' ,'details.birthdayRegion'
+            'employment',
+            'employment.contract',
+            'employment.contract.position:id,name' ,
+            'employment.contract.section:id,name,short_name',
+            'employment.contract.sector:id,name,short_name',
+            'employment.contract.department:id,name,short_name',
+            'employment.contract.currency',
+            'employment.company' ,
+            'details' ,
+            'details.nationality',
+            'details.citizen',
+            'details.birthdayCity',
+            'details.birthdayCountry',
+            'details.birthdayRegion',
+            'education' ,
+            'education.speciality',
+            'education.place:id,name',
+            'education.level:id,name',
+            'education.state:id,name',
+            'education.language:id,name'
         ]);
         return $this->successResponse($user);
     }

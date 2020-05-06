@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Hash;
 use Laravel\Passport\HasApiTokens;
 use Modules\Hr\Entities\Employee\Employee;
 use Modules\Hr\Entities\Employee\UserDetail;
+use Modules\Hr\Entities\User\UserEducation;
 
 
 class User extends Authenticatable
@@ -62,8 +63,9 @@ class User extends Authenticatable
             $q->where('company_id' , request('company_id'));
         });
     }
-
-
+    public function education(){
+        return $this->hasMany(UserEducation::class);
+    }
     public $generatedPassword = null;
 
 }

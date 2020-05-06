@@ -35,7 +35,6 @@ class DraftController extends Controller
     public function index(Request $request)
     {
         $this->validate($request, [
-
             'company_id' => 'required|integer',
             "per_page" => "sometimes|required|integer",
             "section_id" => "sometimes|required|integer",
@@ -43,7 +42,6 @@ class DraftController extends Controller
             'time_to' => 'sometimes|required|date|date_format:Y-m-d',
             'document_no' => 'sometimes|required',
             'register_number' => 'sometimes|required',
-
         ]);
 
         $draft = Document::with(['section:id,name'])
@@ -53,7 +51,6 @@ class DraftController extends Controller
 
         if ($request->has("theme"))
             $draft->where("theme", 'like', $request->theme . "%");
-
 
         if ($request->has("time_from"))
             $draft->where("created_at", ">", $request->time_from);

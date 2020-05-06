@@ -96,7 +96,7 @@ class Document extends Model
         ];
         if ($all) {
             $func = function ($q) {
-                $q->with('position:id,name')->active()->select(['id', 'position_id']);
+                $q->with('position:id,name')->active()->select(['id', 'position_id' , 'employee_id']);
             };
             $relations['companyUser.contracts'] = $func;
             $relations['toInOurCompany.contracts'] = $func;
