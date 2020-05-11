@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Modules\Entities;
+namespace Modules\Esd\Entities;
 
 
 use Illuminate\Database\Eloquent\Model;
@@ -14,6 +14,5 @@ class InCompany extends Model
     public $timestamps = false;
 
     protected  $guarded = ['id'];
-
 
 }

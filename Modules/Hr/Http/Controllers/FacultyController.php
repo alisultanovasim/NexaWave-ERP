@@ -19,11 +19,10 @@ class FacultyController extends Controller
     public function index(Request $request)
     {
         $this->validate($request , [
-            'company_id' => ['required' , 'integer'],
             'paginateCount' => ['sometimes','required' , 'integer'],
         ]);
 
-        $result = Faculty::where('company_id' , $request->get('company_id'))->paginate($request->get('paginateCount'));
+        $result = Faculty::paginate($request->get('paginateCount'));
 
         return $this->dataResponse($result);
     }
@@ -40,8 +39,6 @@ class FacultyController extends Controller
             Faculty::create([
                 'name' => $request->get('name'),
                 'code' => $request->get('code'),
-                'position' => $request->get('position'),
-                'company_id' => $request->get('company_id')
             ]);
             DB::commit();
         }
@@ -64,13 +61,12 @@ class FacultyController extends Controller
         {
             DB::beginTransaction();
             $saved = true;
-            $faculty = Faculty::where('id', $id)->where('company_id' , $request->get('company_id'))->first(['id']);
+            $faculty = Faculty::where('id', $id)->first(['id']);
             if (!$faculty)
                 return $this->errorResponse(trans('messages.not_found'), 404);
             $faculty->update([
                 'name' => $request->get('name'),
                 'code' => $request->get('code'),
-                'position' => $request->get('position'),
             ]);
             DB::commit();
         }
@@ -86,7 +82,7 @@ class FacultyController extends Controller
 
     public function destroy(Request $request , $id)
     {
-        return Faculty::where('id', $id)->where('company_id', $request->get('company_id'))->delete()
+        return Faculty::where('id', $id)->delete()
             ? $this->successResponse(trans('messages.saved'))
             : $this->errorResponse(trans('messages.not_saved'));
     }
@@ -95,7 +91,6 @@ class FacultyController extends Controller
         $validationArray = [
             'name' => 'required|max:256',
             'code' => 'required|max:50',
-            'position' => 'required|numeric',
             'company_id' => ['required' , 'integer'],
         ];
         $validator = \Validator::make($input, $validationArray);

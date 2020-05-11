@@ -14,7 +14,7 @@ class AddIndexesToGlobalLogs extends Migration
     public function up()
     {
         Schema::table('global_logs', function (Blueprint $table) {
-            $table->index(['company_id' , 'service' , 'method']);
+            $table->index(['company_id' , 'module' , 'method']);
         });
     }
 
@@ -26,7 +26,7 @@ class AddIndexesToGlobalLogs extends Migration
     public function down()
     {
         Schema::table('global_logs', function (Blueprint $table) {
-            $table->dropIndex(['company_id' , 'service' , 'method']);
+            $table->dropIndex(['company_id' , 'module' , 'method']);
         });
     }
 }

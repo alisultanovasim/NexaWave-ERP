@@ -5,7 +5,7 @@ namespace Modules\Esd\Http\Controllers;
 
 
 use Illuminate\Foundation\Validation\ValidatesRequests;
-use Modules\Entities\Adjustment;
+use Modules\Esd\Entities\Adjustment;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -19,12 +19,12 @@ class  AdjustmentController extends Controller
 
     public function index(Request $request){
         $this->validate($request , [
-            'user_id' => 'required|integer',
+
             'company_id' => 'required|integer',
             'section_type' => 'required|integer',
         ]);
         try{
-            $adjustments = Adjustment::with([])->where('user_id' ,$request->user_id)->where('section_type' , $request->section_type)->get([
+            $adjustments = Adjustment::with([])->where('user_id' ,Auth::id())->where('section_type' , $request->section_type)->get([
                 'name',
                 'field',
                 'is_active',
@@ -32,7 +32,7 @@ class  AdjustmentController extends Controller
                 'type'
             ]);
             if ($adjustments->count() == 0){
-                $arr = config("modules.document.adjustments.initial_rules.coulmns{$request->section_type}");
+                $arr = config("esd.document.adjustments.initial_rules.coulmns{$request->section_type}");
                 if($arr == null) return $this->successResponse([]);
                 $sendArr = [];
                 foreach ($arr  as $k => $v) {
@@ -41,7 +41,7 @@ class  AdjustmentController extends Controller
                     $arr[$k]['position'] = (int)$arr[$k]['position'];
 
                     $sendArr[$k] = $arr[$k];
-                    $arr[$k]['user_id'] = $request->user_id;
+                    $arr[$k]['user_id'] = Auth::id();
                     $arr[$k]['section_type'] = $request->section_type;
                 }
 
@@ -58,7 +58,7 @@ class  AdjustmentController extends Controller
 
     public function update(Request $request){
         $this->validate($request , [
-            'user_id' => 'required|integer',
+
             'company_id' => 'required|integer',
             'data'=> 'required|array',
             'data.*.name' => 'required|string|max:255',
@@ -69,10 +69,10 @@ class  AdjustmentController extends Controller
             'section_type' => 'sometimes|integer'
         ]);
         try{
-            Adjustment::where('user_id' , $request->user_id)->where('section_type' , $request->section_type)->delete();
+            Adjustment::where('user_id' ,Auth::id())->where('section_type' , $request->section_type)->delete();
             $arr = $request->data;
             foreach ($arr  as $k => $v) {
-                $arr[$k]['user_id'] = $request->user_id;
+                $arr[$k]['user_id'] = Auth::id();
                 $arr[$k]['section_type'] = $request->section_type;
             }
             Adjustment::insert($arr);

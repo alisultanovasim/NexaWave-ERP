@@ -1,0 +1,71 @@
+image: lorisleiva/laravel-docker:latest
+
+.init_ssh: &init_ssh |
+  eval $(ssh-agent -s)
+  echo "$TEST_SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add - > /dev/null
+  mkdir -p ~/.ssh
+  chmod 700 ~/.ssh
+  [[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
+
+.change_file_permissions: &change_file_permissions |
+  find . -type f -not -path "./vendor/*" -exec chmod 664 {} \;
+  find . -type d -not -path "./vendor/*" -exec chmod 775 {} \;
+
+# The job's name.
+composer:
+
+  # The job's stage (build, test or deploy).
+  stage: build
+
+  # What to run on the job.
+  script:
+    - composer install --prefer-dist --no-ansi --no-interaction --no-progress --no-scripts
+    - cp .env.example .env
+  #    - php artisan key:generate
+
+  artifacts:
+
+    # (Optional) Give it an expiration date,
+    # after that period you won't be able to
+    # download them via the UI anymore.
+    expire_in: 1 month
+
+    # Define what to output from the job.
+    paths:
+      - vendor/
+      - .env
+  cache:
+
+    # The variable CI_COMMIT_REF_SLUG
+    # refers to the slug of the branch.
+    # For example: `master` for the master branch.
+    # We use the `composer` suffix to avoid conflicts with
+    # the `npm` cache that we'll define next.
+    key: ${CI_COMMIT_REF_SLUG}-composer
+
+    # Define what to cache.
+    paths:
+      - vendor/
+staging:
+  stage: deploy
+  script:
+
+    # Reuse a template by calling `*reference`
+    - *init_ssh
+    - *change_file_permissions
+    - php artisan deploy time-vps1.serverxx.com -s upload
+    # Next section
+    # - Deploy to the staging host using Laravel Deployer
+  # Pseudocode describing roughly what we're trying to achive
+
+  # Define an GitLab environment.
+  # This makes GitLab aware of your latest deployments
+  # and provides a button to check out the provided url.
+  environment:
+    name: staging
+    url: http://time-vps1.serverxx.com
+
+  # (Optional) Only deploy if we're in the master branch
+  # Other branches will only build and test.
+  only:
+    - master

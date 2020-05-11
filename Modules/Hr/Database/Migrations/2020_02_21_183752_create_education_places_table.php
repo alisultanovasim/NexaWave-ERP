@@ -18,11 +18,9 @@ class CreateEducationPlacesTable extends Migration
             $table->string('name', 256);
             $table->char('code', 50);
             $table->string('note', 1000)->nullable();
-            $table->bigInteger('position');
             $table->unsignedBigInteger('country_id');
             $table->unsignedBigInteger('city_id')->nullable();
             $table->unsignedBigInteger('region_id')->nullable();
-            $table->unsignedBigInteger('company_id');
             $table->timestamps();
             $table->softDeletes();
 

@@ -16,6 +16,7 @@ class CreateModulesTable extends Migration
         Schema::create('modules', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string("name");
+            $table->string('component')->nullable();//for front components
             $table->bigInteger("parent_id")->nullable();
             $table->boolean("is_active")->default(true);
             $table->timestamps();

@@ -5,9 +5,9 @@ namespace Modules\Esd\Http\Controllers;
 
 
 use Illuminate\Foundation\Validation\ValidatesRequests;
-use Modules\Entities\senderCompany;
-use Modules\Entities\senderCompanyRole;
-use Modules\Entities\senderCompanyUser;
+use Modules\Esd\Entities\senderCompany;
+use Modules\Esd\Entities\senderCompanyRole;
+use Modules\Esd\Entities\senderCompanyUser;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -21,7 +21,7 @@ class SenderCompaniesUser extends  Controller
     public function index(Request $request){
         $this->validate($request , [
             'company_id'=>'required|integer',
-            'user_id'=>'required|integer' ,
+
             'sender_company_id'=>'required|integer',
             'name'=>'sometimes|required|max:255',
             'role_id' => 'sometimes|Required|integer'
@@ -44,7 +44,6 @@ class SenderCompaniesUser extends  Controller
     public function store(Request $request){
         $this->validate($request , [
             'company_id'=>'required|integer',
-            'user_id'=>'required|integer' ,
             'sender_company_id'=>'required|integer',
             'sender_company_role_id'=>'required|integer',
             'name'=>'required|max:255'
@@ -69,7 +68,6 @@ class SenderCompaniesUser extends  Controller
     public function update(Request $request){
         $this->validate($request , [
             'company_id'=>'required|integer',
-            'user_id'=>'required|integer' ,
             'sender_company_role_id'=>'sometimes|required|integer',
             'name'=>'sometimes|required|max:255',
             'sender_company_user_id'=>'required|integer'
@@ -101,7 +99,6 @@ class SenderCompaniesUser extends  Controller
     public function delete(Request $request){
         $this->validate($request , [
             'company_id'=>'required|integer',
-            'user_id'=>'required|integer' ,
             'sender_company_user_id'=>'required|integer'
         ]);
         try {
@@ -125,7 +122,6 @@ class SenderCompaniesUser extends  Controller
     public function getAllRoles(Request $request){
         $this->validate($request , [
            'company_id'=>'required|integer',
-           'user_id'=>'required|integer',
             'sender_company_id'=>'required|integer',
             'name'=>'sometimes|required|max:255'
 
@@ -146,7 +142,6 @@ class SenderCompaniesUser extends  Controller
     public function storeRole(Request $request){
         $this->validate($request , [
            'company_id'=>'required|integer',
-           'user_id'=>'required|integer',
             'sender_company_id'=>'required|integer',
             'name'=>'required|max:255'
         ]);
@@ -164,7 +159,6 @@ class SenderCompaniesUser extends  Controller
     public function updateRole(Request $request){
         $this->validate($request , [
            'company_id'=>'required|integer',
-           'user_id'=>'required|integer',
             'sender_company_role_id'=>'required|integer',
             'name'=>'required|integer'
         ]);
@@ -187,7 +181,6 @@ class SenderCompaniesUser extends  Controller
     public function deleteRole(Request $request){
         $this->validate($request , [
            'company_id'=>'required|integer',
-           'user_id'=>'required|integer',
         ]);
         try{
             $role = senderCompanyRole::where('id' , $request->sender_company_role)->first(['id' , 'sender_company_id']);

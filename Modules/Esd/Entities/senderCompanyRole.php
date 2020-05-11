@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Modules\Entities;
+namespace Modules\Esd\Entities;
 
 
 use Illuminate\Database\Eloquent\Model;
@@ -13,7 +13,8 @@ class senderCompanyRole extends Model
     public $timestamps = false;
 
     protected $guarded = ['id'];
-    public function roles(){
-        return $this->belongsTo('Modules\Entities\senderCompanyUser' , 'sender_company_role_id');
+
+    public function users(){
+        return $this->hasMany('Modules\Esd\Entities\senderCompanyUser' , 'sender_company_role_id');
     }
 }

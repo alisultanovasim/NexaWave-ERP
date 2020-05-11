@@ -6,7 +6,34 @@ use Illuminate\Support\Facades\Route;
 Route::group([
     'prefix' => 'v1'
 ] , function ($router) {
-    Route::get('/profile', 'Auth\UserController@profile')->middleware('auth:api');
+
+    Route::group([
+        'prefix' => 'profile',
+        'middleware' => 'auth:api',
+        'namespace' => 'Auth'
+    ] , function ($r) {
+        Route::get('/', 'ProfileController@profile');
+        Route::post('/update', 'ProfileController@update');
+        Route::get('/me', 'ProfileController@index');
+        Route::get('/history', 'ProfileController@history');
+    }); // profile
+
+
+
+    Route::group([
+        'prefix' => 'users',
+        'middleware' => 'auth:api',
+        'namespace' => 'Auth'
+    ] , function ($r) {
+        Route::get('/', 'UserController@index');
+        Route::post('/', 'UserController@store');
+        Route::put('/{id}', 'UserController@update');
+        Route::get('/{id}', 'UserController@show');
+        //delete
+        Route::get('/search', 'UserController@searchByFin');
+
+    }); // profile
+
 
     Route::group([
         'prefix' => 'logs',
@@ -36,7 +63,14 @@ Route::group([
 
         Route::post('/login' , 'UserController@login');
         Route::post('/register' , 'UserController@register');
-    });
+    }); // auth
+
+    Route::group(['prefix' => 'permissions'], function (){
+        Route::post('set', 'PermissionController@setPositionPermissions');
+        Route::get('modules', 'PermissionController@getModules');
+        Route::get('permissions', 'PermissionController@getPermissions');
+        Route::get('', 'PermissionController@getPositions');
+    }); // permissions
 
 });
 

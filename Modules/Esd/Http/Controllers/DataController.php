@@ -18,9 +18,9 @@ class DataController extends Controller
     use ApiResponse  ,ValidatesRequests;
     public function index(Request $request)
     {
-        $conf = config('modules.document.data');
+        $conf = config('esd.document.data');
         $this->validate($request, [
-            'user_id' => ['required', 'integer'],
+
             'company_id' => ['required', 'integer'],
             'data' => ['required', 'array'],
             'data.*' => ['required', 'string', 'max:255',
@@ -34,7 +34,6 @@ class DataController extends Controller
                     $data[$table] = DB::table($table)->where('company_id', $request->company_id)->get();
                 else
                     $data[$table] = DB::table($table)->get();
-
             }
             return $this->successResponse($data);
         } catch (\Exception $exception) {

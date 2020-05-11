@@ -14,7 +14,8 @@ class Document extends Model
 
     public function getUrlAttribute($value){
         if ($value)
-            return env('API_GATEWAY_STATIC_FILES') . 'Plaza?path=documents/'  .  $value;
+            return env('APP_URL') . '/documents/'  .  $value;
         return $value;
     }
+
 }

@@ -20,7 +20,6 @@ class WorkerController extends Controller
     public function all(Request $request){
         $this->validate($request, [
             'company_id' => 'required|integer',
-            'office_id' => 'sometimes|required|integer',
             'name'=> 'sometimes|nullable|string|max:255',
             'has_card'=>'sometimes|required|in:1,0'
         ]);
@@ -52,16 +51,20 @@ class WorkerController extends Controller
     {
         $this->validate($request, [
             'company_id' => 'required|integer',
-            'office_id' => 'required|integer',
             'role_id' => 'sometimes|required|integer',
             'has_card'=> 'sometimes|required|in:0,1'
         ]);
 
         try {
-            $check = Office::where('company_id', $request->company_id)->where('id', $request->office_id)->exists();
-            if (!$check) return $this->errorResponse(trans('apiResponse.unProcess'));
 
-            $workers = Worker::with(['card:id,alias','role:id,name' , 'office:id,name'])->where("office_id", $request->office_id);
+            $workers = Worker::with(['card:id,alias','role:id,name' , 'office:id,name']);
+            if ($request->has('office_id') and $request->get('office_id') != "null"){
+
+                $check = Office::where('company_id', $request->company_id)->where('id', $request->office_id)->exists();
+                if (!$check) return $this->errorResponse(trans('apiResponse.unProcess'));
+
+                $workers->where("office_id", $request->office_id);
+            }
 
 
             if ($request->has('name'))
@@ -113,7 +116,7 @@ class WorkerController extends Controller
             'gender'=>'required|in:1,2',
             'office_id' => 'required|integer',
             'role_id' => 'required|integer',
-            'user_id' => 'required|integer',
+
             'description' => 'sometimes|required',
             'card' => 'sometimes|required|integer'
         ]);
@@ -156,7 +159,7 @@ class WorkerController extends Controller
             'company_id' => 'required|integer',
             'name' => 'sometimes|required|min:2|max:255',
             'gender'=> 'sometimes|required|in:1,2',
-            'user_id' => 'required|integer',
+
             'office_id' => 'required|integer',
             'description' => 'sometimes|required|string',
             'role_id' => 'sometimes|required|integer',
@@ -192,7 +195,7 @@ class WorkerController extends Controller
     public function delete(Request $request, $id)
     {
         $this->validate($request, [
-            'user_id' => 'required|integer',
+
             'company_id' => 'required|integer',
             'office_id' => 'required|integer',
         ]);
@@ -214,7 +217,7 @@ class WorkerController extends Controller
     public function getRoles(Request $request)
     {
         $this->validate($request, [
-            'user_id' => 'required|integer',
+
             'company_id' => 'required|integer',
             'office_id' => 'required|integer',
         ]);
@@ -232,7 +235,7 @@ class WorkerController extends Controller
     public function showRole(Request $request , $id)
     {
         $this->validate($request, [
-            'user_id' => 'required|integer',
+
             'company_id' => 'required|integer',
             'office_id' => 'required|integer',
         ]);
@@ -251,7 +254,7 @@ class WorkerController extends Controller
     public function storeRole(Request $request)
     {
         $this->validate($request, [
-            'user_id' => 'required|integer',
+
             'company_id' => 'required|integer',
             'office_id' => 'required|integer',
             'name' => 'required|min:2,max:255'
@@ -272,7 +275,7 @@ class WorkerController extends Controller
     public function updateRole(Request $request, $id)
     {
         $this->validate($request, [
-            'user_id' => 'required|integer',
+
             'company_id' => 'required|integer',
             'office_id' => 'required|integer',
             'name' => 'required|min:2,max:255'
@@ -293,7 +296,7 @@ class WorkerController extends Controller
     public function deleteRole(Request $request, $id)
     {
         $this->validate($request, [
-            'user_id' => 'required|integer',
+
             'company_id' => 'required|integer',
             'office_id' => 'required|integer',
         ]);

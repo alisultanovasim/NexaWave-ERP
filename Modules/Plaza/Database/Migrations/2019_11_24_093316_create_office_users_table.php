@@ -19,7 +19,7 @@ class CreateOfficeUsersTable extends Migration
             $table->unsignedBigInteger('office_id');
             $table  ->unsignedBigInteger('company_id');
             $table->foreign('office_id' )->references('id')->on('offices');
-            $table->unique('user_id' ,  'office_id');
+            $table->unique(['user_id' ,  'office_id']);
         });
     }
 

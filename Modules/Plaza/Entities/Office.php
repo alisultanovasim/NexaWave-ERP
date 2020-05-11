@@ -27,13 +27,16 @@ class Office  extends Model
     public function workers(){
         return $this->hasMany('Modules\Plaza\Entities\Workers' , 'office_id' , 'id' );
     }
+    public function user(){
+        return $this->hasOne('Modules\Plaza\Entities\OfficeUser');
+    }
     public function documents(){
         return $this->hasMany('Modules\Plaza\Entities\Document');
     }
 
     public function getImageAttribute($value){
         if ($value)
-            return env('API_GATEWAY_STATIC_FILES') . 'Plaza?path=documents/'  .  $value;
+            return env('APP_URL') . '/documents/'  .  $value;
         return $value;
     }
 

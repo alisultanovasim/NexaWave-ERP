@@ -24,7 +24,7 @@ class SectionController extends Controller
         ]);
         $result = Section::where('company_id' , $request->get('company_id'))->orderBy('position');
 
-        if ($request->has('department_id')) $request->where('department_id' , $request->get('department_id'));
+        if ($request->has('department_id')) $result->where('department_id' , $request->get('department_id'));
 
         $result = $result->paginate($request->get('paginateCount'));
 

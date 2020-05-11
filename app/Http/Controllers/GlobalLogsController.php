@@ -94,4 +94,8 @@ class GlobalLogsController extends Controller
         }
     }
 
+    public static function store(Request $request){
+
+    }
+
 }

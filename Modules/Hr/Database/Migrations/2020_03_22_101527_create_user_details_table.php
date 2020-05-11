@@ -3,7 +3,6 @@
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
-
 class CreateUserDetailsTable extends Migration
 {
     /**
@@ -47,6 +46,35 @@ class CreateUserDetailsTable extends Migration
             $table->string('passport_get_at')->nullable();
             $table->string('passport_expire_at')->nullable();
 
+
+            $table->boolean('military_status')->nullable();
+            $table->date('military_start_at')->nullable();
+            $table->date('military_end_at')->nullable();
+            $table->unsignedBigInteger('military_state_id')->nullable();
+            $table->string('military_passport_number')->nullable();
+            $table->string('military_place')->nullable();
+            $table->foreign('military_state_id')->references('id')->on('military_states');
+
+            $table->string('driving_license_number')->nullable();
+//            $table->set('driving_license_categories',UserDetail::DRIVING_CATEGORIES)->nullable();
+            $table->string('driving_license_categories')->nullable();
+            $table->string('driving_license_organ')->nullable();
+            $table->date('driving_license_get_at')->nullable();
+            $table->date('driving_license_expire_at')->nullable();
+
+
+
+            $table->string('foreign_passport_number')->nullable();
+            $table->string('foreign_passport_organ')->nullable();
+            $table->date('foreign_passport_get_at')->nullable();
+            $table->date('foreign_passport_expire_at')->nullable();
+
+//            Marital status
+            $table->string('family_status_document_number')->nullable();
+            $table->string('family_status_state')->nullable();
+            $table->date('family_status_register_at')->nullable();
+
+            $table->string('avatar')->nullable();
 
 
             $table->unique('fin');

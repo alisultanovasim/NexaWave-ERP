@@ -19,7 +19,7 @@ class PaymentController extends Controller
     {
         $this->validate($request, [
             'company_id' => 'required|integer',
-            'user_id' => 'required|integer',
+
         ]);
 
         try {
@@ -50,7 +50,7 @@ class PaymentController extends Controller
     {
         $this->validate($request, [
             'company_id' => 'required|integer',
-            'user_id' => 'required|integer',
+
             'additive_id' => 'required|integer'
         ]);
         try {
@@ -72,7 +72,7 @@ class PaymentController extends Controller
     {
         $this->validate($request, [
             'company_id' => 'required|integer',
-            'user_id' => 'required|integer',
+
         ]);
         try {
             $office = Office::where('id', $id)->where('company_id', $request->company_id)->first();
@@ -89,7 +89,7 @@ class PaymentController extends Controller
     public function createAdditive(Request $request , $id){
         $this->validate($request, [
             'company_id' => 'required|integer',
-            'user_id' => 'required|integer',
+
             'days' => 'required|integer',
             'payed_at' => 'sometimes|required|date|date_format:Y-m-d',
             'month' => 'required|integer'
@@ -111,7 +111,7 @@ class PaymentController extends Controller
     {
         $this->validate($request, [
             'company_id' => 'required|integer',
-            'user_id' => 'required|integer',
+
             'additive_id' => 'required|integer',
             'days' => 'sometimes|required|integer',
             'payed_at' => 'sometimes|date|date:format:Y-m-d'
@@ -140,7 +140,7 @@ class PaymentController extends Controller
     {
         $this->validate($request, [
             'company_id' => 'required|integer',
-            'user_id' => 'required|integer',
+
             'additive_id' => 'required|integer'
         ]);
         try {

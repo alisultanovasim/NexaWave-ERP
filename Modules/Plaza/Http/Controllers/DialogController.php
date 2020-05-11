@@ -4,7 +4,10 @@
 namespace Modules\Plaza\Http\Controllers;
 
 
+use App\Models\User;
 use Illuminate\Foundation\Validation\ValidatesRequests;
+use Illuminate\Support\Facades\Auth;
+use Modules\Hr\Entities\Employee\Employee;
 use Modules\Plaza\Entities\Dialog;
 use Modules\Plaza\Entities\Message;
 use Modules\Plaza\Entities\Office;
@@ -18,47 +21,33 @@ class DialogController extends Controller
 {
     use ApiResponse  , ValidatesRequests;
 
+
     public function getDialogWithOffices(Request $request)
     {
         $this->validate($request, [
             'company_id' => 'required|integer',
-            'user_id' => 'required|integer',
             'office_id' => 'sometimes|required|integer',
             'kind_id' => 'sometimes|required|integer',
             'from_office' => 'sometimes|required|in:0,1',
-            'per_page' => 'sometimes|required|integer'
+            'per_page' => 'sometimes|required|integer',
+            'tome' => 'sometimes|required|boolean'
         ]);
         try {
             DB::beginTransaction();
-            $dialog = Dialog::with('office:id,name', 'kind:id,title')->where('company_id', $request->company_id);
+            $dialog = Dialog::with(['office:id,name', 'kind:id,title' , 'user.user:id,name'])->where('company_id', $request->company_id);
+
             if ($request->has('kind_id')) $dialog->where('kind_id', $request->kind_id);
             if ($request->has('office_id')) $dialog->where('office_id', $request->office_id);
             if ($request->has('from_office')) $dialog->where('from_office', $request->from_office);
+            if ($request->get('tome')) $dialog->where('assigned_user', Auth::id());
+
 
             $dialogs = $dialog->orderBy('id', 'desc')->paginate($request->per_page ?? 10);
-            $finder = [];
-            foreach ($dialogs as $dialog){
-                foreach (config('static-data.part') as $data){
-                    $partName = $data['name'];
-                    foreach ($data['users'] as $d){
-                        $userName = $d['name'];
-                        if ($d['id'] == $dialog->assigned_user ){
-                            $finder['part'] = [
-                                'id' => $data['id'],
-                                'name' => $partName,
-                                'user' => [
-                                    'id' => $d['id'],
-                                    'name'=>$userName
-                                ]
-                            ];
-                        }
-                    }
-                }
-                $dialog->assigned_user = $finder;
-            }
+
             DB::commit();
             return $this->successResponse($dialogs);
         } catch (\Exception $exception) {
+            dd($exception);
             DB::rollBack();
             return $this->errorResponse(trans('apiResponse.tryLater'), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
@@ -68,12 +57,12 @@ class DialogController extends Controller
     {
         $this->validate($request, [
             'company_id' => 'required|integer',
-            'user_id' => 'required|integer',
+
             'per_page' => 'sometimes|required|integer'
         ]);
         try {
 
-            $check = Dialog::with(['kind:id,title', 'office:id,name'])->where('company_id', $request->company_id)->where('id', $id)->first();
+            $check = Dialog::with(['kind:id,title', 'office:id,name' , "user.user:id,name"])->where('company_id', $request->company_id)->where('id', $id)->first();
             if (!$check) return $this->errorResponse(trans('apiResponse.DialogNotFound'));
 
             if ($check->status  == 2){
@@ -120,7 +109,7 @@ class DialogController extends Controller
     {
         $this->validate($request, [
             'company_id' => 'required|integer',
-            'user_id' => 'required|integer',
+
             'office_id' => 'required|integer',
             'kind_id' => 'required|integer',
             'body' => 'required|string',
@@ -164,15 +153,22 @@ class DialogController extends Controller
             'note' => 'sometimes',
             'end_time' => 'sometimes|required|date|date_format:Y-m-d',
             'company_id' => 'sometimes|required|integer',
-            'user_id' => 'required|integer',
-            'status' => 'sometimes|required|integer|in:0,1'
+            'status' => 'sometimes|required|integer|in:0,1',
+
         ]);
         try {
-            $check = Dialog::where('id', $id)->where('company_id', $request->company_iod);
-            if (!$check) return $this->errorResponse('apiResponse.DialogNotFound');
+            $check = Dialog::where('id', $id)->where('company_id', $request->company_id)->exists();
+            if (!$check) return $this->errorResponse('apiResponse.DialogNotFound' ,404);
 
-            $check = Dialog::where('id', $id)->update($request->only('assigned_user', 'note', 'end_time', 'status'));
-            if (!$check) return $this->errorResponse('apiResponse.unProcess');
+            if ($request->has('assigned_user')){
+                $check = Employee::where('id' , $request->get('assigned_user'))
+                    ->where('company_id' , $request->get('assigned_user'))
+                    ->where('is_active' , true)
+                    ->exists();
+                if (!$check) return $this->errorResponse('apiResponse.EmployeeNotFoundNotFound' , 404);
+            }
+
+           Dialog::where('id', $id)->update($request->only('assigned_user', 'note', 'end_time', 'status'));
 
             return $this->successResponse('OK');
         } catch (\Exception $e) {
@@ -184,7 +180,7 @@ class DialogController extends Controller
     {
         $this->validate($request, [
             'company_id' => 'required|integer',
-            'user_id' => 'required|integer',
+
             'body' => 'required|string'
         ]);
         try {
@@ -201,7 +197,7 @@ class DialogController extends Controller
     {
         $this->validate($request, [
             'company_id' => 'required|integer',
-            'user_id' => 'required|integer',
+
             'office_id' => 'required|required|integer',
             'kind_id' => 'sometimes|required|integer',
             'per_page' => 'sometimes|required|integer',
@@ -246,12 +242,12 @@ class DialogController extends Controller
     {
         $this->validate($request, [
             'company_id' => 'required|integer',
-            'user_id' => 'required|integer',
+
             'office_id' => 'required|integer',
             'per_page' => 'sometimes|required|integer'
         ]);
         try {
-            $check = Dialog::with(['kind:id,title', 'office:id,name'])->where('company_id', $request->company_id)->where('office_id', $request->office_id)->where('id', $id)->first();
+            $check = Dialog::with(['kind:id,title', 'office:id,name' ])->where('company_id', $request->company_id)->where('office_id', $request->office_id)->where('id', $id)->first();
             if (!$check) return $this->errorResponse(trans('apiResponse.DialogNotFound'));
 
             Message::where('dialog_id', $id)->where(['from_office' => 1])->update(['is_read' => 1]);
@@ -272,7 +268,7 @@ class DialogController extends Controller
     {
         $this->validate($request, [
             'company_id' => 'required|integer',
-            'user_id' => 'required|integer',
+
             'office_id' => 'required|integer',
             'kind_id' => 'required|integer',
             'body' => 'required|string',
@@ -318,7 +314,7 @@ class DialogController extends Controller
     {
         $this->validate($request, [
             'company_id' => 'required|integer',
-            'user_id' => 'required|integer',
+
             'body' => 'required|string'
         ]);
         try {

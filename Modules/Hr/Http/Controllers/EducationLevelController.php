@@ -18,10 +18,9 @@ class EducationLevelController extends Controller
     public function index(Request $request)
     {
         $this->validate($request , [
-            'company_id' => ['required' , 'integer'],
             'paginateCount' => ['sometimes','required' , 'integer'],
         ]);
-        $educationLevels = EducationLevel::where('company_id' , $request->get('company_id'))->paginate($request->get('paginateCount'));
+        $educationLevels = EducationLevel::paginate($request->get('paginateCount'));
         return $this->dataResponse($educationLevels);
     }
 
@@ -37,8 +36,6 @@ class EducationLevelController extends Controller
             EducationLevel::create([
                 'name' => $request->get('name'),
                 'code' => $request->get('code'),
-                'position' => $request->get('position'),
-                'company_id' => $request->get('company_id')
             ]);
             DB::commit();
         }
@@ -61,13 +58,12 @@ class EducationLevelController extends Controller
         {
             DB::beginTransaction();
             $saved = true;
-            $educationLevel = EducationLevel::where('id', $id)->where('company_id' , $request->get('company_id'))->first(['id']);
+            $educationLevel = EducationLevel::where('id', $id)->first(['id']);
             if (!$educationLevel)
                 return $this->errorResponse(trans('messages.not_found'), 404);
             $educationLevel->update([
                 'name' => $request->get('name'),
                 'code' => $request->get('code'),
-                'position' => $request->get('position'),
             ]);
             DB::commit();
         }
@@ -83,7 +79,7 @@ class EducationLevelController extends Controller
 
     public function destroy(Request $request ,  $id)
     {
-        return EducationLevel::where('id', $id)->where('company_id' , $request->get('company_id'))->delete()
+        return EducationLevel::where('id', $id)->delete()
             ? $this->successResponse(trans('messages.saved'))
             : $this->errorResponse(trans('messages.not_saved'));
     }
@@ -92,8 +88,6 @@ class EducationLevelController extends Controller
         $validationArray = [
             'name' => 'required|max:256',
             'code' => 'required|max:50',
-            'position' => 'required|numeric',
-            'company_id' => ['required' , 'integer']
         ];
         $validator = \Validator::make($input, $validationArray);
 

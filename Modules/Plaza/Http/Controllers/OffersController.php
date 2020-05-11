@@ -26,7 +26,6 @@ class OffersController extends Controller
     {
         $this->validate($request, [
             'company_id' => 'required|integer',
-            'user_id' => 'required|integer',
             'name' => 'sometimes|required|string',
             'come_at' => 'sometimes|required|date|date_format:Y-m-d',
             'status' => 'sometimes|required|in:1,0',
@@ -43,7 +42,7 @@ class OffersController extends Controller
         ]);
         try {
 
-            $offers = Offer::with('specialization')->where('company_id', $request->company_id);
+                $offers = Offer::with('specialization')->where('company_id', $request->company_id);
 
             if ($request->has('come_at'))
                 $offers->where('come_at', $request->time);
@@ -96,7 +95,7 @@ class OffersController extends Controller
     {
         $this->validate($request, [
             'company_id' => 'required|integer',
-            'user_id' => 'required|integer',
+
             'client' => 'required|string|max:255',
             'name' => 'required|string|max:255',
 
@@ -130,7 +129,7 @@ class OffersController extends Controller
     {
         $this->validate($request, [
             'company_id' => 'required|integer',
-            'user_id' => 'required|integer',
+
         ]);
         try {
             $offer = Offer::where('company_id' , $request->company_id)->where("id",$id)->first();
@@ -145,7 +144,7 @@ class OffersController extends Controller
     {
         $this->validate($request, [
             'company_id' => 'required|integer',
-            'user_id' => 'required|integer',
+
             'client' => 'sometimes|required|string',
             'name' => 'sometimes|required|integer',
             'size' => 'sometimes|required|numeric',
@@ -171,7 +170,7 @@ class OffersController extends Controller
     {
         $this->validate($request, [
             'company_id' => 'required|integer',
-            'user_id' => 'required|integer',
+
         ]);
         try {
             $offer = Offer::where('company_id', $request->company_id)

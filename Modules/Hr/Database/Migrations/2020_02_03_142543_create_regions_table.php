@@ -21,7 +21,6 @@ class CreateRegionsTable extends Migration
             $table->unsignedBigInteger('company_id')->nullable();
             $table->timestamps();
             $table->foreign("city_id")->references("id")->on("cities")->onDelete('cascade');
-
         });
     }
 

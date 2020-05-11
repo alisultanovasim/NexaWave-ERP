@@ -20,7 +20,7 @@ class GuestController extends Controller
     public  function index(Request $request){
         $this->validate($request , [
             'company_id' => 'required|integer',
-            'user_id' => 'required|integer',
+
             'from' => 'sometimes|required|date|date_format:Y-m-d H:i:s',
             'to' => 'sometimes|required|date|date_format:Y-m-d H:i:s',
             'per_page' => 'sometimes|integer',
@@ -58,7 +58,7 @@ class GuestController extends Controller
     public  function show(Request $request , $id){
         $this->validate($request , [
             'company_id' => 'required|integer',
-            'user_id' => 'required|integer',
+
         ]);
         try{
             $quests = Guest::where('id' , $id)->where('company_id' , $request->company_id)->first();
@@ -77,8 +77,8 @@ class GuestController extends Controller
             'name' => 'required|min:2|max:255',
             'come_at' => 'required|date|date_format:Y-m-d H:i:s',
             'description' => 'sometimes|required',
-            'user_id' => 'required|integer',
-            'office_id' => 'sometimes|required|integer',
+
+            'office_id' => 'nullable',
             'company_id' => 'required|integer',
             'worker_id' => ['sometimes' , 'required' , 'integer']
         ]);
@@ -86,7 +86,7 @@ class GuestController extends Controller
         if ($request->come_at < $now ) return $this->errorResponse(trans('apiResponse.TimeError'));
 
         try{
-            if ($request->has('office_id')){
+            if ($request->has('office_id') and $request->get('office_id') !== "null"){
                 $check = Office::where('id' , $request->office_id)
                     ->where('company_id' ,  $request->company_id)->exists();
                 if (!$check) return $this->errorResponse(trans('apiResponse.officeNotFound'));
@@ -101,7 +101,6 @@ class GuestController extends Controller
 
             return $this->successResponse('OK');
         }catch (\Exception $exception){
-            dd($exception);
             return $this->errorResponse(trans('apiResponse.tryLater') , Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
@@ -111,7 +110,7 @@ class GuestController extends Controller
             'name' => 'sometimes|required|min:2|max:255',
             'come_at' => 'sometimes|required|date|date_format:Y-m-d H:i:s',
             'description' => 'sometimes|sometimes|required',
-            'user_id' => 'required|integer',
+
             'office_id' => 'sometimes|required|integer',
             'company_id' => 'required|integer',
             'status'=>'sometimes|required|in:1,0'

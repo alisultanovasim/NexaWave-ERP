@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Entities;
+namespace Modules\Esd\Entities;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -11,10 +11,13 @@ class Assignment extends Model
 
 
     public  function  document(){
-        return $this->belongsTo("Modules\Entities\Document" );
+        return $this->belongsTo("Modules\Esd\Entities\Document" );
     }
     public function items(){
-        return $this->hasMany('Modules\Entities\AssignmentItem' , 'assignment_id');
+        return $this->hasMany('Modules\Esd\Entities\AssignmentItem' , 'assignment_id');
+    }
+    public function item(){
+        return $this->hasOne('Modules\Esd\Entities\AssignmentItem' , 'assignment_id');
     }
 
 }

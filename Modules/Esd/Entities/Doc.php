@@ -1,11 +1,13 @@
 <?php
 
-namespace Modules\Entities;
+namespace Modules\Esd\Entities;
 
 use Illuminate\Database\Eloquent\Model;
 
 class Doc extends Model
 {
+    const FILE = 1;
+    const EDITOR = 2;
     protected $guarded = ["id"];
 
     protected $table = "docs";
@@ -13,16 +15,19 @@ class Doc extends Model
     public $timestamps = false;
 
     public function subDocs(){
-        return $this->hasMany("Modules\Entities\Doc" , "parent_id");
+        return $this->hasMany("Modules\Esd\Entities\Doc" , "parent_id");
     }
 
     public  function  uploader(){
-        return $this->belongsTo("Modules\Entities\User" , "uploader" , "id")->select(["id" , "name"]);
+        return $this->belongsTo("Modules\Esd\Entities\User" , "uploader" , "id")->select(["id" , "name"]);
     }
 
     public function getResourceAttribute($value){
-        if ($this->type == config('modules.document.type.file') and $value)
-            return env('API_GATEWAY_STATIC_FILES') . 'Esd?path=' . 'documents/' .  $value;
+        if ($this->type == self::FILE and $value)
+        return env('APP_URL','http://office-backend.vac.az') . '/documents/'  .  $value;
         return $value;
     }
+
+
+
 }

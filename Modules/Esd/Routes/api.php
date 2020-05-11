@@ -4,7 +4,7 @@
 use Illuminate\Support\Facades\Route;
 
 Route::group([
-    "prefix" => "v1",
+    "prefix" => "v1/esd",
     'middleware' =>   ['auth:api' , 'company']
 
 ], function ($route) {
@@ -19,38 +19,38 @@ Route::group([
 
         /** crud doc*/
         Route::get("/", "DocumentController@index");
-        Route::get("/{id:[0-9]+}", "DocumentController@show");
+        Route::get("/{id}", "DocumentController@show");
 
-        Route::post("/{id:[0-9]+}/add/documents", "DocumentController@addDocument");
-        Route::post("/{id:[0-9]+}/update/document", "DocumentController@updateDocument");
+        Route::post("/add/documents/{id}", "DocumentController@addDocument");
+        Route::post("/update/document/{id}", "DocumentController@updateDocument");
 
-        Route::post("/{id:[0-9]+}", "DocumentController@show");
+        Route::post("/{id}", "DocumentController@show");
 
         Route::post("/", "DocumentController@store");
-        Route::post("/{id:[0-9]+}/delete", "DocumentController@destroy");
-        Route::post("/{id:[0-9]+}/update", "DocumentController@update");
+        Route::post("/delete/{id}", "DocumentController@destroy");
+        Route::post("/update/{id}", "DocumentController@update");
 
-        Route::post("/{id:[0-9]+}/admin/update", "DocumentController@updateForAdmin");
-        //  Route::get("/tome" , "DocumentController@getDocumentToMe");
+        Route::post("/admin/update/{id}", "DocumentController@updateForAdmin");
+        //  Route::get("/tome" , "Do    cumentController@getDocumentToMe");
 
         /**  start  assignment */
-            Route::post("/{id:[0-9]+}/to", "AssignmentController@store");
-            Route::post("/{id:[0-9]+}/update/assignment", "AssignmentController@update");
-            Route::post('/{id:[0-9]+}/remove/assignment', 'AssignmentController@delete');
+            Route::post("/to/{id}", "AssignmentController@store");
+            Route::post("/update/assignment/{id}", "AssignmentController@update");
+            Route::post('/remove/assignment/{id}', 'AssignmentController@delete');
 
 
-            Route::post("/{id:[0-9]+}/add/user", "AssignmentController@addUser");
-            Route::post("/{id:[0-9]+}/remove/user", "AssignmentController@removeUser");
+            Route::post("/{id}/add/user", "AssignmentController@addUser");
+            Route::post("/{id}/remove/user", "AssignmentController@removeUser");
 
 
-            Route::post("/{id:[0-9]+}/mark/done", "AssignmentController@done");
-            Route::post("/{id:[0-9]+}/tome/add/notes", "AssignmentController@addNotes");
-            Route::post("/{id:[0-9]+}/tome/update/note", "AssignmentController@updateNote");
-            Route::post("/{id:[0-9]+}/tome/remove/note", "AssignmentController@deleteNote");
+            Route::post("/mark/done/{id}", "AssignmentController@done");
+            Route::post("/tome/add/notes/{id}", "AssignmentController@addNotes");
+            Route::post("/tome/update/note/{id}", "AssignmentController@updateNote");
+            Route::post("/tome/remove/note/{id}", "AssignmentController@deleteNote");
 
-            Route::post("/{id:[0-9]+}/mark/read", "AssignmentController@markAsRead");
+            Route::post("/mark/read/{id}", "AssignmentController@markAsRead");
 
-            Route::post('/{id:[0-9]+}/add/helper/user', 'AssignmentController@addUsersByMainAssignment');
+            Route::post('/add/helper/user/{id}', 'AssignmentController@addUsersByMainAssignment');
 
 
 
@@ -62,16 +62,16 @@ Route::group([
             Route::post('/templates/update', 'AssignmentTemplates@update');
             Route::post('/templates/delete', 'AssignmentTemplates@delete');
 
-                Route::post("/{id:[0-9]+}/change/status", "AssignmentController@changeStatus");
+                Route::post("/change/status/{id}", "AssignmentController@changeStatus");
                 Route::get('/', 'AssignmentController@index');
-                Route::get('/{id:[0-9]+}', 'AssignmentController@show');
+                Route::get('/{id}', 'AssignmentController@show');
 
         });
 
         /** end assignment */
 
 
-        Route::post("/{id:[0-9]+}/activate", "DocumentController@makeActive");
+        Route::post("/activate/{id}", "DocumentController@makeActive");
 
         Route::get("/sections", "SectionController@index");
 
@@ -83,10 +83,10 @@ Route::group([
         Route::get("/register_number", "DocumentController@getDocumentsRegNo");
 
 
-        Route::post('/{id:[0-9]+}/change/status', 'DocumentController@changeStatus');
+        Route::post('/change/status/{id}', 'DocumentController@changeStatus');
         Route::post('/make/archive', 'ArchiveController@store');
 
-        Route::post('/{id:[0-9]+}/archive/update', 'ArchiveController@update');
+        Route::post('/archive/update/{id}', 'ArchiveController@update');
 
         Route::group(['prefix' => 'adjustments'], function () {
             Route::get('/', 'AdjustmentController@index');
@@ -120,15 +120,15 @@ Route::group([
     ], function ($rotes) {
         Route::get("/", "DraftController@index");
         Route::post("/", "DraftController@store");
-        Route::get("/{id:[0-9]+}", "DraftController@show");
-        Route::post("/{id:[0-9]+}/update", "DraftController@update");
-        Route::post("/{id:[0-9]+}/delete", "DraftController@destroy");
+        Route::get("/{id}", "DraftController@show");
+        Route::post("/update/{id}", "DraftController@update");
+        Route::post("/delete/{id}", "DraftController@destroy");
 
-        Route::post("/{id:[0-9]+}/add/documents", "DraftController@addDocument");
-        Route::post("/{id:[0-9]+}/remove/documents", "DraftController@removeDocument");
-        Route::post("/{id:[0-9]+}/update/documents", "DraftController@updateDocument");
+        Route::post("/add/documents/{id}", "DraftController@addDocument");
+        Route::post("/remove/documents/{id}", "DraftController@removeDocument");
+        Route::post("/update/documents/{id}", "DraftController@updateDocument");
 
-        Route::post("/{id:[0-9]+}/make/document", "DraftController@makeRealDocument");
+        Route::post("/make/document/{id}", "DraftController@makeRealDocument");
     });//draft
 
 
@@ -142,13 +142,13 @@ Route::group([
 //        "prefix" => "inbox",
 //    ], function ($rotes) {
 //        Route::get("/", "InboxController@index");
-//        Route::get("/{id:[0-9]+}", "InboxController@show");
-//        Route::post("/{id:[0-9]+}/markasread", "InboxController@markAsRead");
+//        Route::get("/{id}", "InboxController@show");
+//        Route::post("/{id}/markasread", "InboxController@markAsRead");
 //        Route::post("/", "InboxController@store");
 //
 //        Route::post("/{id}/delete", "InboxController@destroy");
 //        Route::post("/delete/many", "InboxController@destroyMany");
-//        Route::post("/{id:[0-9]+}/softdelete", "InboxController@markAsDelete");
+//        Route::post("/{id}/softdelete", "InboxController@markAsDelete");
 //        Route::post("/softdelete/many", "InboxController@markAsDeleteMany");
 //
 //        Route::get("/getnew", "InboxController@getNotReadCount");

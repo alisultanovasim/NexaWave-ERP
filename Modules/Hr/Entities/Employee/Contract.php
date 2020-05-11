@@ -17,16 +17,36 @@ class Contract extends Model
         return $this->belongsTo('Modules\Hr\Entities\Employee\Employee' , 'employee_id', 'id');
     }
     public function department(){
-        return $this->belongsTo('Modules\Hr\EntitiesDepartment' );
+        return $this->belongsTo('Modules\Hr\Entities\Department' );
     }
     public function section(){
-        return $this->belongsTo('Modules\Hr\EntitiesSection' );
+        return $this->belongsTo('Modules\Hr\Entities\Section' );
     }
     public function sector(){
-        return $this->belongsTo('Modules\Hr\EntitiesSector' );
+        return $this->belongsTo('Modules\Hr\Entities\Sector' );
     }
     public function position(){
-        return $this->belongsTo('Modules\Hr\EntitiesPositions' );
+        return $this->belongsTo('Modules\Hr\Entities\Positions' );
+    }
+    public function currency(){
+        return $this->belongsTo('Modules\Hr\Entities\Currency' );
+    }
+    public function contract_type(){
+        return $this->belongsTo('Modules\Hr\Entities\ContractType' );
+    }
+    public function duration_type(){
+        return $this->belongsTo('Modules\Hr\Entities\DurationType' );
+    }
+    public function scopeActive($q){
+        return $q -> where('is_active' , true);
+    }
+    public function acceptor(){
+        return $this->belongsTo('Modules\Hr\Entities\Employee\Employee');
+    }
+    public function getContractAttribute($value)
+    {
+        if ($value) return env('APP_URL' , "http://office-backend.vac.az")."/documents/".$value;
+        return $value;
     }
 
 }

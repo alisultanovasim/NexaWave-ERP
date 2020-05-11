@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Modules\Entities;
+namespace Modules\Esd\Entities;
 
 
 use Illuminate\Database\Eloquent\Model;
@@ -16,7 +16,7 @@ class Citizen extends Model
     protected  $table = 'citizen_docs';
 
     public function region(){
-        return $this->belongsTo('Modules\Entities\Region');
+        return $this->belongsTo('Modules\Esd\Entities\Region');
     }
 
 }

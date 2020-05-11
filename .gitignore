@@ -1,5 +1,7 @@
 /node_modules
 /public/hot
+/public/documents
+/public/users
 /public/storage
 /storage/*.key
 /vendor
@@ -11,3 +13,7 @@ Homestead.yaml
 npm-debug.log
 yarn-error.log
 .idea
+<<<<<<< HEAD
+=======
+
+>>>>>>> ca565b605a15d6a84d8c201745161542a6ae0084

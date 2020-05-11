@@ -18,10 +18,9 @@ class EducationSpecialtyController extends Controller
     public function index(Request $request)
     {
         $this->validate($request , [
-            'company_id' => ['required' , 'integer'],
             'paginateCount' => ['sometimes','required' , 'integer'],
         ]);
-        $result = EducationSpecialty::where('company_id' , $request->get('company_id'))->paginate($request->get('paginateCount'));
+        $result = EducationSpecialty::paginate($request->get('paginateCount'));
         return $this->dataResponse($result);
     }
 
@@ -37,8 +36,6 @@ class EducationSpecialtyController extends Controller
             EducationSpecialty::create([
                 'name' => $request->get('name'),
                 'code' => $request->get('code'),
-                'position' => $request->get('position'),
-                'company_id' => $request->get('company_id')
             ]);
             DB::commit();
         }
@@ -61,13 +58,12 @@ class EducationSpecialtyController extends Controller
         {
             DB::beginTransaction();
             $saved = true;
-            $educationSpecialty = EducationSpecialty::where('id', $id)->where('company_id' , $request->get('company_id'))->first(['id']);
+            $educationSpecialty = EducationSpecialty::where('id', $id)->first(['id']);
             if (!$educationSpecialty)
                 return $this->errorResponse(trans('messages.not_found'), 404);
             $educationSpecialty->update([
                 'name' => $request->get('name'),
                 'code' => $request->get('code'),
-                'position' => $request->get('position'),
             ]);
             DB::commit();
         }
@@ -83,7 +79,7 @@ class EducationSpecialtyController extends Controller
 
     public function destroy(Request $request  ,$id)
     {
-        return EducationSpecialty::where('id', $id)->where('company_id', $request->get('company_id'))->delete()
+        return EducationSpecialty::where('id', $id)->delete()
             ? $this->successResponse(trans('messages.saved'))
             : $this->errorResponse(trans('messages.not_saved'));
     }
@@ -92,8 +88,6 @@ class EducationSpecialtyController extends Controller
         $validationArray = [
             'name' => 'required|max:256',
             'code' => 'required|max:50',
-            'position' => 'required|numeric',
-            'company_id' => ['required' , 'integer'],
 
         ];
         $validator = \Validator::make($input, $validationArray);

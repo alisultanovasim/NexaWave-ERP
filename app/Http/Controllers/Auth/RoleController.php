@@ -138,9 +138,7 @@ class RoleController extends Controller
         ModuleRolePermission::with([])->where("role_id", "=", $role->id)->delete();
         $role->delete();
         return $this->successResponse([]);
-
     }
-
 
     /**
      * @param $name

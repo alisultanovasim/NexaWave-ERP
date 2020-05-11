@@ -20,7 +20,7 @@ class MeetingRoomImageController extends Controller
     {
         $this->validate($request, [
             'company_id' => ['required', 'integer'],
-            'user_id' => ['required', 'integer'],
+
             'room_id' => ['required' , 'integer'] ,
             'image_limit' => [ 'sometimes' ,'required' , 'integer' ]
         ]);
@@ -45,7 +45,7 @@ class MeetingRoomImageController extends Controller
     {
         $this->validate($request, [
             'company_id' => ['required', 'integer'],
-            'user_id' => ['required', 'integer'],
+
             'room_id' => ['required' , 'integer'] ,
             'images' => ['required' , 'array' ],
             'images.*' => ['required' , 'mimes:png,jpg,jpeg,svg'],
@@ -81,7 +81,7 @@ class MeetingRoomImageController extends Controller
     public function delete(Request $request , $id){
         $this->validate($request, [
             'company_id' => ['required', 'integer'],
-            'user_id' => ['required', 'integer'],
+
             'room_id' => ['required' , 'integer'] ,
         ]);
         try{

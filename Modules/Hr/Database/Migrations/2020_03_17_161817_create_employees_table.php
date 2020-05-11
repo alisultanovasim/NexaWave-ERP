@@ -20,6 +20,7 @@ class CreateEmployeesTable extends Migration
             $table->boolean('is_active')->default(true);
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->unique(['user_id' , 'company_id']);
+            $table->softDeletes();
             $table->timestamps();
         });
     }

@@ -28,7 +28,7 @@ class MeetingRoomController extends Controller
     {
         $this->validate($request, [
             'company_id' => 'required|integer',
-            'user_id' => 'required|integer',
+
             'with_images' => ['sometimes', 'required', 'boolean']
         ]);
         try {
@@ -51,7 +51,7 @@ class MeetingRoomController extends Controller
     {
         $this->validate($request, [
             'company_id' => 'required|integer',
-            'user_id' => 'required|integer',
+
             'size' => 'required|numeric',
             'description' => 'sometimes|required',
             'name' => 'required|string|max:255',
@@ -118,7 +118,7 @@ class MeetingRoomController extends Controller
     {
         $this->validate($request, [
             'company_id' => 'required|integer',
-            'user_id' => 'required|integer',
+
             'from' => 'sometimes|date|date_format:Y-m-d H:i:s',
             'to' => 'sometimes|date|date_format:Y-m-d H:i:s',
             'time_zone' => 'sometimes|required',
@@ -151,7 +151,7 @@ class MeetingRoomController extends Controller
     {
         $this->validate($request, [
             'company_id' => 'required|integer',
-            'user_id' => 'required|integer',
+
             'size' => 'sometimes|required|numeric',
             'schema' => 'sometimes|required|mimes:png,jpg,jpeg,svg',
             'description' => 'sometimes',

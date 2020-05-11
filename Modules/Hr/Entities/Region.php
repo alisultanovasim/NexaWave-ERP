@@ -33,6 +33,6 @@ class Region extends Model
      */
     public function city()
     {
-        return $this->belongsTo('Modules\Hr\EntitiesCity');
+        return $this->belongsTo('Modules\Hr\Entities\City');
     }
 }

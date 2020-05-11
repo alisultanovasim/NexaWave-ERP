@@ -17,8 +17,6 @@ class CreateFacultiesTable extends Migration
             $table->bigIncrements('id');
             $table->string('name');
             $table->char('code', 50);
-            $table->bigInteger('position');
-            $table->unsignedBigInteger('company_id');
             $table->timestamps();
             $table->softDeletes();
         });

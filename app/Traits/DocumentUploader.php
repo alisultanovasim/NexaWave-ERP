@@ -6,6 +6,7 @@ namespace App\Traits;
 
 use Illuminate\Http\Response;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 
 trait DocumentUploader
@@ -22,12 +23,12 @@ trait DocumentUploader
     private function saveDoc($document, $request, $str)
     {
         if ($document instanceof UploadedFile) {
-            if (in_array($request->document->extension(), config("modules.document.extensions"))) {
+            if (in_array($request->document->extension(), config("esd.document.extensions"))) {
                 $filesize = filesize($document->getRealPath());
                 $sub_documents = [
-                    "uploader" => $request->user_id,
+                    "uploader" => Auth::id(),
                     "resource" => $this->uploadFile($document, $request->company_id, $str),
-                    "type" => config("modules.document.type.file"),
+                    "type" => config("esd.document.type.file"),
                     'size' => $filesize
 
                 ];
@@ -37,9 +38,9 @@ trait DocumentUploader
                 ]);
         } else {
             $sub_documents = [
-                "uploader" => $request->user_id,
+                "uploader" => Auth::id(),
                 "resource" => $document,
-                "type" => config("modules.document.type.editor"),
+                "type" => config("esd.document.type.editor"),
                 'size' => strlen($document)
             ];
         }
@@ -56,11 +57,11 @@ trait DocumentUploader
 
     private function saveNote($assignmentItem, $note , $request , $str){
         if ($note instanceof UploadedFile) {
-            if (in_array($note->extension(), config("modules.document.extensions"))) {
+            if (in_array($note->extension(), config("esd.document.extensions"))) {
                 $filesize = filesize($note->getRealPath());
                 $item = [
                     "resource" => $this->uploadFile($note, $request->company_id, $str),
-                    "type" => config("modules.document.type.file"),
+                    "type" => config("esd.document.type.file"),
                     'size' => $filesize,
                     'assignment_item_id'=>$assignmentItem->id
                 ];
@@ -71,31 +72,23 @@ trait DocumentUploader
         } else {
             $item = [
                 "resource" => $note,
-                "type" => config("modules.document.type.editor"),
+                "type" => config("esd.document.type.editor"),
                 'size' => strlen($note),
                 'assignment_item_id'=>$assignmentItem->id
             ];
         }
         return $item;
     }
-    /**
-     * for documents and logic where have pasrent id
-     * @param $baseDocument
-     * @param $document
-     * @param $request
-     * @param string $str
-     * @return array
-     */
     private function BaseDocumentBuilder($baseDocument, $document, $request, $str = 'documents')
     {
         if ($baseDocument instanceof UploadedFile) {
-            if (in_array($baseDocument->extension(), config("modules.document.extensions"))) {
+            if (in_array($baseDocument->extension(), config("esd.document.extensions"))) {
                 $filesize = filesize($baseDocument->getPathName());
                 $base_document = [
-                    "uploader" => $request->user_id,
+                    "uploader" => Auth::id(),
                     "resource" => $this->uploadFile($baseDocument, $request->company_id, $str),
                     "parent_id" => null,
-                    "type" => config("modules.document.type.file"),
+                    "type" => config("esd.document.type.file"),
                     "document_id" => $document->id,
                     'size' => $filesize
 
@@ -106,10 +99,10 @@ trait DocumentUploader
                 ]);
         } else {
             $base_document = [
-                "uploader" => $request->user_id,
+                "uploader" => Auth::id(),
                 "resource" => $baseDocument,
                 "parent_id" => null,
-                "type" => config("modules.document.type.editor"),
+                "type" => config("esd.document.type.editor"),
                 "document_id" => $document->id,
                 'size' => strlen($baseDocument)
             ];
@@ -124,24 +117,17 @@ trait DocumentUploader
         return "$company_id/$str/$filename";
     }
 
-    /**
-     * for documents and logic where have pasrent id
-     * @param UploadedFile $file
-     * @param $company_id
-     * @param string $str
-     * @return string
-     */
     private function SubDocumentsBuilder($document, $documents, $baseDoc, $request, $str = 'documents')
     {
         foreach ($documents as $sub_document) {
             if ($sub_document instanceof UploadedFile) {
-                if (in_array($sub_document->extension(), config("modules.document.extensions"))) {
+                if (in_array($sub_document->extension(), config("esd.document.extensions"))) {
                     $filesize = filesize($sub_document->getPathName());
                     $sub_documents[] = [
-                        "uploader" => $request->user_id,
+                        "uploader" => Auth::id(),
                         "resource" => $this->uploadFile($sub_document, $request->company_id, $str),
                         "parent_id" => $baseDoc->id,
-                        "type" => config("modules.document.type.file"),
+                        "type" => config("esd.document.type.file"),
                         "document_id" => $document->id,
                         'size' => $filesize
                     ];
@@ -151,10 +137,10 @@ trait DocumentUploader
                     ]);
             } else {
                 $sub_documents[] = [
-                    "uploader" => $request->user_id,
+                    "uploader" => Auth::id(),
                     "resource" => $sub_document,
                     "parent_id" => $baseDoc->id,
-                    "type" => config("modules.document.type.editor"),
+                    "type" => config("esd.document.type.editor"),
                     "document_id" => $document->id,
                     'size' => strlen($sub_document)
                 ];

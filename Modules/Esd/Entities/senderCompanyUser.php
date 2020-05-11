@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Modules\Entities;
+namespace Modules\Esd\Entities;
 
 
 use Illuminate\Database\Eloquent\Model;
@@ -17,7 +17,7 @@ class senderCompanyUser extends  Model
 
 
     public function roles(){
-        return $this->belongsTo('Modules\Entities\senderCompanyRole' , 'sender_company_role_id');
+        return $this->belongsTo('Modules\Esd\Entities\senderCompanyRole' , 'sender_company_role_id');
     }
 
 }

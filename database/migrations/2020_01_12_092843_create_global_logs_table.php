@@ -16,14 +16,13 @@ class CreateGlobalLogsTable extends Migration
         Schema::create('global_logs',
             function (Blueprint $table) {
                 $table->bigIncrements('id');
-                $table->string('service')->nullable();
+                $table->string('module')->nullable();
                 $table->string('url');
                 $table->mediumText('description')->nullable();
                 $table->unsignedBigInteger('user_id')->nullable();
                 $table->json('fields')->nullable();
                 $table->string('method')->nullable();
                 $table->unsignedBigInteger('company_id');
-                //$table->char('status_code' , 3)->nullable();
                 $table->timestamp('created_at')->useCurrent();
                 $table->softDeletes();
             });

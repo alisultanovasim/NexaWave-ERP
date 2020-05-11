@@ -3,7 +3,7 @@ namespace Modules\Esd\Http\Controllers;
 use App\Traits\ApiResponse;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\Request;
-use Modules\Entities\Document;
+use Modules\Esd\Entities\Document;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
 
@@ -15,7 +15,7 @@ class ArchiveController extends Controller
     {
         $this->validate($request , [
             'documents' => ['sometimes' , 'required' , 'array'],
-            'user_id' => ['required' , 'integer'] ,
+            ['required' , 'integer'] ,
             'company_id' => [ 'required' , 'integer'] ,
         ]);
         try {

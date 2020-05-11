@@ -4,11 +4,13 @@
 namespace Modules\Esd\Http\Controllers;
 
 
+use App\Models\User;
 use Illuminate\Foundation\Validation\ValidatesRequests;
-use Modules\Entities\Assignment;
-use Modules\Entities\AssignmentItem;
-use Modules\Entities\Document;
-use Modules\Entities\Note;
+use Illuminate\Support\Facades\Auth;
+use Modules\Esd\Entities\Assignment;
+use Modules\Esd\Entities\AssignmentItem;
+use Modules\Esd\Entities\Document;
+use Modules\Esd\Entities\Note;
 use App\Traits\ApiResponse;
 use App\Traits\DocumentBySection;
 use App\Traits\DocumentUploader;
@@ -17,6 +19,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Routing\Controller;
+use Modules\Hr\Entities\Employee\Employee;
 
 class AssignmentController extends Controller
 {
@@ -31,7 +34,6 @@ class AssignmentController extends Controller
             "description" => "sometimes|required",
             "expire_time" => "sometimes|required|date|date_format:Y-m-d",
             'company_id' => 'required|integer',
-            'user_id' => 'required|integer'
         ]);
         if (!in_array($request->base, $request->user_ids))
             return $this->errorResponse(["base" => trans("apiResponse.notFound")]);
@@ -44,17 +46,20 @@ class AssignmentController extends Controller
                 ["company_id", $company_id]
             ])->first(["status", "id"]);
 
+
             if (!$document)
-                return $this->errorResponse(trans("apiResponse.unProcess"));
+                return $this->errorResponse(trans("apiResponse.documentNotFound"));
 
             if ($document->status !== Document::ACTIVE)
                 return $this->errorResponse(['error' => trans("apiResponse.docStatusError", ["status" => $document->status])]);
 
             if ($request->has('expire_time')) $document->update(['expire_time' => $request->expire_time]);
 
+
             $helper = array_unique($request->user_ids);
-            if (in_array($request->user_id, $helper))
-                return $this->errorResponse(['assignment' => trans("apiResponse.selfSend")]);
+
+            if (!$this->checkUser($helper , $request))
+             return $this->errorResponse(trans('response.EmployeesIsIncorrect'));
 
             $assignment = Assignment::create(array_merge($request->only('description', 'expire_time'), [
                 'document_id' => $document->id
@@ -63,7 +68,7 @@ class AssignmentController extends Controller
             foreach ($helper as $k => $v) {
                 $assignmentItems[$k] = [
                     "user_id" => $v,
-                    "assignment_id" => $assignment->id
+                    "assignment_id" => $assignment->id,
                 ];
                 if ($request->base == $v)
                     $assignmentItems[$k]["is_base"] = 1;
@@ -76,6 +81,7 @@ class AssignmentController extends Controller
             return $this->successResponse("OK");
         } catch (QueryException $e) {
             DB::rollBack();
+
             if ($e->errorInfo[1] == 1062) {
                 return $this->errorResponse(['error' => trans("apiResponse.assignmentAlreadyExists")]);
             }
@@ -93,7 +99,7 @@ class AssignmentController extends Controller
     {
         $this->validate($request, [
             'company_id' => 'required|integer',
-            'user_id' => 'required|integer',
+
             "description" => "sometimes|required",
             "expire_time" => "sometimes|required|date|date_format:Y-m-d",
             'user_ids' => 'sometimes|required|array',
@@ -124,8 +130,10 @@ class AssignmentController extends Controller
                 if (!in_array($request->base, $request->user_ids))
                     return $this->errorResponse(["base" => trans("apiResponse.notFound")]);
 
-                if (in_array($request->user_id, $request->user_ids))
-                    return $this->errorResponse(trans("apiResponse.selfSend"));
+                $helper = array_unique($request->user_ids);
+                if (!$this->checkUser($helper , $request))
+                    return $this->errorResponse(trans('response.unProcess'));
+
 
                 $allItems = AssignmentItem::where('assignment_id', $assignment->id)->pluck('user_id')->toArray();
 
@@ -133,12 +141,12 @@ class AssignmentController extends Controller
                     ->where('is_base', 1)
                     ->where('user_id', "!=", $request->base)
                     ->update(['is_base' => 0]);
-                $needToDelete = array_diff($allItems, $request->user_ids);
+                $needToDelete = array_diff($allItems, $helper);
                 if ($needToDelete) {
                     AssignmentItem::whereIn('user_id', $needToDelete)->delete();
                 }
 
-                $needToAdd = array_diff($request->user_ids, $allItems);
+                $needToAdd = array_diff($helper, $allItems);
                 if ($needToAdd) {
                     $assignmentItems = [];
                     foreach ($needToAdd as $v) {
@@ -168,11 +176,13 @@ class AssignmentController extends Controller
         }
     }
 
+    /**
+     * todo derkenari silme meselesin danisariq
+     */
     public function delete(Request $request, $id)
     {
         $this->validate($request, [
             'company_id' => 'required|integer',
-            'user_id' => 'required|integer',
         ]);
         $company_id = $request->company_id;
         try {
@@ -196,14 +206,19 @@ class AssignmentController extends Controller
     public function addUsersByMainAssignment(Request $request, $id)
     {
         $this->validate($request, [
-            'user_id' => ['required', 'integer'],
+
             'company_id' => ['required', 'integer'],
             'user_ids' => ['required', 'array', 'max:255'],
             'user_ids.*' => ['required', 'integer']
         ]);
         try {
-            if (in_array($request->user_id, $request->user_ids))
-                return $this->errorResponse(trans("apiResponse.selfSend"));
+
+
+            $helper = array_unique($request->user_ids);
+            if (!$this->checkUser($helper , $request))
+                return $this->errorResponse(trans('response.unProcess'));
+
+
 
             $assignment = Assignment::whereHas('document', function ($q) use ($request, $id) {
                 $q->where('company_id', $request->company_id)
@@ -213,17 +228,20 @@ class AssignmentController extends Controller
 
             if (!$assignment) return $this->errorResponse(['assignment' => trans('apiResponse.assignmentNotFound')]);
 
-            $base = AssignmentItem::where('assignment_id', $assignment->id)->where('user_id', $request->user_id)->where('is_base', 1)->first(['id']);
+
+
+
+            $base = AssignmentItem::where('assignment_id', $assignment->id)->where('user_id', $helper)->where('is_base', 1)->first(['id']);
             if (!$base) return $this->errorResponse(['error' => trans('apiResponse.permissionDeny')]);
 
             AssignmentItem::where('assignment_id', $assignment->id)
-                ->whereNotIn('user_id', $request->user_ids)
+                ->whereNotIn('user_id', $helper)
                 ->where('parent_id', $base->id)
                 ->delete();
 
             $items = [];
 
-            foreach ($request->user_ids as $user_id) {
+            foreach ($helper as $user_id) {
                 $items[] = [
                     'parent_id' => $base->id,
                     'assignment_id' => $assignment->id,
@@ -244,7 +262,7 @@ class AssignmentController extends Controller
     public function show(Request $request, $id)
     {
         $this->validate($request, [
-            'user_id' => 'required|integer',
+
             'company_id' => 'required|integer',
         ]);
         $company_id = $request->company_id;
@@ -254,12 +272,11 @@ class AssignmentController extends Controller
                 ->exists();
             if (!$document)
                 return $this->errorResponse(trans("apiResponse.documentNotExists"));
-            $assignment = Assignment::with(['items', 'items.notes'])
+            $assignment = Assignment::with(['items', 'items.notes', 'items.employee.user'])
                 ->where('document_id', $id)->first();
             return $this->successResponse($assignment);
         } catch (\Exception $e) {
-            dd($e);
-            //return $this->errorResponse(trans("apiResponse.tryLater"), Response::HTTP_INTERNAL_SERVER_ERROR);
+            return $this->errorResponse(trans("apiResponse.tryLater"), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -268,32 +285,29 @@ class AssignmentController extends Controller
         $this->validate($request, [
             "per_page" => "sometimes|required|integer",
             "finished_at" => "sometimes|required|date|date_format:Y-m-d",
-            'user_id' => 'required|integer',
+
             'company_id' => 'required|integer',
             'tome' => 'sometimes|required|integer|int:1,0'
 
         ]);
-        try {
-            $assignments = Assignment::with(['items'])
-                ->whereHas('document', function ($q) use ($request) {
-                    $q->where('company_id', $request->company_id);
-                    if ($request->has('finished_at'))
-                        $q->where(DB::raw('DATE(expire_time)'), '<=', $request->finished_at)->whereNotNull('expire_time');
-                });
-            if ($request->has('tome')) {
-                $assignments->whereHas('items', function ($q) use ($request) {
-                    if ($request->tome)
-                        $q->where('user_id', $request->user_id);
-                    else
-                        $q->where('user_id', "!=", $request->user_id);
-                });
-            }
-            $assignments = $assignments->paginate($request->per_page ?? 10);
-
-            return $this->successResponse($assignments);
-        } catch (\Exception $e) {
-            return $this->errorResponse(trans("apiResponse.tryLater"), Response::HTTP_INTERNAL_SERVER_ERROR);
+        $assignments = Assignment::with(['items' ,'items.employee.user'  ])
+            ->whereHas('document', function ($q) use ($request) {
+                $q->where('company_id', $request->company_id);
+                if ($request->has('finished_at'))
+                    $q->where(DB::raw('DATE(expire_time)'), '<=', $request->finished_at)->whereNotNull('expire_time');
+            });
+        if ($request->has('tome')) {
+            $assignments->whereHas('items', function ($q) use ($request) {
+                if ($request->get('tome'))
+                    $q->whereHas('employee' , function ($q){
+                        $q->where('user_id' , Auth::id());
+                    });
+            });
         }
+
+        $assignments = $assignments->paginate($request->per_page ?? 10);
+
+        return $this->successResponse($assignments);
     }
 
     public function addNotes(Request $request, $id)
@@ -301,7 +315,7 @@ class AssignmentController extends Controller
         $this->validate($request, [
             "notes" => "required|array",
             "notes.*" => "required",
-            'user_id' => 'required|integer',
+
             'company_id' => 'required|integer'
         ]);
         $company_id = $request->company_id;
@@ -320,7 +334,7 @@ class AssignmentController extends Controller
 
 
             $assignmentItem = AssignmentItem::where('assignment_id', $assignment->id)
-                ->where('user_id', $request->user_id)
+                ->where('user_id', Auth::id())
                 ->first('id');
             if (!$assignmentItem)
                 return $this->errorResponse(trans('apiResponse.itemNotFound'));
@@ -338,7 +352,7 @@ class AssignmentController extends Controller
         $this->validate($request, [
             "note" => "required",
             "note_id" => "required|integer",
-            'user_id' => 'required|integer',
+
             'company_id' => 'required|integer',
         ]);
         $company_id = $request->company_id;
@@ -358,7 +372,7 @@ class AssignmentController extends Controller
 
 
             $assignmentItem = AssignmentItem::where('assignment_id', $assignment->id)
-                ->where('user_id', $request->user_id)
+                ->where('user_id',  Auth::id())
                 ->first('id');
 
             if (!$assignmentItem) return $this->errorResponse(trans('apiResponse.assignmentItemNotFound'));
@@ -396,7 +410,7 @@ class AssignmentController extends Controller
     {
         $this->validate($request, [
             'company_id' => 'required|integer',
-            'user_id' => 'required|integer'
+//            'user_id' => 'required|integer'
 
         ]);
         try {
@@ -414,7 +428,7 @@ class AssignmentController extends Controller
 
 
             $assignmentItem = AssignmentItem::where('assignment_id', $assignment->id)
-                ->where('user_id', $request->user_id)
+                ->where('user_id', Auth::id())
                 ->first('id');
 
             if (!$assignmentItem)
@@ -437,7 +451,7 @@ class AssignmentController extends Controller
     public function markAsRead(Request $request, $id)
     {
         $this->validate($request, [
-            'user_id' => 'required|integer',
+
             'company_id' => 'required|integer'
         ]);
         $company_id = $request->company_id;
@@ -454,7 +468,7 @@ class AssignmentController extends Controller
 
 
             $check = AssignmentItem::where('assignment_id', $assignment->id)
-                ->where('user_id', $request->user_id)
+                ->where('user_id', Auth::id())
                 ->update([
                     'status' => AssignmentItem::WAIT
                 ]);
@@ -471,7 +485,7 @@ class AssignmentController extends Controller
     public function done(Request $request, $id)
     {
         $this->validate($request, [
-            'user_id' => 'required|integer',
+
             'company_id' => 'required|integer',
             'return' => 'sometimes|required|boolean'
         ]);
@@ -489,7 +503,7 @@ class AssignmentController extends Controller
                 return $this->errorResponse(trans("apiResponse.unProcess"));
 
             $assignmentItem = AssignmentItem::where('assignment_id', $assignment->id)
-                ->where('user_id', $request->user_id)
+                ->where('user_id',  Auth::id())
                 ->first(['id', 'is_base']);
 
             if (!$assignmentItem)
@@ -521,7 +535,7 @@ class AssignmentController extends Controller
     public function changeStatus(Request $request, $id)
     {
         $this->validate($request, [
-            'user_id' => 'required|integer',
+
             'company_id' => 'required|integer',
             'return' => 'sometimes|required|boolean',
             'status' => 'required|integer|in:1,2,3'
@@ -539,7 +553,7 @@ class AssignmentController extends Controller
                 return $this->errorResponse(trans("apiResponse.unProcess"));
 
             $assignmentItem = AssignmentItem::where('assignment_id', $assignment->id)
-                ->where('user_id', $request->user_id)
+                ->where('user_id', Auth::id())
                 ->first(['id', 'is_base']);
             if (!$assignmentItem)
                 return $this->errorResponse(trans("apiResponse.unProcess"));
@@ -574,5 +588,14 @@ class AssignmentController extends Controller
         return AssignmentItem::where('parent_id',$assignmentId)
             ->where('status', "!=", AssignmentItem::DONE)
             ->exists();
+    }
+
+    private function checkUser(array $helper, Request $request)
+    {
+        $employees = Employee::whereIn('id' , $helper)
+            ->where('company_id', $request->get('company_id'))
+            ->where('is_active' , true)
+            ->count();
+         return count($helper) == $employees;
     }
 }

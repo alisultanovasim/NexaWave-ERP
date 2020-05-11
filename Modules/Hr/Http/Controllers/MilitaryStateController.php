@@ -5,6 +5,7 @@ namespace Modules\Hr\Http\Controllers;
 
 
 use Illuminate\Foundation\Validation\ValidatesRequests;
+use Illuminate\Support\Facades\Validator;
 use Modules\Hr\Entities\MilitaryState;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
@@ -18,10 +19,9 @@ class MilitaryStateController extends Controller
     public function index(Request $request)
     {
         $this->validate($request , [
-            'company_id' => ['required' , 'integer'],
             'paginateCount' => ['sometimes','required' , 'integer'],
         ]);
-        $result = MilitaryState::where('company_id' , $request->get('company_id'))->paginate($request->get('company_id'));
+        $result = MilitaryState::paginate($request->get('paginateCount'));
 
         return $this->dataResponse($result);
     }
@@ -39,7 +39,6 @@ class MilitaryStateController extends Controller
                 'name' => $request->get('name'),
                 'code' => $request->get('code'),
                 'position' => $request->get('position'),
-                'company_id' => $request->get('company_id')
             ]);
             DB::commit();
         }
@@ -62,7 +61,7 @@ class MilitaryStateController extends Controller
         {
             DB::beginTransaction();
             $saved = true;
-            $militaryState = MilitaryState::where('id', $id)->where('company_id' , $request->get('company_id'))->first(['id']);;
+            $militaryState = MilitaryState::where('id', $id)->first(['id']);;
             if (!$militaryState)
                 return $this->errorResponse(trans('messages.not_found'), 404);
             $militaryState->update([
@@ -84,7 +83,7 @@ class MilitaryStateController extends Controller
 
     public function destroy(Request $request , $id)
     {
-        return MilitaryState::where('id', $id)->where('company_id', $request->get('company_id'))->delete()
+        return MilitaryState::where('id', $id)->delete()
             ? $this->successResponse(trans('messages.saved'))
             : $this->errorResponse(trans('messages.not_saved'));
     }
@@ -95,7 +94,7 @@ class MilitaryStateController extends Controller
             'code' => 'required|max:50',
             'position' => 'required|numeric'
         ];
-        $validator = \Validator::make($input, $validationArray);
+        $validator = Validator::make($input, $validationArray);
 
         if($validator->fails())
             return $validator->errors();
