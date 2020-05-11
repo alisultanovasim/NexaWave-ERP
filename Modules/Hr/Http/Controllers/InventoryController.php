@@ -8,6 +8,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Modules\Hr\Entities\Inventory;
 
@@ -37,7 +38,7 @@ class InventoryController extends Controller
         ->with([
             'inventoryType:id,name'
         ])
-        ->orderBy('desc', 'id')
+        ->orderBy('id', 'desc')
         ->paginate($request->get('per_page'));
 
         return $this->dataResponse($inventories);
@@ -49,7 +50,7 @@ class InventoryController extends Controller
      * @throws ValidationException
      */
     public function create(Request $request): JsonResponse{
-        $this->validate($request, $this->getInventoryRules());
+        $this->validate($request, $this->getInventoryRules($request));
         $this->saveInventory($request, $this->inventory);
         return $this->successResponse(trans('messages.saved'), 201);
     }
@@ -61,7 +62,7 @@ class InventoryController extends Controller
      * @throws ValidationException
      */
     public function update(Request $request, $id): JsonResponse{
-        $this->validate($request, $this->getInventoryRules());
+        $this->validate($request, $this->getInventoryRules($request));
         $inventory = $this->findOrFailInventory($request, $id);
         $this->saveInventory($request, $inventory);
         return $this->successResponse(trans('messages.saved'), 200);
@@ -107,12 +108,17 @@ class InventoryController extends Controller
             ->firstOrFail();
     }
 
+
     /**
-     * @return array
+     * @param Request $request
+     * @return array|string[]
      */
-    private function getInventoryRules(): array {
+    private function getInventoryRules(Request $request): array {
         return  [
-            'inventory_type_id' => 'required|exists:inventory_types,id',
+            'inventory_type_id' => [
+                'required',
+                Rule::exists('inventory_types', 'id')->where('company_id', $request->get('company_id'))
+            ],
             'name' => 'required|min:2|max:150',
             'number' => 'required|numeric',
             'note' => 'nullable|max:255',

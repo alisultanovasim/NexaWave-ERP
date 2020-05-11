@@ -410,7 +410,7 @@ Route::group([
         Route::delete('/{id}', 'ContractTypeController@destroy');
     });
 
-    Route::group(['prefix' => 'inventory'], function (){
+    Route::group(['prefix' => 'inventories'], function (){
         Route::get('/', 'InventoryController@index');
         Route::post('/', 'InventoryController@create');
         Route::put('/{id}', 'InventoryController@update');

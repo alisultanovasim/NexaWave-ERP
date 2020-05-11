@@ -290,27 +290,24 @@ class AssignmentController extends Controller
             'tome' => 'sometimes|required|integer|int:1,0'
 
         ]);
-        try {
-            $assignments = Assignment::with(['items' ,'items.employee.user'  ])
-                ->whereHas('document', function ($q) use ($request) {
-                    $q->where('company_id', $request->company_id);
-                    if ($request->has('finished_at'))
-                        $q->where(DB::raw('DATE(expire_time)'), '<=', $request->finished_at)->whereNotNull('expire_time');
-                });
-            if ($request->has('tome')) {
-                $assignments->whereHas('items', function ($q) use ($request) {
-                    if ($request->tome)
-                        $q->where('user_id', Auth::id());
-                    else
-                        $q->where('user_id', "!=", Auth::id());
-                });
-            }
-            $assignments = $assignments->paginate($request->per_page ?? 10);
-
-            return $this->successResponse($assignments);
-        } catch (\Exception $e) {
-            return $this->errorResponse(trans("apiResponse.tryLater"), Response::HTTP_INTERNAL_SERVER_ERROR);
+        $assignments = Assignment::with(['items' ,'items.employee.user'  ])
+            ->whereHas('document', function ($q) use ($request) {
+                $q->where('company_id', $request->company_id);
+                if ($request->has('finished_at'))
+                    $q->where(DB::raw('DATE(expire_time)'), '<=', $request->finished_at)->whereNotNull('expire_time');
+            });
+        if ($request->has('tome')) {
+            $assignments->whereHas('items', function ($q) use ($request) {
+                if ($request->get('tome'))
+                    $q->whereHas('employee' , function ($q){
+                        $q->where('user_id' , Auth::id());
+                    });
+            });
         }
+
+        $assignments = $assignments->paginate($request->per_page ?? 10);
+
+        return $this->successResponse($assignments);
     }
 
     public function addNotes(Request $request, $id)

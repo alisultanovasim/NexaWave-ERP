@@ -26,10 +26,17 @@ class UserEducationController extends Controller
             'level:id,name',
             'state:id,name',
             'language:id,name'
-        ])
-            ->company($request->get('company_id'))
-            ->orderBy('id','desc')
-            ->paginate($request->get('per_page'));
+        ])->company();
+
+        if ($request->has('user_id')){
+            $edu = $edu->where('user_id' , $request->get('user_id'))->first();
+            if ($edu === null) return $this->successResponse(trans('response.UserNotFound'));
+        }else
+            $edu = $edu
+                ->orderBy('id','desc')
+                ->paginate($request->get('per_page'));
+
+
         return $this->successResponse($edu);
     }
 

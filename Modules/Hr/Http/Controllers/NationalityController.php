@@ -22,8 +22,7 @@ class NationalityController extends Controller
             'paginateCount' => ['sometimes' , 'required'],
         ]);
 
-        $result = Nationality::orderBy('position')
-            ->paginate($request->get('paginateCount'));
+        $result = Nationality::paginate($request->get('paginateCount'));
 
         return $this->dataResponse($result);
     }
@@ -40,8 +39,6 @@ class NationalityController extends Controller
             Nationality::create([
                 'name' => $request->get('name'),
                 'code' => $request->get('code'),
-//                'position' => $request->get('position'),
-//                'company_id' => $request->get('company_id')
             ]);
             DB::commit();
         }
@@ -70,7 +67,6 @@ class NationalityController extends Controller
             Nationality::where('id', $id)->update([
                 'name' => $request->get('name'),
                 'code' => $request->get('code'),
-                'position' => $request->get('position'),
             ]);
             DB::commit();
         }
@@ -95,7 +91,6 @@ class NationalityController extends Controller
         $validationArray = [
             'name' => 'required|max:256',
             'code' => 'required|max:50',
-            'position' => 'required|numeric',
         ];
         $validator = \Validator::make($input, $validationArray);
 

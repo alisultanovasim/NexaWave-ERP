@@ -29,7 +29,7 @@ class Inventory extends Model
      * @return mixed
      */
     public function scopeCompanyId($query, $companyId){
-        return  $query->wherHas('inventoryType', function ($query) use ($companyId){
+        return  $query->whereHas('inventoryType', function ($query) use ($companyId){
             $query->where('company_id', $companyId);
         });
     }

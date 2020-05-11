@@ -8,6 +8,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Modules\Hr\Entities\Inventory;
 use Modules\Hr\Entities\Uniform;
@@ -50,7 +51,7 @@ class UniformController extends Controller
      * @throws ValidationException
      */
     public function create(Request $request): JsonResponse {
-        $this->validate($request, $this->getUniformRules());
+        $this->validate($request, $this->getUniformRules($request));
         $this->saveUniform($request, $this->uniform);
         return  $this->successResponse(trans('messages.saved'), 201);
     }
@@ -62,7 +63,7 @@ class UniformController extends Controller
      * @throws ValidationException
      */
     public function update(Request $request, $id): JsonResponse {
-        $this->validate($request, $this->getUniformRules());
+        $this->validate($request, $this->getUniformRules($request));
         $uniform = $this->findOrFailUniform($request, $id);
         $this->saveUniform($request, $uniform);
         return  $this->successResponse(trans('messages.saved'), 200);
@@ -98,12 +99,17 @@ class UniformController extends Controller
             ->firstOrFail(['id']);
     }
 
+
     /**
-     * @return array
+     * @param Request $request
+     * @return array|string[]
      */
-    private function getUniformRules(): array {
+    private function getUniformRules(Request $request): array {
         return [
-            'uniform_type_id' => 'required|exists:uniform_types,id',
+                'uniform_type_id' => [
+                'required',
+                Rule::exists('uniform_types', 'id')->where('company_id', $request->get('company_id'))
+            ],
             'size' => 'required|max:50',
             'note' => 'nullable|max:255|min:2'
         ];

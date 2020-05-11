@@ -17,7 +17,7 @@ class CreateUniformsTable extends Migration
             $table->bigIncrements('id');
             $table->unsignedBigInteger('uniform_type_id');
             $table->char('size', 150);
-            $table->char('node')->nullable()->default(null);
+            $table->char('note')->nullable()->default(null);
             $table->timestamps();
             $table->softDeletes();
 
