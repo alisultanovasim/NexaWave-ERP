@@ -35,8 +35,8 @@ class AddColumnsToEmployeeContracts extends Migration
 
             $table->float('state_value')->nullable();//stat deyeri
 
-            $table->date('intern_start_at')->nullable();
-            $table->date('intern_end_at')->nullable();
+            $table->date('intern_start_date')->nullable();
+            $table->date('intern_end_date')->nullable();
             $table->unsignedBigInteger('currency_id')->nullable();
 
             $table->foreign('currency_id')
@@ -50,8 +50,8 @@ class AddColumnsToEmployeeContracts extends Migration
                 ->on('contract_types')
                 ->onDelete('cascade');
 
-            $table->date('work_start_at')->nullable();
-            $table->date('work_end_at')->nullable();
+            $table->date('work_start_date')->nullable();
+            $table->date('work_end_date')->nullable();
 
             $table->time('work_time_start_at')->nullable();
             $table->time('work_time_end_at')->nullable();

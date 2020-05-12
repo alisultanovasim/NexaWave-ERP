@@ -11,6 +11,6 @@ class Storage extends Model
     protected $guarded = ['id'];
 
     public function products(){
-        return $this->hasMany(ProductTitle::class);
+        return $this->hasMany(Product::class);
     }
 }

@@ -26,9 +26,10 @@ class CreateProductsTable extends Migration
             $table->unsignedBigInteger('kind_id')->nullable();
             $table->foreign('kind_id')->references('id')->on('product_kinds')->onDelete('cascade');
 
-            $table->unsignedTinyInteger('state');
+            $table->unsignedBigInteger('state_id');
+            $table->foreign('state_id')->references('id')->on('product_states')->onDelete('cascade');
 
-            $table->text('description');
+            $table->text('description')->nullable();
             $table->double('amount');
             $table->unsignedBigInteger('storage_id');
             $table->timestamps();
@@ -40,8 +41,6 @@ class CreateProductsTable extends Migration
             $table->softDeletes();
 
             $table->unsignedBigInteger('company_id');
-
-            $table->unique(['title_id' , 'kind_id' , 'state' , 'deleted_at']);
         });
 
     }

@@ -17,6 +17,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -35,8 +36,6 @@ use Modules\Plaza\Entities\OfficeUser;
 class UserController extends Controller
 {
     use ApiResponse;
-
-
 
     public function login(Request $request)
     {
@@ -300,7 +299,7 @@ class UserController extends Controller
             'passport_from_organ' => ['nullable', 'string', 'max:255'],
             'passport_get_at' => ['nullable', 'date', 'date_format:dd-mm-YYYY'],
             'passport_expire_at' => ['nullable', 'date', 'date_format:dd-mm-YYYY'],
-
+            'social_insurance_no' => ['nullable' , 'string' , 'max:255'],
             'military_status' => ['nullable' , 'string' , 'max:255'],
             'military_start_at' => ['nullable' , 'date', 'date_format:dd-mm-YYYY'],
             'military_end_at' => ['nullable' , 'date', 'date_format:dd-mm-YYYY'],
@@ -346,7 +345,7 @@ class UserController extends Controller
             'passport_from_organ' => ['nullable', 'string', 'max:255'],
             'passport_get_at' => ['nullable', 'date', 'date_format:dd-mm-YYYY'],
             'passport_expire_at' => ['nullable', 'date', 'date_format:dd-mm-YYYY'],
-
+            'social_insurance_no' => ['nullable' , 'string' , 'max:255'],
             'military_status' => ['nullable' , 'string' , 'max:255'],
             'military_start_at' => ['nullable' , 'date', 'date_format:dd-mm-YYYY'],
             'military_end_at' => ['nullable' , 'date', 'date_format:dd-mm-YYYY'],
@@ -366,6 +365,7 @@ class UserController extends Controller
             'family_status_state' => ['nullable' , 'string' , 'max:255'],
             'family_status_register_at' => ['nullable' , 'date', 'date_format:dd-mm-YYYY'],
             'avatar' => ['nullable' , 'mimes:png,jpg,jpeg'],
+
         ];
     }
 
@@ -393,7 +393,8 @@ class UserController extends Controller
 
         $user->details()->create($request->all());
 
-        $user->generatedPassword = $password;
+
+        SendMailCreatePassword::dispatch($user , $password);
 
         return $user;
     }

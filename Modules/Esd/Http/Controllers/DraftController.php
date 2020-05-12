@@ -144,7 +144,7 @@ class DraftController extends Controller
             $table = Section::RULES[$document->section_id];
 //            $table = Section::where('id', $request->section_id)->first('table')->table;
 
-            $data = $this->dataBySection($request , $document, $table);
+            $data = $this->saveBySection($request, $table);
 
             if($data instanceof JsonResponse) return $data;
 
@@ -174,10 +174,12 @@ class DraftController extends Controller
                     return $this->errorResponse([$find[0] => "incorrect format"], Response::HTTP_UNPROCESSABLE_ENTITY);
                 }
             }
+            dd($e);
 
              return $this->errorResponse(trans('apiResponse.tryLater'), Response::HTTP_INTERNAL_SERVER_ERROR);
         } catch (\Exception $exception) {
             DB::rollBack();
+            dd($exception);
             return $this->errorResponse(trans("apiResponse.tryLater"), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
@@ -279,7 +281,7 @@ class DraftController extends Controller
 
             //$table = Section::where('id', $document->section_id)->first('table')->table;
             $table = Section::RULES[$document->section_id];
-            $data = $this->dataBySection($request , $document, $table);
+            $data = $this->saveBySection($request , $table);
 
             if($data instanceof JsonResponse) return $data;
             if ($data)

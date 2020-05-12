@@ -23,4 +23,12 @@ class Product extends Model
     public function title(){
         return $this->belongsTo(ProductTitle::class);
     }
+
+    public function state(){
+        return $this->belongsTo(ProductState::class);
+    }
+
+    public function color(){
+        return $this->belongsTo(ProductColor::class);
+    }
 }

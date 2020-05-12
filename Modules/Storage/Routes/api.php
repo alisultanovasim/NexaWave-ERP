@@ -46,8 +46,40 @@ Route::group([
         Route::get('/{id}', 'ProductKindController@show');
         Route::post('/', 'ProductKindController@store');
         Route::put('/{id}', 'ProductKindController@update');
-        Route::delete('{id}', 'ProductKindController@update');
+        Route::delete('{id}', 'ProductKindController@delete');
     }); //kinds
+
+    Route::group([
+        'prefix' => 'models'
+    ], function ($q) {
+        Route::get('/', 'ProductModelController@index');
+        Route::get('/{id}', 'ProductModelController@show');
+        Route::post('/', 'ProductModelController@store');
+        Route::put('/{id}', 'ProductModelController@update');
+        Route::delete('{id}', 'ProductModelController@delete');
+    }); //models
+
+    Route::group([
+        'prefix' => 'states'
+    ], function ($q) {
+        Route::get('/', 'ProductStateController@index');
+        Route::get('/{id}', 'ProductStateController@show');
+        Route::post('/', 'ProductStateController@store');
+        Route::put('/{id}', 'ProductStateController@update');
+        Route::delete('{id}', 'ProductStateController@delete');
+    }); //states
+
+
+    Route::group([
+        'prefix' => 'colors'
+    ], function ($q) {
+        Route::get('/', 'ProductColorController@index');
+        Route::get('/{id}', 'ProductColorController@show');
+        Route::post('/', 'ProductColorController@store');
+        Route::put('/{id}', 'ProductColorController@update');
+        Route::delete('{id}', 'ProductColorController@delete');
+    }); //states
+
 
     Route::group([
         'prefix' => 'report'

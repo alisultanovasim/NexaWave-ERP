@@ -36,14 +36,16 @@ class EmployeeController extends Controller
             'position_id' => ['nullable', 'integer'],
             'section_id' => ['nullable', 'integer'],
             'sector_id' => ['nullable', 'integer'],
+
         ]);
 
         if ($notExists = $this->companyInfo($request->get('company_id'), $request->only(['profession_id']))) return $this->errorResponse($notExists);
 
         $employees = Employee::with([
             'user:id,name,surname',
-            'contract',
-            'contract.currency'
+            'contracts',
+            'contract.currency',
+            'contracts.position:id,name'
 
         ])->where('company_id', $request->get('company_id'));
 
@@ -76,12 +78,21 @@ class EmployeeController extends Controller
             'company_id' => ['required', 'integer'],
         ]);
         $employees = Employee::with([
-            'user', 'contracts',
+            'user',  'user.details',
+            'details' ,
+            'details.nationality',
+            'details.citizen',
+            'details.birthdayCity',
+            'details.birthdayCountry',
+            'details.birthdayRegion',
+        ])
+            /*
+             * 'contracts',
             'contracts.department:id,name',
             'contracts.section:id,name',
             'contracts.sector:id,name',
             'contracts.position:id,name'
-        ])
+             */
             ->where('id', $id)
             ->where('company_id', $request->get('company_id'))
             ->first();
@@ -89,7 +100,6 @@ class EmployeeController extends Controller
         if (!$employees) return $this->errorResponse(trans('response.employeeNotFound'), Response::HTTP_NOT_FOUND);
 
         return $this->successResponse($employees);
-
     }
 
     public function store(Request $request)
@@ -111,7 +121,7 @@ class EmployeeController extends Controller
                 $user = UserController::createUser($request);
             }
 
-            Employee::create([
+            $employee = Employee::create([
                 'company_id' => $request->get('company_id'),
                 'user_id' => $user->id,
             ]);
@@ -122,8 +132,11 @@ class EmployeeController extends Controller
 
                 $relations = $request->only(['department_id', 'section_id', 'sector_id', 'position_id']);
 
-                if ($notExists = $this->companyInfo($request->get('company_id'), $relations)) return $this->errorResponse($notExists);
+                if ($notExists = $this->companyInfo($request->get('company_id'), $relations)) return $this->errorResponse($notExists , 422);
 
+                $request->request->set('employee_id', $employee->id);
+
+                ContractController::storeContract($request);
             }
 
             DB::commit();
