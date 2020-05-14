@@ -2,12 +2,21 @@
 
 namespace Modules\Hr\Entities;
 
+use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
-use Modules\Esd\Entities\User;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ContactInformation extends Model
 {
-    protected $guarded = ['id'];
+
+    use SoftDeletes;
+
+    protected $table = 'contact_information';
+
+    protected $fillable = [
+        'user_id', 'country_id', 'city_id', 'region_id', 'address_type_id', 'address',
+        'expire_date', 'post_index', 'fax', 'number', 'created_at', 'updated_at', 'deleted_at'
+    ];
 
     public function country(){
         return $this->belongsTo(Country::class);

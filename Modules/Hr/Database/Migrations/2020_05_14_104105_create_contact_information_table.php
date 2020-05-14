@@ -26,6 +26,12 @@ class CreateContactInformationTable extends Migration
             $table->char('number');
             $table->char('fax');
             $table->timestamps();
+            $table->softDeletes();
+
+            $table->foreign('user_id')->references('id')->on('users');
+            $table->foreign('country_id')->references('id')->on('countries');
+            $table->foreign('region_id')->references('id')->on('regions');
+            $table->foreign('address_type_id')->references('id')->on('address_types');
         });
     }
 
