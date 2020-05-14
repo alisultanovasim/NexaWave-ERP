@@ -41,7 +41,7 @@ class ContactInformationController extends Controller
         ->company()
         ->orderBy('id', 'desc')
         ->paginate($request->get('per_page'));
-        return $this->dataResponse($contacts);
+        return $this->successResponse($contacts);
     }
 
     public function indexV2(Request $request): JsonResponse{
@@ -71,7 +71,7 @@ class ContactInformationController extends Controller
         ])
         ->company()
         ->firstOrFail();
-        return $this->dataResponse($contact);
+        return $this->successResponse($contact);
     }
 
     /**
@@ -106,7 +106,7 @@ class ContactInformationController extends Controller
         $contact = $this->contacts->where('id', $id)->company()->firstOrFail(['id']);
         return $contact->delete()
             ? $this->successResponse(trans('messages.saved'))
-            : $this->successResponse(trans('messages.not_saved'));
+            : $this->errorResponse(trans('messages.not_saved'), 400);
     }
 
     /**
