@@ -20,13 +20,21 @@ class ProductKindController extends Controller
     public function index(Request $request)
     {
         $this->validate($request , [
-            'is_filter' => ['sometimes' , 'required' , 'boolean']
+            'is_filter' => ['sometimes' , 'required' , 'boolean'],
+            'title_id' => ['required' , 'integer']
         ]);
-        $titles = ProductKind::query();
-        if (!$request->get('is_filter'))
-            $titles->with(['title']);
-        $titles = $titles->where('company_id', $request->get('company_id'))->get();
-        return $this->successResponse($titles);
+
+
+        $title = ProductTitle::with([
+            'kinds' => function($q){
+                $q->withCount('products')->paginate();
+            } , 'kinds.unit'
+        ])
+            ->where('id' , $request->get('title_id'))
+            ->where('company_id', $request->get('company_id'))
+            ->get();
+
+        return $this->successResponse($title);
     }
 
     public function store(Request $request)

@@ -15,7 +15,7 @@ class ArchiveController extends Controller
     {
         $this->validate($request , [
             'documents' => ['sometimes' , 'required' , 'array'],
-            ['required' , 'integer'] ,
+            'documents.*' => ['required' , 'integer'] ,
             'company_id' => [ 'required' , 'integer'] ,
         ]);
         try {

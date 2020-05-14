@@ -45,6 +45,7 @@ class UserDetail extends Model
         'family_status_state',
         'family_status_register_at',
         'avatar',
+        'social_insurance_no'
     ];
 
     public function user(){

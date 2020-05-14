@@ -18,11 +18,7 @@ class PlazaDatabaseSeeder extends Seeder
         Model::unguard();
 
 
-        Floor::create([
-            'number' => 1,
-            'common_size'=>200.00,
-            'company_id'=>1
-        ]);
+
         // $this->call("OthersTableSeeder");
     }
 }

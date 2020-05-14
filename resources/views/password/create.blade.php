@@ -8,10 +8,12 @@
     <title>Document</title>
 </head>
 <body>
-<h1>{{$user['name'] . " " . $user['surname']}} </h1>
+<h1>{{$user->name . " " . $user->surname}} </h1>
 <ul>
-    <li>Login : {{$user['surname']}}</li>
-    <li>Parol : {{$user['password']}}</li>
+    <li>Login : {{$user->username}}</li>
+    <li>Parol : {{$password}}</li>
+    <br>
+    <a href="https://1of.az">One Office</a>
 </ul>
 </body>
 </html>

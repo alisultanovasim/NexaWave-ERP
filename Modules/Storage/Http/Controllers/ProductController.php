@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\DB;
 use Modules\Storage\Entities\Income;
 use Modules\Storage\Entities\Outcome;
 use Modules\Storage\Entities\Product;
+use Modules\Storage\Entities\ProductKind;
 use Modules\Storage\Entities\ProductTitle;
 
 class ProductController extends Controller
@@ -29,13 +30,19 @@ class ProductController extends Controller
         ]);
 
         // for product filter
-        $filter = function ($q) use ($request) {
-            $q->with("kind:id,name,unit_id" ,'kind.unit' );
-            if ($request->get('storage_id')) $q->where('storage_id', $request->get('storage_id'));
-        };
+//        $filter = function ($q) use ($request) {
+//            $q->with("kind:id,name,unit_id" ,'kind.unit' );
+//            if ($request->get('storage_id')) $q->where('storage_id', $request->get('storage_id'));
+//        };
+//
+        //with(['kinds' , 'kinds.products' => $filter])
 
-        $products = ProductTitle::with(['kinds' , 'kinds.products' => $filter])
-            ->where('company_id', $request->get('company_id'));
+        $products = ProductTitle::
+        withCount([
+            'products' ,
+            'kinds'
+        ])
+        ->where('company_id', $request->get('company_id'));
 
         if ($request->get('name'))
             $products->where('name', 'like', $request->get('name') . '%');
@@ -48,7 +55,9 @@ class ProductController extends Controller
 
     public function show(Request $request, $id)
     {
-        $product = ProductTitle::with(['products' , 'products.kind' ,  'products.kind.unit'])
+        $product = ProductTitle::with(['products'=>function($q){
+            $q->orderBy('id' , 'desc');
+        } , 'products.kind' ,  'products.color' , 'products.state' ,  'products.kind.unit'])
             ->where('company_id', $request->get('company_id'))
             ->where('id', $id)
             ->first();
@@ -62,42 +71,58 @@ class ProductController extends Controller
             'title_id' => ['required', 'integer', 'min:1'],
             'kind_id' => ['required', 'integer', 'min:1'],
             'description' => ['nullable', 'string'],
-            'state' => ['required', 'integer'],
+            'state_id' => ['required', 'integer'],
             'amount' => ['required', 'numeric'],
             'income_description' => ['nullable', 'string'],
             'storage_id' => ['required' , 'integer'],
             'unit_id' => ['required' , 'integer' , 'min:1'],
             'less_value' => ['required' , 'boolean'],
             'quickly_old' => ['required' , 'boolean'],
+            'color_id' => ['nullable' , 'integer'],
+            'model_id' => ['nullable' , 'integer']
         ]);
         DB::beginTransaction();
         $product = Product::where([
             ['title_id', '=', $request->get('title_id')],
             ['kind_id', '=', $request->get('kind_id')],
-            ['state', '=', $request->get('state')],
+            ['state_id', '=', $request->get('state_id')],
             ['company_id', '=', $request->get('company_id')],
+            ['size' , '=' , $request->get('size')],
+            ['color_id' , '=' , $request->get('color_id')],
+            ['model_id' , '=' , $request->get('model_id')],
         ])->first(['id']);
         if ($product) {
             Product::where('id', $product->id)
                 ->increment('amount', $request->get('amount'));
         } else {
-            if ($notExists = $this->companyInfo($request->get('company_id'), $request->only('storage_id' , 'title_id', 'kind_id')))
+            if ($notExists = $this->companyInfo(
+                    $request->get('company_id'),
+                    $request->only('storage_id' , 'title_id','color_id' , 'state_id')))
                 return $this->errorResponse($notExists);
+
+            $check = ProductKind::whereHas('models' , function ($q) use ($request){
+                if ($request->has('model_id'))
+                    $q->where('id', $request->get('model_id'));
+            })->where('company_id' , $request->get('company_id'))
+                ->exists();
+            if (!$check) return $this->errorResponse(trans('response.fieldIsNotFindInDatabase'));
+
             $product = Product::create($request->only([
                 'title_id',
                 'kind_id',
                 'description',
-                'state',
                 'amount',
                 'unit_id',
                 'less_value' ,
                 'quickly_old',
                 'description',
                 'storage_id',
-                'company_id'
+                'company_id',
+                'color_id',
+                'model_id',
+                'state_id'
             ]));
         }
-
 
         Income::create([
             'description' => $request->get('income_description'),

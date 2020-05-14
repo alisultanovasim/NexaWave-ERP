@@ -17,15 +17,18 @@ class SendMailCreatePassword implements ShouldQueue
     public $user;
 
     public $tries = 5;
+    public $password;
 
     /**
      * Create a new job instance.
      *
      * @param $data
      */
-    public function __construct($data)
+    public function __construct($data , $password)
     {
         $this->user = $data;
+        $this->password = $password;
+
     }
 
     /**
@@ -35,9 +38,9 @@ class SendMailCreatePassword implements ShouldQueue
      */
     public function handle()
     {
-         Mail::send('password.create' , ['user' => $this->user] , function ($m) {
+         Mail::send('password.create' , ['user' => $this->user , 'password' => $this->password] , function ($m) {
             $m->from("Info@1of.az");
-            $m->to($this->user['email'])->subject("One office create an account");
+            $m->to($this->user->email)->subject("One office create an account");
         });
 
     }

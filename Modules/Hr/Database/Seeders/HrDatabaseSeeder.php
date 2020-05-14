@@ -6,6 +6,8 @@ use Illuminate\Database\Seeder;
 use Illuminate\Database\Eloquent\Model;
 use Modules\Hr\Entities\City;
 use Modules\Hr\Entities\Country;
+use Modules\Hr\Entities\Currency;
+use Modules\Hr\Entities\DurationType;
 use Modules\Hr\Entities\EducationLevel;
 use Modules\Hr\Entities\EducationPlace;
 use Modules\Hr\Entities\EducationSpecialty;
@@ -74,6 +76,16 @@ class HrDatabaseSeeder extends Seeder
             "code"=> "language levelinde hec codu olar?"
         ]);
 
+
+        DurationType::create([
+            'name' => 'type_1'
+        ]);
+
+        Currency::create([
+            'char' => '$',
+            'name' => 'aze',
+            'code' => 1231,
+        ]);
         // $this->call("OthersTableSeeder");
     }
 }

@@ -30,8 +30,6 @@ class CreateIncomesTable extends Migration
             $table->unsignedBigInteger('storage_id')->nullable();
             $table->foreign('storage_id')->references('id')->on('storages')->onDelete('set null');
 
-//            $table->unsignedBigInteger('supplier_id')->nullable();
-//            $table->foreign('supplier_id')->references('id')->on('suppliers')->onDelete('cascade');
 
         });
     }
