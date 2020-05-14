@@ -42,7 +42,8 @@ class UserCertificateController extends Controller
             'user:id,name,surname',
         ])
         ->company()
-        ->get();
+        ->orderBy('id', 'desc')
+        ->paginate($request->get('per_page'));
 
         return $this->dataResponse($certificates);
     }
