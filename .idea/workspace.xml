@@ -3,6 +3,21 @@
   <component name="ChangeListManager">
     <list default="true" id="b30929d9-41f6-4a33-a130-c3679b863b12" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+<<<<<<< HEAD
+      <change beforePath="$PROJECT_DIR$/composer.json" beforeDir="false" afterPath="$PROJECT_DIR$/composer.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/composer.lock" beforeDir="false" afterPath="$PROJECT_DIR$/composer.lock" afterDir="false" />
+=======
+=======
+>>>>>>> 6f600bc0119de954fc274addff40b0f1819a6bf0
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+<<<<<<< HEAD
+      <change beforePath="$PROJECT_DIR$/Modules/Esd/Routes/api.php" beforeDir="false" afterPath="$PROJECT_DIR$/Modules/Esd/Routes/api.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Modules/Hr/Database/Migrations/2020_03_17_153000_create_humans_table.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Modules/Hr/Database/Migrations/2020_03_17_161817_create_employees_table.php" beforeDir="false" afterPath="$PROJECT_DIR$/Modules/Hr/Database/Migrations/2020_03_17_161817_create_employees_table.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Modules/Hr/Entities/Employee/Employee.php" beforeDir="false" afterPath="$PROJECT_DIR$/Modules/Hr/Entities/Employee/Employee.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Modules/Plaza/Http/Controllers/FloorController.php" beforeDir="false" afterPath="$PROJECT_DIR$/Modules/Plaza/Http/Controllers/FloorController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Modules/Plaza/Routes/api.php" beforeDir="false" afterPath="$PROJECT_DIR$/Modules/Plaza/Routes/api.php" afterDir="false" />
+=======
       <change beforePath="$PROJECT_DIR$/Modules/Esd/Entities/Assignment.php" beforeDir="false" afterPath="$PROJECT_DIR$/Modules/Esd/Entities/Assignment.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Modules/Esd/Http/Controllers/ArchiveController.php" beforeDir="false" afterPath="$PROJECT_DIR$/Modules/Esd/Http/Controllers/ArchiveController.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Modules/Esd/Http/Controllers/AssignmentController.php" beforeDir="false" afterPath="$PROJECT_DIR$/Modules/Esd/Http/Controllers/AssignmentController.php" afterDir="false" />
@@ -27,12 +42,29 @@
       <change beforePath="$PROJECT_DIR$/Modules/Storage/Http/Controllers/StorageController.php" beforeDir="false" afterPath="$PROJECT_DIR$/Modules/Storage/Http/Controllers/StorageController.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Modules/Storage/Routes/api.php" beforeDir="false" afterPath="$PROJECT_DIR$/Modules/Storage/Routes/api.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Exceptions/Handler.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Exceptions/Handler.php" afterDir="false" />
+>>>>>>> ca565b605a15d6a84d8c201745161542a6ae0084
       <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Auth/UserController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Auth/UserController.php" afterDir="false" />
+<<<<<<< HEAD
+      <change beforePath="$PROJECT_DIR$/app/Models/User.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Models/User.php" afterDir="false" />
+<<<<<<< HEAD
+      <change beforePath="$PROJECT_DIR$/database/seeds/DatabaseSeeder.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/seeds/DatabaseSeeder.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/routes/api.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/api.php" afterDir="false" />
+>>>>>>> 6f600bc0119de954fc274addff40b0f1819a6bf0
+=======
+      <change beforePath="$PROJECT_DIR$/database/migrations/2019_10_28_075442_create_users_table.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/migrations/2019_10_28_075442_create_users_table.php" afterDir="false" />
+>>>>>>> 1f85fccf587dbfa6017825d622b2c17b8ecb420a
+=======
+      <change beforePath="$PROJECT_DIR$/app/Traits/DocumentBySection.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Traits/DocumentBySection.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Traits/Query.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Traits/Query.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/routes/console.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/console.php" afterDir="false" />
+>>>>>>> ca565b605a15d6a84d8c201745161542a6ae0084
+=======
       <change beforePath="$PROJECT_DIR$/app/Jobs/SendMailCreatePassword.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Jobs/SendMailCreatePassword.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Traits/DocumentBySection.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Traits/DocumentBySection.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/composer.json" beforeDir="false" afterPath="$PROJECT_DIR$/composer.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/config/query.php" beforeDir="false" afterPath="$PROJECT_DIR$/config/query.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/views/password/create.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/password/create.blade.php" afterDir="false" />
+>>>>>>> bb5d764014c79e9f7715732994f646a619067d70
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -214,6 +246,24 @@
       <created>1585047002332</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
+<<<<<<< HEAD
+      <updated>1584828303633</updated>
+      <workItem from="1584828305104" duration="7374000" />
+<<<<<<< HEAD
+<<<<<<< HEAD
+      <workItem from="1584861788830" duration="253000" />
+      <workItem from="1584862933396" duration="2275000" />
+=======
+      <workItem from="1584861788830" duration="7977000" />
+>>>>>>> 2066256da1fded9e0fbb64e035a2a37be849a61a
+=======
+      <workItem from="1584861788830" duration="19215000" />
+<<<<<<< HEAD
+>>>>>>> 6f600bc0119de954fc274addff40b0f1819a6bf0
+=======
+      <workItem from="1584898907650" duration="1780000" />
+>>>>>>> 1f85fccf587dbfa6017825d622b2c17b8ecb420a
+=======
       <updated>1585047002332</updated>
       <workItem from="1585047004757" duration="2758000" />
       <workItem from="1585056314123" duration="9599000" />
@@ -255,6 +305,10 @@
       <workItem from="1588599556551" duration="4000" />
       <workItem from="1588661846592" duration="20539000" />
       <workItem from="1588708988062" duration="1198000" />
+<<<<<<< HEAD
+      <workItem from="1588749364246" duration="5987000" />
+>>>>>>> ca565b605a15d6a84d8c201745161542a6ae0084
+=======
       <workItem from="1588749364246" duration="8822000" />
       <workItem from="1588768109658" duration="3142000" />
       <workItem from="1588835171858" duration="13131000" />
@@ -270,6 +324,7 @@
       <workItem from="1589180206648" duration="591000" />
       <workItem from="1589183520581" duration="11144000" />
       <workItem from="1589265179148" duration="7801000" />
+>>>>>>> bb5d764014c79e9f7715732994f646a619067d70
     </task>
     <servers />
   </component>

@@ -26,6 +26,7 @@ class CreateUsersTable extends Migration
             $table->boolean('is_blocked')->default(false);
             $table->foreign('role_id')->references('id')->on('roles')->onDelete('cascade');
             $table->timestamps();
+
         });
     }
 
