@@ -45,7 +45,7 @@ class UserCertificateController extends Controller
         ->orderBy('id', 'desc')
         ->paginate($request->get('per_page'));
 
-        return $this->dataResponse($certificates);
+        return $this->successResponse($certificates);
     }
 
     /**
@@ -53,7 +53,7 @@ class UserCertificateController extends Controller
      * @return JsonResponse
      */
     public function show($id): JsonResponse{
-        return $this->dataResponse($this->firstOrFailCertificate($id, ['*']));
+        return $this->successResponse($this->firstOrFailCertificate($id, ['*']));
     }
 
     /**
@@ -64,7 +64,7 @@ class UserCertificateController extends Controller
     public function create(Request $request){
         $this->validate($request, $this->getCertificateRules($request));
         $this->saveCertificate($request, $this->certificate);
-        return $this->dataResponse(trans('messages.saved'), 201);
+        return $this->successResponse(trans('messages.saved'), 201);
     }
 
     /**
@@ -77,7 +77,7 @@ class UserCertificateController extends Controller
         $this->validate($request, $this->getCertificateRules($request));
         $certificate = $this->firstOrFailCertificate($id);
         $this->saveCertificate($request, $certificate);
-        return $this->dataResponse(trans('messages.saved'), 200);
+        return $this->successResponse(trans('messages.saved'), 200);
     }
 
     /**
