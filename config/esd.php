@@ -46,6 +46,7 @@ return [
                 ],
 
                 'coulmns12' => [
+                    ['name' => 'İcraci', 'position' => '0', 'is_active' => '1', 'type' => '1', 'field' => 'stuck',],
                     ['name' => 'Bölmə', 'position' => '1', 'is_active' => '1', 'type' => '1', 'field' => 'section',],
                     ['name' => 'Qeydiyyat Nömrəsi', 'position' => '2', 'is_active' => '1', 'type' => '1', 'field' => 'register_number',],
                     ['name' => 'Status', 'position' => '3', 'is_active' => '1', 'type' => '1', 'field' => 'status',],
@@ -61,13 +62,14 @@ return [
                     ['name' => 'Sənədlər', 'position' => '1', 'is_active' => '1', 'type' => '2', 'field' => '/assets/images/svg/file.svg',],
                     ['name' => 'Redaktə et', 'position' => '2', 'is_active' => '1', 'type' => '2', 'field' => '/assets/images/svg/edit.svg',],
                     ['name' => 'Statusu dəyiş', 'position' => '3', 'is_active' => '1', 'type' => '2', 'field' => '/assets/images/svg/status change.svg',],
-                    ['name' => 'Dərkənar', 'position' => '4', 'is_active' => '0', 'type' => '2', 'field' => '/assets/images/svg/instructions.svg',],
+                    ['name' => 'Dərkənar', 'position' => '4', 'is_active' => '1', 'type' => '2', 'field' => '/assets/images/svg/instructions.svg',],
                     ['name' => 'Müddətin artırılması', 'position' => '5', 'is_active' => '0', 'type' => '2', 'field' => '/assets/images/svg/passage-of-time.svg',],
                     ['name' => 'Cavab Yaz', 'position' => '6', 'is_active' => '0', 'type' => '2', 'field' => '/assets/images/svg/email.svg',],
                     ['name' => 'Adiyyatı üzrə göndər', 'position' => '7', 'is_active' => '0', 'type' => '2', 'field' => '/assets/images/svg/mail-send.svg',],],
 
 
                 'coulmns1' => [
+                    ['name' => 'İcraci', 'position' => '0', 'is_active' => '1', 'type' => '1', 'field' => 'stuck',],
 //                    ['name' => 'Bölmə', 'position' => '1', 'is_active' => '0', 'type' => '1', 'field' => 'section',],
                     ['name' => 'Qeydiyyat Nömrəsi', 'position' => '2', 'is_active' => '1', 'type' => '1', 'field' => 'register_number',],
                     ['name' => 'Status', 'position' => '3', 'is_active' => '1', 'type' => '1', 'field' => 'status',],
@@ -86,7 +88,7 @@ return [
                     ['name' => 'Sənədlər', 'position' => '1', 'is_active' => '1', 'type' => '2', 'field' => '/assets/images/svg/file.svg',],
                     ['name' => 'Redaktə et', 'position' => '2', 'is_active' => '1', 'type' => '2', 'field' => '/assets/images/svg/edit.svg',],
                     ['name' => 'Statusu dəyiş', 'position' => '3', 'is_active' => '1', 'type' => '2', 'field' => '/assets/images/svg/status change.svg',],
-                    ['name' => 'Dərkənar', 'position' => '4', 'is_active' => '0', 'type' => '2', 'field' => '/assets/images/svg/instructions.svg',],
+                    ['name' => 'Dərkənar', 'position' => '4', 'is_active' => '1', 'type' => '2', 'field' => '/assets/images/svg/instructions.svg',],
                     ['name' => 'Müddətin artırılması', 'position' => '5', 'is_active' => '0', 'type' => '2', 'field' => '/assets/images/svg/passage-of-time.svg',],
                     ['name' => 'Cavab Yaz', 'position' => '6', 'is_active' => '0', 'type' => '2', 'field' => '/assets/images/svg/email.svg',],
                     ['name' => 'Adiyyatı üzrə göndər', 'position' => '7', 'is_active' => '0', 'type' => '2', 'field' => '/assets/images/svg/mail-send.svg',]
@@ -94,6 +96,7 @@ return [
 
 
                 'coulmns2' => [
+                    ['name' => 'İcraci', 'position' => '0', 'is_active' => '1', 'type' => '1', 'field' => 'stuck',],
 //                    ['name' => 'Bölmə', 'position' => '1', 'is_active' => '0', 'type' => '1', 'field' => 'section',],
                     ['name' => 'Qeydiyyat Nömrəsi', 'position' => '2', 'is_active' => '1', 'type' => '1', 'field' => 'register_number',],
                     ['name' => 'Status', 'position' => '3', 'is_active' => '1', 'type' => '1', 'field' => 'status',],
@@ -114,13 +117,14 @@ return [
                     ['name' => 'Sənədlər', 'position' => '1', 'is_active' => '1', 'type' => '2', 'field' => '/assets/images/svg/file.svg',],
                     ['name' => 'Redaktə et', 'position' => '2', 'is_active' => '1', 'type' => '2', 'field' => '/assets/images/svg/edit.svg',],
                     ['name' => 'Statusu dəyiş', 'position' => '3', 'is_active' => '1', 'type' => '2', 'field' => '/assets/images/svg/status change.svg',],
-                    ['name' => 'Dərkənar', 'position' => '4', 'is_active' => '0', 'type' => '2', 'field' => '/assets/images/svg/instructions.svg',],
+                    ['name' => 'Dərkənar', 'position' => '4', 'is_active' => '1', 'type' => '2', 'field' => '/assets/images/svg/instructions.svg',],
                     ['name' => 'Müddətin artırılması', 'position' => '5', 'is_active' => '0', 'type' => '2', 'field' => '/assets/images/svg/passage-of-time.svg',],
                     ['name' => 'Cavab Yaz', 'position' => '6', 'is_active' => '0', 'type' => '2', 'field' => '/assets/images/svg/email.svg',],
                     ['name' => 'Adiyyatı üzrə göndər', 'position' => '7', 'is_active' => '0', 'type' => '2', 'field' => '/assets/images/svg/mail-send.svg',],],
 
 
                 'coulmns34' => [
+                    ['name' => 'İcraci', 'position' => '0', 'is_active' => '1', 'type' => '1', 'field' => 'stuck',],
                     ['name' => 'Bölmə', 'position' => '1', 'is_active' => '1', 'type' => '1', 'field' => 'section',],
                     ['name' => 'Qeydiyyat Nömrəsi', 'position' => '2', 'is_active' => '1', 'type' => '1', 'field' => 'register_number',],
                     ['name' => 'Status', 'position' => '3', 'is_active' => '1', 'type' => '1', 'field' => 'status',],
@@ -136,13 +140,14 @@ return [
                     ['name' => 'Sənədlər', 'position' => '1', 'is_active' => '1', 'type' => '2', 'field' => '/assets/images/svg/file.svg',],
                     ['name' => 'Redaktə et', 'position' => '2', 'is_active' => '1', 'type' => '2', 'field' => '/assets/images/svg/edit.svg',],
                     ['name' => 'Statusu dəyiş', 'position' => '3', 'is_active' => '1', 'type' => '2', 'field' => '/assets/images/svg/status change.svg',],
-                    ['name' => 'Dərkənar', 'position' => '4', 'is_active' => '0', 'type' => '2', 'field' => '/assets/images/svg/instructions.svg',],
+                    ['name' => 'Dərkənar', 'position' => '4', 'is_active' => '1', 'type' => '2', 'field' => '/assets/images/svg/instructions.svg',],
                     ['name' => 'Müddətin artırılması', 'position' => '5', 'is_active' => '0', 'type' => '2', 'field' => '/assets/images/svg/passage-of-time.svg',],
                     ['name' => 'Cavab Yaz', 'position' => '6', 'is_active' => '0', 'type' => '2', 'field' => '/assets/images/svg/email.svg',],
                     ['name' => 'Adiyyatı üzrə göndər', 'position' => '7', 'is_active' => '0', 'type' => '2', 'field' => '/assets/images/svg/mail-send.svg',],],
 
 
                 'coulmns3' => [
+                    ['name' => 'İcraci', 'position' => '0', 'is_active' => '1', 'type' => '1', 'field' => 'stuck',],
 //                    ['name' => 'Bölmə', 'position' => '1', 'is_active' => '0', 'type' => '1', 'field' => 'section',],
                     ['name' => 'Qeydiyyat Nömrəsi', 'position' => '2', 'is_active' => '1', 'type' => '1', 'field' => 'register_number',],
                     ['name' => 'Status', 'position' => '3', 'is_active' => '1', 'type' => '1', 'field' => 'status',],
@@ -161,7 +166,7 @@ return [
                     ['name' => 'Sənədlər', 'position' => '1', 'is_active' => '1', 'type' => '2', 'field' => '/assets/images/svg/file.svg',],
                     ['name' => 'Redaktə et', 'position' => '2', 'is_active' => '1', 'type' => '2', 'field' => '/assets/images/svg/edit.svg',],
                     ['name' => 'Statusu dəyiş', 'position' => '3', 'is_active' => '1', 'type' => '2', 'field' => '/assets/images/svg/status change.svg',],
-                    ['name' => 'Dərkənar', 'position' => '4', 'is_active' => '0', 'type' => '2', 'field' => '/assets/images/svg/instructions.svg',],
+                    ['name' => 'Dərkənar', 'position' => '4', 'is_active' => '1', 'type' => '2', 'field' => '/assets/images/svg/instructions.svg',],
                     ['name' => 'Müddətin artırılması', 'position' => '5', 'is_active' => '0', 'type' => '2', 'field' => '/assets/images/svg/passage-of-time.svg',],
                     ['name' => 'Cavab Yaz', 'position' => '6', 'is_active' => '0', 'type' => '2', 'field' => '/assets/images/svg/email.svg',],
                     ['name' => 'Adiyyatı üzrə göndər', 'position' => '7', 'is_active' => '0', 'type' => '2', 'field' => '/assets/images/svg/mail-send.svg',],
@@ -169,6 +174,7 @@ return [
 
 
                 'coulmns4' => [
+                    ['name' => 'İcraci', 'position' => '0', 'is_active' => '1', 'type' => '1', 'field' => 'stuck',],
 //                    ['name' => 'Bölmə', 'position' => '1', 'is_active' => '0', 'type' => '1', 'field' => 'section',],
                     ['name' => 'Qeydiyyat Nömrəsi', 'position' => '2', 'is_active' => '1', 'type' => '1', 'field' => 'register_number',],
                     ['name' => 'Status', 'position' => '3', 'is_active' => '1', 'type' => '1', 'field' => 'status',],
@@ -189,13 +195,14 @@ return [
                     ['name' => 'Sənədlər', 'position' => '1', 'is_active' => '1', 'type' => '2', 'field' => '/assets/images/svg/file.svg',],
                     ['name' => 'Redaktə et', 'position' => '2', 'is_active' => '1', 'type' => '2', 'field' => '/assets/images/svg/edit.svg',],
                     ['name' => 'Statusu dəyiş', 'position' => '3', 'is_active' => '1', 'type' => '2', 'field' => '/assets/images/svg/status change.svg',],
-                    ['name' => 'Dərkənar', 'position' => '4', 'is_active' => '0', 'type' => '2', 'field' => '/assets/images/svg/instructions.svg',],
+                    ['name' => 'Dərkənar', 'position' => '4', 'is_active' => '1', 'type' => '2', 'field' => '/assets/images/svg/instructions.svg',],
                     ['name' => 'Müddətin artırılması', 'position' => '5', 'is_active' => '0', 'type' => '2', 'field' => '/assets/images/svg/passage-of-time.svg',],
                     ['name' => 'Cavab Yaz', 'position' => '6', 'is_active' => '0', 'type' => '2', 'field' => '/assets/images/svg/email.svg',],
                     ['name' => 'Adiyyatı üzrə göndər', 'position' => '7', 'is_active' => '0', 'type' => '2', 'field' => '/assets/images/svg/mail-send.svg',],],
 
 
                 'coulmns5' => [
+                    ['name' => 'İcraci', 'position' => '0', 'is_active' => '1', 'type' => '1', 'field' => 'stuck',],
 //                    ['name' => 'Bölmə', 'position' => '1', 'is_active' => '0', 'type' => '1', 'field' => 'section',],
                     ['name' => 'Qeydiyyat Nömrəsi', 'position' => '2', 'is_active' => '1', 'type' => '1', 'field' => 'register_number',],
                     ['name' => 'Status', 'position' => '3', 'is_active' => '1', 'type' => '1', 'field' => 'status',],
@@ -214,7 +221,7 @@ return [
                     ['name' => 'Sənədlər', 'position' => '1', 'is_active' => '1', 'type' => '2', 'field' => '/assets/images/svg/file.svg',],
                     ['name' => 'Redaktə et', 'position' => '2', 'is_active' => '1', 'type' => '2', 'field' => '/assets/images/svg/edit.svg',],
                     ['name' => 'Statusu dəyiş', 'position' => '3', 'is_active' => '1', 'type' => '2', 'field' => '/assets/images/svg/status change.svg',],
-                    ['name' => 'Dərkənar', 'position' => '4', 'is_active' => '0', 'type' => '2', 'field' => '/assets/images/svg/instructions.svg',],
+                    ['name' => 'Dərkənar', 'position' => '4', 'is_active' => '1', 'type' => '2', 'field' => '/assets/images/svg/instructions.svg',],
                     ['name' => 'Müddətin artırılması', 'position' => '5', 'is_active' => '0', 'type' => '2', 'field' => '/assets/images/svg/passage-of-time.svg',],
                     ['name' => 'Cavab Yaz', 'position' => '6', 'is_active' => '0', 'type' => '2', 'field' => '/assets/images/svg/email.svg',],
                     ['name' => 'Adiyyatı üzrə göndər', 'position' => '7', 'is_active' => '0', 'type' => '2', 'field' => '/assets/images/svg/mail-send.svg'

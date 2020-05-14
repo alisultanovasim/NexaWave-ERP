@@ -23,6 +23,7 @@ Route::group([
     ], function ($q) {
         Route::get('/', 'ProductController@index');
         Route::get('/{id}', 'ProductController@show');
+        Route::put('/{id}', 'ProductController@update');
         Route::post('/', 'ProductController@store');
         Route::post('/increase/{id}', 'ProductController@increase');
         Route::post('/reduce/{id}', 'ProductController@reduce');

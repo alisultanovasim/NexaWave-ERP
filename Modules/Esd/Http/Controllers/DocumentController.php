@@ -36,6 +36,7 @@ class DocumentController extends Controller
 //            "status.*" => "sometimes|required|in:0,1,3,4",
             "time" => "sometimes|required|in:1,0",
             "section_id" => "sometimes|required|array",
+            'inner_inspect' => 'sometimes|boolean',
             "section_id.*" => "sometimes|required|integer",
             'tome' => "sometimes|required|in:0,1",
             'send_type' => 'sometimes|required|integer',
@@ -47,8 +48,15 @@ class DocumentController extends Controller
             'to' => "sometimes|required|integer",
             'from' => "sometimes|required|integer",
             'time_from' => 'sometimes|required|date|date_format:Y-m-d',
+
             'register_time' => 'sometimes|required|date|date_format:Y-m-d',
+            'register_time_from' => 'sometimes|required|date|date_format:Y-m-d',
+            'register_time_to' => 'sometimes|required|date|date_format:Y-m-d',
+
             'expire_time' => 'sometimes|required|date|date_format:Y-m-d',
+            'expire_time_from' => 'sometimes|required|date|date_format:Y-m-d',
+            'expire_time_to' => 'sometimes|required|date|date_format:Y-m-d',
+
             'time_to' => 'sometimes|required|date|date_format:Y-m-d',
             'sender_comp_id' => "sometimes|required|integer",
             'folder' => 'sometimes|required',
@@ -70,6 +78,11 @@ class DocumentController extends Controller
                                 $q->where('user_id' , Auth::id());
                             })
                             ->select(['assignment_id' , 'status' , 'is_base']);
+                    },'stuck' => function($q){
+                        $q->with(['employee:id,user_id' , 'employee.user:id,name,surname'])
+                            ->where('status' , AssignmentItem::NOT_SEEN)
+                            ->orWhere('status' , AssignmentItem::REJECTED)
+                            ->orWhere('status' , AssignmentItem::WAIT);
                     }]);
                 },
             ])
@@ -92,8 +105,8 @@ class DocumentController extends Controller
             if ($request->has('send_form'))
                 $documents->where("send_type", $request->send_form);
 
-            if ($request->has("from"))
-                $documents->where("from", $request->from);
+//            if ($request->has("from"))
+//                $documents->where("from", $request->from);
 
             if ($request->has("time_from"))
                 $documents->where("created_at", ">", $request->time_from);
@@ -128,6 +141,25 @@ class DocumentController extends Controller
             if ($request->has("expire_time"))
                 $documents->where("expire_time", "{$request->expire_time}");
 
+
+            if ($request->has("expire_time_to"))
+                $documents->where("expire_time",">=" ,   $request->get('expire_time_to'));
+
+            if ($request->has("expire_time_from"))
+                $documents->where("expire_time", "<=" , $request->get('expire_time_from'));
+
+
+            if($request->has('inner_inspect')){
+                $documents->where('inner_inspect' , $request->get('inner_inspect'));
+            }
+
+            if ($request->has("register_time_to"))
+                $documents->where("register_time", ">=" , $request->get('register_time_to'));
+
+            if ($request->has("register_time_from"))
+                $documents->where("register_time","<=" ,  $request->get('register_time_from'));
+
+
             if ($request->has("register_time"))
                 $documents->where("register_time", $request->register_time);
 
@@ -135,14 +167,20 @@ class DocumentController extends Controller
                 $documents->where("company_user", $request->to);
             }
 
+            if ($request->get('tome')){
+                $documents->where(function ($q){
+                    $q->whereHas('assignment' , function ($q){
+                        $q->whereHas('items' ,function ($q){
+                            $q->where('user_id' , Auth::id());
+                        });
+                    })->orWhere('from' , Auth::id());
+                });
+            }
             if ($request->has('section_id')) {
                 $documents->whereIn('section_id', $request->section_id);
                 if (count($request->section_id) == 1) {
-
                     $table = Section::RULES[$request->section_id[array_key_first($request->section_id)]];
-
                     if (!$table) return $this->errorResponse(['section_id' => trans('apiResponse.sectionIdNotValid')]);
-
                     $documents->join($table, "documents.id", '=', "$table.document_id");
                 }
             }
@@ -372,7 +410,7 @@ class DocumentController extends Controller
                 'section', 'docs', 'sendType', 'sendType', 'sendForm',
                 'parent', 'assignment', 'assignment.items',
                 'assignment.uploader:id,name,surname',
-                'assignment.items.employee.user:id,name,surname', 'assignment.items.notes'])->where(["documents.id" => $id])
+                'assignment.items.employee.user:id,name,surname', 'assignment.items.notes', 'assignment.items.rejects'])->where(["documents.id" => $id])
                 ->where("status", "!=", Document::DRAFT)
                 ->join($table, "documents.id", '=', "$table.document_id");
 
@@ -567,7 +605,7 @@ class DocumentController extends Controller
         $documents = $documents
             ->orderBy('id', 'desc')
             ->take(50)
-            ->get(['id', 'register_number', 'theme']);
+            ->get(['id', 'register_number', 'theme' , 'theme']);
 
         return $this->successResponse($documents);
     }

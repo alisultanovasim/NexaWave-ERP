@@ -14,9 +14,9 @@ class DatabaseSeeder extends Seeder
 
 
         $kinds = [
-            'təbrik',
-            'şikayət',
-            'təklif',
+            'Təbrik',
+            'Şikayət',
+            'Təklif',
         ];
         foreach ($kinds as $kind)
             \Modules\Plaza\Entities\Kind::create([

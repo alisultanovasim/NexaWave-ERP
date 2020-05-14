@@ -6,15 +6,10 @@ use App\Traits\ApiResponse;
 use App\Traits\Query;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Modules\Storage\Entities\Income;
-use Modules\Storage\Entities\Outcome;
 use Modules\Storage\Entities\Product;
 use Modules\Storage\Entities\ProductKind;
-use Modules\Storage\Entities\ProductTitle;
 
 class ProductController extends Controller
 {
@@ -25,29 +20,29 @@ class ProductController extends Controller
         $this->validate($request, [
             'storage_id' => ['nullable', 'integer', 'min:1'],
             'title_id' => ['nullable', 'integer', 'min:1'],
+            'kind_id' => ['nullable' , 'integer' , 'min:1'],
             'name' => ['nullable', 'string', 'max:255'],
             'per_page' => ['nullable', 'integer', 'min:1']
         ]);
 
-        // for product filter
-//        $filter = function ($q) use ($request) {
-//            $q->with("kind:id,name,unit_id" ,'kind.unit' );
-//            if ($request->get('storage_id')) $q->where('storage_id', $request->get('storage_id'));
-//        };
-//
-        //with(['kinds' , 'kinds.products' => $filter])
-
-        $products = ProductTitle::
-        withCount([
-            'products' ,
-            'kinds'
+        $products = Product::with([
+            'kind',
+            'title',
+            'state',
+            'color',
         ])
         ->where('company_id', $request->get('company_id'));
 
         if ($request->get('name'))
             $products->where('name', 'like', $request->get('name') . '%');
 
-        $products = $products->paginate($request->get('per_page'));
+        if ($request->get('kind_id'))
+            $products->where('kind_id', $request->get('kind_id'));
+
+        if ($request->get('title_id'))
+            $products->where('title_id', $request->get('title_id'));
+
+        $products = $products->orderBy('id' , 'desc')->paginate($request->get('per_page'));
 
         return $this->successResponse($products);
 
@@ -55,41 +50,64 @@ class ProductController extends Controller
 
     public function show(Request $request, $id)
     {
-        $product = ProductTitle::with(['products'=>function($q){
-            $q->orderBy('id' , 'desc');
-        } , 'products.kind' ,  'products.color' , 'products.state' ,  'products.kind.unit'])
+        $product = Product::with([
+            'kind',
+            'title',
+            'state',
+            'color',
+        ])
             ->where('company_id', $request->get('company_id'))
             ->where('id', $id)
             ->first();
-        if (!$product) return $this->errorResponse(trans('response.productNotFound'));
+
+        if (!$product)
+            return $this->errorResponse(trans('response.ProductNotFound'));
+
         return $this->successResponse($product);
     }
 
     public function store(Request $request)
     {
         $this->validate($request, [
-            'title_id' => ['required', 'integer', 'min:1'],
-            'kind_id' => ['required', 'integer', 'min:1'],
-            'description' => ['nullable', 'string'],
-            'state_id' => ['required', 'integer'],
-            'amount' => ['required', 'numeric'],
-            'income_description' => ['nullable', 'string'],
-            'storage_id' => ['required' , 'integer'],
             'unit_id' => ['required' , 'integer' , 'min:1'],
             'less_value' => ['required' , 'boolean'],
             'quickly_old' => ['required' , 'boolean'],
-            'color_id' => ['nullable' , 'integer'],
-            'model_id' => ['nullable' , 'integer']
+            'title_id' => ['required', 'integer', 'min:1'],//
+            'kind_id' => ['required', 'integer', 'min:1'],//
+            'state_id' => ['required', 'integer'],
+            'description' => ['nullable', 'string'],
+            'amount' => ['required', 'numeric'],
+            'storage_id' => ['required' , 'integer'],
+            'product_model' => ['nullable' , 'string' , 'max:255'],
+            'product_mark' => ['nullable' , 'string' , 'max:255'],
+            'color_id' => ['nullable' , 'integer'],//
+            'main_funds' => ['nullable' , 'boolean'],
+            'inv_no' => ['nullable' , 'string' , 'max:255'],
+            'exploitation_date' => ['nullable' , 'date' ,'date_format:Y-m-d'],
+            'size' => ['nullable' , 'numeric'],
+            'made_in_country ' => ['nullable' , 'integer' , 'min:1'],//
+            'buy_from_country ' => ['nullable' , 'integer' , 'min:1'],//
+            'make_date' =>  ['nullable' , 'date' ,'date_format:Y-m-d'],
+            'income_description' => ['nullable', 'string'],
         ]);
         DB::beginTransaction();
         $product = Product::where([
+            ['company_id', '=', $request->get('company_id')],
             ['title_id', '=', $request->get('title_id')],
             ['kind_id', '=', $request->get('kind_id')],
             ['state_id', '=', $request->get('state_id')],
-            ['company_id', '=', $request->get('company_id')],
-            ['size' , '=' , $request->get('size')],
+            ['inv_no' , '=' , $request->get('inv_no')],
+            ['unit_id' , '=' , $request->get('unit_id')],
             ['color_id' , '=' , $request->get('color_id')],
-            ['model_id' , '=' , $request->get('model_id')],
+            ['buy_from_country' , '=' , $request->get('buy_from_country')],
+            ['made_in_country' , '=' , $request->get('made_in_country')],
+            ['make_date' , '=' , $request->get('make_date')],
+            ['size' , '=' , $request->get('size')],
+            ['product_model' , '=' , $request->get('product_model')],
+            ['product_mark' , '=' , $request->get('product_mark')],
+            ['product_no' , '=' , $request->get('product_no')],
+            ['exploitation_date' , '=' , $request->get('exploitation_date')],
+            ['main_funds'  , '='  ,  $request->get('main_funds')]
         ])->first(['id']);
         if ($product) {
             Product::where('id', $product->id)
@@ -97,42 +115,18 @@ class ProductController extends Controller
         } else {
             if ($notExists = $this->companyInfo(
                     $request->get('company_id'),
-                    $request->only('storage_id' , 'title_id','color_id' , 'state_id')))
+                    $request->only('storage_id' , 'title_id', 'state_id')))
                 return $this->errorResponse($notExists);
 
-            $check = ProductKind::whereHas('models' , function ($q) use ($request){
-                if ($request->has('model_id'))
-                    $q->where('id', $request->get('model_id'));
-            })->where('company_id' , $request->get('company_id'))
-                ->exists();
+            $check = ProductKind::where([
+                ['company_id' , '=' , $request->get('company_id')],
+                ['id' , '=' , $request->get('kind_id')],
+            ])->exists();
             if (!$check) return $this->errorResponse(trans('response.fieldIsNotFindInDatabase'));
 
-            $product = Product::create($request->only([
-                'title_id',
-                'kind_id',
-                'description',
-                'amount',
-                'unit_id',
-                'less_value' ,
-                'quickly_old',
-                'description',
-                'storage_id',
-                'company_id',
-                'color_id',
-                'model_id',
-                'state_id'
-            ]));
+            Product::create($request->all());
         }
-
-        Income::create([
-            'description' => $request->get('income_description'),
-            'company_id' => $request->get('company_id'),
-            'product_id' => $product->id,
-            'amount' => $request->get('amount')
-        ]);
-
         DB::commit();
-
         return $this->successResponse('ok');
     }
 
@@ -156,18 +150,9 @@ class ProductController extends Controller
             ['company_id', '=', $request->get('company_id')],
         ])->increment('amount', $request->get('amount'));
 
-        Income::create([
-            'user_id' => Auth::id(),
-            'product_id' => $id,
-            'amount' => $request->get('amount'),
-            'description' => $request->get('income_description'),
-            'company_id' => $request->get('company_id')
-
-        ]);
         DB::commit();
 
         return $this->successResponse('ok');
-
     }
 
     public function reduce(Request $request, $id)
@@ -192,17 +177,59 @@ class ProductController extends Controller
             ['id', '=', $id],
         ])->decrement('amount', $request->get('amount'));
 
-        Outcome::create([
-            'user_id' => Auth::id(),
-            'product_id' => $id,
-            'amount' => $request->get('amount'),
-            'description' => $request->get('outcome_description'),
-            'company_id' => $request->get('company_id')
-        ]);
 
         DB::commit();
 
         return $this->successResponse('ok');
+    }
+
+    public function update(Request $request , $id){
+        $this->validate($request, [
+            'unit_id' => ['nullable' , 'integer' , 'min:1'],
+            'less_value' => ['nullable' , 'boolean'],
+            'quickly_old' => ['nullable' , 'boolean'],
+            'title_id' => ['nullable', 'integer', 'min:1'],//
+            'kind_id' => ['nullable', 'integer', 'min:1'],//
+            'state_id' => ['nullable', 'integer'],
+            'description' => ['nullable', 'string'],
+            'amount' => ['nullable', 'numeric'],
+            'storage_id' => ['nullable' , 'integer'],
+            'product_model' => ['nullable' , 'string' , 'max:255'],
+            'product_mark' => ['nullable' , 'string' , 'max:255'],
+            'color_id' => ['nullable' , 'integer'],//
+            'main_funds' => ['nullable' , 'boolean'],
+            'inv_no' => ['nullable' , 'string' , 'max:255'],
+            'exploitation_date' => ['nullable' , 'date' ,'date_format:Y-m-d'],
+            'size' => ['nullable' , 'numeric'],
+            'made_in_country ' => ['nullable' , 'integer' , 'min:1'],//
+            'buy_from_country ' => ['nullable' , 'integer' , 'min:1'],//
+            'make_date' =>  ['nullable' , 'date' ,'date_format:Y-m-d'],
+            'income_description' => ['nullable', 'string'],
+        ]);
+        $product = Product::where([
+            ['company_id', '=', $request->get('company_id')],
+            ['id', '=',$id],
+        ])->exists();
+
+        if (!$product)
+            return $this->errorResponse(trans('response.productNotFound'), 422);
+
+        if ($notExists = $this->companyInfo(
+            $request->get('company_id'),
+            $request->only('storage_id' , 'title_id', 'state_id')))
+            return $this->errorResponse($notExists);
+
+        if ($request->has('kind_id')){
+            $check = ProductKind::where([
+                ['company_id' , '=' , $request->get('company_id')],
+                ['id' , '=' , $request->get('kind_id')],
+            ])->exists();
+            if (!$check) return $this->errorResponse(trans('response.fieldIsNotFindInDatabase'));
+        }
+
+        Product::where('id' , $id)
+            ->update($request->all());
+
     }
 
     public function delete(Request $request, $id){

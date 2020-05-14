@@ -13,6 +13,7 @@ class AssignmentItem extends Model
     const DONE = 2;
     const DENY = 3;
     const NOT_SEEN = 0;
+    const REJECTED = 4;
 
 
     public $timestamps = false;
@@ -32,5 +33,9 @@ class AssignmentItem extends Model
     public function assignment()
     {
         return $this->belongsTo('Modules\Esd\Entities\Assignment', 'assignment_id', 'id');
+    }
+
+    public function rejects(){
+        return $this->hasMany(AssignmentReject::class , 'item_id' , 'id');
     }
 }

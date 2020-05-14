@@ -22,7 +22,7 @@ class EsdDatabaseSeeder extends Seeder
 
         $arr = [
             [
-                'name' => 'Structurlardan',
+                'name' => 'Kənar təşkilatlardan',
                 'table' => 'structure_docs',
             ],
             [
@@ -30,7 +30,7 @@ class EsdDatabaseSeeder extends Seeder
                 'table' => 'citizen_docs',
             ],
             [
-                'name' => 'Structurlara',
+                'name' => 'Kənar təşkilatlara',
                 'table' => 'structure_docs',
             ],
             [
@@ -54,6 +54,7 @@ class EsdDatabaseSeeder extends Seeder
                 ['name' => 'Kuryer'],
                 ['name' => 'Poçt'],
                 ['name' => 'Faks'],
+                ['name' => 'E-mail'],
             ]);
 
         \Illuminate\Support\Facades\DB::table('send_forms')
@@ -61,6 +62,7 @@ class EsdDatabaseSeeder extends Seeder
                 ['name' => 'Şikayət'],
                 ['name' => 'Təklif'],
                 ['name' => 'Müraciət'],
+                ['name' => 'Təbrik'],
             ]);
 
         \Illuminate\Support\Facades\DB::table('esd_regions')->insert([
@@ -77,7 +79,7 @@ class EsdDatabaseSeeder extends Seeder
             ['name' => 'Xəzər'],
             ['name' => 'Yasamal'],
         ]);
-
+//
         $sc =senderCompany::create([
             'name' => 'AzerSun MMC',
             'company_id' => 1

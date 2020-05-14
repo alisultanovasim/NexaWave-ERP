@@ -17,6 +17,7 @@ class CreateStoragesTable extends Migration
             $table->bigIncrements('id');
             $table->string('name');
             $table->string('location')->nullable();
+            $table->float('size')->nullable();
             $table->unsignedBigInteger('company_id');
             $table->timestamps();
             $table->softDeletes();

@@ -4,7 +4,9 @@ namespace Modules\Hr\Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Database\Eloquent\Model;
+use Modules\Hr\Entities\BloodGroup;
 use Modules\Hr\Entities\City;
+use Modules\Hr\Entities\Color;
 use Modules\Hr\Entities\Country;
 use Modules\Hr\Entities\Currency;
 use Modules\Hr\Entities\DurationType;
@@ -27,7 +29,7 @@ class HrDatabaseSeeder extends Seeder
     public function run()
     {
         Model::unguard();
-
+//
         $country = Country::create([
             'name' => "Azərbaycan Respublikasi",
             'short_name' => 'Azərbaycan'
@@ -85,6 +87,33 @@ class HrDatabaseSeeder extends Seeder
             'char' => '$',
             'name' => 'aze',
             'code' => 1231,
+        ]);
+
+        Color::insert(
+          [
+              'name'=>'blue',
+            'code'=> 'blue',
+            'position' => 1,
+            'company_id'=>1
+          ],
+            [
+                'name'=>'red',
+                'code'=> 'red',
+                'position' => 1,
+                'company_id'=>1
+            ]
+        );
+//
+//
+        BloodGroup::insert([
+            ['name' => 'O(I)RH+'],
+            ['name' => 'O(I)RH-'],
+            ['name' => 'A(II)RH+'],
+            ['name' => 'A(II)RH-'],
+            ['name' => 'B(III)RH+'],
+            ['name' => 'B(III)RH-'],
+            ['name' => 'AB(IV)RH+'],
+            ['name' => 'AB(IV)RH-'],
         ]);
         // $this->call("OthersTableSeeder");
     }

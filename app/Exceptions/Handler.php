@@ -63,7 +63,6 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Throwable $exception)
     {
-
         if ($exception instanceof HttpException) {
             $code = $exception->getStatusCode();
             $message = \Symfony\Component\HttpFoundation\Response::$statusTexts[$code];
@@ -72,6 +71,7 @@ class Handler extends ExceptionHandler
         else if ($exception instanceof QueryException) {
             if ($exception->errorInfo[1] == 1452)
                 return $this->errorResponse([trans('response.SomeFiledIsNotFoundInDatabase')], 422);
+            dd($exception);
             return $this->errorResponse(trans('response.serverError. code : 222'), 422);
         }
         else if ($exception instanceof ModelNotFoundException) {
