@@ -358,6 +358,14 @@ Route::group([
         Route::put("/{id}", 'EmployeeController@update')->where('id' , '[0-9]+');
         Route::delete("/{id}", 'EmployeeController@delete')->where('id' , '[0-9]+');
 
+        Route::group(['prefix' => 'rewards'], function (){
+            Route::get("/", 'RewardController@index');
+            Route::get("/{id}", 'RewardController@show');
+            Route::post("/", 'RewardController@create');
+            Route::put("/{id}", 'RewardController@update');
+            Route::delete("/{id}", 'RewardController@destroy');
+        });
+
 //
 //
 //        Route::post("/make/in/{id}", 'EmployeeController@makeIn');
