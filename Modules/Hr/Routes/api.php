@@ -429,12 +429,19 @@ Route::group([
         });
 
         Route::group(['prefix' => 'users/contact/information'], function (){
-//            Route::get('/v2', 'ContactInformationController@indev');
             Route::get('/', 'ContactInformationController@index');
             Route::get('/{id}', 'ContactInformationController@show');
             Route::post('/', 'ContactInformationController@create');
             Route::put('/{id}', 'ContactInformationController@update');
             Route::delete('/{id}', 'ContactInformationController@destroy');
+        });
+
+        Route::group(['prefix' => 'users/labor/activities'], function (){
+            Route::get('/', 'LaborActivityController@index');
+            Route::get('/{id}', 'LaborActivityController@show');
+            Route::post('/', 'LaborActivityController@create');
+            Route::put('/{id}', 'LaborActivityController@update');
+            Route::delete('/{id}', 'LaborActivityController@destroy');
         });
 
         Route::group(['prefix' => 'users/language/skills'], function ($router) {
