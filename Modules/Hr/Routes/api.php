@@ -352,6 +352,7 @@ Route::group([
         'prefix' => "employees",
         'namespace' => 'Employee'
     ], function ($router) {
+
         Route::get("/", 'EmployeeController@index');
         Route::get("/{id}", 'EmployeeController@show')->where('id' , '[0-9]+');
         Route::post("/", 'EmployeeController@store');
@@ -364,6 +365,14 @@ Route::group([
             Route::post("/", 'RewardController@create');
             Route::put("/{id}", 'RewardController@update');
             Route::delete("/{id}", 'RewardController@destroy');
+        });
+
+        Route::group(['prefix' => 'punishments'], function (){
+            Route::get("/", 'PunishmentController@index');
+            Route::get("/{id}", 'PunishmentController@show');
+            Route::post("/", 'PunishmentController@create');
+            Route::put("/{id}", 'PunishmentController@update');
+            Route::delete("/{id}", 'PunishmentController@destroy');
         });
 
 //

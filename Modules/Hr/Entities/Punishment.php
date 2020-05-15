@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Modules\Hr\Entities\Employee\Employee;
 
-class Reward extends Model
+class Punishment extends Model
 {
     use SoftDeletes;
 
@@ -20,8 +20,8 @@ class Reward extends Model
         return $this->belongsTo(Currency::class);
     }
 
-    public function rewardType(){
-        return $this->belongsTo(RewardType::class, 'reward_type_id');
+    public function punishmentType(){
+        return $this->belongsTo(PunishmentType::class, 'punishment_type_id');
     }
 
     public function scopeWhereBelongsToCompany($query, $companyId){

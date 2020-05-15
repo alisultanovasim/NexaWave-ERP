@@ -10,21 +10,22 @@ use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
+use Modules\Hr\Entities\Punishment;
 use Modules\Hr\Entities\Reward;
 
-class RewardController extends Controller
+class PunishmentController extends Controller
 {
     use ApiResponse, ValidatesRequests;
 
-    private $reward;
+    private $punishment;
 
     /**
      * RewardController constructor.
-     * @param Reward $reward
+     * @param Punishment $punishment
      */
-    public function __construct(Reward $reward)
+    public function __construct(Punishment $punishment)
     {
-        $this->reward = $reward;
+        $this->punishment = $punishment;
     }
 
     /**
@@ -37,17 +38,17 @@ class RewardController extends Controller
             'per_page' => 'nullable|integer'
         ]);
 
-        $rewards = $this->reward
+        $punishments = $this->punishment
         ->whereBelongsToCompany($request->get('company_id'))
         ->with([
             'currency:id,name',
-            'rewardType:id,name',
+            'punishmentType:id,name',
             'employee:id,user_id',
             'employee.user:id,name'
         ])
         ->orderBy('id', 'desc')
         ->paginate($request->get('per_page'));
-        return  $this->successResponse($rewards);
+        return  $this->successResponse($punishments);
     }
 
 
@@ -57,18 +58,18 @@ class RewardController extends Controller
      * @return JsonResponse
      */
     public function show(Request $request, $id): JsonResponse {
-        $reward = $this->reward
+        $punishment = $this->punishment
         ->where('id', $id)
         ->whereBelongsToCompany($request->get('company_id'))
         ->with([
             'currency:id,name',
-            'rewardType:id,name',
+            'punishmentType:id,name',
             'employee:id,user_id',
             'employee.user:id,name'
         ])
         ->orderBy('id', 'desc')
         ->firstOrFail();
-        return  $this->successResponse($reward);
+        return  $this->successResponse($punishment);
     }
 
     /**
@@ -78,7 +79,7 @@ class RewardController extends Controller
      */
     public function create(Request $request): JsonResponse {
         $this->validate($request, $this->getRewardRules($request));
-        $this->saveReward($request, $this->reward);
+        $this->saveReward($request, $this->punishment);
         return $this->successResponse(trans('messages.saved'), 201);
     }
 
@@ -90,8 +91,8 @@ class RewardController extends Controller
      */
     public function update(Request $request, $id): JsonResponse {
         $this->validate($request, $this->getRewardRules($request));
-        $reward = $this->reward->where('id', $id)->whereBelongsToCompany($request->get('company_id'))->firstOrFail();
-        $this->saveReward($request, $reward);
+        $punishment = $this->punishment->where('id', $id)->whereBelongsToCompany($request->get('company_id'))->firstOrFail();
+        $this->saveReward($request, $punishment);
         return $this->successResponse(trans('messages.saved'), 200);
     }
 
@@ -101,18 +102,18 @@ class RewardController extends Controller
      * @return JsonResponse
      */
     public function destroy(Request $request, $id): JsonResponse {
-        $reward = $this->reward->where('id', $id)->whereBelongsToCompany($request->get('company_id'))->firstOrFail();
-        return $reward->delete()
+        $punishment = $this->punishment->where('id', $id)->whereBelongsToCompany($request->get('company_id'))->firstOrFail();
+        return $punishment->delete()
             ? $this->successResponse(trans('messages.saved'), 200)
             : $this->errorResponse(trans('messages.not_saved'), 400);
     }
 
     /**
      * @param Request $request
-     * @param Reward $reward
+     * @param Punishment $punishment
      */
-    private function saveReward(Request $request, Reward $reward): void {
-        $reward->fill($request->only(
+    private function saveReward(Request $request, Punishment $punishment): void {
+        $punishment->fill($request->only(
             array_keys($this->getRewardRules($request))
         ))->save();
     }
@@ -128,7 +129,7 @@ class RewardController extends Controller
                 Rule::exists('employees', 'id')->where('company_id', $request->get('company_id'))
             ],
             'currency_id' => 'required|exists:currency,id',
-            'reward_type_id' => 'required|exists:reward_types,id',
+            'punishment_type_id' => 'required|exists:punishment_types,id',
             'amount' => 'required|numeric',
             'date_of_issue' => 'required|date',
             'expire_date' => 'required|date',
