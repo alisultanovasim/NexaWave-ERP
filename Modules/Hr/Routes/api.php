@@ -420,6 +420,23 @@ Route::group([
             Route::delete('/{id}', 'UserEducationController@delete');
         });
 
+        Route::group(['prefix' => 'users/certificates'], function (){
+           Route::get('/', 'UserCertificateController@index');
+           Route::get('/{id}', 'UserCertificateController@show');
+           Route::post('/', 'UserCertificateController@create');
+           Route::put('/{id}', 'UserCertificateController@update');
+           Route::delete('/{id}', 'UserCertificateController@destroy');
+        });
+
+        Route::group(['prefix' => 'users/contact/information'], function (){
+//            Route::get('/v2', 'ContactInformationController@indev');
+            Route::get('/', 'ContactInformationController@index');
+            Route::get('/{id}', 'ContactInformationController@show');
+            Route::post('/', 'ContactInformationController@create');
+            Route::put('/{id}', 'ContactInformationController@update');
+            Route::delete('/{id}', 'ContactInformationController@destroy');
+        });
+
         Route::group(['prefix' => 'users/language/skills'], function ($router) {
             Route::get('/', 'UserLanguageSkillController@index');
             Route::get('/{id}', 'UserLanguageSkillController@show');
@@ -428,7 +445,6 @@ Route::group([
             Route::delete('/{id}', 'UserLanguageSkillController@delete');
         });
     });
-
 
 });
 
