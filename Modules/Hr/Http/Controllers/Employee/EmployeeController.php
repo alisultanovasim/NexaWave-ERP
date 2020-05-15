@@ -144,10 +144,7 @@ class EmployeeController extends Controller
 
                 ContractController::storeContract($request);
             }
-
             DB::commit();
-
-
             return $this->successResponse('ok');
         } catch (QueryException  $exception) {
             if ($exception->errorInfo[1] == 1062){
@@ -157,7 +154,6 @@ class EmployeeController extends Controller
             }
             if ($exception->errorInfo[1] == 1452)
                 return $this->errorResponse([trans('response.SomeFiledIsNotFoundInDatabase')], 422);
-
             return $this->errorResponse(trans('response.tryLater'), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
@@ -169,6 +165,8 @@ class EmployeeController extends Controller
             'company_id' => ['required', 'integer'],
             'update_user' => ['sometimes', 'boolean']
         ]);
+
+
         $data = $request->only(['is_active', 'update_user']);
         if (!$data) return $this->errorResponse(trans('response.nothing'));
 
@@ -180,10 +178,13 @@ class EmployeeController extends Controller
 
         if (!$employee) return $this->errorResponse(trans('response.employeeNotFound'), 404);
 
-        Employee::where('id', $id)->update($request->get('is_active'));
+        $data = $request->only(['is_active']);
+
+        if (count($data) != 0)
+            Employee::where('id', $id)->update($data);
 
         if ($request->get('update_user'))
-            UserController::updateUser($request, $employee->use_id);
+            UserController::updateUser($request, $employee->user_id);
 
         DB::commit();
         return $this->successResponse('ok');

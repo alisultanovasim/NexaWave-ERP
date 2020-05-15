@@ -369,7 +369,7 @@ class AssignmentController extends Controller
             if (!$assignmentItem)
                 return $this->errorResponse(trans('apiResponse.itemNotFound'));
 
-            $notes = $request->notes;
+            $notes = array_merge($request->get('notes')??[] , $request->notes??[]);
             Note::insert($this->saveNotes($assignmentItem, $notes, $request, $str = 'notes'));
             return $this->successResponse("OK");
         } catch (\Exception $e) {

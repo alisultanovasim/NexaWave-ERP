@@ -8,6 +8,7 @@ use Modules\Hr\Entities\EducationLevel;
 use Modules\Hr\Entities\EducationPlace;
 use Modules\Hr\Entities\EducationSpecialty;
 use Modules\Hr\Entities\EducationState;
+use Modules\Hr\Entities\Faculty;
 use Modules\Hr\Entities\Language;
 
 class UserEducation extends Model
@@ -32,6 +33,9 @@ class UserEducation extends Model
     }
     public function language(){
         return $this->belongsTo(Language::class);
+    }
+    public function faculty(){
+        return $this->belongsTo(Faculty::class);
     }
 
     public function scopeCompany($q ){

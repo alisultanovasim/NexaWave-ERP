@@ -9,6 +9,7 @@ use Modules\Hr\Entities\City;
 use Modules\Hr\Entities\Color;
 use Modules\Hr\Entities\Country;
 use Modules\Hr\Entities\Currency;
+use Modules\Hr\Entities\Department;
 use Modules\Hr\Entities\DurationType;
 use Modules\Hr\Entities\EducationLevel;
 use Modules\Hr\Entities\EducationPlace;
@@ -18,6 +19,8 @@ use Modules\Hr\Entities\Faculty;
 use Modules\Hr\Entities\LanguageLevel;
 use Modules\Hr\Entities\Positions;
 use Modules\Hr\Entities\Region;
+use Modules\Hr\Entities\Section;
+use Modules\Hr\Entities\Sector;
 
 class HrDatabaseSeeder extends Seeder
 {
@@ -114,6 +117,35 @@ class HrDatabaseSeeder extends Seeder
             ['name' => 'B(III)RH-'],
             ['name' => 'AB(IV)RH+'],
             ['name' => 'AB(IV)RH-'],
+        ]);
+
+
+        $dep = Department::create([
+            'name'=>'Informasiya texnologiyalari',
+            'short_name' => 'IT',
+            'code' => 1,
+            'country_id' => 1,
+            'city_id' => 1,
+            'position' => 1,
+            'company_id' => 1,
+        ]);
+
+        $section =   Section::create([
+            'department_id' => $dep->id,
+            'name' => 'Programlasdirma' ,
+            'short_name' => 'Programlasdirma' ,
+            'code' => '1' ,
+            'position' => 1 ,
+            'company_id' => 1 ,
+        ]);
+
+        $sector = Sector::create([
+            'section_id' =>$section->id ,
+            'name' => 'Banck-end',
+            'short_name' => 'back-end',
+            'code' => 1,
+            'position' =>1 ,
+            'company_id' => 1,
         ]);
         // $this->call("OthersTableSeeder");
     }

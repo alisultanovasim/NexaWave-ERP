@@ -330,7 +330,7 @@ class UserController extends Controller
             'voen' => ['nullable', 'string', 'max:255'],
             'email' => ['nullable', 'email', 'max:255'],
 //            'fin' => ['nullable', 'string', 'max:255'],
-            'birthday' => ['nullable', 'date', 'date_format:dd-mm-YYYY'],
+            'birthday' => ['nullable', 'date', 'date_format:Y-m-d'],
             'father_name' => ['nullable', 'string', 'max:255'],
             'gender' => ['nullable', 'string', 'in:f,m'],
             'nationality_id' => ['nullable', 'integer'],
@@ -384,15 +384,50 @@ class UserController extends Controller
             ]
         ));
 
-        $data = $request->all();
+        $data = $request->only([
+            'fin',
+            'birthday',
+            'father_name',
+            'gender',
+            'nationality_id',
+            'citizen_id',
+            'birthday_country_id',
+            'birthday_city_id',
+            'birthday_region_id',
+            'blood_id',
+            'eye_color_id',
+            'user_id',
+            'passport_seria',
+            'passport_number',
+            'passport_from_organ',
+            'passport_get_date',
+            'passport_expire_date',
+            'military_status',
+            'military_start_date',
+            'military_end_date',
+            'military_state_id',
+            'military_passport_number',
+            'military_place',
+            'driving_license_number',
+            'driving_license_categories',
+            'driving_license_organ',
+            'driving_license_get_at',
+            'driving_license_expire_date',
+            'foreign_passport_number',
+            'foreign_passport_organ',
+            'foreign_passport_get_date',
+            'foreign_passport_expire_date',
+            'family_status_document_number',
+            'family_status_state',
+            'family_status_register_date',
+            'social_insurance_no'
+        ]);
         if ($request->hasFile('avatar')){
             $name = "{$user->id}.{$request->file('avatar')->getClientOriginalExtension()}";
             $request->file('avatar')->move(public_path('users')  , $name);
             $data['avatar'] = $name;
         }
-
-        $user->details()->create($request->all());
-
+        $user->details()->create($data);
 
         SendMailCreatePassword::dispatch($user , $password);
 
@@ -407,19 +442,53 @@ class UserController extends Controller
         if ($data)
             User::where('id' ,$id)->update($data);
 
-        $data = $request->all();
+
+
+        $data = $request->only([
+            'fin',
+            'birthday',
+            'father_name',
+            'gender',
+            'nationality_id',
+            'citizen_id',
+            'birthday_country_id',
+            'birthday_city_id',
+            'birthday_region_id',
+            'blood_id',
+            'eye_color_id',
+            'user_id',
+            'passport_seria',
+            'passport_number',
+            'passport_from_organ',
+            'passport_get_date',
+            'passport_expire_date',
+            'military_status',
+            'military_start_date',
+            'military_end_date',
+            'military_state_id',
+            'military_passport_number',
+            'military_place',
+            'driving_license_number',
+            'driving_license_categories',
+            'driving_license_organ',
+            'driving_license_get_at',
+            'driving_license_expire_date',
+            'foreign_passport_number',
+            'foreign_passport_organ',
+            'foreign_passport_get_date',
+            'foreign_passport_expire_date',
+            'family_status_document_number',
+            'family_status_state',
+            'family_status_register_date',
+            'social_insurance_no'
+        ]);
         if ($request->hasFile('avatar')){
             $name = "$id.{$request->file('avatar')->getClientOriginalExtension()}";
             $request->file('avatar')->move(public_path('users')  , $name);
             $data['avatar'] = $name;
         }
-
-
-        $userDetail = UserDetail::whereHas('user' , function ($q) use ($id) {
-            $q->where('id' , $id);
-        })->first(['id']);
-
-        $userDetail->fill($request->all());
+        UserDetail::where('user_id' , $id)
+            ->update($data);
 
         return true;
     }

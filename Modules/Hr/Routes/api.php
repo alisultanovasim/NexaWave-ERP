@@ -355,7 +355,7 @@ Route::group([
         Route::get("/", 'EmployeeController@index');
         Route::get("/{id}", 'EmployeeController@show')->where('id' , '[0-9]+');
         Route::post("/", 'EmployeeController@store');
-        Route::put("/{id}", 'EmployeeController@update')->where('id' , '[0-9]+');
+        Route::post("/{id}", 'EmployeeController@update')->where('id' , '[0-9]+');
         Route::delete("/{id}", 'EmployeeController@delete')->where('id' , '[0-9]+');
 
 //
