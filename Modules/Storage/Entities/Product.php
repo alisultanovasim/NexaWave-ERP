@@ -37,6 +37,9 @@ class Product extends Model
     public function kind(){
         return $this->belongsTo(ProductKind::class);
     }
+    public function unit(){
+        return $this->belongsTo(Unit::class);
+    }
     public function title(){
         return $this->belongsTo(ProductTitle::class);
     }

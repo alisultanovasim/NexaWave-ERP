@@ -67,7 +67,7 @@ Route::group([
         Route::get('/{id}', 'ProductStateController@show');
         Route::post('/', 'ProductStateController@store');
         Route::put('/{id}', 'ProductStateController@update');
-        Route::delete('{id}', 'ProductStateController@delete');
+        Route::delete('{id}', 'ProductStateController@destroy');
     }); //states
 
 

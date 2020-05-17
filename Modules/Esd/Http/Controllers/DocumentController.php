@@ -299,7 +299,9 @@ class DocumentController extends Controller
                     return $this->errorResponse([$find[0] => trans('apiResponse.inCorrectFormat')], Response::HTTP_UNPROCESSABLE_ENTITY);
                 }
             }
+
             return $this->errorResponse(trans('apiResponse.tryLater'), Response::HTTP_INTERNAL_SERVER_ERROR);
+
         } catch (ValidationException $exception) {
             return $this->errorResponse($exception->errors());
         } catch (\Exception $e) {

@@ -2,6 +2,7 @@
 
 namespace Modules\Storage\Http\Controllers;
 
+use App\Models\User;
 use App\Traits\ApiResponse;
 use App\Traits\Query;
 use Illuminate\Foundation\Validation\ValidatesRequests;
@@ -17,6 +18,7 @@ class ProductController extends Controller
 
     public function index(Request $request)
     {
+
         $this->validate($request, [
             'storage_id' => ['nullable', 'integer', 'min:1'],
             'title_id' => ['nullable', 'integer', 'min:1'],
@@ -30,6 +32,7 @@ class ProductController extends Controller
             'title',
             'state',
             'color',
+            'unit'
         ])
         ->where('company_id', $request->get('company_id'));
 
@@ -41,6 +44,9 @@ class ProductController extends Controller
 
         if ($request->get('title_id'))
             $products->where('title_id', $request->get('title_id'));
+
+        if ($request->get('storage_id'))
+            $products->where('storage_id', $request->get('storage_id'));
 
         $products = $products->orderBy('id' , 'desc')->paginate($request->get('per_page'));
 
