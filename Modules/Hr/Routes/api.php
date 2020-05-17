@@ -352,11 +352,28 @@ Route::group([
         'prefix' => "employees",
         'namespace' => 'Employee'
     ], function ($router) {
+
         Route::get("/", 'EmployeeController@index');
         Route::get("/{id}", 'EmployeeController@show')->where('id' , '[0-9]+');
         Route::post("/", 'EmployeeController@store');
         Route::post("/{id}", 'EmployeeController@update')->where('id' , '[0-9]+');
         Route::delete("/{id}", 'EmployeeController@delete')->where('id' , '[0-9]+');
+
+        Route::group(['prefix' => 'rewards'], function (){
+            Route::get("/", 'RewardController@index');
+            Route::get("/{id}", 'RewardController@show');
+            Route::post("/", 'RewardController@create');
+            Route::put("/{id}", 'RewardController@update');
+            Route::delete("/{id}", 'RewardController@destroy');
+        });
+
+        Route::group(['prefix' => 'punishments'], function (){
+            Route::get("/", 'PunishmentController@index');
+            Route::get("/{id}", 'PunishmentController@show');
+            Route::post("/", 'PunishmentController@create');
+            Route::put("/{id}", 'PunishmentController@update');
+            Route::delete("/{id}", 'PunishmentController@destroy');
+        });
 
 //
 //
@@ -429,12 +446,19 @@ Route::group([
         });
 
         Route::group(['prefix' => 'users/contact/information'], function (){
-//            Route::get('/v2', 'ContactInformationController@indev');
             Route::get('/', 'ContactInformationController@index');
             Route::get('/{id}', 'ContactInformationController@show');
             Route::post('/', 'ContactInformationController@create');
             Route::put('/{id}', 'ContactInformationController@update');
             Route::delete('/{id}', 'ContactInformationController@destroy');
+        });
+
+        Route::group(['prefix' => 'users/labor/activities'], function (){
+            Route::get('/', 'LaborActivityController@index');
+            Route::get('/{id}', 'LaborActivityController@show');
+            Route::post('/', 'LaborActivityController@create');
+            Route::put('/{id}', 'LaborActivityController@update');
+            Route::delete('/{id}', 'LaborActivityController@destroy');
         });
 
         Route::group(['prefix' => 'users/language/skills'], function ($router) {
