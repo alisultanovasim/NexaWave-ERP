@@ -476,6 +476,14 @@ Route::group([
             Route::put('/{id}', 'UserLanguageSkillController@update');
             Route::delete('/{id}', 'UserLanguageSkillController@delete');
         });
+
+        Route::group(['prefix' => 'users/files'], function ($router) {
+            Route::get('/', 'PrivateFileController@index');
+            Route::get('/{id}', 'PrivateFileController@show');
+            Route::post('/', 'PrivateFileController@create');
+            Route::put('/{id}', 'PrivateFileController@update');
+            Route::delete('/{id}', 'PrivateFileController@destroy');
+        });
     });
 
 });

@@ -29,7 +29,7 @@ class IsValidEmployeeRule implements Rule
     public function passes($attribute, $value)
     {
         return Employee::where([
-            'id' => $value,
+            'user_id' => $value,
             'company_id' => $this->companyId
         ])->exists();
     }

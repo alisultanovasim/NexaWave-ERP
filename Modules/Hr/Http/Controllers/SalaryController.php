@@ -128,7 +128,7 @@ class SalaryController extends Controller
         return [
             'employee_id' => [
                 'required',
-                new IsValidEmployeeRule($request->get('company_id'))
+                Rule::exists('employees', 'id')->where('company_id', $request->get('company_id'))
             ],
             'amount' => 'required|numeric',
             'salary_type_id' => [
