@@ -118,6 +118,7 @@ Route::group([
 
     Route::group(['prefix' => 'salaries'], function (){
         Route::get('/', 'SalaryController@index');
+        Route::get('/{id}', 'SalaryController@show');
         Route::post('/', 'SalaryController@create');
         Route::put('/{id}', 'SalaryController@update');
         Route::delete('/{id}', 'SalaryController@destroy');

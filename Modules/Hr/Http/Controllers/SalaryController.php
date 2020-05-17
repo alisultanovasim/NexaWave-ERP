@@ -9,6 +9,8 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Modules\Hr\Entities\Salary;
 use Psy\Util\Json;
@@ -39,35 +41,37 @@ class SalaryController extends Controller
         ]);
 
         $salaries = $this->salary
+        ->whereBelongsToCompany($request->get('company_id'))
         ->with([
-            'user:id,name,surname',
-            'position:id,name',
-            'salaryType:id,name'
+            'employee:id,user_id,company_id',
+            'employee.user:id,name,surname',
+            'salaryType:id,name',
+            'currency:id,name'
         ])
-        ->company()
         ->orderBy('id', 'desc')
         ->paginate($request->get('per_page'));
-
-        $this->successResponse($salaries);
+        return $this->successResponse($salaries);
     }
 
     /**
+     * @param Request $request
      * @param $id
      * @return JsonResponse
      */
-    public function show($id): JsonResponse {
+    public function show(Request $request, $id): JsonResponse {
         $salary = $this->salary
+            ->whereBelongsToCompany($request->get('company_id'))
             ->where('id', $id)
             ->with([
-                'user:id,name,surname',
-                'position:id,name',
-                'salaryType:id,name'
+                'employee:id,user_id,company_id',
+                'employee.user:id,name,surname',
+                'salaryType:id,name',
+                'currency:id,name'
             ])
-            ->company()
             ->orderBy('id', 'desc')
             ->firstOrFail();
 
-        $this->successResponse($salary);
+        return $this->successResponse($salary);
     }
 
     /**
@@ -89,17 +93,18 @@ class SalaryController extends Controller
      */
     public function update(Request $request, $id): JsonResponse {
         $this->validate($request, $this->getSalaryRules($request));
-        $salary = $this->salary->where('id', $id)->company()->firstOrFail(['id']);
+        $salary = $this->salary->where('id', $id)->whereBelongsToCompany($request->get('company_id'))->firstOrFail(['id']);
         $this->saveSalary($request, $salary);
         return $this->successResponse(trans('messages.saved'), 200);
     }
 
     /**
+     * @param Request $request
      * @param $id
      * @return JsonResponse
      */
-    public function destroy($id): JsonResponse {
-        $salary = $this->salary->where('id', $id)->company()->firstOrFail(['id']);
+    public function destroy(Request $request, $id): JsonResponse {
+        $salary = $this->salary->where('id', $id)->whereBelongsToCompany($request->get('company_id'))->firstOrFail(['id']);
         return $salary->delete()
             ? $this->successResponse(trans('messages.saved'), 200)
             : $this->errorResponse(trans('messages.not_saved'), 400);
@@ -121,8 +126,15 @@ class SalaryController extends Controller
      */
     private function getSalaryRules(Request $request): array {
         return [
-            'position_id' => 'required|exists:positions,id',
-            'salary_type_id' => 'required|exists:supplement_salary_types,id',
+            'employee_id' => [
+                'required',
+                new IsValidEmployeeRule($request->get('company_id'))
+            ],
+            'amount' => 'required|numeric',
+            'salary_type_id' => [
+                'required',
+                Rule::exists('supplement_salary_types', 'id')->where('company_id', $request->get('company_id'))
+            ],
             'currency_id' => 'required|exists:currency,id',
             'start_date' => 'required|date',
             'end_date' => 'required|date',

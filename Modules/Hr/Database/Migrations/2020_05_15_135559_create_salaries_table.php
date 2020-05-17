@@ -15,19 +15,20 @@ class CreateSalariesTable extends Migration
     {
         Schema::create('salaries', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->unsignedBigInteger('company_id');
-            $table->unsignedBigInteger('position_id');
+            $table->unsignedBigInteger('employee_id');
+//            $table->unsignedBigInteger('position_id');
             $table->unsignedBigInteger('salary_type_id');
             $table->date('start_date');
             $table->date('end_date');
-            $table->float('quantity');
+            $table->float('amount');
             $table->unsignedBigInteger('currency_id');
             $table->boolean('with_percentage')->default(0);
             $table->char('note')->nullable()->default(null);
             $table->timestamps();
+            $table->softDeletes();
 
-            $table->foreign('company_id')->references('id')->on('companies');
-            $table->foreign('position_id')->references('id')->on('positions');
+            $table->foreign('employee_id')->references('id')->on('employees');
+//            $table->foreign('position_id')->references('id')->on('positions');
             $table->foreign('salary_type_id')->references('id')->on('supplement_salary_types');
         });
     }
