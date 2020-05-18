@@ -46,8 +46,8 @@ return [
                 ],
 
                 'coulmns12' => [
-                    ['name' => 'İcraçi', 'position' => '0', 'is_active' => '1', 'type' => '1', 'field' => 'stuck',],
-                    ['name' => 'Bölmə', 'position' => '1', 'is_active' => '1', 'type' => '1', 'field' => 'section',],
+                    ['name' => 'Bölmə', 'position' => '0', 'is_active' => '1', 'type' => '1', 'field' => 'section',],
+                    ['name' => 'İcraçı', 'position' => '1', 'is_active' => '1', 'type' => '1', 'field' => 'stuck',],
                     ['name' => 'Qeydiyyat Nömrəsi', 'position' => '2', 'is_active' => '1', 'type' => '1', 'field' => 'register_number',],
                     ['name' => 'Status', 'position' => '3', 'is_active' => '1', 'type' => '1', 'field' => 'status',],
                     ['name' => 'Mövzu', 'position' => '4', 'is_active' => '1', 'type' => '1', 'field' => 'theme',],
@@ -69,7 +69,7 @@ return [
 
 
                 'coulmns1' => [
-                    ['name' => 'İcraçi', 'position' => '0', 'is_active' => '1', 'type' => '1', 'field' => 'stuck',],
+                    ['name' => 'İcraçı', 'position' => '0', 'is_active' => '1', 'type' => '1', 'field' => 'stuck',],
 //                    ['name' => 'Bölmə', 'position' => '1', 'is_active' => '0', 'type' => '1', 'field' => 'section',],
                     ['name' => 'Qeydiyyat Nömrəsi', 'position' => '2', 'is_active' => '1', 'type' => '1', 'field' => 'register_number',],
                     ['name' => 'Status', 'position' => '3', 'is_active' => '1', 'type' => '1', 'field' => 'status',],
@@ -96,7 +96,7 @@ return [
 
 
                 'coulmns2' => [
-                    ['name' => 'İcraçi', 'position' => '0', 'is_active' => '1', 'type' => '1', 'field' => 'stuck',],
+                    ['name' => 'İcraçı', 'position' => '0', 'is_active' => '1', 'type' => '1', 'field' => 'stuck',],
 //                    ['name' => 'Bölmə', 'position' => '1', 'is_active' => '0', 'type' => '1', 'field' => 'section',],
                     ['name' => 'Qeydiyyat Nömrəsi', 'position' => '2', 'is_active' => '1', 'type' => '1', 'field' => 'register_number',],
                     ['name' => 'Status', 'position' => '3', 'is_active' => '1', 'type' => '1', 'field' => 'status',],
@@ -124,8 +124,8 @@ return [
 
 
                 'coulmns34' => [
-                    ['name' => 'İcraçi', 'position' => '0', 'is_active' => '1', 'type' => '1', 'field' => 'stuck',],
-                    ['name' => 'Bölmə', 'position' => '1', 'is_active' => '1', 'type' => '1', 'field' => 'section',],
+                    ['name' => 'Bölmə', 'position' => '0', 'is_active' => '1', 'type' => '1', 'field' => 'section',],
+                    ['name' => 'İcraçı', 'position' => '1', 'is_active' => '1', 'type' => '1', 'field' => 'stuck',],
                     ['name' => 'Qeydiyyat Nömrəsi', 'position' => '2', 'is_active' => '1', 'type' => '1', 'field' => 'register_number',],
                     ['name' => 'Status', 'position' => '3', 'is_active' => '1', 'type' => '1', 'field' => 'status',],
                     ['name' => 'Mövzu', 'position' => '4', 'is_active' => '1', 'type' => '1', 'field' => 'theme',],
@@ -146,7 +146,7 @@ return [
 
 
                 'coulmns3' => [
-                    ['name' => 'İcraçi', 'position' => '0', 'is_active' => '1', 'type' => '1', 'field' => 'stuck',],
+                    ['name' => 'İcraçı', 'position' => '0', 'is_active' => '1', 'type' => '1', 'field' => 'stuck',],
 //                    ['name' => 'Bölmə', 'position' => '1', 'is_active' => '0', 'type' => '1', 'field' => 'section',],
                     ['name' => 'Qeydiyyat Nömrəsi', 'position' => '2', 'is_active' => '1', 'type' => '1', 'field' => 'register_number',],
                     ['name' => 'Status', 'position' => '3', 'is_active' => '1', 'type' => '1', 'field' => 'status',],
@@ -172,7 +172,7 @@ return [
 
 
                 'coulmns4' => [
-                    ['name' => 'İcraçi', 'position' => '0', 'is_active' => '1', 'type' => '1', 'field' => 'stuck',],
+                    ['name' => 'İcraçı', 'position' => '0', 'is_active' => '1', 'type' => '1', 'field' => 'stuck',],
 //                    ['name' => 'Bölmə', 'position' => '1', 'is_active' => '0', 'type' => '1', 'field' => 'section',],
                     ['name' => 'Qeydiyyat Nömrəsi', 'position' => '2', 'is_active' => '1', 'type' => '1', 'field' => 'register_number',],
                     ['name' => 'Status', 'position' => '3', 'is_active' => '1', 'type' => '1', 'field' => 'status',],
@@ -199,7 +199,7 @@ return [
 
 
                 'coulmns5' => [
-                    ['name' => 'İcraçi', 'position' => '0', 'is_active' => '1', 'type' => '1', 'field' => 'stuck',],
+                    ['name' => 'İcraçı', 'position' => '0', 'is_active' => '1', 'type' => '1', 'field' => 'stuck',],
 //                    ['name' => 'Bölmə', 'position' => '1', 'is_active' => '0', 'type' => '1', 'field' => 'section',],
                     ['name' => 'Qeydiyyat Nömrəsi', 'position' => '2', 'is_active' => '1', 'type' => '1', 'field' => 'register_number',],
                     ['name' => 'Status', 'position' => '3', 'is_active' => '1', 'type' => '1', 'field' => 'status',],
