@@ -428,6 +428,14 @@ Route::group([
            Route::delete('/{id}', 'UserCertificateController@destroy');
         });
 
+        Route::group(['prefix' => 'users/social/states'], function (){
+            Route::get('/', 'UserSocialStateController@index');
+            Route::get('/{id}', 'UserSocialStateController@show');
+            Route::post('/', 'UserSocialStateController@create');
+            Route::put('/{id}', 'UserSocialStateController@update');
+            Route::delete('/{id}', 'UserSocialStateController@destroy');
+        });
+
         Route::group(['prefix' => 'users/contact/information'], function (){
 //            Route::get('/v2', 'ContactInformationController@indev');
             Route::get('/', 'ContactInformationController@index');
