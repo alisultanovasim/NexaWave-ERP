@@ -116,6 +116,14 @@ Route::group([
         Route::delete('/{id}', 'SupplementSalaryTypeController@destroy');
     });
 
+    Route::group(['prefix' => 'salaries'], function (){
+        Route::get('/', 'SalaryController@index');
+        Route::get('/{id}', 'SalaryController@show');
+        Route::post('/', 'SalaryController@create');
+        Route::put('/{id}', 'SalaryController@update');
+        Route::delete('/{id}', 'SalaryController@destroy');
+    });
+
     Route::group(['prefix' => 'uniform/types'], function ($router) {
         Route::get('/', 'UniformTypeController@index');
         Route::post('/', 'UniformTypeController@create');
@@ -445,6 +453,14 @@ Route::group([
            Route::delete('/{id}', 'UserCertificateController@destroy');
         });
 
+        Route::group(['prefix' => 'users/social/states'], function (){
+            Route::get('/', 'UserSocialStateController@index');
+            Route::get('/{id}', 'UserSocialStateController@show');
+            Route::post('/', 'UserSocialStateController@create');
+            Route::put('/{id}', 'UserSocialStateController@update');
+            Route::delete('/{id}', 'UserSocialStateController@destroy');
+        });
+
         Route::group(['prefix' => 'users/contact/information'], function (){
             Route::get('/', 'ContactInformationController@index');
             Route::get('/{id}', 'ContactInformationController@show');
@@ -467,6 +483,14 @@ Route::group([
             Route::post('/', 'UserLanguageSkillController@store');
             Route::put('/{id}', 'UserLanguageSkillController@update');
             Route::delete('/{id}', 'UserLanguageSkillController@delete');
+        });
+
+        Route::group(['prefix' => 'users/files'], function ($router) {
+            Route::get('/', 'PrivateFileController@index');
+            Route::get('/{id}', 'PrivateFileController@show');
+            Route::post('/', 'PrivateFileController@create');
+            Route::put('/{id}', 'PrivateFileController@update');
+            Route::delete('/{id}', 'PrivateFileController@destroy');
         });
     });
 
