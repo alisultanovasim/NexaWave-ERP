@@ -53,6 +53,7 @@ class HrDatabaseSeeder extends Seeder
             "name" => "Computer science",
             "code" => "ks",
         ]);
+
         $eduSpeciality = EducationPlace::create([
             "name" => "Azərbaycan Respublikasının yanında Dövlət İdarəçilik Akademiyası",
             "code" => "dia",
@@ -61,11 +62,11 @@ class HrDatabaseSeeder extends Seeder
             "city_id" => 1,
             "region_id" => null,
         ]);
+
         $eduSpeciality = EducationLevel::create([
             "name" => "Bakalavr dərəcəsi",
             "code" => "bakalvr",
         ]);
-
 
         $faculty = Faculty::create([
             "name" => "Avtomatlaşdırma",
