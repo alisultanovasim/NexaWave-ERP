@@ -2,7 +2,9 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Role;
 use App\Models\User;
+use App\Providers\PermissionProvider;
 use App\Traits\ApiResponse;
 use Closure;
 use Illuminate\Http\Request;
@@ -40,6 +42,11 @@ class CompanyIdValidator
         if ($err) return $err;
 
         $request->request->set('company_id' , $this->company);
+
+        //Bootstrap permissions gateways
+        $provider = new PermissionProvider();
+        $role = new Role();
+        $provider->boot($role);
 
         return $next($request);
 
