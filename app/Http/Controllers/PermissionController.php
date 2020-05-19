@@ -7,17 +7,23 @@ use App\Models\Permission;
 use App\Models\PositionModulePermission;
 use App\Traits\ApiResponse;
 use Carbon\Carbon;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 use Modules\Hr\Entities\Positions;
 
 class PermissionController extends Controller
 {
     use ApiResponse;
 
-    public function getModules(Request $request){
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function getModules(Request $request): JsonResponse {
         $modules = Module::hasCompany($request->get('company_id'))
             ->with([
                 'subModules'
@@ -31,34 +37,52 @@ class PermissionController extends Controller
         return $this->successResponse($modules);
     }
 
-    public function getPositions(Request $request){
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function getPositions(Request $request): JsonResponse{
         $permissions = Positions::where('company_id', $request->get('company_id'))
         ->with([
             'modules'
         ])
         ->get();
+//        return  $this->successResponse($permissions);
         return $this->successResponse(
             $this->beautifyPositionPermissionsResponse($permissions)
         );
     }
 
-    public function getPermissions(){
+    /**
+     * @return JsonResponse
+     */
+    public function getPermissions(): JsonResponse{
         return $this->successResponse(
             Permission::all(['id', 'name'])
         );
     }
 
-    public function setPositionPermissions(Request $request){
+    /**
+     * @param Request $request
+     * @return mixed
+     * @throws ValidationException
+     */
+    public function setPositionPermissions(Request $request): JsonResponse{
         $this->validate($request, $this->getRules($request->get('company_id')));
         $permissions = $this->prepareStoreData($request->get('position_id'), $request->get('modules'));
         return DB::transaction(function () use ($request, $permissions){
             PositionModulePermission::where('position_id', $request->get('position_id'))->delete();
             PositionModulePermission::insert($permissions);
-            return $this->successResponse(['success' => trans('responses.OK')]);
+            return $this->successResponse(trans('responses.OK'));
         });
     }
 
-    private function prepareStoreData(int $positionId, array $modules){
+    /**
+     * @param int $positionId
+     * @param array $modules
+     * @return array
+     */
+    private function prepareStoreData(int $positionId, array $modules): array {
         $data = [];
         foreach ($modules as $module){
             foreach ($module['position_permissions'] as $permission){
@@ -66,7 +90,7 @@ class PermissionController extends Controller
                     'id' => Str::uuid(),
                     'position_id' => $positionId,
                     'module_id' => $module['module_id'],
-                    'permission_id' => $permission,
+                    'permission_id' => $permission['id'],
                     'created_at' => Carbon::now(),
                     'updated_at' => Carbon::now()
                 ];
@@ -75,7 +99,11 @@ class PermissionController extends Controller
         return $data;
     }
 
-    private function beautifyPositionPermissionsResponse($positionModulePermissions){
+    /**
+     * @param $positionModulePermissions
+     * @return array
+     */
+    private function beautifyPositionPermissionsResponse($positionModulePermissions): array {
         $data = [];
         foreach ($positionModulePermissions as $position){
             $updatedPosition = [
@@ -101,12 +129,16 @@ class PermissionController extends Controller
         return $data;
     }
 
-    private function getRules($companyId){
+    /**
+     * @param $companyId
+     * @return array
+     */
+    private function getRules($companyId): array {
         return [
             'position_id' => 'required|exists:positions,id,company_id,'.$companyId,
             'modules' => 'required|array|min:1',
             'modules.*.position_permissions' => 'required|array',
-            'modules.*.position_permissions.*' => 'required|exists:permissions,id',
+            'modules.*.position_permissions.*.id' => 'required|exists:permissions,id',
             'modules.*.module_id' => [
                 'required',
                 Rule::exists('company_modules', 'module_id')
