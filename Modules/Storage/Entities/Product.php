@@ -51,4 +51,7 @@ class Product extends Model
     public function color(){
         return $this->belongsTo(ProductColor::class);
     }
+    public function storage(){
+        return $this->belongsTo(Storage::class);
+    }
 }
