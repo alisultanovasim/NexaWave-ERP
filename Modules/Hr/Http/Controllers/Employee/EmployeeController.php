@@ -3,13 +3,8 @@
 namespace Modules\Hr\Http\Controllers\Employee;
 
 use App\Http\Controllers\Auth\UserController;
-use App\Jobs\SendMailCreatePassword;
 use App\Models\User;
 use Illuminate\Foundation\Validation\ValidatesRequests;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
-use Illuminate\Validation\Rule;
-use Modules\Hr\Entities\Employee\Contract;
 use Modules\Hr\Entities\Employee\Employee;
 use App\Traits\ApiResponse;
 use App\Traits\Query;
@@ -17,10 +12,8 @@ use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\ValidationException;
 use Illuminate\Routing\Controller;
 use Modules\Hr\Traits\DocumentUploader;
-use Modules\Plaza\Entities\Contact;
 
 class EmployeeController extends Controller
 {
@@ -37,7 +30,8 @@ class EmployeeController extends Controller
             'position_id' => ['nullable', 'integer'],
             'section_id' => ['nullable', 'integer'],
             'sector_id' => ['nullable', 'integer'],
-            'is_filter' => ['nullable' , 'boolean']
+            'is_filter' => ['nullable' , 'boolean'],
+            "tabel_no" => ['nullable' , 'string' , 'max:255']
         ]);
 
         if ($notExists = $this->companyInfo($request->get('company_id'), $request->only(['profession_id']))) return $this->errorResponse($notExists);
@@ -57,11 +51,13 @@ class EmployeeController extends Controller
             $employees->whereHas('contract' , function ($q) use ($request){
                 $q->where('section_id', $request->get('section_id'));
             });
+
         if ($request->get('sector_id'))
             $employees->whereHas('contract' , function ($q) use ($request){
                 $q->where('sector_id', $request->get('sector_id'));
             });
-
+        if ($request->get('tabel_no'))
+            $employees->where('tabel_no' , 'like' , $request->get('tabel_no')."%");
 
         if ($request->get('is_filter')) {
             $employees = $employees->with([
@@ -71,10 +67,10 @@ class EmployeeController extends Controller
             ])->orderBy('id', 'desc')->take(50)->get(
                 ['id', 'user_id', 'company_id']
             );
-
             return $this->successResponse(['data' => $employees]);
         }
-            $employees = $employees->with([
+
+        $employees = $employees->with([
                 'user:id,name,surname',
                 'contracts',
                 'contracts.position',
@@ -114,7 +110,8 @@ class EmployeeController extends Controller
             'company_id' => ['required', 'integer'],
             'is_active' => ['sometimes', 'required', 'boolean'],
             'user_id' => ['sometimes', 'required', 'integer'],
-            'create_contract' => ['required', 'boolean']
+            'create_contract' => ['required', 'boolean'],
+            'tabel_no' => ['nullable' , 'string' , 'max:255']
         ]);
 
         try {
@@ -130,6 +127,7 @@ class EmployeeController extends Controller
             $employee = Employee::create([
                 'company_id' => $request->get('company_id'),
                 'user_id' => $user->id,
+                'tabel_no' => $request->get('tabel_no')
             ]);
 
             if ($request->get('create_contract')) {
@@ -178,7 +176,7 @@ class EmployeeController extends Controller
 
         if (!$employee) return $this->errorResponse(trans('response.employeeNotFound'), 404);
 
-        $data = $request->only(['is_active']);
+        $data = $request->only(['is_active' , 'tabel_no']);
 
         if (count($data) != 0)
             Employee::where('id', $id)->update($data);
