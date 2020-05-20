@@ -28,6 +28,8 @@ class ProductController extends Controller
             'name' => ['nullable', 'string', 'max:255'],
             'per_page' => ['nullable', 'integer', 'min:1']
         ]);
+
+
         $titles = ProductTitle::with(['kinds' => function ($q) use ($request) {
             $q->where('id', $request->get('kind_id'));
         }, 'kinds.products' => function ($q) use ($request) {
@@ -148,28 +150,7 @@ class ProductController extends Controller
 
     public function update(Request $request, $id)
     {
-        $this->validate($request, [
-            'unit_id' => ['nullable', 'integer', 'min:1'],
-            'less_value' => ['nullable', 'boolean'],
-            'quickly_old' => ['nullable', 'boolean'],
-            'title_id' => ['nullable', 'integer', 'min:1'],//
-            'kind_id' => ['nullable', 'integer', 'min:1'],//
-            'state_id' => ['nullable', 'integer'],
-            'description' => ['nullable', 'string'],
-            'amount' => ['nullable', 'numeric'],
-            'storage_id' => ['nullable', 'integer'],
-            'product_model' => ['nullable', 'string', 'max:255'],
-            'product_mark' => ['nullable', 'string', 'max:255'],
-            'color_id' => ['nullable', 'integer'],//
-            'main_funds' => ['nullable', 'boolean'],
-            'inv_no' => ['nullable', 'string', 'max:255'],
-            'exploitation_date' => ['nullable', 'date', 'date_format:Y-m-d'],
-            'size' => ['nullable', 'numeric'],
-            'made_in_country ' => ['nullable', 'integer', 'min:1'],//
-            'buy_from_country ' => ['nullable', 'integer', 'min:1'],//
-            'make_date' => ['nullable', 'date', 'date_format:Y-m-d'],
-            'income_description' => ['nullable', 'string'],
-        ]);
+        $this->validate($request , self::getUpdateRules() );
         $product = Product::where([
             ['company_id', '=', $request->get('company_id')],
             ['id', '=', $id],
@@ -217,6 +198,31 @@ class ProductController extends Controller
             'description' => ['nullable', 'string'],
             'amount' => ['required', 'numeric'],
             'storage_id' => ['required', 'integer'],
+            'product_model' => ['nullable', 'string', 'max:255'],
+            'product_mark' => ['nullable', 'string', 'max:255'],
+            'color_id' => ['nullable', 'integer'],//
+            'main_funds' => ['nullable', 'boolean'],
+            'inv_no' => ['nullable', 'string', 'max:255'],
+            'exploitation_date' => ['nullable', 'date', 'date_format:Y-m-d'],
+            'size' => ['nullable', 'numeric'],
+            'made_in_country ' => ['nullable', 'integer', 'min:1'],//
+            'buy_from_country ' => ['nullable', 'integer', 'min:1'],//
+            'make_date' => ['nullable', 'date', 'date_format:Y-m-d'],
+            'income_description' => ['nullable', 'string'],
+        ];
+    }
+
+    public static function getUpdateRules(){
+        return [
+            'unit_id' => ['nullable', 'integer', 'min:1'],
+            'less_value' => ['nullable', 'boolean'],
+            'quickly_old' => ['nullable', 'boolean'],
+            'title_id' => ['nullable', 'integer', 'min:1'],//
+            'kind_id' => ['nullable', 'integer', 'min:1'],//
+            'state_id' => ['nullable', 'integer'],
+            'description' => ['nullable', 'string'],
+            'amount' => ['nullable', 'numeric'],
+            'storage_id' => ['nullable', 'integer'],
             'product_model' => ['nullable', 'string', 'max:255'],
             'product_mark' => ['nullable', 'string', 'max:255'],
             'color_id' => ['nullable', 'integer'],//

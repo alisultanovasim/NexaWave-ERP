@@ -3,10 +3,13 @@
 namespace Modules\Storage\Entities;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Modules\Hr\Entities\Employee\Employee;
 
 class Demand extends Model
 {
+
+    use SoftDeletes;
 
     const STATUS_WAIT = 0;
     const STATUS_ASSIGNED = 1;

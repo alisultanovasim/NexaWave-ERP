@@ -17,7 +17,6 @@ class DemandAssignmentController extends Controller
     {
         //
     }
-
     public function show(Request $request , $id)
     {
         //

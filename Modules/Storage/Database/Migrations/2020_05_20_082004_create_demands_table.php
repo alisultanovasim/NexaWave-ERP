@@ -37,6 +37,8 @@ class CreateDemandsTable extends Migration
             $table->unsignedBigInteger('company_id');
 
             $table->timestamps();
+
+            $table->softDeletes();
         });
     }
 
