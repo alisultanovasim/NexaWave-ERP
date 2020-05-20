@@ -17,4 +17,14 @@ class ProductKind extends Model
     public function products(){
         return $this->hasMany(Product::class , 'kind_id' , 'id');
     }
+    public function models(){
+        return $this->hasMany(ProductModel::class , 'kind_id');
+    }
+
+    public function scopeCompany($q)
+    {
+        return $q->whereHas('title' , function ($q){
+            $q->where('company_id' , request('company_id'));
+        });
+    }
 }

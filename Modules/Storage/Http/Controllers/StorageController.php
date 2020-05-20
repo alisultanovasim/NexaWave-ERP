@@ -16,14 +16,13 @@ class StorageController extends Controller
     public function index(Request $request)
     {
         $this->validate($request, [
-            'company_id' => ['required', 'integer'],
             'per_page' =>  ['nullable' , 'integer' , 'min:1']
         ]);
 
-        $storage = Storage::where('company_id', $request->get('company_id'))
+        $storage = Storage::withCount('products')
+            ->where('company_id', $request->get('company_id'))
             ->orderBy('id', 'DESC')
             ->paginate($request->get('per_page'));
-
 
         return $this->successResponse($storage);
     }

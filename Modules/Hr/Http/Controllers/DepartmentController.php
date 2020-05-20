@@ -22,10 +22,11 @@ class DepartmentController extends Controller
     public function index(Request $request)
     {
         $this->validate($request , [
-           'company_id' => ['required' , 'integer'],
             'paginateCount' => ['sometimes' , 'integer']
         ]);
-        $result = Department::with(['city:id,name'])->paginate($request->paginateCount);
+        $result = Department::with(['city:id,name'])
+            ->where('company_id' , $request->get('company_id'))
+            ->paginate($request->paginateCount);
 
         return $this->dataResponse($result);
     }

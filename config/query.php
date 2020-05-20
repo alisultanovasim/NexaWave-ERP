@@ -16,6 +16,8 @@ return [
     'sender_company_user_id' => 'sender_company_users',
     'military_state_id' => 'military_states',
     'title_id'  => 'product_titles',
-    'kind_id' => 'product_kinds',
-    'storage_id' => 'storages'
+//    'kind_id' => 'product_kinds',
+    'storage_id' => 'storages',
+    'color_id' => 'product_colors',
+    'state_id' => 'product_states'
 ];

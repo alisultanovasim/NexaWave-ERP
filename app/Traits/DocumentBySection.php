@@ -16,17 +16,18 @@ trait DocumentBySection
         switch ($tableName) {
             case "structure_docs":
                 $this->validate($request, [
-                    'sender_company_id' => ['required', 'integer'],
+                    'sender_company_id' => [ 'sometimes','required', 'integer'],
                     'sender_company_role_id' => ['sometimes', 'required', 'integer'],
                     'sender_company_user_id' => ['sometimes', 'required', 'integer'],
                 ]);
+                if ($request->has('sender_company_id')){
+                    $check = senderCompany::where('company_id', $request->get('company_id'))
+                        ->where('id', $request->get('sender_company_id'))
+                        ->checkSender($request)
+                        ->exists();
+                    if (!$check) return $this->errorResponse(trans('response.senderDataIsNotValid'));
+                }
 
-                $check = senderCompany::where('company_id', $request->get('company_id'))
-                    ->where('id', $request->get('sender_company_id'))
-                    ->checkSender($request)
-                    ->exists();
-
-                if (!$check) return $this->errorResponse(trans('response.senderDataIsNotValid'));
 
                 return $request->only([
                     'sender_company_id',
@@ -51,10 +52,7 @@ trait DocumentBySection
                     'from_in_our_company' => ['required', 'integer'],
                     'to_in_our_company' => ['required', 'integer']
                 ]);
-                $data = $request->only([
-                    'from_in_our_company',
-                    'to_in_our_company'
-                ]);
+                $data = [$request->get('from_in_our_company') ,$request->get('to_in_our_company')  ];
 
                 $existsCount = Employee::whereIn('id' , $data)
                     ->where('company_id' , $request->get('company_id'))

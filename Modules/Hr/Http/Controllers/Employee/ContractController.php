@@ -22,47 +22,53 @@ class ContractController extends Controller
     public static function storeContract(Request $request)
     {
         $data = $request->only([
-            'department_id' ,
-            'section_id' ,
-            'sector_id' ,
-            'position_id' ,
-            'salary' ,
-            'contract' ,
-            'start_date' ,
-            'end_date' ,
-            'employee_id' ,
-            'personal_category_id' ,
-            'specialization_degree_id' ,
-            'work_environment_id' ,
-            'state_value' ,
-            'intern_start_at' ,
-            'intern_end_at' ,
-            'currency_id' ,
-            'contract_type_id' ,
-            'work_start_at' ,
-            'work_end_at' ,
-            'break_time_start' ,
-            'break_time_end' ,
-            'work_time_start_at' ,
-            'work_time_end_at' ,
-            'contract_no' ,
-            'acceptor_id' ,
-            'duration_type_id' ,
-            'labor_protection_addition' ,
-            'labor_meal_addition' ,
-            'labor_sport_addition' ,
-            'vacation_main' ,
-            'vacation_work_insurance' ,
-            'vacation_work_envs' ,
-            'vacation_for_child' ,
-            'vacation_collective_contract' ,
-            'vacation_total' ,
-            'vacation_social_benefits' ,
+            'department_id',
+            'section_id',
+            'sector_id',
+            'position_id',
+            'salary',
+            'contract',
+            'start_date',
+            'end_date',
+            'employee_id',
+            'personal_category_id',
+            'specialization_degree_id',
+            'work_environment_id',
+            'state_value',
+            'currency_id',
+            'contract_type_id',
+            'break_time_start',
+            'break_time_end',
+            'work_time_start_at',
+            'work_time_end_at',
+            'contract_no',
+            'acceptor_id',
+            'duration_type_id',
+            'labor_protection_addition',
+            'labor_meal_addition',
+            'labor_sport_addition',
+            'vacation_main',
+            'vacation_work_insurance',
+            'vacation_work_envs',
+            'vacation_for_child',
+            'vacation_collective_contract',
+            'vacation_total',
+            'vacation_social_benefits',
+            'position_description',
+            'intern_start_date',
+            'intern_end_date',
+            'work_start_date',
+            'work_end_date',
+            'vacation_start_date',
+            'vacation_end_date',
+            'duration_limit_reason'
         ]);
 
 
         if ($request->has('contract') and $request->hasFile('contract'))
             $data['contract'] = self::save($request->file('contract'), $request->get('company_id'), 'contracts');
+
+
 
         return Contract::create($data);
     }
@@ -83,12 +89,12 @@ class ContractController extends Controller
             'specialization_degree_id' => ['nullable', 'integer'],//exists
             'work_environment_id' => ['nullable', 'integer'],//exists
             'state_value' => ['nullable', 'numeric'],
-            'intern_start_at' => ['nullable', 'date'],
-            'intern_end_at' => ['nullable', 'time'],
+            'intern_start_date' => ['nullable', 'date'],
+            'intern_end_date' => ['nullable', 'date'],
             'currency_id' => ['required', 'integer'],//exists
             'contract_type_id' => ['nullable', 'integer'],//exists
-            'work_start_at' => ['nullable', 'date_format:Y-m-d'],
-            'work_end_at' => ['nullable', 'date_format:Y-m-d'],
+            'work_start_date' => ['nullable', 'date_format:Y-m-d'],
+            'work_end_date' => ['nullable', 'date_format:Y-m-d'],
             'break_time_start' => ['nullable', 'date_format:H:i'],
             'break_time_end' => ['nullable', 'date_format:H:i'],
             'work_time_start_at' => ['nullable', 'date_format:H:i'],
@@ -106,19 +112,19 @@ class ContractController extends Controller
             'vacation_collective_contract' => ['nullable', 'integer'],
             'vacation_total' => ['nullable', 'integer'],
             'vacation_social_benefits' => ['nullable', 'numeric'],
+            'vacation_start_date' =>  ['nullable', 'date_format:Y-m-d'],
+            'vacation_end_date' =>  ['nullable', 'date_format:Y-m-d'],
         ];
     }
 
     public function index(Request $request)
     {
         $this->validate($request, [
-            'company_id' => ['required', 'integer'],
             'paginateCount' => ['integer'],
             'status' => ['sometimes', 'required', 'in:0,1,2'],
             'employee_id' => ['sometimes', 'required', 'integer'],
             'employee_status' => ['sometimes', 'required', 'in:0,1,2'],
         ]);
-        try {
             $contract = Contract::with([
                 'employee:id,user_id,is_active',
                 'employee.user:id,name,surname',
@@ -126,7 +132,8 @@ class ContractController extends Controller
                 'section:id,name,short_name',
                 'sector:id,name,short_name',
                 'department:id,name,short_name',
-                'currency'
+                'currency',
+
             ])->whereHas('employee', function ($q) use ($request) {
                 $q->where('company_id', $request->get('company_id'));
                 if ($request->has('employee_status') and $request->get('employee_status') != 2) {
@@ -146,9 +153,6 @@ class ContractController extends Controller
 
             return $this->successResponse($contract);
 
-        } catch (\Exception $e) {
-            return $this->errorResponse(trans('response.tryLater'));
-        }
     }
 
     public function store(Request $request)
@@ -172,7 +176,7 @@ class ContractController extends Controller
 
             $relations = $request->only(['department_id', 'section_id', 'sector_id', 'position_id']);
 
-            if ($notExists = $this->companyInfo($request->get('company_id'), $relations)) return $this->errorResponse($notExists);
+            if ($notExists = $this->companyInfo($request->get('company_id'), $relations)) return $this->errorResponse($notExists , 422);
 
             $newContract = self::storeContract($request);
 
@@ -280,7 +284,7 @@ class ContractController extends Controller
             'department:id,name,short_name',
             'employee:id,is_active,user_id',
             'employee.user:id,name,surname',
-            'contract_type' ,
+            'contract_type',
             'duration_type',
             'acceptor:id,is_active,user_id',
             'acceptor.user:id,name,surname',

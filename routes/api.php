@@ -65,11 +65,11 @@ Route::group([
         Route::post('/register' , 'UserController@register');
     }); // auth
 
-    Route::group(['prefix' => 'permissions'], function (){
+    Route::group(['prefix' => 'permissions', 'middleware' => ['auth:api', 'company']], function (){
         Route::post('set', 'PermissionController@setPositionPermissions');
-        Route::get('modules', 'PermissionController@getModules');
-        Route::get('permissions', 'PermissionController@getPermissions');
-        Route::get('', 'PermissionController@getPositions');
+        Route::get('/modules', 'PermissionController@getModules');
+        Route::get('/', 'PermissionController@getPermissions');
+        Route::get('/positions', 'PermissionController@getPositions');
     }); // permissions
 
 });

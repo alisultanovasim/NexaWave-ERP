@@ -66,10 +66,10 @@ class DocumentController extends Controller
                 'assignment' => function ($q) {
                     $q->with(['item' => function ($q) {
                         $q
-                            ->whereHas('employee' , function ($q){
-                                $q->where('user_id', Auth::id());
+                            ->whereHas('employee' , function ($q) {
+                                $q->where('user_id' , Auth::id());
                             })
-                            ->select(['assignment_id' , 'status']);
+                            ->select(['assignment_id' , 'status' , 'is_base']);
                     }]);
                 },
             ])
@@ -79,10 +79,12 @@ class DocumentController extends Controller
             /**  Start filter  */
             if ($request->has("status")) {
                 $documents->where("status", $request->get('status'));
+            }else{
+                $documents->where("status", '!=' , Document::ARCHIVE);
             }
+
             if ($request->has('year'))
                 $documents->where(DB::raw('YEAR(created_at)'), $request->year);
-
 
             if ($request->has('send_type'))
                 $documents->where("send_type", $request->send_type);
@@ -366,7 +368,11 @@ class DocumentController extends Controller
             /**
              * , 'docs.subDocs'
              */
-            $document = Document::with(['section', 'docs', 'sendType', 'sendType', 'sendForm', 'parent', 'assignment', 'assignment.items', 'assignment.items.employee.user:id,name,surname', 'assignment.items.notes'])->where(["documents.id" => $id])
+            $document = Document::with([
+                'section', 'docs', 'sendType', 'sendType', 'sendForm',
+                'parent', 'assignment', 'assignment.items',
+                'assignment.uploader:id,name,surname',
+                'assignment.items.employee.user:id,name,surname', 'assignment.items.notes'])->where(["documents.id" => $id])
                 ->where("status", "!=", Document::DRAFT)
                 ->join($table, "documents.id", '=', "$table.document_id");
 
@@ -423,7 +429,6 @@ class DocumentController extends Controller
                 ->where("company_id", $company_id)
                 ->where("status", "=", Document::WAIT);
 
-
             $document = $document->first(['id', 'section_id']);
             if (!$document)
                 return $this->errorResponse(trans("apiResponse.documentNotInValidStatus"));
@@ -473,14 +478,12 @@ class DocumentController extends Controller
                     return $this->errorResponse([$find[0] => "incorrect format"], Response::HTTP_UNPROCESSABLE_ENTITY);
                 }
             }
-            dd($e);
 
             return $this->errorResponse(trans('apiResponse.tryLater'), Response::HTTP_INTERNAL_SERVER_ERROR);
         } catch (ValidationException $exception) {
             return $this->errorResponse($exception->errors());
         } catch (\Exception $e) {
             DB::rollBack();
-            dd($e);
             return $this->errorResponse(trans("apiResponse.tryLater"), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
@@ -602,7 +605,6 @@ class DocumentController extends Controller
             return $this->errorResponse(trans('apiResponse.tryLater'), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
-
 }
 
 

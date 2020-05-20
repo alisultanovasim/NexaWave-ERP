@@ -117,6 +117,14 @@ Route::group([
         Route::delete('/{id}', 'SupplementSalaryTypeController@destroy');
     });
 
+    Route::group(['prefix' => 'salaries'], function (){
+        Route::get('/', 'SalaryController@index');
+        Route::get('/{id}', 'SalaryController@show');
+        Route::post('/', 'SalaryController@create');
+        Route::put('/{id}', 'SalaryController@update');
+        Route::delete('/{id}', 'SalaryController@destroy');
+    });
+
     Route::group(['prefix' => 'uniform/types'], function ($router) {
         Route::get('/', 'UniformTypeController@index');
         Route::post('/', 'UniformTypeController@create');
@@ -353,11 +361,28 @@ Route::group([
         'prefix' => "employees",
         'namespace' => 'Employee'
     ], function ($router) {
+
         Route::get("/", 'EmployeeController@index');
         Route::get("/{id}", 'EmployeeController@show')->where('id' , '[0-9]+');
         Route::post("/", 'EmployeeController@store');
         Route::put("/{id}", 'EmployeeController@update')->where('id' , '[0-9]+');
         Route::delete("/{id}", 'EmployeeController@delete')->where('id' , '[0-9]+');
+
+        Route::group(['prefix' => 'rewards'], function (){
+            Route::get("/", 'RewardController@index');
+            Route::get("/{id}", 'RewardController@show');
+            Route::post("/", 'RewardController@create');
+            Route::put("/{id}", 'RewardController@update');
+            Route::delete("/{id}", 'RewardController@destroy');
+        });
+
+        Route::group(['prefix' => 'punishments'], function (){
+            Route::get("/", 'PunishmentController@index');
+            Route::get("/{id}", 'PunishmentController@show');
+            Route::post("/", 'PunishmentController@create');
+            Route::put("/{id}", 'PunishmentController@update');
+            Route::delete("/{id}", 'PunishmentController@destroy');
+        });
 
 //
 //
@@ -435,6 +460,38 @@ Route::group([
             Route::delete('/{id}', 'UserEducationController@delete');
         });
 
+        Route::group(['prefix' => 'users/certificates'], function (){
+           Route::get('/', 'UserCertificateController@index');
+           Route::get('/{id}', 'UserCertificateController@show');
+           Route::post('/', 'UserCertificateController@create');
+           Route::put('/{id}', 'UserCertificateController@update');
+           Route::delete('/{id}', 'UserCertificateController@destroy');
+        });
+
+        Route::group(['prefix' => 'users/social/states'], function (){
+            Route::get('/', 'UserSocialStateController@index');
+            Route::get('/{id}', 'UserSocialStateController@show');
+            Route::post('/', 'UserSocialStateController@create');
+            Route::put('/{id}', 'UserSocialStateController@update');
+            Route::delete('/{id}', 'UserSocialStateController@destroy');
+        });
+
+        Route::group(['prefix' => 'users/contact/information'], function (){
+            Route::get('/', 'ContactInformationController@index');
+            Route::get('/{id}', 'ContactInformationController@show');
+            Route::post('/', 'ContactInformationController@create');
+            Route::put('/{id}', 'ContactInformationController@update');
+            Route::delete('/{id}', 'ContactInformationController@destroy');
+        });
+
+        Route::group(['prefix' => 'users/labor/activities'], function (){
+            Route::get('/', 'LaborActivityController@index');
+            Route::get('/{id}', 'LaborActivityController@show');
+            Route::post('/', 'LaborActivityController@create');
+            Route::put('/{id}', 'LaborActivityController@update');
+            Route::delete('/{id}', 'LaborActivityController@destroy');
+        });
+
         Route::group(['prefix' => 'users/language/skills'], function ($router) {
             Route::get('/', 'UserLanguageSkillController@index');
             Route::get('/{id}', 'UserLanguageSkillController@show');
@@ -442,8 +499,15 @@ Route::group([
             Route::put('/{id}', 'UserLanguageSkillController@update');
             Route::delete('/{id}', 'UserLanguageSkillController@delete');
         });
-    });
 
+        Route::group(['prefix' => 'users/files'], function ($router) {
+            Route::get('/', 'PrivateFileController@index');
+            Route::get('/{id}', 'PrivateFileController@show');
+            Route::post('/', 'PrivateFileController@create');
+            Route::put('/{id}', 'PrivateFileController@update');
+            Route::delete('/{id}', 'PrivateFileController@destroy');
+        });
+    });
 
 });
 

@@ -16,12 +16,25 @@ class ProductTitleController extends Controller
 
     public function index(Request $request)
     {
-        $titles = ProductTitle::where('company_id', $request->get('company_id'))
-            ->orderBy('id' , 'desc')
-            ->get();
+        $this->validate($request, [
+            'is_filter' => ['sometimes', 'required', 'boolean']
+        ]);
+
+        $titles = ProductTitle::query()
+            ->where('company_id', $request->get('company_id'));
+        if ($request->get('is_filter'))
+            $titles = $titles->get(['id', 'name']);
+        else
+            $titles = $titles->withCount([
+                'products',
+                'kinds'
+            ])
+                ->orderBy('id', 'desc')
+                ->get();
 
         return $this->successResponse($titles);
     }
+
 
     public function store(Request $request)
     {
