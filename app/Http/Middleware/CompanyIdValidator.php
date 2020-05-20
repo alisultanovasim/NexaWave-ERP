@@ -30,7 +30,6 @@ class CompanyIdValidator
             case User::EMPLOYEE:
                     $err = $this->employee($request);
                 break;
-
             default:
                 $err = $this->errorResponse(trans('response.unAvailable') , 503);
                 break;
@@ -71,11 +70,12 @@ class CompanyIdValidator
 
         $inThisCompany = Employee::where('company_id' , $company_id)
             ->where('user_id' , Auth::id())
-            ->exists();
+            ->first(['id']);
 
         if (!$inThisCompany) return $this->errorMessage(['error' => trans('response.notYouCompany')] , 400);
 
         $this->company = $company_id;
+        $this->auth_employee_id = $inThisCompany->id;
 
 
         return null;

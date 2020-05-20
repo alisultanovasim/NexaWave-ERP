@@ -8,6 +8,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Product extends Model
 {
     use SoftDeletes;
+
+    const STATUS_ACTIVE = 1;
+    const STATUS_DEMAND = 2;
     protected $fillable = [
         'unit_id',
         'less_value',
@@ -29,7 +32,8 @@ class Product extends Model
         'made_in_country',
         'buy_from_country',
         'make_date',
-        "company_id"
+        "company_id",
+        'status'
     ];
 
     protected $hidden = ['mark_id'];

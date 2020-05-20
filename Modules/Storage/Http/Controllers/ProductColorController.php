@@ -20,9 +20,9 @@ class ProductColorController extends Controller
 
     public function store(Request $request)
     {
-        $this->validate($request, [
-            'name' => ['required', 'string', 'max:255'],
-            'hex' => ['nullable' , 'string' , 'max:255']
+        $this->validate($request , [
+            'name' => ['required' , 'string'],
+            'hex' => ['required' , 'string']
         ]);
 
         ProductColor::create($request->only('name' , 'hex' ));
