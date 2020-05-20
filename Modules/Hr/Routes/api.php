@@ -17,6 +17,7 @@ Route::group([
     'prefix' => "v1/hr",
     'middleware' => ['auth:api' , 'company']
 ], function ($route) {
+
     Route::post("organizationType", "OrganizationTypeController@store");
     Route::get("organizationType", "OrganizationTypeController@index");
     Route::delete("organizationType/{id}", "OrganizationTypeController@destroy");
@@ -432,6 +433,20 @@ Route::group([
         Route::post('/', 'ContractTypeController@store');
         Route::put('/{id}', 'ContractTypeController@update');
         Route::delete('/{id}', 'ContractTypeController@destroy');
+    });
+
+    Route::group(['prefix' => 'inventories'], function (){
+        Route::get('/', 'InventoryController@index');
+        Route::post('/', 'InventoryController@create');
+        Route::put('/{id}', 'InventoryController@update');
+        Route::delete('/{id}', 'InventoryController@destroy');
+    });
+
+    Route::group(['prefix' => 'uniforms'], function (){
+        Route::get('/', 'UniformController@index');
+        Route::post('/', 'UniformController@create');
+        Route::put('/{id}', 'UniformController@update');
+        Route::delete('/{id}', 'UniformController@destroy');
     });
 
     Route::group([
