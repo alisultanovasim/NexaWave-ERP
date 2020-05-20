@@ -36,7 +36,9 @@ class InventoryController extends Controller
         $inventories = $this->inventory
         ->companyId($request->get('company_id'))
         ->with([
-            'inventoryType:id,name'
+            'inventoryType:id,name',
+            'employee:id,user_id',
+            'employee.user:id,name,surname'
         ])
         ->orderBy('id', 'desc')
         ->paginate($request->get('per_page'));
@@ -80,7 +82,8 @@ class InventoryController extends Controller
                 'delivery_time',
                 'number',
                 'name',
-                'note'
+                'note',
+                'employee_id'
             ]
         ))->save();
     }
@@ -118,6 +121,10 @@ class InventoryController extends Controller
             'inventory_type_id' => [
                 'required',
                 Rule::exists('inventory_types', 'id')->where('company_id', $request->get('company_id'))
+            ],
+            'employee_id' => [
+                'required',
+                Rule::exists('employees', 'id')->where('company_id', $request->get('company_id'))
             ],
             'name' => 'required|min:2|max:150',
             'number' => 'required|numeric',

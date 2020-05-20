@@ -37,7 +37,9 @@ class UniformController extends Controller
         $uniforms = $this->uniform
         ->companyId($request->get('company_id'))
         ->with([
-            'uniformType:id,name'
+            'uniformType:id,name',
+            'employee:id,user_id',
+            'employee.user:id,name,surname'
         ])
         ->orderBy('id', 'desc')
         ->paginate($request->get('per_page'));
@@ -76,6 +78,7 @@ class UniformController extends Controller
     private function saveUniform(Request $request, Uniform $uniform): void {
         $uniform->fill($request->only([
             'uniform_type_id',
+            'employee_id',
             'size',
             'note'
         ]))->save();
@@ -106,9 +109,13 @@ class UniformController extends Controller
      */
     private function getUniformRules(Request $request): array {
         return [
-                'uniform_type_id' => [
+            'uniform_type_id' => [
                 'required',
                 Rule::exists('uniform_types', 'id')->where('company_id', $request->get('company_id'))
+            ],
+            'employee_id' => [
+                'required',
+                Rule::exists('employees', 'id')->where('company_id', $request->get('company_id'))
             ],
             'size' => 'required|max:50',
             'note' => 'nullable|max:255|min:2'
