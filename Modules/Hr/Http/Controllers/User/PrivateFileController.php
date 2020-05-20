@@ -139,7 +139,9 @@ class PrivateFileController extends Controller
      * @return array
      */
     private function getFileRules($type = 'create'): array {
-        $extensions = implode(',', $this->files::allowedExtensions());
+        $extensions = implode(',', $this->files->allowedExtensions());
+        $size = $this->files->getMaxSizeField();
+        $size = $size * 1024;
         return [
             'user_id' => [
                 'required',
@@ -147,8 +149,8 @@ class PrivateFileController extends Controller
             ],
             'name' => 'required',
             'file' => $type === 'create'
-                ? 'required|file|mimes:'.$extensions.'|max:5120'
-                : 'nullable|file|mimes:'.$extensions.'|max:5120',
+                ? 'required|file|mimes:'.$extensions.'|max:'.$size
+                : 'nullable|file|mimes:'.$extensions.'|max:'.$size,
             'note' => 'nullable|max:255'
         ];
     }

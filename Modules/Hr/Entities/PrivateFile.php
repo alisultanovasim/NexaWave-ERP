@@ -12,6 +12,9 @@ class PrivateFile extends Model
 
     protected $guarded = ['id'];
 
+    //with MB
+    private $maxSize = 5;
+
     protected $casts = [
         'file' => 'json'
     ];
@@ -30,7 +33,11 @@ class PrivateFile extends Model
      * Add extensions to validate files
      * @return array|string[]
      */
-    public static function allowedExtensions(): array {
+    public function allowedExtensions(): array {
         return ['txt', 'jpg', 'jpeg', 'png', 'svg', 'pdf', 'doc', 'docx', 'csv', 'xls', 'xlsx'];
+    }
+
+    public function getMaxSizeField(){
+        return with(new static())->maxSize;
     }
 }
