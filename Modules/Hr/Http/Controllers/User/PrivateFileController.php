@@ -94,6 +94,8 @@ class PrivateFileController extends Controller
         ];
         if ($request->file('file')){
             $fillable['file'] = $this->uploadAndGetName($request->file('file'), $request->get('user_id'), 'user/files');
+            $size = $request->file('file')->getSize();
+            $file['size'] = number_format($size / 1048576,4) . 'MB';
         }
         $file->fill($fillable)->save();
     }
@@ -110,6 +112,7 @@ class PrivateFileController extends Controller
     }
 
     private function uploadAndGetName($file, $userId, $folder = '', $pre = ''): array {
+
         $uploadedFile = $file;
         $filename = '';
         if ($pre)
@@ -144,8 +147,8 @@ class PrivateFileController extends Controller
             ],
             'name' => 'required',
             'file' => $type === 'create'
-                ? 'required|file|mimes:'.$extensions
-                : 'nullable|file|mimes:'.$extensions,
+                ? 'required|file|mimes:'.$extensions.'|max:5120'
+                : 'nullable|file|mimes:'.$extensions.'|max:5120',
             'note' => 'nullable|max:255'
         ];
     }

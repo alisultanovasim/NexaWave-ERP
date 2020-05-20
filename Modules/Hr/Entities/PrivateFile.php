@@ -31,8 +31,6 @@ class PrivateFile extends Model
      * @return array|string[]
      */
     public static function allowedExtensions(): array {
-        return [
-            'txt'
-        ];
+        return ['txt', 'jpg', 'jpeg', 'png', 'svg', 'pdf', 'doc', 'docx', 'csv', 'xls', 'xlsx'];
     }
 }
