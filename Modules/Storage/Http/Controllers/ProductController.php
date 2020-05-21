@@ -26,32 +26,49 @@ class ProductController extends Controller
             'title_id' => ['required', 'integer', 'min:1'],
             'kind_id' => ['required', 'integer', 'min:1'],
             'name' => ['nullable', 'string', 'max:255'],
-            'per_page' => ['nullable', 'integer', 'min:1']
+            'per_page' => ['nullable', 'integer', 'min:1'],
+            'status' => ['nullable', 'integer', 'min:1']
         ]);
 
 
-        $titles = ProductTitle::with(['kinds' => function ($q) use ($request) {
-            $q->where('id', $request->get('kind_id'));
-        }, 'kinds.products' => function ($q) use ($request) {
-            if ($request->get('name'))
-                $q->where('name', 'like', $request->get('name') . '%');
-        }])
-            ->where('title_id', $request->get('title_id'))
-            ->where('company_id', $request->get('company_id'))
-            ->first();
+//        $title = ProductTitle::with(['kinds' => function ($q) use ($request) {
+//            $q->where('id', $request->get('kind_id'));
+//        }])
+//            ->where('id', $request->get('title_id'))
+//            ->where('company_id', $request->get('company_id'))
+//            ->first();
 
-        return $this->successResponse($titles);
+        $products = Product::where('company_id', $request->get('company_id'));
+
+        if ($request->has('status'))
+            $products->where('status', $request->get('status'));
+        else
+            $products->where('status', Product::STATUS_ACTIVE);
+
+        $products = $products->where('kind_id', $request->get('kind_id'))
+            ->paginate($request->get('per_page'));
+
+//        [
+//            'title' => $title   ,
+//            'products' => $products
+//        ]
+        return $this->successResponse($products);
     }
 
-    public function getFirstProductPageData(Request $request){
-        $this->validate($request , [
-            'per_page' => ['nullable' , 'integer', 'min:1'],
+    public function firstPage(Request $request)
+    {
+        $this->validate($request, [
+            'per_page' => ['nullable', 'integer', 'min:1'],
             'name' => ['nullable', 'string', 'max:255'],
         ]);
 
-        $title = ProductTitle::with(['kinds'])
-            ->where('')
-            ->paginate($request->get('per_page'));
+        $title = ProductKind::with('title')
+            ->where('company_id', $request->get('company_id'))
+            ->paginate();
+
+//        $title = ProductTitle::with(['kinds'])
+//            ->where('company_id' , $request->get('company_id'))
+//            ->paginate($request->get('per_page'));
 
         return $this->successResponse($title);
     }
@@ -59,11 +76,13 @@ class ProductController extends Controller
     public function show(Request $request, $id)
     {
         $product = Product::with([
-            'kind',
-            'title',
-            'state',
-            'color',
-            'storage',
+            'kind:id,name',
+            'title:id,name',
+            'state:id,name',
+            'color:id,name',
+            'storage:id,name',
+            'buy_from_country:id,name:short_name',
+            'made_in_country:id,name:short_name'
         ])
             ->where('company_id', $request->get('company_id'))
             ->where('id', $id)
@@ -89,8 +108,7 @@ class ProductController extends Controller
             ['id', '=', $request->get('kind_id')],
         ])->exists();
         if (!$check) return $this->errorResponse(trans('response.fieldIsNotFindInDatabase'));
-
-        Product::create($request->all());
+        Product::create(array_merge($request->all(), ['status' => Product::STATUS_ACTIVE]));
         DB::commit();
         return $this->successResponse('ok');
     }
@@ -150,7 +168,7 @@ class ProductController extends Controller
 
     public function update(Request $request, $id)
     {
-        $this->validate($request , self::getUpdateRules() );
+        $this->validate($request, self::getUpdateRules());
         $product = Product::where([
             ['company_id', '=', $request->get('company_id')],
             ['id', '=', $id],
@@ -173,7 +191,7 @@ class ProductController extends Controller
         }
 
         Product::where('id', $id)
-            ->update($request->all());
+            ->update($request->except('status'));
 
     }
 
@@ -187,7 +205,8 @@ class ProductController extends Controller
 
     }
 
-    public static function  getValidationRules(){
+    public static function getValidationRules()
+    {
         return [
             'unit_id' => ['required', 'integer', 'min:1'],
             'less_value' => ['required', 'boolean'],
@@ -212,7 +231,8 @@ class ProductController extends Controller
         ];
     }
 
-    public static function getUpdateRules(){
+    public static function getUpdateRules()
+    {
         return [
             'unit_id' => ['nullable', 'integer', 'min:1'],
             'less_value' => ['nullable', 'boolean'],

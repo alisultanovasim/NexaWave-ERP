@@ -19,6 +19,7 @@ class CompanyIdValidator
     use ApiResponse;
 
     private $company;
+    private $auth_employee_id;
 
     public function handle(Request $request, Closure $next)
     {
@@ -27,7 +28,7 @@ class CompanyIdValidator
                     $err =  $this->office();
                 break;
 
-            case User::EMPLOYEE:
+            case User::EMPLOYEE or User::COMPANY_ADMIN:
                     $err = $this->employee($request);
                 break;
             default:
@@ -39,6 +40,7 @@ class CompanyIdValidator
         if ($err) return $err;
 
         $request->request->set('company_id' , $this->company);
+        $request->request->set('auth_employee_id' , $this->auth_employee_id);
 
         return $next($request);
 

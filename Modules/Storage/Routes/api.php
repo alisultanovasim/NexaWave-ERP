@@ -21,7 +21,8 @@ Route::group([
     Route::group([
         'prefix' => 'products'
     ], function ($q) {
-        Route::get('/', 'ProductController@index');
+        Route::get('/all', 'ProductController@index');
+        Route::get('/', 'ProductController@firstPage');
         Route::get('/{id}', 'ProductController@show');
         Route::put('/{id}', 'ProductController@update');
         Route::post('/', 'ProductController@store');

@@ -20,6 +20,7 @@ class User extends Authenticatable
     const SUPER_ADMIN = 1;
     const EMPLOYEE = 2;
     const DEV = 4;
+    const COMPANY_ADMIN = 5;
 
     /**
      * The attributes that are mass assignable.

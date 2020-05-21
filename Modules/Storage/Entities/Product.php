@@ -4,9 +4,12 @@ namespace Modules\Storage\Entities;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Modules\Hr\Entities\Country;
 
 class Product extends Model
 {
+
+
     use SoftDeletes;
 
     const STATUS_ACTIVE = 1;
@@ -36,7 +39,7 @@ class Product extends Model
         'status'
     ];
 
-    protected $hidden = ['mark_id'];
+    protected $hidden = ['mark_id' , 'model_id'];
 
     public function kind(){
         return $this->belongsTo(ProductKind::class);
@@ -58,4 +61,15 @@ class Product extends Model
     public function storage(){
         return $this->belongsTo(Storage::class);
     }
+
+
+
+    public function buy_from_country(){
+        return $this->belongsTo(Country::class , 'buy_from_country');
+    }
+
+    public function made_in_country(){
+        return $this->belongsTo(Country::class , 'made_in_country');
+    }
+
 }

@@ -69,6 +69,7 @@ class Handler extends ExceptionHandler
             return $this->errorResponse($message, $code);
         }
         else if ($exception instanceof QueryException) {
+            dd($exception);
             if ($exception->errorInfo[1] == 1452)
                 return $this->errorResponse([trans('response.SomeFiledIsNotFoundInDatabase')], 422);
             return $this->errorResponse(trans('response.serverError. code : 222'), 422);
