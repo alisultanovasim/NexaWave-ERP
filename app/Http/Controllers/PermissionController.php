@@ -47,7 +47,6 @@ class PermissionController extends Controller
             'modules'
         ])
         ->get();
-//        return  $this->successResponse($permissions);
         return $this->successResponse(
             $this->beautifyPositionPermissionsResponse($permissions)
         );

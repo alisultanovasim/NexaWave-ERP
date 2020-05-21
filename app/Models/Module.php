@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Auth;
+use Rennokki\QueryCache\Traits\QueryCacheable;
 
 /**
  * @property integer $id
@@ -20,7 +21,12 @@ use Illuminate\Support\Facades\Auth;
  */
 class   Module extends Model
 {
+    use QueryCacheable;
 
+//    public $cacheFor = 24 * 60 * 60; // cache time, in seconds
+
+    //uncomment above line after changing cache driver to redis
+    public $cacheFor = 0;
     /**
      * The "type" of the auto-incrementing ID.
      *
@@ -69,6 +75,14 @@ class   Module extends Model
             'permission_id'
         );
     }
+
+    /**
+     * Invalidate the cache automatically
+     * upon update in the database.
+     *
+     * @var bool
+     */
+    protected static $flushCacheOnUpdate = true;
 
 
     /**

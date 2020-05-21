@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Role extends Model
 {
 
+    private $superAdminId = 1;
+    private $companyAdminId = 5;
     /**
      * @var array
      */
@@ -21,4 +23,22 @@ class Role extends Model
     {
         return $this->hasMany('App\Models\User');
     }
+
+    /**
+     * @return int
+     */
+    public function getSuperAdminId(): int
+    {
+        return $this->superAdminId;
+    }
+
+    /**
+     * @return int
+     */
+    public function getCompanyAdminId(): int
+    {
+        return $this->companyAdminId;
+    }
+
+
 }
