@@ -94,6 +94,8 @@ class PrivateFileController extends Controller
         ];
         if ($request->file('file')){
             $fillable['file'] = $this->uploadAndGetName($request->file('file'), $request->get('user_id'), 'user/files');
+            $size = $request->file('file')->getSize();
+            $file['size'] = number_format($size / 1048576,4) . 'MB';
         }
         $file->fill($fillable)->save();
     }
@@ -110,6 +112,7 @@ class PrivateFileController extends Controller
     }
 
     private function uploadAndGetName($file, $userId, $folder = '', $pre = ''): array {
+
         $uploadedFile = $file;
         $filename = '';
         if ($pre)
@@ -136,7 +139,9 @@ class PrivateFileController extends Controller
      * @return array
      */
     private function getFileRules($type = 'create'): array {
-        $extensions = implode(',', $this->files::allowedExtensions());
+        $extensions = implode(',', $this->files->allowedExtensions());
+        $size = $this->files->getMaxSizeField();
+        $size = $size * 1024;
         return [
             'user_id' => [
                 'required',
@@ -144,8 +149,8 @@ class PrivateFileController extends Controller
             ],
             'name' => 'required',
             'file' => $type === 'create'
-                ? 'required|file|mimes:'.$extensions
-                : 'nullable|file|mimes:'.$extensions,
+                ? 'required|file|mimes:'.$extensions.'|max:'.$size
+                : 'nullable|file|mimes:'.$extensions.'|max:'.$size,
             'note' => 'nullable|max:255'
         ];
     }
