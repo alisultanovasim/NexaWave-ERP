@@ -512,6 +512,20 @@ Route::group([
             Route::delete('/{id}', 'VacationPlanningController@destroy');
         });
 
+        Route::group(['prefix' => 'work/calendar'], function (){
+            Route::get('/', 'WorkCalendarController@index');
+            Route::post('/', 'WorkCalendarController@create');
+            Route::delete('/{id}', 'WorkCalendarController@remove');
+        });
+
+        Route::group(['prefix' => 'work/hours'], function (){
+            Route::get('/', 'CompanyWorkingHourController@index');
+            Route::get('/{id}', 'CompanyWorkingHourController@show');
+            Route::post('/', 'CompanyWorkingHourController@create');
+            Route::put('/{id}', 'CompanyWorkingHourController@create');
+            Route::delete('/{id}', 'CompanyWorkingHourController@destroy');
+        });
+
     });
 
 });
