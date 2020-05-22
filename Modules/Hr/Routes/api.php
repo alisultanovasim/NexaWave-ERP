@@ -494,5 +494,25 @@ Route::group([
         });
     });
 
+    Route::group(['prefix' => 'time/tracking'], function (){
+
+        Route::group(['prefix' => 'work/events'], function ($router) {
+            Route::get('/', 'WokEventController@index');
+            Route::get('/{id}', 'WokEventController@show');
+            Route::post('/', 'WokEventController@create');
+            Route::put('/{id}', 'WokEventController@update');
+            Route::delete('/{id}', 'WokEventController@destroy');
+        });
+
+        Route::group(['prefix' => 'vacation/planning'], function (){
+            Route::get('/', 'VacationPlanningController@index');
+            Route::get('/{id}', 'VacationPlanningController@show');
+            Route::post('/', 'VacationPlanningController@create');
+            Route::put('/{id}', 'VacationPlanningController@update');
+            Route::delete('/{id}', 'VacationPlanningController@destroy');
+        });
+
+    });
+
 });
 
