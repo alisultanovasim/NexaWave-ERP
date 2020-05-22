@@ -14,18 +14,18 @@ class ProductColorController extends Controller
     use  ApiResponse, ValidatesRequests;
     public function index(Request $request)
     {
-        $data = ProductColor::where('company_id' , $request->get('company_id'))->get();
+        $data = ProductColor::all();
         return $this->successResponse($data);
     }
 
     public function store(Request $request)
     {
-        $this->validate($request, [
-            'name' => ['required', 'string', 'max:255'],
-            'hex' => ['nullable' , 'string' , 'max:255']
+        $this->validate($request , [
+            'name' => ['required' , 'string'],
+            'hex' => ['required' , 'string']
         ]);
 
-        ProductColor::create($request->only('name' , 'hex' , 'company_id'));
+        ProductColor::create($request->only('name' , 'hex' ));
 
         return $this->successResponse('ok');
     }
@@ -36,8 +36,7 @@ class ProductColorController extends Controller
             'name' => ['required', 'string', 'max:255'],
         ]);
 
-        $data = ProductColor::where('id' , $id)->where('company_id' , $request->get('company_id'))->first();
-
+        $data = ProductColor::where('id' , $id)->first();
 
         return $this->successResponse($data);
     }
@@ -50,7 +49,6 @@ class ProductColorController extends Controller
         ]);
 
         ProductColor::where('id' , $id)
-            ->where('company_id' , $request->get('company_id'))
             ->update($request->only('hex' , 'name'));
 
         return $this->successResponse('ok');
@@ -58,8 +56,7 @@ class ProductColorController extends Controller
 
     public function delete(Request $request, $id)
     {
-        ProductColor::where('company_id' , $request->get('company_id'))
-            ->where('id', $id)
+        ProductColor::where('id', $id)
             ->delete();
 
         return $this->successResponse('ok');

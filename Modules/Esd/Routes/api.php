@@ -57,6 +57,10 @@ Route::group([
         Route::group([
             'prefix' => 'assignment'
         ], function ($r) {
+
+            Route::get('/rejects', 'AssignmentRejectController@index');
+            Route::post('/rejects/{id}', 'AssignmentRejectController@store');
+
             Route::get('/templates', 'AssignmentTemplates@index');
             Route::post('/templates', 'AssignmentTemplates@store');
             Route::post('/templates/update', 'AssignmentTemplates@update');

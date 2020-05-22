@@ -22,6 +22,10 @@ class Assignment extends Model
     {
         return $this->hasOne('Modules\Esd\Entities\AssignmentItem', 'assignment_id');
     }
+    public function stuck()
+    {
+        return $this->hasOne('Modules\Esd\Entities\AssignmentItem', 'assignment_id');
+    }
 
     public function uploader()
     {

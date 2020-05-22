@@ -21,6 +21,7 @@ class CompanyIdValidator
     use ApiResponse;
 
     private $company;
+    private $auth_employee_id;
 
     public function handle(Request $request, Closure $next)
     {
@@ -29,10 +30,9 @@ class CompanyIdValidator
                     $err =  $this->office();
                 break;
 
-            case User::EMPLOYEE:
+            case User::EMPLOYEE or User::COMPANY_ADMIN:
                     $err = $this->employee($request);
                 break;
-
             default:
                 $err = $this->errorResponse(trans('response.unAvailable') , 503);
                 break;
@@ -42,6 +42,7 @@ class CompanyIdValidator
         if ($err) return $err;
 
         $request->request->set('company_id' , $this->company);
+        $request->request->set('auth_employee_id' , $this->auth_employee_id);
 
         //Bootstrap permissions gateways
         $provider = new PermissionProvider();
@@ -78,11 +79,12 @@ class CompanyIdValidator
 
         $inThisCompany = Employee::where('company_id' , $company_id)
             ->where('user_id' , Auth::id())
-            ->exists();
+            ->first(['id']);
 
         if (!$inThisCompany) return $this->errorMessage(['error' => trans('response.notYouCompany')] , 400);
 
         $this->company = $company_id;
+        $this->auth_employee_id = $inThisCompany->id;
 
 
         return null;

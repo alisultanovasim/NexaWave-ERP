@@ -52,7 +52,7 @@ class ProductStateController extends Controller
 
     public function destroy($id)
     {
-        ProductState::where('company_id' , \request('company_id'))
+        ProductState::where('company_id' , request('company_id'))
             ->where('id' ,$id)
             ->delete();
         return $this->successResponse('ok');

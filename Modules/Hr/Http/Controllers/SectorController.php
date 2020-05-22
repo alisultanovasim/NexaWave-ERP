@@ -23,7 +23,7 @@ class SectorController extends Controller
         ]);
         $result = Sector::where('company_id' , $request->get('company_id'))->orderBy('position');
 
-        if ($request->has('section_id')) $request->where('section_id' , $request->get('section_id'));
+        if ($request->has('section_id')) $result->where('section_id' , $request->get('section_id'));
 
         $result = $result->paginate($request->get('paginateCount'));
 

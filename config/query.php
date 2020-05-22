@@ -19,5 +19,7 @@ return [
 //    'kind_id' => 'product_kinds',
     'storage_id' => 'storages',
     'color_id' => 'product_colors',
-    'state_id' => 'product_states'
+    'state_id' => 'product_states',
+    'employee_id' => 'employees' ,
+    'demand_id'  => 'demands'
 ];

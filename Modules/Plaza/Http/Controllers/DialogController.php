@@ -34,13 +34,18 @@ class DialogController extends Controller
         ]);
         try {
             DB::beginTransaction();
-            $dialog = Dialog::with(['office:id,name', 'kind:id,title' , 'user.user:id,name'])->where('company_id', $request->company_id);
+            $dialog = Dialog::with(['office:id,name',
+                'kind:id,title' ,
+                'user.contract:id,department_id,section_id,sector_id,employee_id'  ,
+                'user.contract.department',
+                'user.contract.section',
+                'user.contract.sector',
+                'user.user:id,name,surname'])->where('company_id', $request->company_id);
 
             if ($request->has('kind_id')) $dialog->where('kind_id', $request->kind_id);
             if ($request->has('office_id')) $dialog->where('office_id', $request->office_id);
             if ($request->has('from_office')) $dialog->where('from_office', $request->from_office);
             if ($request->get('tome')) $dialog->where('assigned_user', Auth::id());
-
 
             $dialogs = $dialog->orderBy('id', 'desc')->paginate($request->per_page ?? 10);
 
@@ -62,7 +67,13 @@ class DialogController extends Controller
         ]);
         try {
 
-            $check = Dialog::with(['kind:id,title', 'office:id,name' , "user.user:id,name"])->where('company_id', $request->company_id)->where('id', $id)->first();
+            $check = Dialog::with(['office:id,name',
+                'kind:id,title' ,
+                'user.contract:id,department_id,section_id,sector_id,employee_id',
+                'user.contract.department',
+                'user.contract.section',
+                'user.contract.sector',
+                'user.user:id,name,surname'])->where('company_id', $request->company_id)->where('id', $id)->first();
             if (!$check) return $this->errorResponse(trans('apiResponse.DialogNotFound'));
 
             if ($check->status  == 2){
@@ -77,25 +88,7 @@ class DialogController extends Controller
 
             $message = Message::where('dialog_id', $id)->orderBy('id', 'desc')->get();
 
-            $finder = [];
-            foreach (config('static-data.part') as $data){
-                $partName = $data['name'];
-                foreach ($data['users'] as $d){
-                    $userName = $d['name'];
-                    if ($d['id'] == $check->assigned_user ){
-                        $finder['part'] = [
-                            'id' => $data['id'],
-                            'name' => $partName,
-                            'user' => [
-                                'id' => $d['id'],
-                                'name'=>$userName
-                            ]
-                        ];
-                        break;
-                    }
-                }
-            }
-            $check->assigned_user = $finder;
+
             return $this->successResponse([
                 'messages' => $message,
                 'dialog' => $check
@@ -162,10 +155,10 @@ class DialogController extends Controller
 
             if ($request->has('assigned_user')){
                 $check = Employee::where('id' , $request->get('assigned_user'))
-                    ->where('company_id' , $request->get('assigned_user'))
+                    ->where('company_id' , $request->get('company_id'))
                     ->where('is_active' , true)
                     ->exists();
-                if (!$check) return $this->errorResponse('apiResponse.EmployeeNotFoundNotFound' , 404);
+                if (!$check) return $this->errorResponse('apiResponse.EmployeeNotFound' , 404);
             }
 
            Dialog::where('id', $id)->update($request->only('assigned_user', 'note', 'end_time', 'status'));
@@ -204,7 +197,9 @@ class DialogController extends Controller
             'from_office' => 'sometimes|required|in:0,1',
         ]);
         try {
-            $dialog = Dialog::with('office:id,name', 'kind:id,title')->where('company_id', $request->company_id)->where('office_id', $request->office_id);
+            $dialog = Dialog::with([               'user.contract.department',
+                'user.contract.section',
+                'user.contract.sector', 'office:id,name', 'kind:id,title' , 'user.contract:id,department_id,section_id,sector_id,employee_id'  , 'user.user:id,name,surname'])->where('company_id', $request->company_id)->where('office_id', $request->office_id);
 
             if ($request->has('kind_id')) $dialog->where('kind_id', $request->kind_id);
             if ($request->has('from_office')) $dialog->where('from_office', $request->from_office);
@@ -247,7 +242,9 @@ class DialogController extends Controller
             'per_page' => 'sometimes|required|integer'
         ]);
         try {
-            $check = Dialog::with(['kind:id,title', 'office:id,name' ])->where('company_id', $request->company_id)->where('office_id', $request->office_id)->where('id', $id)->first();
+            $check = Dialog::with([               'user.contract.department',
+                'user.contract.section',
+                'user.contract.sector','office:id,name', 'kind:id,title' , 'user.contract:id,department_id,section_id,sector_id,employee_id'  , 'user.user:id,name,surname' ])->where('company_id', $request->company_id)->where('office_id', $request->office_id)->where('id', $id)->first();
             if (!$check) return $this->errorResponse(trans('apiResponse.DialogNotFound'));
 
             Message::where('dialog_id', $id)->where(['from_office' => 1])->update(['is_read' => 1]);

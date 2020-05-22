@@ -32,10 +32,10 @@ class StorageController extends Controller
         $this->validate($request, [
             'name' => ['required', 'string', 'max:255'],
             'location' => ['nullable', 'string', 'max:255'],
-            'company_id' => ['required', 'integer']
+            'size' => ['nullable' , 'numeric']
         ]);
 
-        Storage::create($request->only('name', 'location', 'company_id'));
+        Storage::create($request->only('name', 'location', 'company_id' , 'size'));
 
         return $this->successResponse('ok');
     }
@@ -45,10 +45,11 @@ class StorageController extends Controller
         $this->validate($request, [
             'location' => ['nullable', 'string', 'max:255'],
             'name' => ['nullable', 'string', 'max:255'],
-            'company_id' => ['required', 'integer']
+            'company_id' => ['required', 'integer'],
+            'size' => ['nullable' , 'numeric']
         ]);
 
-        $data = $request->only('location', 'name');
+        $data = $request->only('location', 'name' , 'size');
         if (!$data) return $this->errorResponse('response.nothing');
 
         Storage::where('id', $id)

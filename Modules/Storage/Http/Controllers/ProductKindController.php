@@ -42,7 +42,7 @@ class ProductKindController extends Controller
         $this->validate($request, [
             'name' => ['required', 'string', 'max:255'],
             'title_id' => ['required' , 'integer'],
-            'unit_id' => ['required' , 'integer' , 'exists:units,id']
+//            'unit_id' => ['required' , 'integer' , 'exists:units,id']
         ]);
 
         if ($notExists = $this->companyInfo($request->get('company_id') , $request->only('title_id')))
@@ -50,7 +50,7 @@ class ProductKindController extends Controller
 
             ProductKind::create([
                 'name' => $request->get('name'),
-                'unit_id' => $request->get('unit_id'),
+//                'unit_id' => $request->get('unit_id'),
                 'company_id' => $request->get('company_id'),
                 'title_id' => $request->get('title_id')
             ]);
@@ -81,12 +81,14 @@ class ProductKindController extends Controller
             'company_id' => $request->get('company_id')
         ])
             ->first(['id']);
-        if ($notExists = $this->companyInfo($request->get('company_id') , $request->only('title_id')))
-            return $this->errorResponse($notExists);
+
         if (!$title) return $this->errorResponse(trans('response.titleNotFound'), Response::HTTP_NOT_FOUND);
 
+        if ($notExists = $this->companyInfo($request->get('company_id') , $request->only('title_id')))
+            return $this->errorResponse($notExists);
+
         ProductKind::where('id', $id)->update([
-            'name' => $request->get('update')
+            'name' => $request->get('name')
         ]);
         return $this->successResponse('ok');
     }

@@ -28,7 +28,6 @@ class SendMailCreatePassword implements ShouldQueue
     {
         $this->user = $data;
         $this->password = $password;
-
     }
 
     /**

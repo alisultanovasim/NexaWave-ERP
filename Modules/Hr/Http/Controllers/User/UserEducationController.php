@@ -17,7 +17,8 @@ class UserEducationController extends Controller
     public function index(Request $request)
     {
         $this->validate($request, [
-            'per_page' => ['sometimes', 'required', 'integer']
+            'per_page' => ['sometimes', 'required', 'integer'],
+            'user_id' => ['nullable' , 'integer']
         ]);
         $edu = UserEducation::with([
             'user:id,name,surname',
@@ -25,17 +26,14 @@ class UserEducationController extends Controller
             'place:id,name',
             'level:id,name',
             'state:id,name',
-            'language:id,name'
+            'language:id,name',
+            'faculty'
         ])->company();
 
-        if ($request->has('user_id')){
-            $edu = $edu->where('user_id' , $request->get('user_id'))->first();
-            if ($edu === null) return $this->successResponse(trans('response.UserNotFound'));
-        }else
-            $edu = $edu
-                ->orderBy('id','desc')
-                ->paginate($request->get('per_page'));
+        if ($request->has('user_id'))
+            $edu->where('user_id' , $request->get('user_id'));
 
+        $edu = $edu->orderBy('id','desc')->paginate($request->get('per_page'));
 
         return $this->successResponse($edu);
     }
