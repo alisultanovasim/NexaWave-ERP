@@ -7,6 +7,7 @@ use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\DB;
 use Modules\Storage\Entities\ProductKind;
 use Modules\Storage\Entities\ProductModel;
 
@@ -19,7 +20,7 @@ class ProductModelController extends Controller
         $this->validate($request, [
             'kind_id' => ['required', 'integer']
         ]);
-        $models = ProductKind::with('models')->company()->where('id', request('company_id'))
+        $models = ProductKind::with('models')->company()->where('id', request('kind_id'))
             ->first();
         return $this->successResponse($models);
     }
@@ -31,8 +32,15 @@ class ProductModelController extends Controller
             'name' => ['required', 'string', 'max:255'],
         ]);
 
-        $check = ProductKind::company()->where('id', $request->get('company_id'))->exists();
+        $check = ProductKind::company()->where('id', $request->get('kind_id'))->exists();
         if (!$check) return $this->errorResponse(trans('response.kindNotFound'), 404);
+
+
+        if ($request->has('model_id')){
+            $check = ProductModel::company()->where('id', $request->get('model_id'))->exists();
+            if (!$check) return $this->errorResponse(trans('response.modelNotFound'), 404);
+        }
+
         ProductModel::create([
             'name' => $request->get('name'),
             'kind_id' => $request->get('kind_id')

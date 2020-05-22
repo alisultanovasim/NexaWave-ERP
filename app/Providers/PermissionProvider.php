@@ -46,9 +46,12 @@ class PermissionProvider
      * @return bool
      */
     private function companyPositionHasPermission($positionId, User $user, Role $role): bool {
-        //company admin has all permissions for subscribed modules
-        if ($user->getAttribute('role_id') == $role->getCompanyAdminId())
-            return true;
+
+
+
+//company admin has all permissions for subscribed modules
+//        if ($user->getAttribute('role_id') == $role->getCompanyAdminId())
+//            return true;
         //logic for other users
         return Employee::join('employee_contracts', 'employee_contracts.employee_id', 'employees.id')
         ->where([

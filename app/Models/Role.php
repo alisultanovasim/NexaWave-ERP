@@ -9,7 +9,6 @@ class Role extends Model
 {
 
     private $superAdminId = 1;
-    private $companyAdminId = 5;
     /**
      * @var array
      */
@@ -32,13 +31,6 @@ class Role extends Model
         return $this->superAdminId;
     }
 
-    /**
-     * @return int
-     */
-    public function getCompanyAdminId(): int
-    {
-        return $this->companyAdminId;
-    }
 
 
 }

@@ -8,6 +8,7 @@ use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Modules\Storage\Entities\Demand;
 use Modules\Storage\Entities\DemandAssignment;
@@ -30,30 +31,43 @@ class DemandAssignmentController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
-            'employee_id' => ['nullable', 'array'],
+            'employees' => ['nullable', 'array'],
+            'employees.*.id' => ['require_with:employees', 'integer'],
+            'employees.*.expiry_time' =>['nullable', 'date', 'date_format:Y-m-d H:i:s'],
+
             'expiry_time' => ['nullable', 'date', 'date_format:Y-m-d H:i:s'],
-            'expiry_time_for_assignment' => ['nullable', 'date', 'date_format:Y-m-d H:i:s'],
             'demand_id' => ['nullable', 'integer']
         ]);
 
-        if ($notExists = $this->companyInfo($request->get('company_id'), $request->only(['employee_id' , 'demand_id']))) return $this->errorResponse($notExists);
+        DB::beginTransaction();
+
+        if ($notExists = $this->companyInfo($request->get('company_id'), $request->only(['demand_id']))) return $this->errorResponse($notExists);
 
         $demand = DemandAssignment::firstOrCreate([
             'employee_id' => $request->get('employee_id'),
             'demand_id' => $request->get('demand_id'),
             'company_id' => $request->get('company_id')
         ], [
-            'expiry_time' => $request->get('expiry_time_for_assignment') ,
-            'description' => $request->get('description_for_assignment')
+            'expiry_time' => $request->get('expiry_time') ,
+            'description' => $request->get('description')
         ]);
 
+
+        //todo check employee
         if ($request->has('employee_id')){
-            DemandItem::create([
-                'employee_id' => $request->get('employee_id'),
-                'expiry_time' => $request->get('expiry_time'),
-                'demand_id' => $demand->id,
-            ]);
+            $data  = [];
+            foreach ($request->get('employees') as $assignment){
+                $data = [
+                    'demand_id' => $demand->id,
+                    'expiry_time' => $assignment["expiry_time"],
+                    'description' => $assignment["description"],
+                    "employee_id" => $assignment["employee_id"],
+                    'status' => DemandAssignment::STATUS_WAIT
+                ];
+            }
+            DemandItem::insert($data);
         }
+        DB::commit();
 
         return $this->successResponse('ok');
     }

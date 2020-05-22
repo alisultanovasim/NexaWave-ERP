@@ -24,7 +24,7 @@ class Company extends Model
     /**
      * @var array
      */
-    protected $fillable = ['name', 'created_at'];
+    protected $fillable = ['name', 'created_at' , 'owner_id'];
 
     /**
      * @return HasMany

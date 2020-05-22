@@ -27,12 +27,12 @@ class ProductKindController extends Controller
 
         $title = ProductTitle::with([
             'kinds' => function($q){
-                $q->withCount('products')->paginate();
+                $q->withCount('products');
             } , 'kinds.unit'
         ])
             ->where('id' , $request->get('title_id'))
             ->where('company_id', $request->get('company_id'))
-            ->get();
+            ->first();
 
         return $this->successResponse($title);
     }
@@ -42,7 +42,7 @@ class ProductKindController extends Controller
         $this->validate($request, [
             'name' => ['required', 'string', 'max:255'],
             'title_id' => ['required' , 'integer'],
-//            'unit_id' => ['required' , 'integer' , 'exists:units,id']
+            'unit_id' => ['required' , 'integer' , 'exists:units,id']
         ]);
 
         if ($notExists = $this->companyInfo($request->get('company_id') , $request->only('title_id')))
@@ -50,7 +50,7 @@ class ProductKindController extends Controller
 
             ProductKind::create([
                 'name' => $request->get('name'),
-//                'unit_id' => $request->get('unit_id'),
+                'unit_id' => $request->get('unit_id'),
                 'company_id' => $request->get('company_id'),
                 'title_id' => $request->get('title_id')
             ]);
@@ -73,23 +73,21 @@ class ProductKindController extends Controller
     public function update(Request $request, $id)
     {
         $this->validate($request, [
-            'name' => ['required', 'string', 'max:255'],
-            'title_id' => ['required' , 'integer']
+            'name' => ['nullable', 'string', 'max:255'],
+            'title_id' => ['nullable' , 'integer']
         ]);
         $title = ProductKind::where([
             'id' => $id,
             'company_id' => $request->get('company_id')
         ])
-            ->first(['id']);
+            ->first(['id' , 'title_id']);
 
         if (!$title) return $this->errorResponse(trans('response.titleNotFound'), Response::HTTP_NOT_FOUND);
+        if ($title->title_id != $request->get('title_id'))
+            if ($notExists = $this->companyInfo($request->get('company_id') , $request->only('title_id')))
+                 return $this->errorResponse($notExists);
 
-        if ($notExists = $this->companyInfo($request->get('company_id') , $request->only('title_id')))
-            return $this->errorResponse($notExists);
-
-        ProductKind::where('id', $id)->update([
-            'name' => $request->get('name')
-        ]);
+        ProductKind::where('id', $id)->update($request->get('unit_id' , 'name'));
         return $this->successResponse('ok');
     }
 

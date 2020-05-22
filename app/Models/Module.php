@@ -21,12 +21,12 @@ use Rennokki\QueryCache\Traits\QueryCacheable;
  */
 class   Module extends Model
 {
-    use QueryCacheable;
+//    use QueryCacheable;
 
 //    public $cacheFor = 24 * 60 * 60; // cache time, in seconds
 
     //uncomment above line after changing cache driver to redis
-    public $cacheFor = 0;
+//    public $cacheFor = 0;
     /**
      * The "type" of the auto-incrementing ID.
      *

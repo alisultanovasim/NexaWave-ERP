@@ -9,7 +9,7 @@ use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
 use Modules\Storage\Entities\ProductState;
 
-class ProductStateController extends Controller
+class   ProductStateController extends Controller
 {
     use ValidatesRequests, ApiResponse;
 

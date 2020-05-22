@@ -24,7 +24,8 @@ class Product extends Model
         'description',
         'amount',
         'storage_id',
-        'product_model',
+        'model_id',
+//        'product_model',
         'product_mark',
         'product_no',
         'color_id',
@@ -39,7 +40,7 @@ class Product extends Model
         'status'
     ];
 
-    protected $hidden = ['mark_id' , 'model_id'];
+    protected $hidden = ['mark_id' , 'product_model'];
 
     public function kind(){
         return $this->belongsTo(ProductKind::class);
@@ -49,6 +50,10 @@ class Product extends Model
     }
     public function title(){
         return $this->belongsTo(ProductTitle::class);
+    }
+
+    public function model(){
+        return $this->belongsTo(ProductModel::class);
     }
 
     public function state(){

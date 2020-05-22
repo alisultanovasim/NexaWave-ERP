@@ -94,7 +94,8 @@ class UserController extends Controller
             ]);
             $company = new Company();
             $company->fill([
-                'name' => $request->get('company_name')
+                'name' => $request->get('company_name'),
+                'owner_id' => $user->id
             ]);
             $company->save();
             $employee = new Employee();

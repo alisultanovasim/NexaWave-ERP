@@ -30,7 +30,7 @@ class CompanyIdValidator
                     $err =  $this->office();
                 break;
 
-            case User::EMPLOYEE or User::COMPANY_ADMIN:
+            case User::EMPLOYEE:
                     $err = $this->employee($request);
                 break;
             default:
