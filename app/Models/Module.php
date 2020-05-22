@@ -91,7 +91,7 @@ class   Module extends Model
     public function subModules()
     {
         return $this->hasMany('App\Models\Module', 'parent_id', 'id')
-            ->with(['subModules:id,name,parent_id']);
+            ->with(['subModules:id,name,parent_id', 'permissions:id,name,module_id']);
     }
 
     public function scopeHasCompany($query, $companyId){

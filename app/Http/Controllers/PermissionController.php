@@ -26,7 +26,8 @@ class PermissionController extends Controller
     public function getModules(Request $request): JsonResponse {
         $modules = Module::hasCompany($request->get('company_id'))
             ->with([
-                'subModules'
+                'subModules',
+                'permissions:id,name,module_id'
             ])
             ->where('parent_id', null)
             ->get([
