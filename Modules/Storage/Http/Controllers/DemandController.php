@@ -25,7 +25,6 @@ class DemandController extends Controller
             'want_to'=> ['date' , 'date_format' , 'Y-m-d H:i:s'],
         ]);
 
-
         $demands = Demand::with([
             'product:id,product_mark,product_model,amount,kind_id,title_id,unit_id',
             'product.kind:id,name',
@@ -34,16 +33,7 @@ class DemandController extends Controller
             'employee:id,user_id,tabel_no',
             'employee.user:id,name',
         ])
-//        ->where(function ($q) use ($request){
-//             $hasPermissionForAll = true;
-//            if (!$hasPermissionForAll){
-//                $q->whereHas('assignment' , function ($q) use ($request){
-//                    $q->where('employee_id'  , $request->ge('auth_employee_id'));
-//                })->orWhereHas('assignment.item' , function ($q) use ($request){
-//                    $q->where('employee_id'  , $request->ge('auth_employee_id'));
-//                });
-//            }
-//        })
+
         ->where('company_id', $request->get('company_id'));
 
         if ($request->has('product_id'))

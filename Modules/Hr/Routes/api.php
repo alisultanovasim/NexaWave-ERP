@@ -319,6 +319,7 @@ Route::group([
 
     Route::group(['prefix' => 'departments'], function ($router) {
         Route::get('/', 'DepartmentController@index');
+        Route::get('/structure', 'DepartmentController@structure');
         Route::get('/{id}', 'DepartmentController@show');
         Route::post('/', 'DepartmentController@create');
         Route::put('/{id}', 'DepartmentController@update');
