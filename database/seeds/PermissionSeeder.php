@@ -16,5 +16,7 @@ class PermissionSeeder extends Seeder
             \App\Models\Permission::create([
                 "name" => $permission
             ]);
+
+
     }
 }

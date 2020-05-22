@@ -84,7 +84,7 @@ class ModulesSeeder extends Seeder
                             "card_update",
                             "card_read",
                             "card_delete",
-                            "offers_edit",
+                            "offers_create",
                             "offers_update",
                             "offers_read",
                             "offers_delete",

@@ -24,7 +24,7 @@ class Company extends Model
     /**
      * @var array
      */
-    protected $fillable = ['name', 'created_at' , 'owner_id'];
+    protected $fillable = ['name', 'created_at', 'owner_id'];
 
     /**
      * @return HasMany
@@ -34,16 +34,26 @@ class Company extends Model
         return $this->hasMany('App\Models\CompanyModule');
     }
 
+    public function modules()
+    {
+        return $this->belongsToMany(
+            "App\Models\Module",
+            'company_modules',
+            'company_id',
+            'module_id');
+    }
+
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
     public function users()
     {
-        return $this->belongsToMany('App\Models\User' , 'company_role_users' );
+        return $this->belongsToMany('App\Models\User', 'company_role_users');
     }
 
-    public function role(){
-        return $this->belongsToMany('App\Models\Role' , 'company_role_users' );
+    public function role()
+    {
+        return $this->belongsToMany('App\Models\Role', 'company_role_users');
 
     }
 }

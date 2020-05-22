@@ -47,6 +47,9 @@ class   Module extends Model
         return $this->hasMany('App\Models\CompanyModule');
     }
 
+
+    protected $hidden = ['pivot'];
+
     /**
      * @return HasMany
      */
@@ -62,6 +65,13 @@ class   Module extends Model
     {
         return $this->hasMany('App\Models\Permission');
     }
+
+    public function getDefaultPermissionsAttribute(){
+        return Permission::whereNull('module_id')->get([
+            'id','name' ,'module_id'
+        ]);
+    }
+
 
     /**
      * @return BelongsToMany
@@ -93,6 +103,7 @@ class   Module extends Model
         return $this->hasMany('App\Models\Module', 'parent_id', 'id')
             ->with(['subModules:id,name,parent_id', 'permissions:id,name,module_id']);
     }
+
 
     public function scopeHasCompany($query, $companyId){
         return $query->whereHas('companyModules', function ($query) use ($companyId){

@@ -39,4 +39,5 @@ class Employee extends Model
     {
         return $q->where('is_active', true);
     }
+
 }
