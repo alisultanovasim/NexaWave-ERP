@@ -175,13 +175,7 @@ class ModulesSeeder extends Seeder
         }
 
 
-        $modules = \App\Models\Module::all();
 
-        foreach ($modules as $module)
-            \App\Models\CompanyModule::create([
-                'company_id' => 1,
-                "module_id" => $module->id
-            ]);
     }
 
     public function create($module, $parent_id)

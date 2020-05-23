@@ -31,6 +31,10 @@ class Department extends Model
         return $this->hasMany(Section::class);
     }
 
+    public function children(){
+        return $this->sections();
+    }
+
     public function organization()
     {
         return $this->belongsTo(Organization::class);

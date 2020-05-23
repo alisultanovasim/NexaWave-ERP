@@ -33,11 +33,11 @@ class DepartmentController extends Controller
 
     public function structure(Request $request){
         return Department::with([
-            'sections'  => function($q){
+            'children'  => function($q){
                 $q->where('is_closed' , 0);
                 $q->select(['id','department_id','name','short_name']);
             },
-            'sections.sectors' => function($q){
+            'children.children' => function($q){
                 $q->where('is_closed' , 0);
                 $q->select(['id','section_id','name','short_name']);
             }

@@ -41,7 +41,17 @@ class DemandAssignmentController extends Controller
 
         DB::beginTransaction();
 
-        if ($notExists = $this->companyInfo($request->get('company_id'), $request->only(['demand_id']))) return $this->errorResponse($notExists);
+
+        $data = [];
+        foreach ($request->get('employees') as $employee)
+            $data[] = [
+                'employee_id' => $employee->id,
+            ];
+
+
+
+        if ($notExists = $this->companyInfo($request->get('company_id'), $request->only(['demand_id'])))
+            return $this->errorResponse($notExists);
 
         $demand = DemandAssignment::firstOrCreate([
             'employee_id' => $request->get('employee_id'),

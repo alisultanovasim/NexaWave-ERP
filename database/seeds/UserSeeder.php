@@ -11,20 +11,6 @@ class UserSeeder extends Seeder
      */
     public function run()
     {
-        \Modules\Hr\Entities\Positions::create([
-            'name' => 'Director',
-            'short_name' => 'Director'
-        ]);
-        $roles = [
-            'super_admin',
-            'employee',
-            'office',
-            'dev',
-        ];
-        foreach ($roles as $role)
-            \App\Models\Role::create([
-                'name' => $role
-            ]);
 
         $vusal = \App\Models\User::create([
             'username' => 'vusal123',
@@ -84,6 +70,14 @@ class UserSeeder extends Seeder
             'fin' => $vusal->username,
             'gender' => 'm'
         ]);
+
+        $modules = \App\Models\Module::all();
+
+        foreach ($modules as $module)
+            \App\Models\CompanyModule::create([
+                'company_id' => 1,
+                "module_id" => $module->id
+            ]);
 
     }
 }

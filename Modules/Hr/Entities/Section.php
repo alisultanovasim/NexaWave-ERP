@@ -31,4 +31,8 @@ class Section extends Model
             },
         ]);
     }
+
+    public function children(){
+        return $this->sectors();
+    }
 }
