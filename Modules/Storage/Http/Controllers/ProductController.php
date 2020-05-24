@@ -36,21 +36,23 @@ class ProductController extends Controller
 //            ->where('id', $request->get('title_id'))
 //            ->where('company_id', $request->get('company_id'))
 //            ->first();
-        $products = Product::with('model')->where('company_id', $request->get('company_id'));
+        $products = Product::with('model:id,name')->where('company_id', $request->get('company_id'));
 
         if ($request->has('status'))
             $products->where('status', $request->get('status'));
         else
-            $products->where('status', Product::STATUS_ACTIVE);
+            $products->where('status', "=" , Product::STATUS_ACTIVE);
 
-        $products = $products->where('kind_id', $request->get('kind_id'))
+        $products = $products
+            ->orderBy('id' , 'desc')
+            ->where('kind_id', $request->get('kind_id'))
             ->paginate($request->get('per_page'));
 
 //        [
 //            'title' => $title   ,
 //            'products' => $products
 //        ]
-        return $this->successResponse($products);
+        return $this->dataResponse($products);
     }
 
     public function firstPage(Request $request)
@@ -60,19 +62,16 @@ class ProductController extends Controller
             'name' => ['nullable', 'string', 'max:255'],
         ]);
 
-        $title = ProductKind::with('title')
-            ->withCount(['products as product_amount' =>   function ($q){
+        $title = ProductKind::with(['title' , 'unit'])
+            ->withCount(['products as product_amount' => function($q){
                 $q->where('status' , Product::STATUS_ACTIVE);
-                $q->select(DB::raw("amount"));
+                $q->select(DB::raw("SUM(amount)"));
             }])
             ->company()
             ->paginate($request->get('per_page'));
 
-//        $title = ProductTitle::with(['kinds'])
-//            ->where('company_id' , $request->get('company_id'))
-//            ->paginate($request->get('per_page'));
 
-        return $this->successResponse($title);
+        return $this->dataResponse($title);
     }
 
     public function show(Request $request, $id)
@@ -103,7 +102,7 @@ class ProductController extends Controller
         DB::beginTransaction();
         if ($notExists = $this->companyInfo(
             $request->get('company_id'),
-            $request->only('storage_id', 'title_id', 'state_id')))
+            $request->only('storage_id', 'title_id', 'state_id' )))
             return $this->errorResponse($notExists);
 
         $check = ProductKind::where([

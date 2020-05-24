@@ -28,4 +28,11 @@ class Demand extends Model
         return $this->hasOne(DemandAssignment::class);
     }
 
+
+    public function scopeCompany($q){
+        return $q->where('company_id' , request(
+            'company_id'
+        ));
+    }
+
 }

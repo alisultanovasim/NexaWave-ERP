@@ -13,7 +13,7 @@ class DatabaseSeeder extends Seeder
         $this->call(PermissionSeeder::class);
         $this->call(ModulesSeeder::class);
         $this->call(RolePositionSeeder::class);
-        $this->call(UserSeeder::class);
+//        $this->call(UserSeeder::class);
 
     }
 

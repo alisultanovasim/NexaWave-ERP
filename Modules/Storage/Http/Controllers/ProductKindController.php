@@ -25,16 +25,13 @@ class ProductKindController extends Controller
         ]);
 
 
-        $title = ProductTitle::with([
-            'kinds' => function($q){
-                $q->withCount('products');
-            } , 'kinds.unit'
-        ])
-            ->where('id' , $request->get('title_id'))
-            ->where('company_id', $request->get('company_id'))
-            ->first();
+        $kids = ProductKind::with(['unit'])
+            ->withCount('products')
+            ->company()
+            ->where('title_id' , $request->get('title_id'))
+            ->paginate($request->get('per_page'));
 
-        return $this->successResponse($title);
+        return $this->dataResponse($kids);
     }
 
     public function store(Request $request)

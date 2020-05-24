@@ -112,10 +112,13 @@ Route::group([
             Route::put('/{id}', 'DemandAssignmentController@update');
             Route::delete('/{id}', 'DemandAssignmentController@delete');
 
+            Route::post('/item', 'DemandAssignmentController@addItem');
+            Route::put('/item/{id}', 'DemandAssignmentController@updateItem');
+            Route::delete('/item/{id}', 'DemandAssignmentController@deleteItem');
+
             Route::group([
                 'prefix' => 'employee'
             ], function () {
-                Route::get('/', 'DemandAssignmentController@employeeGet');
                 Route::put('/{id}', 'DemandAssignmentController@employeeUpdate');
             });
 

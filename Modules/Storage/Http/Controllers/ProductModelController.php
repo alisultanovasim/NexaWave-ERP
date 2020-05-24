@@ -18,10 +18,11 @@ class ProductModelController extends Controller
     public function index(Request $request)
     {
         $this->validate($request, [
-            'kind_id' => ['required', 'integer']
+            'kind_id' => ['required', 'integer'],
+            "per_page" => ['nullable' , 'integer']
         ]);
-        $models = ProductKind::with('models')->company()->where('id', request('kind_id'))
-            ->first();
+        $models = ProductModel::query()->company()->where('kind_id'  , $request->get('kind_id'))
+            ->get();
         return $this->successResponse($models);
     }
 
@@ -34,12 +35,6 @@ class ProductModelController extends Controller
 
         $check = ProductKind::company()->where('id', $request->get('kind_id'))->exists();
         if (!$check) return $this->errorResponse(trans('response.kindNotFound'), 404);
-
-
-        if ($request->has('model_id')){
-            $check = ProductModel::company()->where('id', $request->get('model_id'))->exists();
-            if (!$check) return $this->errorResponse(trans('response.modelNotFound'), 404);
-        }
 
         ProductModel::create([
             'name' => $request->get('name'),
@@ -56,7 +51,7 @@ class ProductModelController extends Controller
             'name' => ['required', 'string', 'max:255'],
         ]);
 
-        $data = ProductModel::company()->where('id', $id)->first();
+        $data = ProductModel::with('kind')->company()->where('id', $id)->first();
 
         return $this->successResponse($data);
     }

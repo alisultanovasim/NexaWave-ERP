@@ -44,6 +44,7 @@ class UserController extends Controller
             'password' => ['required', 'min:6']
         ]);
 
+        //todo make auth not only with username but with email too bro :D
         if (!Auth::attempt($request->only('username', 'password'))) {
             return $this->errorResponse(trans('response.invalidLoginOrPassword'));
         }
@@ -80,6 +81,7 @@ class UserController extends Controller
             $user = new User();
             $user->fill([
                 'name' => $request->get('name'),
+                'surname' => $request->get('surname'),
                 'username' => $request->get('fin'),
                 'email' => $request->get('email'),
                 'voen' => $request->get('voen'),

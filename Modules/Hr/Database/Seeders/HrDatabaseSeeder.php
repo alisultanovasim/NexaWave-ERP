@@ -37,7 +37,7 @@ class HrDatabaseSeeder extends Seeder
         $this->call(EducationTableSeeder::class);
         $this->call(LanguageTableSeeder::class);
         $this->call(CurrencyColorBloodTableSeeder::class);
-        $this->call(HelperDataTableSeeder::class);
+//        $this->call(HelperDataTableSeeder::class);
         // $this->call("OthersTableSeeder");
     }
 }

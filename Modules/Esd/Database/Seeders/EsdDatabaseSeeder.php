@@ -23,6 +23,6 @@ class EsdDatabaseSeeder extends Seeder
         $this->call(EsdRegionsTableSeeder::class);
         $this->call(SectionTableSeeder::class);
         $this->call(SendFormAndTypeTableSeeder::class);
-        $this->call(HelperDataTableSeeder::class);
+//        $this->call(HelperDataTableSeeder::class);
     }
 }
