@@ -59,3 +59,6 @@ Route::group(['prefix' => 'v1'] , function ($router) {
 });
 
 Route::get('/v1/test', 'TestController@test')->middleware(['auth:api', 'company']);
+Route::get('/v1/test2', function (){
+    return 'ok';
+})->middleware(['auth:api', 'test']);
