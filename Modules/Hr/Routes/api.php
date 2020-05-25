@@ -526,6 +526,14 @@ Route::group([
             Route::delete('/{id}', 'CompanyWorkingHourController@destroy');
         });
 
+        Route::group(['prefix' => 'work/skips'], function (){
+            Route::get('/', 'WorkSkipsController@index');
+            Route::get('/{id}', 'WorkSkipsController@show');
+            Route::post('/', 'WorkSkipsController@create');
+            Route::put('/{id}', 'WorkSkipsController@create');
+            Route::delete('/{id}', 'WorkSkipsController@destroy');
+        });
+
     });
 
 });
