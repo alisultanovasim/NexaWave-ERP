@@ -21,7 +21,14 @@ class CreateSellActsTable extends Migration
                 ->on('suppliers')
                 ->onDelete('cascade');
 
+            $table->string('title')->nullable();
+            $table->string('act_no')->nullable();
+            $table->decimal('price')->nullable();
+            $table->text('description')->nullable();
+
             $table->timestamps();
+
+            $table->unsignedBigInteger('company_id');
         });
     }
 

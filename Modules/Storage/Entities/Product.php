@@ -37,7 +37,8 @@ class Product extends Model
         'buy_from_country',
         'make_date',
         "company_id",
-        'status'
+        'status',
+        'sell_act_id'
     ];
 
     protected $hidden = ['mark_id' , 'product_model'];

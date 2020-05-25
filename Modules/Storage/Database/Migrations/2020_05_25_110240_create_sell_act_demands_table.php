@@ -15,8 +15,20 @@ class CreateSellActDemandsTable extends Migration
     {
         Schema::create('sell_act_demands', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->unsignedBigInteger('act_id');
+
+            $table->unsignedBigInteger('sell_act_id');
+            $table->foreign('sell_act_id')
+                ->references('id')
+                ->on('sell_acts')
+                ->onDelete('cascade');
+
             $table->unsignedBigInteger('demand_id');
+            $table->foreign('demand_id')
+                ->references('id')
+                ->on('demands')
+                ->onDelete('cascade');
+
+            $table->float('amount')->nullable();
             $table->timestamps();
         });
     }

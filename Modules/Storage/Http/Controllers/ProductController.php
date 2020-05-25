@@ -43,6 +43,8 @@ class ProductController extends Controller
         else
             $products->where('status', "=" , Product::STATUS_ACTIVE);
 
+        if ($request->has('act_id'))
+            $products->where('act_id' , $request->get('act_id'));
         $products = $products
             ->orderBy('id' , 'desc')
             ->where('kind_id', $request->get('kind_id'))
@@ -102,7 +104,7 @@ class ProductController extends Controller
         DB::beginTransaction();
         if ($notExists = $this->companyInfo(
             $request->get('company_id'),
-            $request->only('storage_id', 'title_id', 'state_id' )))
+            $request->only('storage_id', 'title_id', 'state_id' , 'sell_act_id' )))
             return $this->errorResponse($notExists);
 
         $check = ProductKind::where([
@@ -110,7 +112,10 @@ class ProductController extends Controller
             ['id', '=', $request->get('kind_id')],
         ])->exists();
         if (!$check) return $this->errorResponse(trans('response.fieldIsNotFindInDatabase'));
-        Product::create(array_merge($request->all(), ['status' => Product::STATUS_ACTIVE]));
+        $product = new Product();
+        $product
+            ->fill(array_merge($request->all(), ['status' => Product::STATUS_ACTIVE]))
+            ->save();
         DB::commit();
         return $this->successResponse('ok');
     }
@@ -230,7 +235,8 @@ class ProductController extends Controller
             'buy_from_country ' => ['nullable', 'integer', 'min:1'],//
             'make_date' => ['nullable', 'date', 'date_format:Y-m-d'],
             'income_description' => ['nullable', 'string'],
-            'model_id' => ['nullable' , 'integer']
+            'model_id' => ['nullable' , 'integer'],
+            'sell_act_id' => ['nullable' , 'integer']
         ];
     }
 

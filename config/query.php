@@ -21,5 +21,7 @@ return [
     'color_id' => 'product_colors',
     'state_id' => 'product_states',
     'employee_id' => 'employees' ,
-    'demand_id'  => 'demands'
+    'demand_id'  => 'demands' ,
+    'sell_act_id' => 'sell_acts',
+    'supplier_id' => 'suppliers',
 ];
