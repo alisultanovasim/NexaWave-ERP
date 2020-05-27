@@ -21,12 +21,12 @@ use Rennokki\QueryCache\Traits\QueryCacheable;
  */
 class   Module extends Model
 {
-    use QueryCacheable;
+//    use QueryCacheable;
 
 //    public $cacheFor = 24 * 60 * 60; // cache time, in seconds
 
     //uncomment above line after changing cache driver to redis
-    public $cacheFor = 0;
+//    public $cacheFor = 0;
     /**
      * The "type" of the auto-incrementing ID.
      *
@@ -47,6 +47,9 @@ class   Module extends Model
         return $this->hasMany('App\Models\CompanyModule');
     }
 
+
+    protected $hidden = ['pivot'];
+
     /**
      * @return HasMany
      */
@@ -62,6 +65,13 @@ class   Module extends Model
     {
         return $this->hasMany('App\Models\Permission');
     }
+
+    public function getDefaultPermissionsAttribute(){
+        return Permission::whereNull('module_id')->get([
+            'id','name' ,'module_id'
+        ]);
+    }
+
 
     /**
      * @return BelongsToMany
@@ -93,6 +103,7 @@ class   Module extends Model
         return $this->hasMany('App\Models\Module', 'parent_id', 'id')
             ->with(['subModules:id,name,parent_id', 'permissions:id,name,module_id']);
     }
+
 
     public function scopeHasCompany($query, $companyId){
         return $query->whereHas('companyModules', function ($query) use ($companyId){

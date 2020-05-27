@@ -2,6 +2,7 @@
 
 namespace Modules\Hr\Entities;
 
+use App\Models\PositionModulePermission;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -28,4 +29,10 @@ class Positions extends Model
             'modules.name as module_name',
         ]);
     }
+
+    public function permissions(){
+        return $this->hasMany(PositionModulePermission::class , 'position_id');
+    }
+
+
 }

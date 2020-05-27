@@ -31,6 +31,22 @@ class DepartmentController extends Controller
         return $this->dataResponse($result);
     }
 
+    public function structure(Request $request){
+        return Department::with([
+            'children'  => function($q){
+                $q->where('is_closed' , 0);
+                $q->select(['id','department_id','name','short_name']);
+            },
+            'children.children' => function($q){
+                $q->where('is_closed' , 0);
+                $q->select(['id','section_id','name','short_name']);
+            }
+        ])
+            ->where('is_closed' , 0)
+            ->where('company_id' , $request->get('company_id'))
+            ->get(['id' , 'name' , 'short_name']);
+
+    }
 
     public function show(Request $request , $id){
         $this->validate($request , [

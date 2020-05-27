@@ -18,6 +18,11 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class Permission extends Model
 {
+
+    const CREATE = 1;
+    const READ = 2;
+    const UPDATE = 3;
+    const DELETE = 4;
     protected $hidden = ['pivot'];
 
     /**

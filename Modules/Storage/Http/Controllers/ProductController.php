@@ -30,15 +30,13 @@ class ProductController extends Controller
             'status' => ['nullable', 'integer', 'min:1']
         ]);
 
-
 //        $title = ProductTitle::with(['kinds' => function ($q) use ($request) {
 //            $q->where('id', $request->get('kind_id'));
 //        }])
 //            ->where('id', $request->get('title_id'))
 //            ->where('company_id', $request->get('company_id'))
 //            ->first();
-
-        $products = Product::where('company_id', $request->get('company_id'));
+        $products = Product::with('model')->where('company_id', $request->get('company_id'));
 
         if ($request->has('status'))
             $products->where('status', $request->get('status'));
@@ -63,8 +61,12 @@ class ProductController extends Controller
         ]);
 
         $title = ProductKind::with('title')
-            ->where('company_id', $request->get('company_id'))
-            ->paginate();
+            ->withCount(['products as product_amount' =>   function ($q){
+                $q->where('status' , Product::STATUS_ACTIVE);
+                $q->select(DB::raw("amount"));
+            }])
+            ->company()
+            ->paginate($request->get('per_page'));
 
 //        $title = ProductTitle::with(['kinds'])
 //            ->where('company_id' , $request->get('company_id'))
@@ -77,6 +79,7 @@ class ProductController extends Controller
     {
         $product = Product::with([
             'kind:id,name',
+            'model:id,name',
             'title:id,name',
             'state:id,name',
             'color:id,name',
@@ -217,7 +220,7 @@ class ProductController extends Controller
             'description' => ['nullable', 'string'],
             'amount' => ['required', 'numeric'],
             'storage_id' => ['required', 'integer'],
-            'product_model' => ['nullable', 'string', 'max:255'],
+//            'product_model' => ['nullable', 'string', 'max:255'],
             'product_mark' => ['nullable', 'string', 'max:255'],
             'color_id' => ['nullable', 'integer'],//
             'main_funds' => ['nullable', 'boolean'],
@@ -228,6 +231,7 @@ class ProductController extends Controller
             'buy_from_country ' => ['nullable', 'integer', 'min:1'],//
             'make_date' => ['nullable', 'date', 'date_format:Y-m-d'],
             'income_description' => ['nullable', 'string'],
+            'model_id' => ['nullable' , 'integer']
         ];
     }
 

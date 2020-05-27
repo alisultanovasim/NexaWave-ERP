@@ -4,10 +4,8 @@ namespace Modules\Plaza\Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Database\Eloquent\Model;
-use Modules\Plaza\Entities\Floor;
-use Modules\Plaza\Entities\Location;
 
-class PlazaDatabaseSeeder extends Seeder
+class KindSeederTableSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -17,7 +15,12 @@ class PlazaDatabaseSeeder extends Seeder
     public function run()
     {
         Model::unguard();
-         $this->call(KindSeederTableSeeder::class);
-//        $this->call(HelperDataSeederTableSeeder::class);
+
+        \Modules\Plaza\Entities\Kind::insert([
+            ['title' => 'Şikayət'],
+            ['title' => 'Təbrik'],
+            ['title' => 'Etiraz'],
+            ['title' => 'Digər'],
+        ]);
     }
 }

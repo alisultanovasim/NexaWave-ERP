@@ -31,7 +31,7 @@ class StorageDatabaseSeeder extends Seeder
             ],
         ];
 
-        foreach ($arr as $a){
+        foreach ($arr as $a) {
             Unit::create($a);
         }
 
@@ -42,16 +42,16 @@ class StorageDatabaseSeeder extends Seeder
             "Təmirə ehtiyaci olan",
         ];
 
-        foreach ($arr as $a){
+        foreach ($arr as $a) {
             ProductState::create([
-                "name" =>  $a
+                "name" => $a
             ]);
         }
 
         ProductColor::insert([
-            ['name' => 'Qırmızı' , 'hex' => '#ff0000'],
-            ['name' => 'Göy' , 'hex' => '#0d00ff'],
-            ['name' => 'Qara' , 'hex' => '#000000'],
+            ['name' => 'Qırmızı', 'hex' => '#ff0000'],
+            ['name' => 'Göy', 'hex' => '#0d00ff'],
+            ['name' => 'Qara', 'hex' => '#000000'],
         ]);
 
         $title = ProductTitle::create([
@@ -83,16 +83,17 @@ class StorageDatabaseSeeder extends Seeder
             "amount" => 2,
             "storage_id" => 1,
             "product_model" => 'Apple',
-            "product_mark" =>'Mac book pro',
+            "product_mark" => 'Mac book pro',
             "product_no" => '123456789',
             "color_id" => 1,
-            "main_funds"=>true,
+            "main_funds" => true,
             "inv_no" => 'ik-16-265',
             "exploitation_date" => '2025-05-13',
             "size" => 1600,
             "made_in_country" => 1,
             "buy_from_country" => 1,
             "make_date" => '2014-05-13',
+            'status' => 1
         ]);
     }
 }

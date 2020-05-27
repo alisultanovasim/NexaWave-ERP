@@ -17,11 +17,11 @@ class CreateProductKindsTable extends Migration
             $table->bigIncrements('id');
             $table->string('name');
 //
-//            $table->unsignedInteger('unit_id')->nullable();
-//            $table->foreign('unit_id')
-//                ->references('id')
-//                ->on('units')
-//                ->onDelete('cascade');
+            $table->unsignedInteger('unit_id')->nullable();
+            $table->foreign('unit_id')
+                ->references('id')
+                ->on('units')
+                ->onDelete('cascade');
 
             $table->unsignedBigInteger('title_id');
             $table->foreign('title_id')

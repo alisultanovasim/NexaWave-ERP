@@ -30,7 +30,7 @@ class CompanyIdValidator
                     $err =  $this->office();
                 break;
 
-            case User::EMPLOYEE or User::COMPANY_ADMIN:
+            case User::EMPLOYEE:
                     $err = $this->employee($request);
                 break;
             default:
@@ -43,11 +43,6 @@ class CompanyIdValidator
 
         $request->request->set('company_id' , $this->company);
         $request->request->set('auth_employee_id' , $this->auth_employee_id);
-
-        //Bootstrap permissions gateways
-        $provider = new PermissionProvider();
-        $role = new Role();
-        $provider->boot($role);
 
         return $next($request);
 

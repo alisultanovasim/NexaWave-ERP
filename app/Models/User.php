@@ -20,7 +20,8 @@ class User extends Authenticatable
     const SUPER_ADMIN = 1;
     const EMPLOYEE = 2;
     const DEV = 4;
-    const COMPANY_ADMIN = 5;
+
+    private $roleId;
 
     /**
      * The attributes that are mass assignable.
@@ -67,6 +68,23 @@ class User extends Authenticatable
     public function education(){
         return $this->hasMany(UserEducation::class);
     }
-    public $generatedPassword = null;
 
+    public function getRoleId(){
+        if (!$this->roleId){
+            $role = UserRole::where([
+                'user_id' => $this->getKey(),
+                'company_id' => request()->get('company_id')
+            ])->first(['role_id as id']);
+            $this->roleId = $role->id ?? null;
+        }
+        return $this->roleId;
+    }
+
+    /**
+     * @param mixed $roleId
+     */
+    public function setRoleId($roleId): void
+    {
+        $this->roleId = $roleId;
+    }
 }
