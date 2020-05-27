@@ -26,7 +26,11 @@ class CheckUserAccess
     private $companyId;
     private $request;
 
-
+    /**
+     * CheckUserAccess constructor.
+     * @param Request $request
+     * @param Role $role
+     */
     public function __construct(Request $request, Role $role)
     {
         $this->request = $request;
@@ -48,16 +52,24 @@ class CheckUserAccess
         if ($this->companyId){
             $this->validateUserCompanyAndMergeToRequest($this->companyId);
         }
+
         /*
          * When user requests as platform user
          */
         else {
             $this->removeCompanyRolesFromUserRoleListForThisRequest();
         }
+
+        /*
+         * Boot permissions and set user roles
+         */
         $userRoles = collect($this->userRoles)->pluck('role_id')->toArray();
+        \auth()->user()->setUserRolesForRequest($userRoles);
         $this->permissionProvider->boot($userRoles);
+
         return $next($this->request);
     }
+
 
     /**
      * @param $companyId
@@ -79,13 +91,23 @@ class CheckUserAccess
 
 
     /**
-     *
+     * @throws AuthorizationException
      */
     private function removeCompanyRolesFromUserRoleListForThisRequest(): void {
+        /*
+         * Remove company roles
+         */
         foreach ($this->userRoles as $key => $role){
             if ($role->company_id !== null){
                 unset($this->userRoles[$key]);
             }
+        }
+
+        /*
+         * If user has no remain roles (user has not platform roles)
+         */
+        if (!count($this->userRoles)){
+            throw new AuthorizationException();
         }
     }
 

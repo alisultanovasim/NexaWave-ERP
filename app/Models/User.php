@@ -21,7 +21,7 @@ class User extends Authenticatable
     const EMPLOYEE = 2;
     const DEV = 4;
 
-    private $roleId;
+    private $userRolesForRequest = [];
 
     /**
      * The attributes that are mass assignable.
@@ -81,10 +81,20 @@ class User extends Authenticatable
     }
 
     /**
-     * @param mixed $roleId
+     * @return array
      */
-    public function setRoleId($roleId): void
+    public function getUserRolesForRequest(): array
     {
-        $this->roleId = $roleId;
+        return $this->userRolesForRequest;
     }
+
+    /**
+     * @param array $userRolesForRequest
+     */
+    public function setUserRolesForRequest(array $userRolesForRequest): void
+    {
+        $this->userRolesForRequest = $userRolesForRequest;
+    }
+
+
 }

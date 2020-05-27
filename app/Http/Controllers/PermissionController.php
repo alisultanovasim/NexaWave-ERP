@@ -17,6 +17,8 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Modules\Hr\Entities\Positions;
+use PhpParser\Node\Expr\AssignOp\Mod;
+use function Deployer\add;
 
 class PermissionController extends Controller
 {
@@ -35,20 +37,65 @@ class PermissionController extends Controller
 
     /**
      * @param Request $request
+     * @param $moduleId
+     * @return JsonResponse
+     */
+    public function userGetPermissionsByModuleId(Request $request, $moduleId): JsonResponse {
+        $modules = Module::where('parent_id', $moduleId)->with('subModuleIds:id,parent_id');
+        if ($request->get('company_id'))
+            $modules = $modules->hasCompany($request->get('company_id'));
+        $modules = $modules->get(['id']);
+        $moduleIds = $this->convertNestedModulesToModelsArray($modules);
+        $permissions = Module::whereIn('id', $moduleIds)
+        ->with([
+            'permissionList' => function ($query) use ($moduleIds){
+                $query->whereIn('role_module_permissions.role_id', \auth()->user()->getUserRolesForRequest());
+                $query->whereIn('role_module_permissions.module_id', $moduleIds);
+                $query->select([
+                    'permissions.id',
+                    'permissions.name',
+                ]);
+            }
+        ])
+        ->get([
+            'id',
+            'name'
+        ]);
+        return $this->successResponse($permissions);
+    }
+
+    /**
+     * @param $modules
+     * @param array $moduleIds
+     * @return array
+     */
+    private function convertNestedModulesToModelsArray($modules, $moduleIds = []){
+        foreach ($modules as $module){
+            $moduleIds[] = $module['id'];
+            if (isset($module['subModuleIds']) and count($module['subModuleIds'])){
+                $moduleIds = $this->convertNestedModulesToModelsArray($module['subModuleIds'], $moduleIds);
+            }
+        }
+        return $moduleIds;
+    }
+
+    /**
+     * @param Request $request
      * @return JsonResponse
      */
     public function getModules(Request $request): JsonResponse {
-        $modules = Module::hasCompany($request->get('company_id'))
-            ->with([
+        $modules = Module::with([
                 'subModules',
                 'permissions:id,name,module_id'
             ])
-            ->where('parent_id', null)
-            ->get([
-                'id',
-                'name',
-                'parent_id'
-            ]);
+            ->where('parent_id', null);
+        if ($request->get('company_id'))
+            $modules = $modules->hasCompany($request->get('company_id'));
+        $modules = $modules->get([
+            'id',
+            'name',
+            'parent_id'
+        ]);
         return $this->successResponse($modules);
     }
 
@@ -58,12 +105,13 @@ class PermissionController extends Controller
      * @return JsonResponse
      */
     public function getRolePermissions(Request $request, $roleId): JsonResponse {
-        $permissions = $this->role->companyId($request->get('company_id'))
-            ->where('id', $roleId)
+        $permissions = $this->role::where('id', $roleId)
             ->with([
                 'modules'
-            ])
-            ->first(['id', 'name']);
+            ]);
+        if ($request->get('company_id'))
+            $permissions = $permissions->companyId($request->get('company_id'));
+        $permissions = $permissions->first(['id', 'name']);
         return $this->successResponse(
             $this->formatRolePermissionsResponse($permissions)
         );
@@ -74,9 +122,11 @@ class PermissionController extends Controller
      * @return JsonResponse
      */
     public function getRoles(Request $request): JsonResponse {
-        return $this->successResponse(
-            $this->role->companyId($request->get('company_id'))->get(['id', 'name'])
-        );
+        $roles = $this->role;
+        if ($request->get('company_id'))
+            $roles = $roles->companyId($request->get('company_id'));
+        $roles = $roles->get(['id', 'name']);
+        return $this->successResponse($roles);
     }
 
     /**
@@ -159,18 +209,29 @@ class PermissionController extends Controller
      * @return array
      */
     private function getRules($companyId): array {
-        return [
-            'role_id' => 'required|exists:roles,id,company_id,'.$companyId,
+        $rules = [
             'modules' => 'required|array|min:1',
             'modules.*.permissions' => 'required|array',
             'modules.*.permissions.*.id' => 'required|exists:permissions,id',
-            'modules.*.module_id' => [
+        ];
+        if ($companyId){
+            $rules['role_id'] = 'required|exists:roles,id,company_id,'.$companyId;
+            $rules['modules.*.module_id'] = [
                 'required',
                 Rule::exists('company_modules', 'module_id')
                     ->where('is_active', true)
                     ->where('company_id', $companyId)
-            ]
-        ];
+            ];
+        }
+        else {
+            $rules['role_id'] = 'required|exists:roles,id';
+            $rules['modules.*.module_id'] = [
+                'required',
+                Rule::exists('modules', 'id')
+                    ->where('is_active', true)
+            ];
+        }
+        return  $rules;
     }
 
 }

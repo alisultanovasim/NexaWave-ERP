@@ -49,13 +49,14 @@ Route::group(['prefix' => 'v1'] , function ($router) {
         Route::post('/register' , 'UserController@register');
     }); // auth
 
-    Route::group(['prefix' => 'permissions', 'middleware' => ['auth:api', 'company']], function (){
+    Route::group(['prefix' => 'permissions', 'middleware' => ['auth:api', 'authorize']], function (){
         Route::post('set', 'PermissionController@setRolePermissions');
         Route::get('/modules', 'PermissionController@getModules');
         Route::get('/', 'PermissionController@getPermissions');
         Route::get('/positions', 'PermissionController@getPositions');
         Route::get('/roles', 'PermissionController@getRoles');
         Route::get('/roles/{id}', 'PermissionController@getRolePermissions');
+        Route::get('/module/{id}', 'PermissionController@userGetPermissionsByModuleId');
     }); // permissions
 
     Route::get('/test', 'TestController@test')->middleware(['auth:api', 'authorize']);
