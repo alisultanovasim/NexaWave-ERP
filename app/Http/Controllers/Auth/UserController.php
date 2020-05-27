@@ -432,7 +432,7 @@ class UserController extends Controller
         }
         $user->details()->create($data);
 
-        SendMailCreatePassword::dispatch($user , $password);
+//        SendMailCreatePassword::dispatch($user , $password);
 
         return $user;
     }
