@@ -511,5 +511,47 @@ Route::group([
         });
     });
 
+    Route::group(['prefix' => 'time/tracking'], function (){
+
+        Route::group(['prefix' => 'work/events'], function ($router) {
+            Route::get('/', 'WokEventController@index');
+            Route::get('/{id}', 'WokEventController@show');
+            Route::post('/', 'WokEventController@create');
+            Route::put('/{id}', 'WokEventController@update');
+            Route::delete('/{id}', 'WokEventController@destroy');
+        });
+
+        Route::group(['prefix' => 'vacation/planning'], function (){
+            Route::get('/', 'VacationPlanningController@index');
+            Route::get('/{id}', 'VacationPlanningController@show');
+            Route::post('/', 'VacationPlanningController@create');
+            Route::put('/{id}', 'VacationPlanningController@update');
+            Route::delete('/{id}', 'VacationPlanningController@destroy');
+        });
+
+        Route::group(['prefix' => 'work/calendar'], function (){
+            Route::get('/', 'WorkCalendarController@index');
+            Route::post('/', 'WorkCalendarController@create');
+            Route::delete('/{id}', 'WorkCalendarController@remove');
+        });
+
+        Route::group(['prefix' => 'work/hours'], function (){
+            Route::get('/', 'CompanyWorkingHourController@index');
+            Route::get('/{id}', 'CompanyWorkingHourController@show');
+            Route::post('/', 'CompanyWorkingHourController@create');
+            Route::put('/{id}', 'CompanyWorkingHourController@create');
+            Route::delete('/{id}', 'CompanyWorkingHourController@destroy');
+        });
+
+        Route::group(['prefix' => 'work/skips'], function (){
+            Route::get('/', 'WorkSkipsController@index');
+            Route::get('/{id}', 'WorkSkipsController@show');
+            Route::post('/', 'WorkSkipsController@create');
+            Route::put('/{id}', 'WorkSkipsController@create');
+            Route::delete('/{id}', 'WorkSkipsController@destroy');
+        });
+
+    });
+
 });
 
