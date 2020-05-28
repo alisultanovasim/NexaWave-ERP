@@ -27,7 +27,7 @@ class AuthServiceProvider extends ServiceProvider
         $this->registerPolicies();
 
         Passport::routes(null , [
-            'prefix' => 'v1/oauth'
+            'prefix' => 'v1/oauth',
         ]);
     }
 }

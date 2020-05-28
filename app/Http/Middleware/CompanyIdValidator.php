@@ -44,11 +44,6 @@ class CompanyIdValidator
         $request->request->set('company_id' , $this->company);
         $request->request->set('auth_employee_id' , $this->auth_employee_id);
 
-        //Bootstrap permissions gateways
-        $provider = new PermissionProvider();
-        $role = new Role();
-        $provider->boot($role);
-
         return $next($request);
 
     }
@@ -66,7 +61,7 @@ class CompanyIdValidator
 
     private function employee(Request $request)
     {
-        if ($request->hasHeader('company_id')){
+            if ($request->hasHeader('company_id')){
             $company_id = $request->header('company_id');
         }else{
             $headers = apache_request_headers();

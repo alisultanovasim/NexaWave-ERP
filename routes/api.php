@@ -50,12 +50,16 @@ Route::group(['prefix' => 'v1'] , function ($router) {
     }); // auth
 
     Route::group(['prefix' => 'permissions', 'middleware' => ['auth:api', 'company']], function (){
-        Route::post('set', 'PermissionController@setPositionPermissions');
+        Route::post('set', 'PermissionController@setRolePermissions');
         Route::get('/modules', 'PermissionController@getModules');
         Route::get('/', 'PermissionController@getPermissions');
         Route::get('/positions', 'PermissionController@getPositions');
+        Route::get('/roles', 'PermissionController@getRoles');
+        Route::get('/roles/{id}', 'PermissionController@getRolePermissions');
     }); // permissions
+
+    Route::get('/test', 'TestController@test')->middleware(['auth:api', 'authorize']);
+
 
 });
 
-Route::get('/v1/test', 'TestController@test')->middleware(['auth:api', 'company']);

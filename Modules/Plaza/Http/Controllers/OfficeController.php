@@ -884,30 +884,27 @@ class OfficeController extends Controller
             'surname' => ['sometimes' , 'required' , 'string' , 'max:255'],
         ]);
 
-        try {
-            DB::beginTransaction();
-            $check = Office::where('company_id', $request->company_id)->where('id', $id)->exists();
-            if (!$check) return $this->errorResponse('apiResponse.unProcess');
+        DB::beginTransaction();
+        $check = Office::where('company_id', $request->company_id)->where('id', $id)->exists();
+        if (!$check) return $this->errorResponse('apiResponse.unProcess');
 
-            $users = User::create([
-                'role_id' => User::OFFICE,
-                'name' => $request->get('name'),
-                'password' => Hash::make($request->get('password')),
-                'username' => $request->get('username')
-            ]);
+        $users = User::create([
+            'name' => $request->get('name'),
+            'password' => Hash::make($request->get('password')),
+            'username' => $request->get('username'),
+            'is_office_user' => true
+        ]);
 
-            $check = OfficeUser::create([
-                'office_id' => $id,
-                'user_id' => $users->id,
-                'company_id' => $request->company_id
-            ]);
-            if (!$check) return $this->errorResponse('apiResponse.unProcess');
-            DB::commit();
-            return $this->successResponse('OK');
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return $this->errorResponse(trans('apiResponse.tryLater'), Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
+        //office_user_permissions
+
+        OfficeUser::create([
+            'office_id' => $id,
+            'user_id' => $users->id,
+            'company_id' => $request->company_id
+        ]);
+        DB::commit();
+        return $this->successResponse('OK');
+
     }
     public function updateUser(Request $request, $id)
     {

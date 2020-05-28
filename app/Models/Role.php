@@ -8,7 +8,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Role extends Model
 {
 
-    private $superAdminId = 1;
+    private $superAdminRoleId = 1;
+    private $companyAdminRoleId = 5;
     /**
      * @var array
      */
@@ -23,14 +24,45 @@ class Role extends Model
         return $this->hasMany('App\Models\User');
     }
 
+    public function modules(){
+        return $this->belongsToMany(
+            'App\Models\Module',
+            'role_module_permissions',
+            'role_id',
+            'module_id'
+        )
+        ->withPivot('role_id')
+        ->join('permissions','permission_id','=','permissions.id')
+        ->select([
+            'permissions.name as pivot_permission_name',
+            'permissions.id as pivot_permission_id',
+            'modules.id as id',
+            'modules.name as module_name',
+        ]);
+    }
+
+    public function permissions(){
+        return $this->hasMany(PositionModulePermission::class , 'position_id');
+    }
+
+    public function scopeCompanyId($query, $companyId) {
+        return $query->where('company_id', $companyId);
+    }
+
     /**
      * @return int
      */
-    public function getSuperAdminId(): int
+    public function getSuperAdminRoleId(): int
     {
-        return $this->superAdminId;
+        return $this->superAdminRoleId;
     }
 
-
+    /**
+     * @return int
+     */
+    public function getCompanyAdminRoleId(): int
+    {
+        return $this->companyAdminRoleId;
+    }
 
 }

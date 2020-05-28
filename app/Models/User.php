@@ -21,6 +21,8 @@ class User extends Authenticatable
     const EMPLOYEE = 2;
     const DEV = 4;
 
+    private $roleId;
+
     /**
      * The attributes that are mass assignable.
      *
@@ -67,4 +69,22 @@ class User extends Authenticatable
         return $this->hasMany(UserEducation::class);
     }
 
+    public function getRoleId(){
+        if (!$this->roleId){
+            $role = UserRole::where([
+                'user_id' => $this->getKey(),
+                'company_id' => request()->get('company_id')
+            ])->first(['role_id as id']);
+            $this->roleId = $role->id ?? null;
+        }
+        return $this->roleId;
+    }
+
+    /**
+     * @param mixed $roleId
+     */
+    public function setRoleId($roleId): void
+    {
+        $this->roleId = $roleId;
+    }
 }

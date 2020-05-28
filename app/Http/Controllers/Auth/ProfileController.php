@@ -23,6 +23,40 @@ class ProfileController extends Controller
         $companies = null;
         $modules = null;
 
+
+
+        return $this->dataResponse([
+            'user' => $user,
+            'companies' => $companies,
+            'modules' => $modules,
+            'office' => $office
+        ]);
+    }
+
+    public function index(Request $request)
+    {
+        return Auth::user()->load([
+            'details', 'details.nationality', 'details.citizen', 'details.birthdayCity', 'details.birthdayCountry', 'details.birthdayRegion'
+        ]);
+    }
+
+    public function history()
+    {
+        return Auth::user()->load([
+            'employment', 'employment.company', 'employment.contracts', 'employment.contracts.position'
+        ]);
+    }
+
+    public function update(Request $request)
+    {
+        UserController::updateUser($request, Auth::id());
+        return $this->successResponse('ok');
+    }
+
+}
+
+/*
+ *
         switch ($user->role_id) {
 
             case User::OFFICE:
@@ -63,33 +97,4 @@ class ProfileController extends Controller
 
         }
 
-
-        return $this->dataResponse([
-            'user' => $user,
-            'companies' => $companies,
-            'modules' => $modules,
-            'office' => $office
-        ]);
-    }
-
-    public function index(Request $request)
-    {
-        return Auth::user()->load([
-            'details', 'details.nationality', 'details.citizen', 'details.birthdayCity', 'details.birthdayCountry', 'details.birthdayRegion'
-        ]);
-    }
-
-    public function history()
-    {
-        return Auth::user()->load([
-            'employment', 'employment.company', 'employment.contracts', 'employment.contracts.position'
-        ]);
-    }
-
-    public function update(Request $request)
-    {
-        UserController::updateUser($request, Auth::id());
-        return $this->successResponse('ok');
-    }
-
-}
+ */
