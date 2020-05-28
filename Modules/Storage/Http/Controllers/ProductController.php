@@ -36,21 +36,25 @@ class ProductController extends Controller
 //            ->where('id', $request->get('title_id'))
 //            ->where('company_id', $request->get('company_id'))
 //            ->first();
-        $products = Product::with('model')->where('company_id', $request->get('company_id'));
+        $products = Product::with('model:id,name')->where('company_id', $request->get('company_id'));
 
         if ($request->has('status'))
             $products->where('status', $request->get('status'));
         else
-            $products->where('status', Product::STATUS_ACTIVE);
+            $products->where('status', "=" , Product::STATUS_ACTIVE);
 
-        $products = $products->where('kind_id', $request->get('kind_id'))
+        if ($request->has('act_id'))
+            $products->where('act_id' , $request->get('act_id'));
+        $products = $products
+            ->orderBy('id' , 'desc')
+            ->where('kind_id', $request->get('kind_id'))
             ->paginate($request->get('per_page'));
 
 //        [
 //            'title' => $title   ,
 //            'products' => $products
 //        ]
-        return $this->successResponse($products);
+        return $this->dataResponse($products);
     }
 
     public function firstPage(Request $request)
@@ -60,19 +64,16 @@ class ProductController extends Controller
             'name' => ['nullable', 'string', 'max:255'],
         ]);
 
-        $title = ProductKind::with('title')
-            ->withCount(['products as product_amount' =>   function ($q){
+        $title = ProductKind::with(['title' , 'unit'])
+            ->withCount(['products as product_amount' => function($q){
                 $q->where('status' , Product::STATUS_ACTIVE);
-                $q->select(DB::raw("amount"));
+                $q->select(DB::raw("SUM(amount)"));
             }])
             ->company()
             ->paginate($request->get('per_page'));
 
-//        $title = ProductTitle::with(['kinds'])
-//            ->where('company_id' , $request->get('company_id'))
-//            ->paginate($request->get('per_page'));
 
-        return $this->successResponse($title);
+        return $this->dataResponse($title);
     }
 
     public function show(Request $request, $id)
@@ -103,7 +104,7 @@ class ProductController extends Controller
         DB::beginTransaction();
         if ($notExists = $this->companyInfo(
             $request->get('company_id'),
-            $request->only('storage_id', 'title_id', 'state_id')))
+            $request->only('storage_id', 'title_id', 'state_id' , 'sell_act_id' )))
             return $this->errorResponse($notExists);
 
         $check = ProductKind::where([
@@ -111,7 +112,10 @@ class ProductController extends Controller
             ['id', '=', $request->get('kind_id')],
         ])->exists();
         if (!$check) return $this->errorResponse(trans('response.fieldIsNotFindInDatabase'));
-        Product::create(array_merge($request->all(), ['status' => Product::STATUS_ACTIVE]));
+        $product = new Product();
+        $product
+            ->fill(array_merge($request->all(), ['status' => Product::STATUS_ACTIVE]))
+            ->save();
         DB::commit();
         return $this->successResponse('ok');
     }
@@ -231,7 +235,8 @@ class ProductController extends Controller
             'buy_from_country ' => ['nullable', 'integer', 'min:1'],//
             'make_date' => ['nullable', 'date', 'date_format:Y-m-d'],
             'income_description' => ['nullable', 'string'],
-            'model_id' => ['nullable' , 'integer']
+            'model_id' => ['nullable' , 'integer'],
+            'sell_act_id' => ['nullable' , 'integer']
         ];
     }
 

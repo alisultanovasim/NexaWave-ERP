@@ -106,6 +106,7 @@ class EmployeeController extends Controller
 
     public function store(Request $request)
     {
+        //todo add roles to user
         $this->validate($request, [
             'company_id' => ['required', 'integer'],
             'is_active' => ['sometimes', 'required', 'boolean'],
@@ -187,6 +188,9 @@ class EmployeeController extends Controller
         DB::commit();
         return $this->successResponse('ok');
     }
+
+    //todo create left-job logic
+    //todo delete user roles in this company
 
     public function delete(Request $request, $id)
     {

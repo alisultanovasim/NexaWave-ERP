@@ -14,13 +14,19 @@ class DemandAssignment extends Model
     protected $guarded = ['id'];
 
     public function demand(){
-        return $this->belongsTo(Demand::class);
+        return $this->belongsTo(Demand::class , 'demand_id');
     }
 
     public function employee(){
-        return $this->belongsTo(Employee::class);
+        return $this->belongsTo(Employee::class , '');
     }
     public function items(){
-        return $this->hasMany(DemandItem::class);
+        return $this->hasMany(DemandItem::class , '');
+    }
+
+    public function scopeCompany($q){
+        return $q->whereHas('demand', function ($q){
+            $q->company();
+        });
     }
 }

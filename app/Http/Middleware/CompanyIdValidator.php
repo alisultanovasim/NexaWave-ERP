@@ -61,7 +61,7 @@ class CompanyIdValidator
 
     private function employee(Request $request)
     {
-        if ($request->hasHeader('company_id')){
+            if ($request->hasHeader('company_id')){
             $company_id = $request->header('company_id');
         }else{
             $headers = apache_request_headers();

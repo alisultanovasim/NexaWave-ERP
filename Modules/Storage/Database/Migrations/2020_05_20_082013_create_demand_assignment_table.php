@@ -13,10 +13,15 @@ class CreateDemandAssignmentTable extends Migration
      */
     public function up()
     {
-        Schema::create('demand_item', function (Blueprint $table) {
+        Schema::create('demand_assignments', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->text('description')->nullable();
             $table->unsignedBigInteger('employee_id')->nullable();
+            $table->unsignedBigInteger('demand_id')->nullable();
+            $table->foreign('demand_id')
+                ->references('id')
+                ->on('demands')
+                ->onDelete('cascade');
             $table->timestamp('expiry_time')->nullable();
             $table->unsignedTinyInteger('status')
                 ->default(\Modules\Storage\Entities\DemandAssignment::STATUS_WAIT);
@@ -32,6 +37,6 @@ class CreateDemandAssignmentTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('demand_item');
+        Schema::dropIfExists('demand_assignments');
     }
 }

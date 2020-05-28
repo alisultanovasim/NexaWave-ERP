@@ -14,15 +14,16 @@ use Modules\Storage\Entities\ProductColor;
 
 class DemandController extends Controller
 {
-    use ApiResponse , ValidatesRequests;
+    use ApiResponse, ValidatesRequests;
+
     public function index(Request $request)
     {
         $this->validate($request, [
-            'per_page' => ['nullable' , 'integer'],
-            'product_id' => ['nullable' , 'integer'] ,
-            'employee_id' => ['nullable' , 'integer'],
-            'want_from'=> ['date' , 'date_format' , 'Y-m-d H:i:s'],
-            'want_to'=> ['date' , 'date_format' , 'Y-m-d H:i:s'],
+            'per_page' => ['nullable', 'integer'],
+            'product_id' => ['nullable', 'integer'],
+            'employee_id' => ['nullable', 'integer'],
+            'want_from' => ['date', 'date_format', 'Y-m-d H:i:s'],
+            'want_to' => ['date', 'date_format', 'Y-m-d H:i:s'],
         ]);
 
         $demands = Demand::with([
@@ -31,55 +32,62 @@ class DemandController extends Controller
             'product.unit:id,name',
             'product.title:id,name',
             'employee:id,user_id,tabel_no',
-            'employee.user:id,name',
+            'employee.user:id,name,surname',
         ])
-
-        ->where('company_id', $request->get('company_id'));
+            ->withCount([
+                'assignment as assigned_tome' => function($q) use ($request){
+                    $q->whereHas('items' , function ($q) use ($request){
+                        $q->where('employee_id' , $request->get('auth_employee_id'));
+                    });
+                }
+            ])
+            ->where('company_id', $request->get('company_id'));
 
         if ($request->has('product_id'))
-            $demands->where('product_id' , $request->get('product_id'));
+            $demands->where('product_id', $request->get('product_id'));
 
         if ($request->has('employee_id'))
-            $demands->where('employee_id' , $request->get('employee_id'));
+            $demands->where('employee_id', $request->get('employee_id'));
 
         if ($request->has('want_from'))
-            $demands->where('want_till'  , ">=", $request->get('employee_id'));
+            $demands->where('want_till', ">=", $request->get('employee_id'));
 
         if ($request->has('want_to'))
-            $demands->where('want_till' , "<=" , $request->get('employee_id'));
+            $demands->where('want_till', "<=", $request->get('employee_id'));
 
         if ($request->has('status'))
-            $demands->where('status' , $request->get('status'));
+            $demands->where('status', $request->get('status'));
 
-        $demands = $demands->orderBy('id' , 'desc')->paginate($request->get('per_page'));
+        $demands = $demands->orderBy('id', 'desc')->paginate($request->get('per_page'), [
+            'id', 'product_id', 'description', 'created_at', 'want_till', 'employee_id'
+        ]);
 
         return $this->successResponse($demands);
     }
 
     public function store(Request $request)
     {
-        $this->validate($request, ProductController::getValidationRules() + [
-                'demand_description' => ['nullable' , 'string'],
-                'want_till' => ['nullable' , 'date_format:Y-m-d H:i:s'],
-            ]);
+        $this->validate($request, array_merge(ProductController::getValidationRules(), [
+            'demand_description' => ['nullable', 'string'],
+            'want_till' => ['nullable', 'date_format:Y-m-d H:i:s'],
+            'storage_id' => ['nullable', 'integer']
+        ]));
 
 
         //todo check title and kind_id
-        $product = Product::create(array_merge($request->all()  , ['status' => Product::STATUS_DEMAND]));
+        $product = Product::create(array_merge($request->all(), ['status' => Product::STATUS_DEMAND]));
 
-
-        $demand = Demand::create([
-            'description' => $request->get('demand_description') ,
+        Demand::create([
+            'description' => $request->get('demand_description'),
             'want_till' => $request->get('want_till'),
             'product_id' => $product->id,
-            'employee_id'  => $request->get('auth_employee_id'),
+            'employee_id' => $request->get('auth_employee_id'),
             'company_id' => $request->get('company_id')
         ]);
-
         return $this->successResponse('ok');
     }
 
-    public function show(Request $request , $id)
+    public function show(Request $request, $id)
     {
         $demands = Demand::with([
             'product',
@@ -90,37 +98,36 @@ class DemandController extends Controller
             'employee.user',
         ])
             ->where('company_id', $request->get('company_id'))
-            ->where('id' , $id)
+            ->where('id', $id)
             ->first();
         if (!$demands)
-            return $this->errorResponse(trans('response.demandNotFound'), 404 );
+            return $this->errorResponse(trans('response.demandNotFound'), 404);
         return $this->successResponse($demands);
     }
 
     public function update(Request $request, $id)
     {
-        $this->validate($request , [
-            'demand_description' => ['nullable' , 'string'],
-            'want_till' => ['nullable' , 'date_format:Y-m-d H:i:s'],
-            'update_product' => ['required' , 'nullable']
-        ] + ProductController::getUpdateRules());
-
+        $this->validate($request, array_merge([
+            'demand_description' => ['nullable', 'string'],
+            'want_till' => ['nullable', 'date_format:Y-m-d H:i:s'],
+            'update_product' => ['required', 'nullable']
+        ], ProductController::getUpdateRules()));
 
         $demand = Demand::where('company_id', $request->get('company_id'))
-            ->where('id' , $id)
-            ->where('employee_id' , $request->get('auth_employee_id'))
-            ->first(['id' , 'status' , 'product_id']);
+            ->where('id', $id)
+            ->where('employee_id', $request->get('auth_employee_id'))
+            ->first(['id', 'status', 'product_id']);
 
         if (!$demand)
-            return $this->errorResponse(trans('response.demandNotFound'), 404 );
+            return $this->errorResponse(trans('response.demandNotFound'), 404);
 
         if ($demand->status != Demand::STATUS_WAIT)
-            return $this->errorResponse(trans('response.cannotUpdateStatusError'), 422 );
+            return $this->errorResponse(trans('response.cannotUpdateStatusError'), 422);
 
 
-        if($request->get('update_product')){
+        if ($request->get('update_product')) {
             //todo check title and kind_id
-            Product::where('id' , $demand->product_id)
+            Product::where('id', $demand->product_id)
                 ->update($request->only([
                     'unit_id',
                     'less_value',
@@ -147,7 +154,7 @@ class DemandController extends Controller
         }
 
         $demand->update($request->only([
-            'description' ,
+            'description',
             'want_till'
         ]));
 
@@ -156,20 +163,20 @@ class DemandController extends Controller
 
     }
 
-    public function delete(Request $request , $id)
+    public function delete(Request $request, $id)
     {
 
         $demand = Demand::where('company_id', $request->get('company_id'))
-            ->where('id' , $id)
-            ->where('employee_id' , $request->get('auth_employee_id'))
-            ->first(['id' , 'status' , 'product_id']);
+            ->where('id', $id)
+            ->where('employee_id', $request->get('auth_employee_id'))
+            ->first(['id', 'status', 'product_id']);
 
         if (!$demand)
-            return $this->errorResponse(trans('response.demandNotFound'), 404 );
+            return $this->errorResponse(trans('response.demandNotFound'), 404);
         if ($demand->status != Demand::STATUS_WAIT)
-            return $this->errorResponse(trans('response.demandNotFound'), 404 );
+            return $this->errorResponse(trans('response.demandNotFound'), 404);
         DB::beginTransaction();
-        Product::where('id' , $demand->product_id)->delete();
+        Product::where('id', $demand->product_id)->delete();
         $demand->delete();
         DB::commit();
         return $this->successResponse('ok');

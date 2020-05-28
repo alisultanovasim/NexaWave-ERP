@@ -13,18 +13,28 @@ use PHPUnit\Framework\Constraint\RegularExpressionTest;
 trait Query
 {
 
+
+    public $custom = [];
     /**
      * doc
      * you must add to config/query.php file table to your field
      * if that table is not exists
-     * @throws TableNotFoundException
+     * @param $companyId
+     * @param array $rules
+     * @param array $custom
+     * @return array
      */
-    protected function companyInfo($companyId, $rules = []): array
+    protected function companyInfo($companyId, $rules = [] , $custom = []): array
     {
+        $this->custom = $custom;
         if (!$rules) return [];
         $sql = 'select  ';
         foreach ($rules as $field => $id) {
-            $sql .= " EXISTS( SELECT id from " . config("query.$field") . " where (company_id = $companyId or company_id is null )  and id = $id ) as  {$field},";
+            if (is_array($id))
+               foreach ($id as $i)
+                   $sql .= $this->sqlQuery($field, $i  , $companyId );
+            else
+                $sql .= $this->sqlQuery($field, $id  , $companyId );
         }
         $sql = rtrim($sql, ",");
         $errors = [];
@@ -43,5 +53,9 @@ trait Query
             if (!$v)
                 $errors[$k] = trans('response.notExists');
         return $errors;
+    }
+
+    public function sqlQuery($field , $id , $companyId){
+        return " EXISTS( SELECT id from " . config("query.$field") . " where (company_id = $companyId or company_id is null )  and id = $id ) as  {$field},";
     }
 }

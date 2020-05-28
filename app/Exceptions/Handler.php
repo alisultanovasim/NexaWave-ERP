@@ -68,11 +68,12 @@ class Handler extends ExceptionHandler
             $message = \Symfony\Component\HttpFoundation\Response::$statusTexts[$code];
             return $this->errorResponse($message, $code);
         }
-//        else if ($exception instanceof QueryException) {
-//            if ($exception->errorInfo[1] == 1452)
-//                return $this->errorResponse([trans('response.SomeFiledIsNotFoundInDatabase')], 422);
-//            return $this->errorResponse(trans('response.serverError. code : 222'), 422);
-//        }
+
+        else if ($exception instanceof QueryException) {
+            if ($exception->errorInfo[1] == 1452)
+                return $this->errorResponse([trans('response.SomeFiledIsNotFoundInDatabase')], 422);
+            return $this->errorResponse(trans('response.serverError. code : 222'), 422);
+        }
         else if ($exception instanceof ModelNotFoundException) {
             $model = strtolower(class_basename($exception->getModel()));
             return $this->errorResponse("Does not exist any instance of {$model} with the given id", Response::HTTP_NOT_FOUND);

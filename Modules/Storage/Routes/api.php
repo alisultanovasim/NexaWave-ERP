@@ -112,14 +112,43 @@ Route::group([
             Route::put('/{id}', 'DemandAssignmentController@update');
             Route::delete('/{id}', 'DemandAssignmentController@delete');
 
+            Route::post('/item', 'DemandAssignmentController@addItem');
+            Route::put('/item/{id}', 'DemandAssignmentController@updateItem');
+            Route::delete('/item/{id}', 'DemandAssignmentController@deleteItem');
+
             Route::group([
                 'prefix' => 'employee'
             ], function () {
-                Route::get('/', 'DemandAssignmentController@employeeGet');
                 Route::put('/{id}', 'DemandAssignmentController@employeeUpdate');
             });
 
         });
 
+    }); // demands
+
+    Route::group([
+        'prefix' => 'acts'
+    ], function ($q) {
+        Route::get('/', 'SellActController@index');
+        Route::get('/{id}', 'SellActController@show');
+        Route::post('/', 'SellActController@store');
+        Route::put('/{id}', 'SellActController@update');
+        Route::delete('/{id}', 'SellActController@delete');
+
+        Route::post('/demand/{id}', 'SellActController@addDemand');
+        Route::put('/demand/{id}', 'SellActController@updateDemand');
+        Route::delete('/demand/{id}', 'SellActController@deleteDemand');
+
+
     });
+
+    Route::group([
+        'prefix' => 'suppliers'
+    ], function ($q) {
+        Route::get('/', 'SupplierController@index');
+        Route::get('/{id}', 'SupplierController@show');
+        Route::post('/', 'SupplierController@store');
+        Route::put('/{id}', 'SupplierController@update');
+        Route::delete('{id}', 'SupplierController@delete');
+    }); //models
 });

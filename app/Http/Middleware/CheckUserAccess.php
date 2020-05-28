@@ -95,7 +95,6 @@ class CheckUserAccess
         $this->userRoles = $userRolesForThisRequest;
     }
 
-
     /**
      * @throws AuthorizationException
      */
