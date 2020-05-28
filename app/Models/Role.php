@@ -10,6 +10,7 @@ class Role extends Model
 
     private $superAdminRoleId = 1;
     private $companyAdminRoleId = 5;
+
     /**
      * @var array
      */
@@ -63,6 +64,14 @@ class Role extends Model
     public function getCompanyAdminRoleId(): int
     {
         return $this->companyAdminRoleId;
+    }
+
+    /**
+     * @return int
+     */
+    public function getOfficeAdminRoleId(): int
+    {
+        return $this->officeAdminRoleId;
     }
 
 }

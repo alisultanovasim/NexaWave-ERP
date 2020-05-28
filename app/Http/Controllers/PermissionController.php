@@ -111,7 +111,7 @@ class PermissionController extends Controller
             ]);
         if ($request->get('company_id'))
             $permissions = $permissions->companyId($request->get('company_id'));
-        $permissions = $permissions->first(['id', 'name']);
+        $permissions = $permissions->firstOrFail(['id', 'name']);
         return $this->successResponse(
             $this->formatRolePermissionsResponse($permissions)
         );

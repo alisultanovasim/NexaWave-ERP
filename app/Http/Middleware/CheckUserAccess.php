@@ -34,7 +34,13 @@ class CheckUserAccess
     public function __construct(Request $request, Role $role)
     {
         $this->request = $request;
-        $this->companyId = $request->get('company_id') ?? $request->header('company_id');
+        if ($request->hasHeader('company_id')){
+            $this->companyId = $request->header('company_id');
+        }else{
+            $headers = apache_request_headers();
+            $this->companyId =  array_key_exists('company_id' , (array)$headers) ? $headers['company_id'] : $request->get('company_id');
+        }
+//        $this->companyId = $request->get('company_id') ?? $request->header('company_id');
         $this->userRoles = UserRole::where('user_id', Auth::id())->get(['role_id', 'company_id']);
         $this->permissionProvider = new PermissionProvider($role, $this->companyId);
     }
