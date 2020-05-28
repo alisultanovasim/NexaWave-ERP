@@ -25,6 +25,7 @@ class CheckUserAccess
     private $permissionProvider;
     private $companyId;
     private $request;
+    private $roleModel;
 
     /**
      * CheckUserAccess constructor.
@@ -43,6 +44,7 @@ class CheckUserAccess
 //        $this->companyId = $request->get('company_id') ?? $request->header('company_id');
         $this->userRoles = UserRole::where('user_id', Auth::id())->get(['role_id', 'company_id']);
         $this->permissionProvider = new PermissionProvider($role, $this->companyId);
+        $this->roleModel = $role;
     }
 
     /**
@@ -84,7 +86,7 @@ class CheckUserAccess
     private function validateUserCompanyAndMergeToRequest($companyId) {
         $userRolesForThisRequest = [];
         foreach ($this->userRoles as $role){
-            if ($role->company_id == $companyId){
+            if ($role->company_id == $companyId or $role->role_id == $this->roleModel->getCompanyAdminRoleId()){
                 $userRolesForThisRequest[] = $role;
             }
         }

@@ -9,6 +9,7 @@ use App\Models\Role;
 use App\Models\RoleModulePermission;
 use App\Traits\ApiResponse;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -46,7 +47,7 @@ class PermissionController extends Controller
             $modules = $modules->hasCompany($request->get('company_id'));
         $modules = $modules->get(['id']);
         $moduleIds = $this->convertNestedModulesToModelsArray($modules);
-        $permissions = Module::whereIn('id', $moduleIds)
+        $modules = Module::whereIn('id', $moduleIds)
         ->with([
             'permissionList' => function ($query) use ($moduleIds){
                 $query->whereIn('role_module_permissions.role_id', \auth()->user()->getUserRolesForRequest());
@@ -61,7 +62,16 @@ class PermissionController extends Controller
             'id',
             'name'
         ]);
-        return $this->successResponse($permissions);
+        if (
+            (in_array($this->role->getCompanyAdminRoleId(), \auth()->user()->getUserRolesForRequest())) or
+            (in_array($this->role->getSuperAdminRoleId(), \auth()->user()->getUserRolesForRequest()))
+        ){
+            foreach ($modules as $key => $module){
+                $modules[$key]['permission_list'] = ['*'];
+                unset($module['permissionList']);
+            }
+        }
+        return $this->successResponse($modules);
     }
 
     /**
@@ -140,17 +150,35 @@ class PermissionController extends Controller
 
     /**
      * @param Request $request
-     * @return mixed
+     * @return JsonResponse
      * @throws ValidationException
      */
     public function setRolePermissions(Request $request): JsonResponse {
         $this->validate($request, $this->getRules($request->get('company_id')));
-        $permissions = $this->preparePermissionsInsertData($request->get('role_id'), $request->get('modules'));
-        return DB::transaction(function () use ($request, $permissions){
-            RoleModulePermission::where('role_id', $request->get('role_id'))->delete();
+        if ($request->get('role_id') and $request->get('role_name')){
+            $role = $this->saveRole($request, $this->role->where([
+                'id' => $request->get('role_id'),
+                'company_id' => $request->get('company_id')
+            ])->first(['id']));
+        }
+        if (!$request->get('role_id') and $request->get('role_name')){
+            $role = $this->saveRole($request, $this->role);
+        }
+        $permissions = $this->preparePermissionsInsertData($role->getKey(), $request->get('modules'));
+        return DB::transaction(function () use ($request, $permissions, $role){
+            RoleModulePermission::where('role_id', $role->getKey())->delete();
             RoleModulePermission::insert($permissions);
             return $this->successResponse(trans('responses.OK'));
         });
+    }
+
+    private function saveRole(Request $request, Role $role) {
+        $role->fill([
+            'name' => $request->get('role_name'),
+            'company_id' => $request->get('company_id'),
+            'created_by' => Auth::id()
+        ])->save();
+        return $role;
     }
 
     /**
@@ -194,10 +222,18 @@ class PermissionController extends Controller
                     'name' => $module->module_name,
                     'permissions' => []
                 ];
-            $modules[$module->id]['permissions'][] = [
-                'id' => $module->pivot->permission_id,
-                'name' => $module->pivot->permission_name,
-            ];
+            if (
+                (in_array($this->role->getCompanyAdminRoleId(), \auth()->user()->getUserRolesForRequest())) or
+                (in_array($this->role->getSuperAdminRoleId(), \auth()->user()->getUserRolesForRequest()))
+            ){
+                $modules[$module->id]['permissions'] = ['*'];
+            }
+            else {
+                $modules[$module->id]['permissions'][] = [
+                    'id' => $module->pivot->permission_id,
+                    'name' => $module->pivot->permission_name,
+                ];
+            }
         }
         $updatedPosition['modules'] = array_values($modules);
         $data[] = $updatedPosition;
@@ -215,7 +251,12 @@ class PermissionController extends Controller
             'modules.*.permissions.*.id' => 'required|exists:permissions,id',
         ];
         if ($companyId){
-            $rules['role_id'] = 'required|exists:roles,id,company_id,'.$companyId;
+            $rules['role_name'] = [
+                'nullable',
+                'max:255',
+                Rule::unique('roles', 'name')->where('company_id', $companyId)
+            ];
+            $rules['role_id'] = 'nullable|exists:roles,id,company_id,'.$companyId;
             $rules['modules.*.module_id'] = [
                 'required',
                 Rule::exists('company_modules', 'module_id')
@@ -224,7 +265,14 @@ class PermissionController extends Controller
             ];
         }
         else {
-            $rules['role_id'] = 'required|exists:roles,id';
+            $rules['role_name'] = [
+                'nullable',
+                'max:255',
+                Rule::unique('roles', 'name')->where('company_id',  function ($query, $company_id){
+                    $query->where('company_id', null);
+                })
+            ];
+            $rules['role_id'] = 'nullable|exists:roles,id';
             $rules['modules.*.module_id'] = [
                 'required',
                 Rule::exists('modules', 'id')

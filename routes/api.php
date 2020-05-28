@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::group(['prefix' => 'v1'] , function ($router) {
 
-    Route::group(['prefix' => 'profile', 'middleware' => 'auth:api', 'namespace' => 'Auth'] , function ($r) {
+    Route::group(['prefix' => 'profile', 'middleware' => ['auth:api', 'authorize'], 'namespace' => 'Auth'] , function ($r) {
         Route::get('/', 'ProfileController@profile');
         Route::post('/update', 'ProfileController@update');
         Route::get('/me', 'ProfileController@index');
