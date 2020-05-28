@@ -23,8 +23,6 @@ class ProfileController extends Controller
         $companies = null;
         $modules = null;
 
-
-
         return $this->dataResponse([
             'user' => $user,
             'companies' => $companies,
