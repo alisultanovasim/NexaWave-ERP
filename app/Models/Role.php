@@ -10,10 +10,13 @@ class Role extends Model
 
     private $superAdminRoleId = 1;
     private $companyAdminRoleId = 5;
+
+    protected $hidden = ['pivot'];
+
     /**
      * @var array
      */
-    protected $guarded = ['name'];
+    protected $guarded = ['id'];
 
 
     /**
@@ -63,6 +66,14 @@ class Role extends Model
     public function getCompanyAdminRoleId(): int
     {
         return $this->companyAdminRoleId;
+    }
+
+    /**
+     * @return int
+     */
+    public function getOfficeAdminRoleId(): int
+    {
+        return $this->officeAdminRoleId;
     }
 
 }

@@ -65,8 +65,16 @@ class PermissionProvider
      * @return bool
      */
     private function userHasAccess(array $userRoles, $moduleId, $permissionId): bool {
+
+        /*
+         * Company admin has permission to all subscribed modules
+         */
         if (in_array($this->roleModel->getCompanyAdminRoleId(), $userRoles))
             return true;
+
+        /*
+         * Check non user access
+         */
         return RoleModulePermission::where([
             'permission_id' => $permissionId,
             'module_id' => $moduleId,
@@ -79,10 +87,12 @@ class PermissionProvider
      * @return Collection
      */
     private function getRoleModulePermissions(): Collection {
+
         $permissions =  Module::where('modules.is_active', 1)
         ->join('permissions', function ($join){
             $join->where('permissions.is_active', 1);
         });
+
         /*
          * if user requests as company user get modules where company subscribed
          */
@@ -92,12 +102,14 @@ class PermissionProvider
                 $join->where('company_modules.is_active', 1);
             });
         }
+
         $permissions = $permissions->get([
             'modules.name as module_name',
             'permissions.name as permission_name',
             'modules.id as module_id',
             'permissions.id as permission_id'
         ]);
+
         return $permissions;
     }
 }
