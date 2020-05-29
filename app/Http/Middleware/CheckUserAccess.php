@@ -86,6 +86,7 @@ class CheckUserAccess
     private function validateUserCompanyAndMergeToRequest($companyId) {
         $userRolesForThisRequest = [];
         foreach ($this->userRoles as $role){
+            //todo update if condition
             if ($role->company_id == $companyId or $role->role_id == $this->roleModel->getCompanyAdminRoleId()){
                 $userRolesForThisRequest[] = $role;
             }
