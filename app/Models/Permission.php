@@ -23,7 +23,7 @@ class Permission extends Model
     const READ = 2;
     const UPDATE = 3;
     const DELETE = 4;
-    protected $hidden = ['pivot'];
+    protected $hidden = ['pivot', 'laravel_through_key'];
 
     /**
      * The "type" of the auto-incrementing ID.

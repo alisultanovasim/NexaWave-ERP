@@ -104,6 +104,25 @@ class   Module extends Model
             ->with(['subModules:id,name,parent_id', 'permissions:id,name,module_id']);
     }
 
+    public function subModuleIds(){
+        $relation = $this->hasMany('App\Models\Module', 'parent_id', 'id')
+            ->with(['subModuleIds:id,parent_id']);
+        if (request()->get('company_id'))
+            $relation = $relation->hasCompany(request()->get('company_id'));
+        return $relation;
+    }
+
+    public function permissionList(){
+        return $this->hasManyThrough(
+            Permission::class,
+            RoleModulePermission::class,
+            'module_id',
+            'id',
+            'id',
+            'permission_id'
+        );
+    }
+
 
     public function scopeHasCompany($query, $companyId){
         return $query->whereHas('companyModules', function ($query) use ($companyId){

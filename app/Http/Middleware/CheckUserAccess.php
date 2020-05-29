@@ -25,14 +25,26 @@ class CheckUserAccess
     private $permissionProvider;
     private $companyId;
     private $request;
+    private $roleModel;
 
-
+    /**
+     * CheckUserAccess constructor.
+     * @param Request $request
+     * @param Role $role
+     */
     public function __construct(Request $request, Role $role)
     {
         $this->request = $request;
-        $this->companyId = $request->get('company_id') ?? $request->header('company_id');
+        if ($request->hasHeader('company_id')){
+            $this->companyId = $request->header('company_id');
+        }else{
+            $headers = apache_request_headers();
+            $this->companyId =  array_key_exists('company_id' , (array)$headers) ? $headers['company_id'] : $request->get('company_id');
+        }
+//        $this->companyId = $request->get('company_id') ?? $request->header('company_id');
         $this->userRoles = UserRole::where('user_id', Auth::id())->get(['role_id', 'company_id']);
         $this->permissionProvider = new PermissionProvider($role, $this->companyId);
+        $this->roleModel = $role;
     }
 
     /**
@@ -48,16 +60,24 @@ class CheckUserAccess
         if ($this->companyId){
             $this->validateUserCompanyAndMergeToRequest($this->companyId);
         }
+
         /*
          * When user requests as platform user
          */
         else {
             $this->removeCompanyRolesFromUserRoleListForThisRequest();
         }
+
+        /*
+         * Boot permissions and set user roles
+         */
         $userRoles = collect($this->userRoles)->pluck('role_id')->toArray();
+        \auth()->user()->setUserRolesForRequest($userRoles);
         $this->permissionProvider->boot($userRoles);
+
         return $next($this->request);
     }
+
 
     /**
      * @param $companyId
@@ -66,7 +86,7 @@ class CheckUserAccess
     private function validateUserCompanyAndMergeToRequest($companyId) {
         $userRolesForThisRequest = [];
         foreach ($this->userRoles as $role){
-            if ($role->company_id == $companyId){
+            if ($role->company_id == $companyId or $role->role_id == $this->roleModel->getCompanyAdminRoleId()){
                 $userRolesForThisRequest[] = $role;
             }
         }
@@ -78,13 +98,23 @@ class CheckUserAccess
     }
 
     /**
-     *
+     * @throws AuthorizationException
      */
     private function removeCompanyRolesFromUserRoleListForThisRequest(): void {
+        /*
+         * Remove company roles
+         */
         foreach ($this->userRoles as $key => $role){
             if ($role->company_id !== null){
                 unset($this->userRoles[$key]);
             }
+        }
+
+        /*
+         * If user has no remain roles (user has not platform roles)
+         */
+        if (!count($this->userRoles)){
+            throw new AuthorizationException();
         }
     }
 
