@@ -7,8 +7,12 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Jobs\SendMailCreatePassword;
 use App\Models\Company;
+use App\Models\CompanyModule;
+use App\Models\Module;
+use App\Models\Role;
 use App\Models\User;
 use App\Models\UserReset;
+use App\Models\UserRole;
 use App\Traits\ApiResponse;
 use App\Traits\DocumentUploader;
 use Carbon\Carbon;
@@ -56,12 +60,14 @@ class UserController extends Controller
         ]);
     }
 
+
     /**
      * @param Request $request
+     * @param Role $role
      * @return mixed
      * @throws ValidationException
      */
-    public function register(Request $request)
+    public function register(Request $request, Role $role)
     {
         $this->validate($request, [
             'email' => 'required|email|unique:users,email',
@@ -77,7 +83,7 @@ class UserController extends Controller
             'company_name' => 'required|min:3'
         ]);
 
-        return DB::transaction(function () use ($request) {
+        return DB::transaction(function () use ($request, $role) {
             $user = new User();
             $user->fill([
                 'name' => $request->get('name'),
@@ -86,7 +92,7 @@ class UserController extends Controller
                 'email' => $request->get('email'),
                 'voen' => $request->get('voen'),
                 'password' => Hash::make($request->get('password')),
-                'role_id' => User::EMPLOYEE,
+//                'role_id' => User::EMPLOYEE,
             ]);
             $user->save();
             UserDetail::create([
@@ -110,9 +116,28 @@ class UserController extends Controller
                 'employee_id' => $employee->getKey(),
                 'position_id' => Positions::DIRECTOR,
             ]);
+            $this->saveCompanyModules($company->getKey());
+            UserRole::create([
+                'user_id' => $user->getKey(),
+                'role_id' => $role->getCompanyAdminRoleId(),
+                'company_id' => $company->getKey()
+            ]);
             $request->merge(['username' => $request->get('fin')]);
             return $this->login($request);
         });
+    }
+
+    private function saveCompanyModules($companyId){
+        $insert = [];
+        $modules = Module::query()->get(['id']);
+        foreach ($modules as $module){
+            $insert[] = [
+                'module_id' => $module['id'],
+                'company_id' => $companyId,
+                'is_active' => 1
+            ];
+        }
+        CompanyModule::insert($insert);
     }
 
     public function destroy($id)

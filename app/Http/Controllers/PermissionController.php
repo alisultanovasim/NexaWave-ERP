@@ -209,7 +209,6 @@ class PermissionController extends Controller
      * @return array
      */
     private function formatRolePermissionsResponse($roleWithPermissions) {
-        $data = [];
         $updatedPosition = [
             'id' => $roleWithPermissions->id,
             'name' => $roleWithPermissions->name,
@@ -236,8 +235,7 @@ class PermissionController extends Controller
             }
         }
         $updatedPosition['modules'] = array_values($modules);
-        $data[] = $updatedPosition;
-        return $data;
+        return $updatedPosition;
     }
 
     /**
