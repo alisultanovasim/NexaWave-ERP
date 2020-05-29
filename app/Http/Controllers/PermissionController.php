@@ -159,7 +159,7 @@ class PermissionController extends Controller
             $role = $this->saveRole($request, $this->role->where([
                 'id' => $request->get('role_id'),
                 'company_id' => $request->get('company_id')
-            ])->first(['id']));
+            ])->firstOrFail(['id']));
         }
         if (!$request->get('role_id') and $request->get('role_name')){
             $role = $this->saveRole($request, $this->role);
@@ -268,9 +268,7 @@ class PermissionController extends Controller
             $rules['role_name'] = [
                 'nullable',
                 'max:255',
-                Rule::unique('roles', 'name')->where('company_id',  function ($query, $company_id){
-                    $query->where('company_id', null);
-                })
+                Rule::unique('roles', 'name')->where('company_id',  $companyId)
             ];
             $rules['role_id'] = 'nullable|exists:roles,id';
             $rules['modules.*.module_id'] = [

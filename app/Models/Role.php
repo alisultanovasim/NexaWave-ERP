@@ -11,6 +11,8 @@ class Role extends Model
     private $superAdminRoleId = 1;
     private $companyAdminRoleId = 5;
 
+    protected $hidden = ['pivot'];
+
     /**
      * @var array
      */

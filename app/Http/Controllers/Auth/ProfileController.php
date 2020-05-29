@@ -20,7 +20,7 @@ class ProfileController extends Controller
 
     public function profile(Request $request, Role $role)
     {
-        $user = Auth::user()->load('role:id,name');
+        $user = Auth::user();
         $office = null;
         $companies = null;
         $modules = null;
