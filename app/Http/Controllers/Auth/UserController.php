@@ -7,6 +7,8 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Jobs\SendMailCreatePassword;
 use App\Models\Company;
+use App\Models\CompanyModule;
+use App\Models\Module;
 use App\Models\Role;
 use App\Models\User;
 use App\Models\UserReset;
@@ -114,6 +116,7 @@ class UserController extends Controller
                 'employee_id' => $employee->getKey(),
                 'position_id' => Positions::DIRECTOR,
             ]);
+            $this->saveCompanyModules($company->getKey());
             UserRole::create([
                 'user_id' => $user->getKey(),
                 'role_id' => $role->getCompanyAdminRoleId(),
@@ -122,6 +125,19 @@ class UserController extends Controller
             $request->merge(['username' => $request->get('fin')]);
             return $this->login($request);
         });
+    }
+
+    private function saveCompanyModules($companyId){
+        $insert = [];
+        $modules = Module::query()->get(['id']);
+        foreach ($modules as $module){
+            $insert[] = [
+                'module_id' => $module['id'],
+                'company_id' => $companyId,
+                'is_active' => 1
+            ];
+        }
+        CompanyModule::insert($insert);
     }
 
     public function destroy($id)
