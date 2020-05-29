@@ -894,7 +894,8 @@ class OfficeController extends Controller
             'password' => Hash::make($request->get('password')),
             'username' => $request->get('username'),
             'is_office_user' => true,
-            'office_company_id' => $request->get('company_id')
+            'office_company_id' => $request->get('company_id'),
+            'role_id' => User::OFFICE
         ]);
 
         OfficeUser::create([
