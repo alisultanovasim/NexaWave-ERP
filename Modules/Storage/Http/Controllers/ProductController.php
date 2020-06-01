@@ -36,7 +36,17 @@ class ProductController extends Controller
 //            ->where('id', $request->get('title_id'))
 //            ->where('company_id', $request->get('company_id'))
 //            ->first();
-        $products = Product::with('model:id,name')->where('company_id', $request->get('company_id'));
+        $products = Product::with([
+            'kind',
+            'model:id,name',
+            'title:id,name',
+            'state:id,name',
+            'color:id,name',
+            'storage:id,name',
+            'kind.unit',
+            'buy_from_country:id,name:short_name',
+            'made_in_country:id,name:short_name'
+        ])->where('company_id', $request->get('company_id'));
 
         if ($request->has('status'))
             $products->where('status', $request->get('status'));
@@ -54,7 +64,7 @@ class ProductController extends Controller
 //            'title' => $title   ,
 //            'products' => $products
 //        ]
-        return $this->dataResponse($products);
+            return $this->dataResponse($products);
     }
 
     public function firstPage(Request $request)

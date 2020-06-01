@@ -60,7 +60,6 @@ class UserController extends Controller
         ]);
     }
 
-
     /**
      * @param Request $request
      * @param Role $role
@@ -255,7 +254,7 @@ class UserController extends Controller
     {
         $user = self::createUser($request);
 
-         SendMailCreatePassword::dispatch($user);
+//         SendMailCreatePassword::dispatch($user);
 
         return $this->successResponse('ok');
     }

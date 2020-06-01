@@ -18,6 +18,6 @@ class PlazaDatabaseSeeder extends Seeder
     {
         Model::unguard();
          $this->call(KindSeederTableSeeder::class);
-        $this->call(HelperDataSeederTableSeeder::class);
+//        $this->call(HelperDataSeederTableSeeder::class);
     }
 }

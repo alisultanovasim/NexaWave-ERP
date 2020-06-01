@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::group([
     'prefix' => 'v1/plaza',
-    'middleware' =>   ['auth:api' , 'company']
+    'middleware' =>   ['auth:api' , 'authorize']
 ], function ($route) {
 
     Route::group([
