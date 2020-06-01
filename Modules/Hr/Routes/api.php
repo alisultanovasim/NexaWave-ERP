@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::group([
     'prefix' => "v1/hr",
-    'middleware' => ['auth:api', 'company']
+    'middleware' => ['auth:api', 'authorize']
 ], function ($route) {
 
     Route::post("organizationType", "OrganizationTypeController@store");
