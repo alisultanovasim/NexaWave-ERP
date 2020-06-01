@@ -4,7 +4,10 @@ namespace Modules\Hr\Http\Controllers\Employee;
 
 use App\Http\Controllers\Auth\UserController;
 use App\Models\User;
+use App\Models\UserRole;
+use Carbon\Carbon;
 use Illuminate\Foundation\Validation\ValidatesRequests;
+use Illuminate\Validation\Rule;
 use Modules\Hr\Entities\Employee\Employee;
 use App\Traits\ApiResponse;
 use App\Traits\Query;
@@ -72,6 +75,7 @@ class EmployeeController extends Controller
 
         $employees = $employees->with([
                 'user:id,name,surname',
+                'user.details:user_id,father_name,gender',
                 'contracts',
                 'contracts.position',
                 'contracts.currency'
@@ -88,6 +92,7 @@ class EmployeeController extends Controller
         ]);
         $employees = Employee::with([
             'user',
+            'user.roles:user_roles.user_id,user_roles.role_id',
             'user.details',
             'user.details.nationality',
             'user.details.citizen',
@@ -106,15 +111,17 @@ class EmployeeController extends Controller
 
     public function store(Request $request)
     {
-        //todo add roles to user
         $this->validate($request, [
             'company_id' => ['required', 'integer'],
             'is_active' => ['sometimes', 'required', 'boolean'],
             'user_id' => ['sometimes', 'required', 'integer'],
             'create_contract' => ['required', 'boolean'],
-            'tabel_no' => ['nullable' , 'string' , 'max:255']
+            'tabel_no' => ['nullable' , 'string' , 'max:255'],
+            'roles' => ['required', 'array', 'min:1'],
+            'roles.*' => [
+                Rule::exists('roles', 'id')->where('company_id', $request->get('company_id'))
+            ]
         ]);
-
         try {
             DB::beginTransaction();
 
@@ -124,6 +131,8 @@ class EmployeeController extends Controller
             } else {
                 $user = UserController::createUser($request);
             }
+
+            $this->setUserRoles($request->get('roles'), $user->id, $request->get('company_id'));
 
             $employee = Employee::create([
                 'company_id' => $request->get('company_id'),
@@ -157,12 +166,32 @@ class EmployeeController extends Controller
         }
     }
 
+    private function setUserRoles($roles, $userId, $companyId): void {
+        $insertData = [];
+        foreach ($roles as $role){
+            $insertData[] = [
+                'user_id' => $userId,
+                'company_id' => $companyId,
+                'role_id' => $role,
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now()
+            ];
+        }
+
+        UserRole::where(['user_id' => $userId, 'company_id' => $companyId])->delete();
+        UserRole::insert($insertData);
+    }
+
     public function update(Request $request, $id)
     {
         $this->validate($request, [
             'is_active' => ['sometimes', 'required', 'boolean'],
             'company_id' => ['required', 'integer'],
-            'update_user' => ['sometimes', 'boolean']
+            'update_user' => ['sometimes', 'boolean'],
+            'roles' => ['nullable', 'array', 'min:1'],
+            'roles.*' => [
+                Rule::exists('roles', 'id')->where('company_id', $request->get('company_id'))
+            ]
         ]);
 
 
@@ -176,6 +205,9 @@ class EmployeeController extends Controller
             ->first(['id', 'user_id', 'is_active']);
 
         if (!$employee) return $this->errorResponse(trans('response.employeeNotFound'), 404);
+
+        if ($request->get('roles'))
+            $this->setUserRoles($request->get('roles'), $employee->user_id, $request->get('company_id'));
 
         $data = $request->only(['is_active' , 'tabel_no']);
 
@@ -204,6 +236,10 @@ class EmployeeController extends Controller
             if (!$employee) return $this->errorResponse(trans('response.employeeNotFound'));
 
             Employee::where('id', $id)->delete();
+            UserRole::where([
+                'user_id' => $employee->user_id,
+                'company_id' => $request->get('company_id')
+            ])->delete();
 
             return $this->successResponse('ok');
         } catch (\Exception $exception) {
