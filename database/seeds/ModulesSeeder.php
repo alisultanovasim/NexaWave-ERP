@@ -57,7 +57,8 @@ class ModulesSeeder extends Seeder
                         "new_permissions" => []
                     ]
                 ],
-                "new_permissions" => []
+                "new_permissions" => [],
+                'icon' =>  '/assets/images/svg/doc-management.svg'
             ],
             "Biznes Mərkəzinin İdarə Edilməsi" => [
                 "new_permissions" => [],
@@ -156,7 +157,7 @@ class ModulesSeeder extends Seeder
                     ]
                 ],
                 "new_permissions" => [],
-
+                'icon' => '/assets/images/svg/hr.svg'
             ]
         ];
 
