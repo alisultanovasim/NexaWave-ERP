@@ -9,7 +9,7 @@ use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
 use Modules\Storage\Entities\ProductState;
 
-class ProductStateController extends Controller
+class   ProductStateController extends Controller
 {
     use ValidatesRequests, ApiResponse;
 
@@ -52,7 +52,7 @@ class ProductStateController extends Controller
 
     public function destroy($id)
     {
-        ProductState::where('company_id' , \request('company_id'))
+        ProductState::where('company_id' , request('company_id'))
             ->where('id' ,$id)
             ->delete();
         return $this->successResponse('ok');

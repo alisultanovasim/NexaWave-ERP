@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Auth;
+use Rennokki\QueryCache\Traits\QueryCacheable;
 
 /**
  * @property integer $id
@@ -20,7 +21,12 @@ use Illuminate\Support\Facades\Auth;
  */
 class   Module extends Model
 {
+//    use QueryCacheable;
 
+//    public $cacheFor = 24 * 60 * 60; // cache time, in seconds
+
+    //uncomment above line after changing cache driver to redis
+//    public $cacheFor = 0;
     /**
      * The "type" of the auto-incrementing ID.
      *
@@ -41,6 +47,9 @@ class   Module extends Model
         return $this->hasMany('App\Models\CompanyModule');
     }
 
+
+    protected $hidden = ['pivot'];
+
     /**
      * @return HasMany
      */
@@ -57,6 +66,13 @@ class   Module extends Model
         return $this->hasMany('App\Models\Permission');
     }
 
+    public function getDefaultPermissionsAttribute(){
+        return Permission::whereNull('module_id')->get([
+            'id','name' ,'module_id'
+        ]);
+    }
+
+
     /**
      * @return BelongsToMany
      */
@@ -70,6 +86,14 @@ class   Module extends Model
         );
     }
 
+    /**
+     * Invalidate the cache automatically
+     * upon update in the database.
+     *
+     * @var bool
+     */
+    protected static $flushCacheOnUpdate = true;
+
 
     /**
      * @return HasMany
@@ -77,8 +101,28 @@ class   Module extends Model
     public function subModules()
     {
         return $this->hasMany('App\Models\Module', 'parent_id', 'id')
-            ->with(['subModules:id,name,parent_id']);
+            ->with(['subModules:id,name,parent_id', 'permissions:id,name,module_id']);
     }
+
+    public function subModuleIds(){
+        $relation = $this->hasMany('App\Models\Module', 'parent_id', 'id')
+            ->with(['subModuleIds:id,parent_id']);
+        if (request()->get('company_id'))
+            $relation = $relation->hasCompany(request()->get('company_id'));
+        return $relation;
+    }
+
+    public function permissionList(){
+        return $this->hasManyThrough(
+            Permission::class,
+            RoleModulePermission::class,
+            'module_id',
+            'id',
+            'id',
+            'permission_id'
+        );
+    }
+
 
     public function scopeHasCompany($query, $companyId){
         return $query->whereHas('companyModules', function ($query) use ($companyId){

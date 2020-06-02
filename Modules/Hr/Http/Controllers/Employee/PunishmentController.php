@@ -78,8 +78,8 @@ class PunishmentController extends Controller
      * @throws ValidationException
      */
     public function create(Request $request): JsonResponse {
-        $this->validate($request, $this->getRewardRules($request));
-        $this->saveReward($request, $this->punishment);
+        $this->validate($request, $this->getPunishmentRules($request));
+        $this->savePunishment($request, $this->punishment);
         return $this->successResponse(trans('messages.saved'), 201);
     }
 
@@ -90,9 +90,9 @@ class PunishmentController extends Controller
      * @throws ValidationException
      */
     public function update(Request $request, $id): JsonResponse {
-        $this->validate($request, $this->getRewardRules($request));
+        $this->validate($request, $this->getPunishmentRules($request));
         $punishment = $this->punishment->where('id', $id)->whereBelongsToCompany($request->get('company_id'))->firstOrFail();
-        $this->saveReward($request, $punishment);
+        $this->savePunishment($request, $punishment);
         return $this->successResponse(trans('messages.saved'), 200);
     }
 
@@ -112,9 +112,9 @@ class PunishmentController extends Controller
      * @param Request $request
      * @param Punishment $punishment
      */
-    private function saveReward(Request $request, Punishment $punishment): void {
+    private function savePunishment(Request $request, Punishment $punishment): void {
         $punishment->fill($request->only(
-            array_keys($this->getRewardRules($request))
+            array_keys($this->getPunishmentRules($request))
         ))->save();
     }
 
@@ -122,7 +122,7 @@ class PunishmentController extends Controller
      * @param Request $request
      * @return array
      */
-    private function getRewardRules(Request $request): array {
+    private function getPunishmentRules(Request $request): array {
         return [
             'employee_id' => [
                 'required',
@@ -133,6 +133,8 @@ class PunishmentController extends Controller
             'amount' => 'required|numeric',
             'date_of_issue' => 'required|date',
             'expire_date' => 'required|date',
+            'reason' => 'nullable|max:255',
+            'note' => 'nullable|max:255',
         ];
     }
 }

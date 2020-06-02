@@ -16,7 +16,6 @@ class CreateProductColorsTable extends Migration
         Schema::create('product_colors', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('name');
-            $table->string('company_id');
             $table->string('hex')->nullable();
             $table->timestamps();
         });

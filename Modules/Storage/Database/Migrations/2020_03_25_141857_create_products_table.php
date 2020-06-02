@@ -17,8 +17,8 @@ class CreateProductsTable extends Migration
             $table->bigIncrements('id');
             $table->unsignedInteger('unit_id');
 
-            $table->unsignedTinyInteger("less_value");
-            $table->unsignedTinyInteger("quickly_old");
+            $table->boolean("less_value");
+            $table->boolean("quickly_old");
 
             $table->unsignedBigInteger('title_id');
             $table->foreign('title_id')->references('id')->on('product_titles')->onDelete('cascade');

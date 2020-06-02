@@ -8,45 +8,46 @@ class UserDetail extends Model
 {
     const DRIVING_CATEGORIES = ['A1','A','B','C','D','E'];
     protected $table = 'user_details';
-    protected $fillable = [
-        'fin',
-        'birthday',
-        'father_name',
-        'gender',
-        'nationality_id',
-        'citizen_id',
-        'birthday_country_id',
-        'birthday_city_id',
-        'birthday_region_id',
-        'blood_id',
-        'eye_color_id',
-        'user_id',
-        'passport_seria',
-        'passport_number',
-        'passport_from_organ',
-        'passport_get_at',
-        'passport_expire_at',
-        'military_status',
-        'military_start_at',
-        'military_end_at',
-        'military_state_id',
-        'military_passport_number',
-        'military_place',
-        'driving_license_number',
-        'driving_license_categories',
-        'driving_license_organ',
-        'driving_license_get_at',
-        'driving_license_expire_at',
-        'foreign_passport_number',
-        'foreign_passport_organ',
-        'foreign_passport_get_at',
-        'foreign_passport_expire_at',
-        'family_status_document_number',
-        'family_status_state',
-        'family_status_register_at',
-        'avatar',
-        'social_insurance_no'
-    ];
+    protected  $guarded = ['id'];
+//    protected $fillable = [
+//        'fin',
+//        'birthday',
+//        'father_name',
+//        'gender',
+//        'nationality_id',
+//        'citizen_id',
+//        'birthday_country_id',
+//        'birthday_city_id',
+//        'birthday_region_id',
+//        'blood_id',
+//        'eye_color_id',
+//        'user_id',
+//        'passport_seria',
+//        'passport_number',
+//        'passport_from_organ',
+//        'passport_get_date',
+//        'passport_expire_date',
+//        'military_status',
+//        'military_start_date',
+//        'military_end_date',
+//        'military_state_id',
+//        'military_passport_number',
+//        'military_place',
+//        'driving_license_number',
+//        'driving_license_categories',
+//        'driving_license_organ',
+//        'driving_license_get_at',
+//        'driving_license_expire_date',
+//        'foreign_passport_number',
+//        'foreign_passport_organ',
+//        'foreign_passport_get_date',
+//        'foreign_passport_expire_date',
+//        'family_status_document_number',
+//        'family_status_state',
+//        'family_status_register_date',
+//        'avatar',
+//        'social_insurance_no'
+//    ];
 
     public function user(){
         return $this->belongsTo('App\Models\User');
@@ -72,5 +73,11 @@ class UserDetail extends Model
 
     public function birthdayRegion(){
         return $this->belongsTo('Modules\Hr\Entities\Region');
+    }
+
+    public function getAvatarAttribute($value){
+        if ($value)
+            return env("APP_URL") . "/users/" . $value;
+        return null;
     }
 }

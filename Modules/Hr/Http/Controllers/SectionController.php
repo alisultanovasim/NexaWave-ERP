@@ -99,7 +99,6 @@ class SectionController extends Controller
             'name' => 'required|max:256',
             'code' => 'required|max:50',
             'short_name' => 'required|max:50',
-            'department_id' => 'numeric|min:1',
             'is_closed' => 'boolean',
             'closing_date' => 'nullable|date_format:Y-m-d',
             'position' => 'required|numeric',
@@ -118,7 +117,6 @@ class SectionController extends Controller
             'name' => $request->get('name'),
             'code' => $request->get('code'),
             'short_name' => $request->get('short_name'),
-            'department_id' => $request->get('department_id'),
             'is_closed' => $request->get('is_closed'),
             'company_id' => $request->get('company_id'),
             'position' => $request->get('position')

@@ -30,9 +30,9 @@ class ProductTitleController extends Controller
                 'kinds'
             ])
                 ->orderBy('id', 'desc')
-                ->get();
+                ->paginate($request->get('per_page'));
 
-        return $this->successResponse($titles);
+        return $this->dataResponse($titles);
     }
 
 

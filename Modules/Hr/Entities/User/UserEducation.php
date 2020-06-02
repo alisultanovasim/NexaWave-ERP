@@ -8,6 +8,7 @@ use Modules\Hr\Entities\EducationLevel;
 use Modules\Hr\Entities\EducationPlace;
 use Modules\Hr\Entities\EducationSpecialty;
 use Modules\Hr\Entities\EducationState;
+use Modules\Hr\Entities\Faculty;
 use Modules\Hr\Entities\Language;
 
 class UserEducation extends Model
@@ -19,7 +20,7 @@ class UserEducation extends Model
         return $this->belongsTo(User::class);
     }
     public function speciality(){
-        return $this->belongsTo(EducationSpecialty::class);
+        return $this->belongsTo(EducationSpecialty::class , 'education_specialty_id');
     }
     public function place(){
         return $this->belongsTo(EducationPlace::class , 'education_place_id');
@@ -33,8 +34,14 @@ class UserEducation extends Model
     public function language(){
         return $this->belongsTo(Language::class);
     }
+    public function faculty(){
+        return $this->belongsTo(Faculty::class);
+    }
 
     public function scopeCompany($q ){
+
+
+
         return $q->whereHas('user' , function ($q){
             $q->company();
         });

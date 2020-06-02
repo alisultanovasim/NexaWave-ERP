@@ -10,6 +10,7 @@ use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Routing\Controller;
+use Modules\Esd\Entities\Section;
 
 class StatisticsController extends  Controller
 {
@@ -17,20 +18,13 @@ class StatisticsController extends  Controller
     public function documents(Request $request){
         $this->validate($request , [
             'company_id' => 'required|integer',
-
         ]);
-        $statistics =  Document::where('documents.status' , "!=" , config('esd.document.status.draft'))
-            ->where('documents.company_id' , $request->company_id)
-            ->join('sections' , 'sections.id' , '=' , 'documents.section_id')
-            ->groupBy(['sections.name' , 'sections.id'])
-            ->get(DB::raw('count(documents.id) as count , sections.name as section , sections.id as section_id '));
 
-//        $total = Document::where('status' , "!=" , config('esd.document.status.draft'))
-//            ->where('company_id' , $request->company_id)
-//            ->get(DB::raw("count(*) as count"));
-        return $this->successResponse([
-//            'total' => $total,
-            'by_sections' => $statistics
-        ]);
+        $data = Section::withCount(['documents' => function ($q){
+            $q
+            ->where('company_id' , \request('company_id'))
+            ->select(DB::raw('count(*)'));
+        }])->get();
+        return $this->successResponse($data);
     }
 }

@@ -44,7 +44,6 @@ class  AdjustmentController extends Controller
                     $arr[$k]['user_id'] = Auth::id();
                     $arr[$k]['section_type'] = $request->section_type;
                 }
-
                 Adjustment::insert($arr);
                 unset($arr);
                 $adjustments = $sendArr;
@@ -52,7 +51,6 @@ class  AdjustmentController extends Controller
             return $this->successResponse($adjustments);
         }catch (\Exception $exception){
             return $this->errorResponse(trans('apiResponse.tryLater') , Response::HTTP_INTERNAL_SERVER_ERROR);
-
         }
     }
 

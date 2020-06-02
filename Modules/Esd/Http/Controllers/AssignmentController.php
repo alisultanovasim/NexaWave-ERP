@@ -50,11 +50,14 @@ class AssignmentController extends Controller
             if (!$document)
                 return $this->errorResponse(trans("apiResponse.documentNotFound"));
 
-            if ($document->status !== Document::ACTIVE)
+            if ($document->status !== Document::ACTIVE and  $document->status !== Document::WAIT)
                 return $this->errorResponse(['error' => trans("apiResponse.docStatusError", ["status" => $document->status])]);
 
-            if ($request->has('expire_time')) $document->update(['expire_time' => $request->expire_time]);
+//            if ($request->has('expire_time')) $document->update(['expire_time' => $request->expire_time]);
 
+            if ($document->status == Document::WAIT)
+                Document::where('id' , $id)
+                    ->update(['status' =>Document::ACTIVE]);
 
             $helper = array_unique($request->user_ids);
 
@@ -237,9 +240,10 @@ class AssignmentController extends Controller
             'user_ids.*' => ['required', 'integer']
         ]);
         try {
-
-
             $helper = array_unique($request->user_ids);
+
+            if (in_array(Auth::id() , $helper)) return $this->errorResponse(trans('response.selfsend'),422);
+
             if (!$this->checkUser($helper , $request))
                 return $this->errorResponse(trans('response.unProcess'));
 
@@ -299,7 +303,7 @@ class AssignmentController extends Controller
                 ->exists();
             if (!$document)
                 return $this->errorResponse(trans("apiResponse.documentNotExists"));
-            $assignment = Assignment::with(['items', 'items.notes', 'items.employee.user'])
+            $assignment = Assignment::with(['items', 'items.notes','items.rejects', 'items.employee.user'])
                 ->where('document_id', $id)->first();
             return $this->successResponse($assignment);
         } catch (\Exception $e) {
@@ -365,7 +369,7 @@ class AssignmentController extends Controller
             if (!$assignmentItem)
                 return $this->errorResponse(trans('apiResponse.itemNotFound'));
 
-            $notes = $request->notes;
+            $notes = array_merge($request->get('notes')??[] , $request->notes??[]);
             Note::insert($this->saveNotes($assignmentItem, $notes, $request, $str = 'notes'));
             return $this->successResponse("OK");
         } catch (\Exception $e) {
@@ -624,4 +628,5 @@ class AssignmentController extends Controller
             ->count();
          return count($helper) == $employees;
     }
+
 }

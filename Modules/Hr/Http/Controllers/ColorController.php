@@ -44,6 +44,7 @@ class ColorController extends Controller
             Color::create([
                 'name' => $request->get('name'),
                 'code' => $request->get('code'),
+                'position' => 0
             ]);
         }
         catch (\Exception $exception)

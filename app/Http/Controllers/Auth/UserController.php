@@ -7,8 +7,12 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Jobs\SendMailCreatePassword;
 use App\Models\Company;
+use App\Models\CompanyModule;
+use App\Models\Module;
+use App\Models\Role;
 use App\Models\User;
 use App\Models\UserReset;
+use App\Models\UserRole;
 use App\Traits\ApiResponse;
 use App\Traits\DocumentUploader;
 use Carbon\Carbon;
@@ -44,6 +48,7 @@ class UserController extends Controller
             'password' => ['required', 'min:6']
         ]);
 
+        //todo make auth not only with username but with email too bro :D
         if (!Auth::attempt($request->only('username', 'password'))) {
             return $this->errorResponse(trans('response.invalidLoginOrPassword'));
         }
@@ -51,16 +56,18 @@ class UserController extends Controller
         return $this->dataResponse([
             'token_type' => 'Bearer',
             'access_token' => $token,
-            'user' => Auth::user()
+            'user' => Auth::user()->load('roles:roles.id,user_roles.company_id'),
         ]);
     }
 
+
     /**
      * @param Request $request
+     * @param Role $role
      * @return mixed
      * @throws ValidationException
      */
-    public function register(Request $request)
+    public function register(Request $request, Role $role)
     {
         $this->validate($request, [
             'email' => 'required|email|unique:users,email',
@@ -76,15 +83,16 @@ class UserController extends Controller
             'company_name' => 'required|min:3'
         ]);
 
-        return DB::transaction(function () use ($request) {
+        return DB::transaction(function () use ($request, $role) {
             $user = new User();
             $user->fill([
                 'name' => $request->get('name'),
+                'surname' => $request->get('surname'),
                 'username' => $request->get('fin'),
                 'email' => $request->get('email'),
                 'voen' => $request->get('voen'),
                 'password' => Hash::make($request->get('password')),
-                'role_id' => User::EMPLOYEE,
+//                'role_id' => User::EMPLOYEE,
             ]);
             $user->save();
             UserDetail::create([
@@ -94,7 +102,8 @@ class UserController extends Controller
             ]);
             $company = new Company();
             $company->fill([
-                'name' => $request->get('company_name')
+                'name' => $request->get('company_name'),
+                'owner_id' => $user->id
             ]);
             $company->save();
             $employee = new Employee();
@@ -107,9 +116,28 @@ class UserController extends Controller
                 'employee_id' => $employee->getKey(),
                 'position_id' => Positions::DIRECTOR,
             ]);
+            $this->saveCompanyModules($company->getKey());
+            UserRole::create([
+                'user_id' => $user->getKey(),
+                'role_id' => $role->getCompanyAdminRoleId(),
+                'company_id' => $company->getKey()
+            ]);
             $request->merge(['username' => $request->get('fin')]);
             return $this->login($request);
         });
+    }
+
+    private function saveCompanyModules($companyId){
+        $insert = [];
+        $modules = Module::query()->get(['id']);
+        foreach ($modules as $module){
+            $insert[] = [
+                'module_id' => $module['id'],
+                'company_id' => $companyId,
+                'is_active' => 1
+            ];
+        }
+        CompanyModule::insert($insert);
     }
 
     public function destroy($id)
@@ -284,7 +312,7 @@ class UserController extends Controller
             'voen' => ['nullable', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255'],
             'fin' => ['required', 'string', 'max:255'],
-            'birthday' => ['nullable', 'date', 'date_format:dd-mm-YYYY'],
+            'birthday' => ['nullable', 'date', 'date_format:Y-m-d'],
             'father_name' => ['nullable', 'string', 'max:255'],
             'gender' => ['required', 'string', 'in:f,m'],
             'nationality_id' => ['nullable', 'integer'],
@@ -297,27 +325,27 @@ class UserController extends Controller
             'passport_seria' => ['nullable', 'string', 'max:255'],
             'passport_number' => ['nullable', 'string', 'max:255'],
             'passport_from_organ' => ['nullable', 'string', 'max:255'],
-            'passport_get_at' => ['nullable', 'date', 'date_format:dd-mm-YYYY'],
-            'passport_expire_at' => ['nullable', 'date', 'date_format:dd-mm-YYYY'],
+            'passport_get_at' => ['nullable', 'date', 'date_format:Y-m-d'],
+            'passport_expire_at' => ['nullable', 'date', 'date_format:Y-m-d'],
             'social_insurance_no' => ['nullable' , 'string' , 'max:255'],
             'military_status' => ['nullable' , 'string' , 'max:255'],
-            'military_start_at' => ['nullable' , 'date', 'date_format:dd-mm-YYYY'],
-            'military_end_at' => ['nullable' , 'date', 'date_format:dd-mm-YYYY'],
+            'military_start_at' => ['nullable' , 'date', 'date_format:Y-m-d'],
+            'military_end_at' => ['nullable' , 'date', 'date_format:Y-m-d'],
             'military_state_id' => ['nullable' , 'string' , 'max:255'],
             'military_passport_number' => ['nullable' , 'string' , 'max:255'],
             'military_place' => ['nullable' , 'string' , 'max:255'],
             'driving_license_number' => ['nullable' , 'string' , 'max:255'],
             'driving_license_categories' => ['nullable' , 'string' , 'max:255'],
             'driving_license_organ' => ['nullable' , 'string' , 'max:255'],
-            'driving_license_get_at' => ['nullable' , 'date', 'date_format:dd-mm-YYYY'],
-            'driving_license_expire_at' => ['nullable' , 'date', 'date_format:dd-mm-YYYY'],
+            'driving_license_get_at' => ['nullable' , 'date', 'date_format:Y-m-d'],
+            'driving_license_expire_at' => ['nullable' , 'date', 'date_format:Y-m-d'],
             'foreign_passport_number' => ['nullable' , 'string' , 'max:255'],
             'foreign_passport_organ' => ['nullable' , 'string' , 'max:255'],
-            'foreign_passport_get_at' => ['nullable' , 'date', 'date_format:dd-mm-YYYY'],
-            'foreign_passport_expire_at' => ['nullable' , 'date', 'date_format:dd-mm-YYYY'],
+            'foreign_passport_get_at' => ['nullable' , 'date', 'date_format:Y-m-d'],
+            'foreign_passport_expire_at' => ['nullable' , 'date', 'date_format:Y-m-d'],
             'family_status_document_number' => ['nullable' , 'string' , 'max:255'],
             'family_status_state' => ['nullable' , 'string' , 'max:255'],
-            'family_status_register_at' => ['nullable' , 'date', 'date_format:dd-mm-YYYY'],
+            'family_status_register_at' => ['nullable' , 'date', 'date_format:Y-m-d'],
             'avatar' => ['nullable' , 'mimes:png,jpg,jpeg'],
         ];
     }
@@ -330,7 +358,7 @@ class UserController extends Controller
             'voen' => ['nullable', 'string', 'max:255'],
             'email' => ['nullable', 'email', 'max:255'],
 //            'fin' => ['nullable', 'string', 'max:255'],
-            'birthday' => ['nullable', 'date', 'date_format:dd-mm-YYYY'],
+            'birthday' => ['nullable', 'date', 'date_format:Y-m-d'],
             'father_name' => ['nullable', 'string', 'max:255'],
             'gender' => ['nullable', 'string', 'in:f,m'],
             'nationality_id' => ['nullable', 'integer'],
@@ -384,17 +412,52 @@ class UserController extends Controller
             ]
         ));
 
-        $data = $request->all();
+        $data = $request->only([
+            'fin',
+            'birthday',
+            'father_name',
+            'gender',
+            'nationality_id',
+            'citizen_id',
+            'birthday_country_id',
+            'birthday_city_id',
+            'birthday_region_id',
+            'blood_id',
+            'eye_color_id',
+            'user_id',
+            'passport_seria',
+            'passport_number',
+            'passport_from_organ',
+            'passport_get_date',
+            'passport_expire_date',
+            'military_status',
+            'military_start_date',
+            'military_end_date',
+            'military_state_id',
+            'military_passport_number',
+            'military_place',
+            'driving_license_number',
+            'driving_license_categories',
+            'driving_license_organ',
+            'driving_license_get_at',
+            'driving_license_expire_date',
+            'foreign_passport_number',
+            'foreign_passport_organ',
+            'foreign_passport_get_date',
+            'foreign_passport_expire_date',
+            'family_status_document_number',
+            'family_status_state',
+            'family_status_register_date',
+            'social_insurance_no'
+        ]);
         if ($request->hasFile('avatar')){
             $name = "{$user->id}.{$request->file('avatar')->getClientOriginalExtension()}";
             $request->file('avatar')->move(public_path('users')  , $name);
             $data['avatar'] = $name;
         }
+        $user->details()->create($data);
 
-        $user->details()->create($request->all());
-
-
-        SendMailCreatePassword::dispatch($user , $password);
+//        SendMailCreatePassword::dispatch($user , $password);
 
         return $user;
     }
@@ -407,19 +470,53 @@ class UserController extends Controller
         if ($data)
             User::where('id' ,$id)->update($data);
 
-        $data = $request->all();
+
+
+        $data = $request->only([
+            'fin',
+            'birthday',
+            'father_name',
+            'gender',
+            'nationality_id',
+            'citizen_id',
+            'birthday_country_id',
+            'birthday_city_id',
+            'birthday_region_id',
+            'blood_id',
+            'eye_color_id',
+            'user_id',
+            'passport_seria',
+            'passport_number',
+            'passport_from_organ',
+            'passport_get_date',
+            'passport_expire_date',
+            'military_status',
+            'military_start_date',
+            'military_end_date',
+            'military_state_id',
+            'military_passport_number',
+            'military_place',
+            'driving_license_number',
+            'driving_license_categories',
+            'driving_license_organ',
+            'driving_license_get_at',
+            'driving_license_expire_date',
+            'foreign_passport_number',
+            'foreign_passport_organ',
+            'foreign_passport_get_date',
+            'foreign_passport_expire_date',
+            'family_status_document_number',
+            'family_status_state',
+            'family_status_register_date',
+            'social_insurance_no'
+        ]);
         if ($request->hasFile('avatar')){
             $name = "$id.{$request->file('avatar')->getClientOriginalExtension()}";
             $request->file('avatar')->move(public_path('users')  , $name);
             $data['avatar'] = $name;
         }
-
-
-        $userDetail = UserDetail::whereHas('user' , function ($q) use ($id) {
-            $q->where('id' , $id);
-        })->first(['id']);
-
-        $userDetail->fill($request->all());
+        UserDetail::where('user_id' , $id)
+            ->update($data);
 
         return true;
     }

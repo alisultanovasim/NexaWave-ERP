@@ -23,7 +23,7 @@ class SectorController extends Controller
         ]);
         $result = Sector::where('company_id' , $request->get('company_id'))->orderBy('position');
 
-        if ($request->has('section_id')) $request->where('section_id' , $request->get('section_id'));
+        if ($request->has('section_id')) $result->where('section_id' , $request->get('section_id'));
 
         $result = $result->paginate($request->get('paginateCount'));
 
@@ -103,7 +103,6 @@ class SectorController extends Controller
             'name' => 'required|max:256',
             'code' => 'required|max:50',
             'short_name' => 'required|max:50',
-            'section_id' => 'required|numeric|min:1',
             'is_closed' => 'boolean',
             'closing_date' => 'date_format:Y-m-d',
             'position' => 'required|numeric',
@@ -120,10 +119,8 @@ class SectorController extends Controller
     {
         $data =  [
             'name' => $request->get('name'),
-            'company_id' => $request->get('company_id'),
             'code' => $request->get('code'),
             'short_name' => $request->get('short_name'),
-            'section_id' => $request->get('section_id'),
             'is_closed' => $request->get('is_closed'),
             'position' => $request->get('position'),
             'company_id' => $request->get('company_id')

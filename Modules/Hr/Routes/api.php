@@ -15,8 +15,9 @@ use Illuminate\Support\Facades\Route;
 
 Route::group([
     'prefix' => "v1/hr",
-    'middleware' => ['auth:api' , 'company']
+    'middleware' => ['auth:api', 'authorize']
 ], function ($route) {
+
     Route::post("organizationType", "OrganizationTypeController@store");
     Route::get("organizationType", "OrganizationTypeController@index");
     Route::delete("organizationType/{id}", "OrganizationTypeController@destroy");
@@ -29,6 +30,8 @@ Route::group([
         Route::put('/{id}', 'OrganizationController@update');
         Route::delete('/{id}', 'OrganizationController@destroy');
     });
+
+
 
     Route::group(['prefix' => "countries"], function ($router) {
         Route::get('/', 'CountryController@index');
@@ -116,7 +119,7 @@ Route::group([
         Route::delete('/{id}', 'SupplementSalaryTypeController@destroy');
     });
 
-    Route::group(['prefix' => 'salaries'], function (){
+    Route::group(['prefix' => 'salaries'], function () {
         Route::get('/', 'SalaryController@index');
         Route::get('/{id}', 'SalaryController@show');
         Route::post('/', 'SalaryController@create');
@@ -316,6 +319,7 @@ Route::group([
 
     Route::group(['prefix' => 'departments'], function ($router) {
         Route::get('/', 'DepartmentController@index');
+        Route::get('/structure', 'DepartmentController@structure');
         Route::get('/{id}', 'DepartmentController@show');
         Route::post('/', 'DepartmentController@create');
         Route::put('/{id}', 'DepartmentController@update');
@@ -362,12 +366,12 @@ Route::group([
     ], function ($router) {
 
         Route::get("/", 'EmployeeController@index');
-        Route::get("/{id}", 'EmployeeController@show')->where('id' , '[0-9]+');
+        Route::get("/{id}", 'EmployeeController@show')->where('id', '[0-9]+');
         Route::post("/", 'EmployeeController@store');
-        Route::put("/{id}", 'EmployeeController@update')->where('id' , '[0-9]+');
-        Route::delete("/{id}", 'EmployeeController@delete')->where('id' , '[0-9]+');
+        Route::post("/{id}", 'EmployeeController@update')->where('id', '[0-9]+');
+        Route::delete("/{id}", 'EmployeeController@delete')->where('id', '[0-9]+');
 
-        Route::group(['prefix' => 'rewards'], function (){
+        Route::group(['prefix' => 'rewards'], function () {
             Route::get("/", 'RewardController@index');
             Route::get("/{id}", 'RewardController@show');
             Route::post("/", 'RewardController@create');
@@ -375,7 +379,7 @@ Route::group([
             Route::delete("/{id}", 'RewardController@destroy');
         });
 
-        Route::group(['prefix' => 'punishments'], function (){
+        Route::group(['prefix' => 'punishments'], function () {
             Route::get("/", 'PunishmentController@index');
             Route::get("/{id}", 'PunishmentController@show');
             Route::post("/", 'PunishmentController@create');
@@ -391,7 +395,7 @@ Route::group([
 
         Route::group([
             'prefix' => 'contracts'
-        ],function ($route){
+        ], function ($route) {
             Route::get("/", 'ContractController@index');
             Route::get("/{id}", 'ContractController@show');
             Route::post("/", 'ContractController@store');
@@ -399,7 +403,6 @@ Route::group([
             Route::delete("/{id}", 'ContractController@delete');
         });
     });
-
 
 
     Route::group(['prefix' => 'workplaces'], function ($router) {
@@ -434,9 +437,23 @@ Route::group([
         Route::delete('/{id}', 'ContractTypeController@destroy');
     });
 
+    Route::group(['prefix' => 'inventories'], function () {
+        Route::get('/', 'InventoryController@index');
+        Route::post('/', 'InventoryController@create');
+        Route::put('/{id}', 'InventoryController@update');
+        Route::delete('/{id}', 'InventoryController@destroy');
+    });
+
+    Route::group(['prefix' => 'uniforms'], function () {
+        Route::get('/', 'UniformController@index');
+        Route::post('/', 'UniformController@create');
+        Route::put('/{id}', 'UniformController@update');
+        Route::delete('/{id}', 'UniformController@destroy');
+    });
+
     Route::group([
         'namespace' => 'User'
-    ],function ($router){
+    ], function ($router) {
         Route::group(['prefix' => 'users/education'], function ($router) {
             Route::get('/', 'UserEducationController@index');
             Route::get('/{id}', 'UserEducationController@show');
@@ -445,15 +462,15 @@ Route::group([
             Route::delete('/{id}', 'UserEducationController@delete');
         });
 
-        Route::group(['prefix' => 'users/certificates'], function (){
-           Route::get('/', 'UserCertificateController@index');
-           Route::get('/{id}', 'UserCertificateController@show');
-           Route::post('/', 'UserCertificateController@create');
-           Route::put('/{id}', 'UserCertificateController@update');
-           Route::delete('/{id}', 'UserCertificateController@destroy');
+        Route::group(['prefix' => 'users/certificates'], function () {
+            Route::get('/', 'UserCertificateController@index');
+            Route::get('/{id}', 'UserCertificateController@show');
+            Route::post('/', 'UserCertificateController@create');
+            Route::put('/{id}', 'UserCertificateController@update');
+            Route::delete('/{id}', 'UserCertificateController@destroy');
         });
 
-        Route::group(['prefix' => 'users/social/states'], function (){
+        Route::group(['prefix' => 'users/social/states'], function () {
             Route::get('/', 'UserSocialStateController@index');
             Route::get('/{id}', 'UserSocialStateController@show');
             Route::post('/', 'UserSocialStateController@create');
@@ -461,7 +478,7 @@ Route::group([
             Route::delete('/{id}', 'UserSocialStateController@destroy');
         });
 
-        Route::group(['prefix' => 'users/contact/information'], function (){
+        Route::group(['prefix' => 'users/contact/information'], function () {
             Route::get('/', 'ContactInformationController@index');
             Route::get('/{id}', 'ContactInformationController@show');
             Route::post('/', 'ContactInformationController@create');
@@ -469,7 +486,7 @@ Route::group([
             Route::delete('/{id}', 'ContactInformationController@destroy');
         });
 
-        Route::group(['prefix' => 'users/labor/activities'], function (){
+        Route::group(['prefix' => 'users/labor/activities'], function () {
             Route::get('/', 'LaborActivityController@index');
             Route::get('/{id}', 'LaborActivityController@show');
             Route::post('/', 'LaborActivityController@create');
@@ -492,6 +509,48 @@ Route::group([
             Route::put('/{id}', 'PrivateFileController@update');
             Route::delete('/{id}', 'PrivateFileController@destroy');
         });
+    });
+
+    Route::group(['prefix' => 'time/tracking'], function (){
+
+        Route::group(['prefix' => 'work/events'], function ($router) {
+            Route::get('/', 'WokEventController@index');
+            Route::get('/{id}', 'WokEventController@show');
+            Route::post('/', 'WokEventController@create');
+            Route::put('/{id}', 'WokEventController@update');
+            Route::delete('/{id}', 'WokEventController@destroy');
+        });
+
+        Route::group(['prefix' => 'vacation/planning'], function (){
+            Route::get('/', 'VacationPlanningController@index');
+            Route::get('/{id}', 'VacationPlanningController@show');
+            Route::post('/', 'VacationPlanningController@create');
+            Route::put('/{id}', 'VacationPlanningController@update');
+            Route::delete('/{id}', 'VacationPlanningController@destroy');
+        });
+
+        Route::group(['prefix' => 'work/calendar'], function (){
+            Route::get('/', 'WorkCalendarController@index');
+            Route::post('/', 'WorkCalendarController@create');
+            Route::delete('/{id}', 'WorkCalendarController@remove');
+        });
+
+        Route::group(['prefix' => 'work/hours'], function (){
+            Route::get('/', 'CompanyWorkingHourController@index');
+            Route::get('/{id}', 'CompanyWorkingHourController@show');
+            Route::post('/', 'CompanyWorkingHourController@create');
+            Route::put('/{id}', 'CompanyWorkingHourController@create');
+            Route::delete('/{id}', 'CompanyWorkingHourController@destroy');
+        });
+
+        Route::group(['prefix' => 'work/skips'], function (){
+            Route::get('/', 'WorkSkipsController@index');
+            Route::get('/{id}', 'WorkSkipsController@show');
+            Route::post('/', 'WorkSkipsController@create');
+            Route::put('/{id}', 'WorkSkipsController@create');
+            Route::delete('/{id}', 'WorkSkipsController@destroy');
+        });
+
     });
 
 });

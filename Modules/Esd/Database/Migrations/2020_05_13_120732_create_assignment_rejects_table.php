@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateAssignemntRejectsTable extends Migration
+class CreateAssignmentRejectsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,9 +13,12 @@ class CreateAssignemntRejectsTable extends Migration
      */
     public function up()
     {
-        Schema::create('assignemnt_rejects', function (Blueprint $table) {
+        Schema::create('assignment_rejects', function (Blueprint $table) {
             $table->bigIncrements('id');
-
+            $table->unsignedBigInteger('employee_id');
+            $table->unsignedBigInteger('item_id');
+            $table->text('description')->nullable();
+            $table->string('helper_field')->nullable();
             $table->timestamps();
         });
     }
@@ -27,6 +30,6 @@ class CreateAssignemntRejectsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('assignemnt_rejects');
+        Schema::dropIfExists('assignment_rejects');
     }
 }

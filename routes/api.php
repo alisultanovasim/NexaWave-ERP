@@ -3,15 +3,9 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-Route::group([
-    'prefix' => 'v1'
-] , function ($router) {
+Route::group(['prefix' => 'v1'] , function ($router) {
 
-    Route::group([
-        'prefix' => 'profile',
-        'middleware' => 'auth:api',
-        'namespace' => 'Auth'
-    ] , function ($r) {
+    Route::group(['prefix' => 'profile', 'middleware' => ['auth:api', 'authorize'], 'namespace' => 'Auth'] , function ($r) {
         Route::get('/', 'ProfileController@profile');
         Route::post('/update', 'ProfileController@update');
         Route::get('/me', 'ProfileController@index');
@@ -19,12 +13,7 @@ Route::group([
     }); // profile
 
 
-
-    Route::group([
-        'prefix' => 'users',
-        'middleware' => 'auth:api',
-        'namespace' => 'Auth'
-    ] , function ($r) {
+    Route::group(['prefix' => 'users', 'middleware' => 'auth:api', 'namespace' => 'Auth'] , function ($r) {
         Route::get('/', 'UserController@index');
         Route::post('/', 'UserController@store');
         Route::put('/{id}', 'UserController@update');
@@ -35,18 +24,13 @@ Route::group([
     }); // profile
 
 
-    Route::group([
-        'prefix' => 'logs',
-    ], function () {
+    Route::group(['prefix' => 'logs',], function () {
         Route::get('/', 'GlobalLogsController@index');
         Route::get('/{id:[0-9]+}', 'GlobalLogsController@show');
         Route::post('/delete/{id:[0-9]+}', 'GlobalLogsController@delete');
     }); // logs
 
-    Route::group([
-        'prefix' => "auth",
-        'namespace' => 'Auth'
-    ], function () {
+    Route::group(['prefix' => "auth", 'namespace' => 'Auth'], function () {
         Route::get("/module/permissions", "ModulePermissionController@getModuleAndPermissionList");
         Route::post("/role", "RoleController@store");
         Route::put("/role/{id}", "RoleController@update");
@@ -65,24 +49,18 @@ Route::group([
         Route::post('/register' , 'UserController@register');
     }); // auth
 
-    Route::group(['prefix' => 'permissions', 'middleware' => ['auth:api', 'company']], function (){
-        Route::post('set', 'PermissionController@setPositionPermissions');
+    Route::group(['prefix' => 'permissions', 'middleware' => ['auth:api', 'authorize']], function (){
+        Route::post('set', 'PermissionController@setRolePermissions');
         Route::get('/modules', 'PermissionController@getModules');
         Route::get('/', 'PermissionController@getPermissions');
         Route::get('/positions', 'PermissionController@getPositions');
+        Route::get('/roles', 'PermissionController@getRoles');
+        Route::get('/roles/{id}', 'PermissionController@getRolePermissions');
+        Route::get('/module/{id}', 'PermissionController@userGetPermissionsByModuleId');
     }); // permissions
+
+    Route::get('/test', 'TestController@test')->middleware(['auth:api', 'authorize']);
+
 
 });
 
-
-////todo need to delete
-//Route::group([], function ($route) {
-//    Route::get('/v1/users', function () {
-//        $users = User::where('company_id', Auth::user()->company_id)->get(['username', 'id']);
-//        return response($users, 200)->header('Content-Type', 'application/json');
-//    });
-//    Route::get('/v1/part', function () {
-//        $parts = config('static-data.part');
-//        return response($parts, 200)->header('Content-Type', 'application/json');
-//    });
-//});

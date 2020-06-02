@@ -59,7 +59,10 @@ trait DocumentBySection
                     ->count();
                 if ($existsCount != count($data)) return $this->errorResponse(trans('response.employeeNotFound'));
 
-                return $data;
+                return [
+                    'from_in_our_company' => $request->get('from_in_our_company') ,
+                    'to_in_our_company' => $request->get('to_in_our_company')
+                ];
                 break;
         }
     }

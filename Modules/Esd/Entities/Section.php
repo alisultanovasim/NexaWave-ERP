@@ -17,6 +17,11 @@ class Section extends Model
     ];
 
 
+    public function documents(){
+        return $this->hasMany(Document::class , 'section_id' , 'id');
+    }
+
+
     protected $guarded = ["id"];
 
     public $timestamps = false;

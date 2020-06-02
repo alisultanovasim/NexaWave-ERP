@@ -2,7 +2,9 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Role;
 use App\Models\User;
+use App\Providers\PermissionProvider;
 use App\Traits\ApiResponse;
 use Closure;
 use Illuminate\Http\Request;
@@ -19,6 +21,7 @@ class CompanyIdValidator
     use ApiResponse;
 
     private $company;
+    private $auth_employee_id;
 
     public function handle(Request $request, Closure $next)
     {
@@ -30,7 +33,6 @@ class CompanyIdValidator
             case User::EMPLOYEE:
                     $err = $this->employee($request);
                 break;
-
             default:
                 $err = $this->errorResponse(trans('response.unAvailable') , 503);
                 break;
@@ -40,6 +42,7 @@ class CompanyIdValidator
         if ($err) return $err;
 
         $request->request->set('company_id' , $this->company);
+        $request->request->set('auth_employee_id' , $this->auth_employee_id);
 
         return $next($request);
 
@@ -58,7 +61,7 @@ class CompanyIdValidator
 
     private function employee(Request $request)
     {
-        if ($request->hasHeader('company_id')){
+            if ($request->hasHeader('company_id')){
             $company_id = $request->header('company_id');
         }else{
             $headers = apache_request_headers();
@@ -71,11 +74,12 @@ class CompanyIdValidator
 
         $inThisCompany = Employee::where('company_id' , $company_id)
             ->where('user_id' , Auth::id())
-            ->exists();
+            ->first(['id']);
 
         if (!$inThisCompany) return $this->errorMessage(['error' => trans('response.notYouCompany')] , 400);
 
         $this->company = $company_id;
+        $this->auth_employee_id = $inThisCompany->id;
 
 
         return null;

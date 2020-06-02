@@ -21,6 +21,8 @@ class User extends Authenticatable
     const EMPLOYEE = 2;
     const DEV = 4;
 
+    private $userRolesForRequest = [];
+
     /**
      * The attributes that are mass assignable.
      *
@@ -55,6 +57,11 @@ class User extends Authenticatable
     public function role(){
         return $this->belongsTo('App\Models\Role');
     }
+
+    public function roles(){
+        return $this->belongsToMany(Role::class, 'user_roles');
+    }
+
     public function employment(){
         return $this->hasMany(Employee::class);
     }
@@ -66,6 +73,33 @@ class User extends Authenticatable
     public function education(){
         return $this->hasMany(UserEducation::class);
     }
-    public $generatedPassword = null;
+
+    public function getRoleId(){
+        if (!$this->roleId){
+            $role = UserRole::where([
+                'user_id' => $this->getKey(),
+                'company_id' => request()->get('company_id')
+            ])->first(['role_id as id']);
+            $this->roleId = $role->id ?? null;
+        }
+        return $this->roleId;
+    }
+
+    /**
+     * @return array
+     */
+    public function getUserRolesForRequest(): array
+    {
+        return $this->userRolesForRequest;
+    }
+
+    /**
+     * @param array $userRolesForRequest
+     */
+    public function setUserRolesForRequest(array $userRolesForRequest): void
+    {
+        $this->userRolesForRequest = $userRolesForRequest;
+    }
+
 
 }

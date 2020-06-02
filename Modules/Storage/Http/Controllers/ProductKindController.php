@@ -25,16 +25,13 @@ class ProductKindController extends Controller
         ]);
 
 
-        $title = ProductTitle::with([
-            'kinds' => function($q){
-                $q->withCount('products')->paginate();
-            } , 'kinds.unit'
-        ])
-            ->where('id' , $request->get('title_id'))
-            ->where('company_id', $request->get('company_id'))
-            ->get();
+        $kids = ProductKind::with(['unit'])
+            ->withCount('products')
+            ->company()
+            ->where('title_id' , $request->get('title_id'))
+            ->paginate($request->get('per_page'));
 
-        return $this->successResponse($title);
+        return $this->dataResponse($kids);
     }
 
     public function store(Request $request)
@@ -73,21 +70,21 @@ class ProductKindController extends Controller
     public function update(Request $request, $id)
     {
         $this->validate($request, [
-            'name' => ['required', 'string', 'max:255'],
-            'title_id' => ['required' , 'integer']
+            'name' => ['nullable', 'string', 'max:255'],
+            'title_id' => ['nullable' , 'integer']
         ]);
         $title = ProductKind::where([
             'id' => $id,
             'company_id' => $request->get('company_id')
         ])
-            ->first(['id']);
-        if ($notExists = $this->companyInfo($request->get('company_id') , $request->only('title_id')))
-            return $this->errorResponse($notExists);
-        if (!$title) return $this->errorResponse(trans('response.titleNotFound'), Response::HTTP_NOT_FOUND);
+            ->first(['id' , 'title_id']);
 
-        ProductKind::where('id', $id)->update([
-            'name' => $request->get('update')
-        ]);
+        if (!$title) return $this->errorResponse(trans('response.titleNotFound'), Response::HTTP_NOT_FOUND);
+        if ($title->title_id != $request->get('title_id'))
+            if ($notExists = $this->companyInfo($request->get('company_id') , $request->only('title_id')))
+                 return $this->errorResponse($notExists);
+
+        ProductKind::where('id', $id)->update($request->get('unit_id' , 'name'));
         return $this->successResponse('ok');
     }
 

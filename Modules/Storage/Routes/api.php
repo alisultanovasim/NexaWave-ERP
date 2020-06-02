@@ -4,9 +4,9 @@ use Illuminate\Support\Facades\Route;
 
 
 Route::group([
-    'middleware' =>   ['auth:api' , 'company'],
+    'middleware' => ['auth:api', 'company'],
     'prefix' => 'v1/storage'
-], function ($q){
+], function ($q) {
 
     Route::group([
         'prefix' => 'storages'
@@ -21,8 +21,10 @@ Route::group([
     Route::group([
         'prefix' => 'products'
     ], function ($q) {
-        Route::get('/', 'ProductController@index');
+        Route::get('/all', 'ProductController@index');
+        Route::get('/', 'ProductController@firstPage');
         Route::get('/{id}', 'ProductController@show');
+        Route::put('/{id}', 'ProductController@update');
         Route::post('/', 'ProductController@store');
         Route::post('/increase/{id}', 'ProductController@increase');
         Route::post('/reduce/{id}', 'ProductController@reduce');
@@ -30,7 +32,7 @@ Route::group([
     }); //products
 
     Route::group([
-            'prefix' => 'titles'
+        'prefix' => 'titles'
     ], function ($q) {
         Route::get('/', 'ProductTitleController@index');
         Route::post('/', 'ProductTitleController@store');
@@ -66,9 +68,8 @@ Route::group([
         Route::get('/{id}', 'ProductStateController@show');
         Route::post('/', 'ProductStateController@store');
         Route::put('/{id}', 'ProductStateController@update');
-        Route::delete('{id}', 'ProductStateController@delete');
+        Route::delete('{id}', 'ProductStateController@destroy');
     }); //states
-
 
     Route::group([
         'prefix' => 'colors'
@@ -80,7 +81,6 @@ Route::group([
         Route::delete('{id}', 'ProductColorController@delete');
     }); //states
 
-
     Route::group([
         'prefix' => 'report'
     ], function ($q) {
@@ -90,7 +90,65 @@ Route::group([
 
     Route::group([
         'prefix' => 'units'
-    ] , function ($r){
+    ], function ($r) {
         Route::get('/', 'UnitController@index');
+    }); //units
+
+    Route::group([
+        'prefix' => 'demands'
+    ], function () {
+        Route::get('/', 'DemandController@index');
+        Route::get('/{id}', 'DemandController@show');
+        Route::post('/', 'DemandController@store');
+        Route::put('/{id}', 'DemandController@update');
+        Route::delete('/{id}', 'DemandController@delete');
+
+        Route::group([
+            'prefix' => 'assignments'
+        ], function () {
+            Route::get('/', 'DemandAssignmentController@index');
+            Route::get('/{id}', 'DemandAssignmentController@show');
+            Route::post('/', 'DemandAssignmentController@store');
+            Route::put('/{id}', 'DemandAssignmentController@update');
+            Route::delete('/{id}', 'DemandAssignmentController@delete');
+
+            Route::post('/item', 'DemandAssignmentController@addItem');
+            Route::put('/item/{id}', 'DemandAssignmentController@updateItem');
+            Route::delete('/item/{id}', 'DemandAssignmentController@deleteItem');
+
+            Route::group([
+                'prefix' => 'employee'
+            ], function () {
+                Route::put('/{id}', 'DemandAssignmentController@employeeUpdate');
+            });
+
+        });
+
+    }); // demands
+
+    Route::group([
+        'prefix' => 'acts'
+    ], function ($q) {
+        Route::get('/', 'SellActController@index');
+        Route::get('/{id}', 'SellActController@show');
+        Route::post('/', 'SellActController@store');
+        Route::put('/{id}', 'SellActController@update');
+        Route::delete('/{id}', 'SellActController@delete');
+
+        Route::post('/demand/{id}', 'SellActController@addDemand');
+        Route::put('/demand/{id}', 'SellActController@updateDemand');
+        Route::delete('/demand/{id}', 'SellActController@deleteDemand');
+
+
     });
+
+    Route::group([
+        'prefix' => 'suppliers'
+    ], function ($q) {
+        Route::get('/', 'SupplierController@index');
+        Route::get('/{id}', 'SupplierController@show');
+        Route::post('/', 'SupplierController@store');
+        Route::put('/{id}', 'SupplierController@update');
+        Route::delete('{id}', 'SupplierController@delete');
+    }); //models
 });

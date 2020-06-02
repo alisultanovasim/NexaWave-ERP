@@ -16,17 +16,19 @@ class CreateProductKindsTable extends Migration
         Schema::create('product_kinds', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('name');
-
+//
             $table->unsignedInteger('unit_id')->nullable();
             $table->foreign('unit_id')
                 ->references('id')
                 ->on('units')
                 ->onDelete('cascade');
+
             $table->unsignedBigInteger('title_id');
             $table->foreign('title_id')
                 ->references('id')
                 ->on('product_titles')
                 ->onDelete('cascade');
+
             $table->unsignedBigInteger('company_id');
             $table->timestamps();
         });
