@@ -18,13 +18,12 @@ class CreateProductAssignmentTable extends Migration
             $table->unsignedInteger('product_id');
             $table->unsignedBigInteger('department_id')->nullable();
             $table->unsignedBigInteger('section_id')->nullable();
-            $table->unsignedBigInteger('section_id')->nullable();
+            $table->unsignedBigInteger('sector_id')->nullable();
             $table->unsignedBigInteger('employee_id')->nullable();
             $table->float('amount')->default(1);
             $table->unsignedInteger('initial_status')->nullable();
             $table->unsignedInteger('finish_status')->nullable();
             $table->date('return_date')->nullable();
-            $table->date('delivery_date')->nullable();
             $table->timestamps();
         });
     }

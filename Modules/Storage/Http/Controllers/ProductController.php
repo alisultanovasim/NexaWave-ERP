@@ -39,6 +39,7 @@ class ProductController extends Controller
         $products = Product::with([
             'kind',
             'model:id,name',
+            'kind.unit',
             'title:id,name',
             'state:id,name',
             'color:id,name',
@@ -89,7 +90,8 @@ class ProductController extends Controller
     public function show(Request $request, $id)
     {
         $product = Product::with([
-            'kind:id,name',
+            'kind',
+            'kind.unit',
             'model:id,name',
             'title:id,name',
             'state:id,name',

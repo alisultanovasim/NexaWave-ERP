@@ -88,7 +88,7 @@ class ProductKindController extends Controller
         return $this->successResponse('ok');
     }
 
-    public function destroy(Request $request, $id)
+    public function delete(Request $request, $id)
     {
 
         $title = ProductKind::where([

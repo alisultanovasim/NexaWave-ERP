@@ -357,7 +357,7 @@ class UserController extends Controller
             'voen' => ['nullable', 'string', 'max:255'],
             'email' => ['nullable', 'email', 'max:255'],
 //            'fin' => ['nullable', 'string', 'max:255'],
-            'birthday' => ['nullable', 'date', 'date_format:Y-m-d'],
+            'birthday' => ['nullable', 'date', 'date_format:dd-mm-YYYY'],
             'father_name' => ['nullable', 'string', 'max:255'],
             'gender' => ['nullable', 'string', 'in:f,m'],
             'nationality_id' => ['nullable', 'integer'],
@@ -383,7 +383,7 @@ class UserController extends Controller
             'driving_license_categories' => ['nullable' , 'string' , 'max:255'],
             'driving_license_organ' => ['nullable' , 'string' , 'max:255'],
             'driving_license_get_at' => ['nullable' , 'date', 'date_format:dd-mm-YYYY'],
-            'driving_license_expire_at' => ['nullable' , 'date', 'date_format:dd-mm-YYYY'],
+                'driving_license_expire_at' => ['nullable' , 'date', 'date_format:dd-mm-YYYY'],
             'foreign_passport_number' => ['nullable' , 'string' , 'max:255'],
             'foreign_passport_organ' => ['nullable' , 'string' , 'max:255'],
             'foreign_passport_get_at' => ['nullable' , 'date', 'date_format:dd-mm-YYYY'],
@@ -392,7 +392,6 @@ class UserController extends Controller
             'family_status_state' => ['nullable' , 'string' , 'max:255'],
             'family_status_register_at' => ['nullable' , 'date', 'date_format:dd-mm-YYYY'],
             'avatar' => ['nullable' , 'mimes:png,jpg,jpeg'],
-
         ];
     }
 
@@ -456,8 +455,7 @@ class UserController extends Controller
         }
         $user->details()->create($data);
 
-//        SendMailCreatePassword::dispatch($user , $password);
-
+        SendMailCreatePassword::dispatch($user , $password);
         return $user;
     }
 
@@ -468,8 +466,6 @@ class UserController extends Controller
 
         if ($data)
             User::where('id' ,$id)->update($data);
-
-
 
         $data = $request->only([
             'fin',

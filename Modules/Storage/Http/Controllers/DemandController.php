@@ -7,7 +7,9 @@ use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Modules\Hr\Entities\Employee\Employee;
 use Modules\Storage\Entities\Demand;
 use Modules\Storage\Entities\Product;
 use Modules\Storage\Entities\ProductColor;
@@ -77,11 +79,15 @@ class DemandController extends Controller
         //todo check title and kind_id
         $product = Product::create(array_merge($request->all(), ['status' => Product::STATUS_DEMAND]));
 
+        $employee_id = Employee::where([
+            ['user_id' , Auth::id()],
+            ['company_id' , $request->get('company_id')]
+        ])->first(['id']);
         Demand::create([
             'description' => $request->get('demand_description'),
             'want_till' => $request->get('want_till'),
             'product_id' => $product->id,
-            'employee_id' => $request->get('auth_employee_id'),
+            'employee_id' => $employee_id->id,
             'company_id' => $request->get('company_id')
         ]);
         return $this->successResponse('ok');
