@@ -89,7 +89,6 @@ class Handler extends ExceptionHandler
             return $this->errorResponse($errors, Response::HTTP_UNPROCESSABLE_ENTITY);
         }
         else if ($exception instanceof BadRequestHttpException) {
-            dd('a');
             $errors = $exception->getMessage();
             return $this->errorResponse($errors, Response::HTTP_BAD_REQUEST);
         }
