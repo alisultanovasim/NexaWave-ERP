@@ -57,7 +57,8 @@ class ModulesSeeder extends Seeder
                         "new_permissions" => []
                     ]
                 ],
-                "new_permissions" => []
+                "new_permissions" => [],
+                'icon' =>  '/assets/images/svg/doc-management.svg'
             ],
             "Biznes Mərkəzinin İdarə Edilməsi" => [
                 "new_permissions" => [],
@@ -95,7 +96,8 @@ class ModulesSeeder extends Seeder
                         "new_permissions" => [],
                         "sub_modules" => []
                     ]
-                ]
+                ],
+                'icon' =>  '/assets/images/svg/marketing.svg'
             ],
             "İnsan Resursları" => [
                 "sub_modules" => [
@@ -156,7 +158,23 @@ class ModulesSeeder extends Seeder
                     ]
                 ],
                 "new_permissions" => [],
-
+                'icon' => '/assets/images/svg/hr.svg'
+            ],
+            "Maliyyə Hesabatı" => [
+                "sub_modules" => [],
+                'icon' => '/assets/images/svg/financial-report.svg'
+            ],
+            "Ehtiyatlar" => [
+                "sub_modules" => [],
+                'icon' => '/assets/images/svg/depo.svg'
+            ],
+            "Tapşırıqların İdarə Edilməsi" => [
+                "sub_modules" => [],
+                'icon' =>  '/assets/images/svg/project.svg'
+            ],
+            "Müqavilələr" => [
+                "sub_modules" => [],
+                'icon' =>  '/assets/images/svg/doc-management.svg'
             ]
         ];
 

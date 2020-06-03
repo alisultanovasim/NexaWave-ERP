@@ -60,7 +60,9 @@ class PermissionController extends Controller
         ])
         ->get([
             'id',
-            'name'
+            'name',
+            'icon',
+            'route'
         ]);
         if (
             (in_array($this->role->getCompanyAdminRoleId(), \auth()->user()->getUserRolesForRequest())) or
@@ -104,7 +106,9 @@ class PermissionController extends Controller
         $modules = $modules->get([
             'id',
             'name',
-            'parent_id'
+            'parent_id',
+            'icon',
+            'route'
         ]);
         return $this->successResponse($modules);
     }
