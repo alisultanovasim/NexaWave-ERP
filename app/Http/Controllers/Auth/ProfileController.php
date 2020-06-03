@@ -64,7 +64,9 @@ class ProfileController extends Controller
 
         $modules = $modules->get([
             'id',
-            'name'
+            'name',
+            'icon',
+            'route'
         ]);
 
         if (
