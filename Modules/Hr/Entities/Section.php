@@ -21,6 +21,11 @@ class Section extends Model
         return $this->hasMany(Sector::class);
     }
 
+    public function structuredSectors(){
+        return $this->hasMany(Sector::class, 'structable_id', 'id')
+            ->where('structable_type', 'section');
+    }
+
     public function scopeWithAllRelations($query){
         return $query->with([
             'department' => function ($query){

@@ -553,5 +553,10 @@ Route::group([
 
     });
 
+    Route::group(['prefix' => 'company/structure'], function (){
+        Route::get('/', 'CompanyStructureController@index');
+        Route::post('/', 'CompanyStructureController@addStructureLink');
+    });
+
 });
 

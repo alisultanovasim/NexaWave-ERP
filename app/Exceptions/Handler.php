@@ -11,6 +11,7 @@ use GuzzleHttp\Exception\ClientException;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Throwable;
 
@@ -68,7 +69,6 @@ class Handler extends ExceptionHandler
             $message = \Symfony\Component\HttpFoundation\Response::$statusTexts[$code];
             return $this->errorResponse($message, $code);
         }
-
         else if ($exception instanceof QueryException) {
             if ($exception->errorInfo[1] == 1452)
                 return $this->errorResponse([trans('response.SomeFiledIsNotFoundInDatabase')], 422);
@@ -88,6 +88,11 @@ class Handler extends ExceptionHandler
             $errors = $exception->validator->errors()->getMessages();
             return $this->errorResponse($errors, Response::HTTP_UNPROCESSABLE_ENTITY);
         }
+        else if ($exception instanceof BadRequestHttpException) {
+            dd('a');
+            $errors = $exception->getMessage();
+            return $this->errorResponse($errors, Response::HTTP_BAD_REQUEST);
+        }
         else if ($exception instanceof ClientException){
             if (env('APP_DEBUG')){
                 $response = $exception->getResponse();
@@ -100,7 +105,6 @@ class Handler extends ExceptionHandler
             }
         }
         else {
-
             if (env('APP_DEBUG'))
                 return parent::render($request, $exception);
             else

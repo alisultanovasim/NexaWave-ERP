@@ -40,6 +40,19 @@ class Department extends Model
         return $this->belongsTo(Organization::class);
     }
 
+    public function structuredSections(){
+        return $this->hasMany(Section::class, 'structable_id', 'id')
+            ->where('structable_type', 'department')
+            ->with([
+                'structuredSectors:id,name,structable_id,structable_type',
+            ]);
+    }
+
+    public function structuredSectors(){
+        return $this->hasMany(Sector::class, 'structable_id', 'id')
+            ->where('structable_type', 'department');
+    }
+
     public function scopeWithAllRelations($query){
         return $query->with([
             'country' => function ($query){
