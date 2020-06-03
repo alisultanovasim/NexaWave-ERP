@@ -79,7 +79,9 @@ class EmployeeController extends Controller
                 'contracts',
                 'contracts.position',
                 'contracts.currency'
-            ])->orderBy('id' , 'desc')->paginate($request->get('paginateCount'));
+            ])
+//            ->orderBy('id' , 'desc')
+            ->paginate($request->get('paginateCount'));
 
         return $this->successResponse($employees);
 
