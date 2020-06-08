@@ -38,8 +38,10 @@ class PrivateFileController extends Controller
             'user:id,name,surname',
         ])
         ->company()
-        ->orderBy('id', 'desc')
-        ->paginate($request->get('per_page'));
+        ->orderBy('id', 'desc');
+        if($request->get('user_id'))
+            $files = $files->where('user_id', $request->get('user_id'));
+        $files = $files->paginate($request->get('per_page'));
 
         return $this->successResponse($files);
     }

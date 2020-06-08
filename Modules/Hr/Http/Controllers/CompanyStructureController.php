@@ -24,7 +24,6 @@ class CompanyStructureController extends Controller
     private $department;
     private $section;
     private $sector;
-    private $userCompanyId;
 
     /**
      * CompanyStructureController constructor.
@@ -38,7 +37,6 @@ class CompanyStructureController extends Controller
         Request $request, Company $company, Department $department,
         Section $section, Sector $sector
     ){
-        $this->userCompanyId = $request->get('company_id');
         $this->company = $company;
         $this->department = $department;
         $this->section = $section;
@@ -50,13 +48,13 @@ class CompanyStructureController extends Controller
      * @return JsonResponse
      */
     public function index(Request $request): JsonResponse {
-        $structure = $this->company->where('id', $this->userCompanyId)
+        $structure = $this->company->where('id', $request->get('company_id'))
         ->with([
             'structuredDepartments:id,name,structable_id,structable_type',
             'structuredSections:id,name,structable_id,structable_type',
             'structuredSectors:id,name,structable_id,structable_type',
         ])
-        ->get([
+        ->first([
             'id',
             'name'
         ]);
@@ -80,12 +78,14 @@ class CompanyStructureController extends Controller
             $structure = $this->section;
         if ($request->get('structure_type') == 'sector')
             $structure = $this->sector;
+        if ($requestedLink['type'] == 'company')
+            $linkToCompanyId = $request->get('company_id');
         if ($requestedLink['type'] == 'department')
             $link = $this->department;
         if ($requestedLink['type'] == 'section')
             $link = $this->section;
-        if ($requestedLink['type'] == 'company')
-            $linkToCompanyId = $this->userCompanyId;
+        if ($requestedLink['type'] == 'sector')
+            $link = $this->sector;
 
         /*
          * Check if structure exists
@@ -96,7 +96,7 @@ class CompanyStructureController extends Controller
          * If links not direct to company check if link structure is exists
          */
         if (!isset($linkToCompanyId))
-            $link->where('id', $requestedLink['id'])->firstOrFail(['id']);
+            $link = $link->where('id', $requestedLink['id'])->firstOrFail(['id']);
 
         /*
          * If Structure has sub structures cant change link before relink sub structures

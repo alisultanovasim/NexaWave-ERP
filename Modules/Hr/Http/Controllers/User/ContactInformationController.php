@@ -28,7 +28,7 @@ class ContactInformationController extends Controller
 
     public function index(Request $request): JsonResponse {
         $this->validate($request, [
-            'per_page' => ['sometimes', 'required', 'integer']
+            'per_page' => ['sometimes', 'required', 'integer'],
         ]);
         $contacts = $this->contacts
         ->with([
@@ -39,8 +39,10 @@ class ContactInformationController extends Controller
             'addressType:id,name',
         ])
         ->company()
-        ->orderBy('id', 'desc')
-        ->paginate($request->get('per_page'));
+        ->orderBy('id', 'desc');
+        if ($request->get('user_id'))
+            $contacts = $contacts->where('user_id', $request->get('user_id'));
+        $contacts = $contacts->paginate($request->get('per_page'));
         return $this->successResponse($contacts);
     }
 
@@ -136,7 +138,7 @@ class ContactInformationController extends Controller
             'address' => 'required|min:3|max:255',
             'number' => 'required|max:50',
             'post_index' => 'required|max:255',
-            'expire_date' => 'required|date',
+            'expire_date' => 'nullable|date',
             'fax' => 'required|max:255'
         ];
     }

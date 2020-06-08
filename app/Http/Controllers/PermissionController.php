@@ -226,10 +226,7 @@ class PermissionController extends Controller
                     'name' => $module->module_name,
                     'permissions' => []
                 ];
-            if (
-                (in_array($this->role->getCompanyAdminRoleId(), \auth()->user()->getUserRolesForRequest())) or
-                (in_array($this->role->getSuperAdminRoleId(), \auth()->user()->getUserRolesForRequest()))
-            ){
+            if ($roleWithPermissions->id == $this->role->getCompanyAdminRoleId()){
                 $modules[$module->id]['permissions'] = ['*'];
             }
             else {

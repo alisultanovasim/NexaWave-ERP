@@ -43,8 +43,10 @@ class UserSocialStateController extends Controller
             'stateType:id,name'
         ])
         ->company()
-        ->orderBy('id', 'desc')
-        ->paginate($request->get('per_page'));
+        ->orderBy('id', 'desc');
+        if ($request->get('user_id'))
+            $states = $states->where('user_id', $request->get('user_id'));
+        $states = $states->paginate($request->get('per_page'));
         return $this->successResponse($states);
     }
 

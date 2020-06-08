@@ -45,8 +45,10 @@ class RewardController extends Controller
             'employee:id,user_id',
             'employee.user:id,name'
         ])
-        ->orderBy('id', 'desc')
-        ->paginate($request->get('per_page'));
+        ->orderBy('id', 'desc');
+        if ($request->get('user_id'))
+            $rewards = $rewards->where('user_id', $request->get('user_id'));
+        $rewards = $rewards->paginate($request->get('per_page'));
         return  $this->successResponse($rewards);
     }
 
