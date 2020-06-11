@@ -42,8 +42,10 @@ class UserCertificateController extends Controller
             'user:id,name,surname',
         ])
         ->company()
-        ->orderBy('id', 'desc')
-        ->paginate($request->get('per_page'));
+        ->orderBy('id', 'desc');
+        if ($request->get('user_id'))
+            $certificates = $certificates->where('user_id', $request->get('user_id'));
+        $certificates = $certificates->paginate($request->get('per_page'));
 
         return $this->successResponse($certificates);
     }

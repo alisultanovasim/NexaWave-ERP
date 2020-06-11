@@ -33,7 +33,8 @@ class LaborActivityController extends Controller
      */
     public function index(Request $request): JsonResponse {
         $this->validate($request, [
-            'per_page' => 'nullable|integer'
+            'per_page' => 'nullable|integer',
+            'user_id' => 'nullable|numeric'
         ]);
         $laborActivities = $this->laborActivity
             ->with([
@@ -43,8 +44,10 @@ class LaborActivityController extends Controller
                 'region:id,name'
             ])
             ->company()
-            ->orderBy('id', 'desc')
-            ->paginate($request->get('per_page'));
+            ->orderBy('id', 'desc');
+        if ($request->get('user_id'))
+            $laborActivities = $laborActivities->where('user_id', $request->get('user_id'));
+        $laborActivities = $laborActivities->paginate($request->get('per_page'));
         return $this->successResponse($laborActivities);
     }
 

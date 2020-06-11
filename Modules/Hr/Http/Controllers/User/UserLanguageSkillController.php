@@ -27,8 +27,10 @@ class UserLanguageSkillController extends Controller
             'reading:id,name',
             'comprehension:id,name',
             'writing:id,name',
-        ])->company()
-            ->paginate($request->get('per_page'));
+        ])->company();
+        if ($request->get('user_id'))
+            $skills = $skills->where('user_id', $request->get('user_id'));
+        $skills = $skills->paginate($request->get('per_page'));
         return $this->successResponse($skills);
     }
 

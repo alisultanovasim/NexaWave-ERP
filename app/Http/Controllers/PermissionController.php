@@ -139,7 +139,7 @@ class PermissionController extends Controller
         $roles = $this->role;
         if ($request->get('company_id'))
             $roles = $roles->companyId($request->get('company_id'));
-        $roles = $roles->get(['id', 'name']);
+        $roles = $roles->get(['id', 'name', 'created_at', 'updated_at']);
         return $this->successResponse($roles);
     }
 
@@ -226,10 +226,7 @@ class PermissionController extends Controller
                     'name' => $module->module_name,
                     'permissions' => []
                 ];
-            if (
-                (in_array($this->role->getCompanyAdminRoleId(), \auth()->user()->getUserRolesForRequest())) or
-                (in_array($this->role->getSuperAdminRoleId(), \auth()->user()->getUserRolesForRequest()))
-            ){
+            if ($roleWithPermissions->id == $this->role->getCompanyAdminRoleId()){
                 $modules[$module->id]['permissions'] = ['*'];
             }
             else {

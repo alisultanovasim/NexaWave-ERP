@@ -98,6 +98,8 @@ class DemandController extends Controller
     {
         $demands = Demand::with([
             'product',
+            'product.color' ,
+            'product.state' ,
             'product.kind',
             'product.unit',
             'product.title',
@@ -107,8 +109,8 @@ class DemandController extends Controller
             'assignment.items',
             'product.model',
             'employee.user',
-            'buy_from_country' ,
-            'made_in_country'
+            'product.buy_from_country' ,
+            'product.made_in_country'
         ])
             ->where('company_id', $request->get('company_id'))
             ->where('id', $id)

@@ -7,9 +7,9 @@ use Modules\Hr\Entities\Employee\Employee;
 
 class DemandItem extends Model
 {
-    const WAIT = 0;
+    const REJECTED = 0;
     const ACCEPTED = 1;
-    const REJECTED = 2;
+    const WAIT = 2;
 
     protected $guarded = ["id"];
 

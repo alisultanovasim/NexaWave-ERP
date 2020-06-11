@@ -123,7 +123,7 @@ class ProductController extends Controller
             ['company_id', '=', $request->get('company_id')],
             ['id', '=', $request->get('kind_id')],
         ])->exists();
-        if (!$check) return $this->errorResponse(trans('response.fieldIsNotFindInDatabase'));
+        if (!$check) return $this->errorResponse(trans('response.fieldIsNotFindInDatabase'),404);
         $product = new Product();
         $product
             ->fill(array_merge($request->all(), ['status' => Product::STATUS_ACTIVE]))
@@ -248,13 +248,15 @@ class ProductController extends Controller
             'make_date' => ['nullable', 'date', 'date_format:Y-m-d'],
             'income_description' => ['nullable', 'string'],
             'model_id' => ['nullable' , 'integer'],
-            'sell_act_id' => ['nullable' , 'integer']
+            'sell_act_id' => ['nullable' , 'integer'],
+            'product_no' => ['nullable' , 'max:255']
         ];
     }
 
     public static function getUpdateRules()
     {
         return [
+            'product_no' => ['nullable' , 'max:255'],
             'unit_id' => ['nullable', 'integer', 'min:1'],
             'less_value' => ['nullable', 'boolean'],
             'quickly_old' => ['nullable', 'boolean'],

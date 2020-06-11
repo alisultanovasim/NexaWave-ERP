@@ -36,9 +36,9 @@ class DemandAssignmentController extends Controller
         $this->validate($request, [
             'employees' => ['nullable', 'array'],
             'employees.*.id' => ['require_with:employees', 'integer'],
-            'employees.*.expiry_time' => ['nullable', 'date', 'date_format:Y-m-d H:i:s'],
+                'employees.*.expiry_time' => ['nullable', 'date', 'date_format:Y-m-d H:i:s'],
             'expiry_time' => ['nullable', 'date', 'date_format:Y-m-d H:i:s'],
-            'demand_id' => ['nullable', 'integer']
+            'demand_id' => ['required', 'integer']
         ]);
 
         DB::beginTransaction();
@@ -65,7 +65,7 @@ class DemandAssignmentController extends Controller
                     'expiry_time' => $assignment["expiry_time"],
                     'description' => $assignment["description"],
                     "employee_id" => $assignment["employee_id"],
-                    'status' => DemandAssignment::STATUS_WAIT
+                    'status' => DemandItem::WAIT
                 ];
             }
             DemandItem::insert($data);

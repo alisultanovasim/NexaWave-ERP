@@ -11,6 +11,13 @@ class Department extends Model
 
     protected $guarded = [];
 
+    protected $hidden = [
+        'structable_type',
+        'structable_id'
+    ];
+
+    protected $appends = ['structure_type'];
+
     public function country()
     {
         return $this->belongsTo(Country::class);
@@ -38,6 +45,34 @@ class Department extends Model
     public function organization()
     {
         return $this->belongsTo(Organization::class);
+    }
+
+    public function structuredSections(){
+        return $this->hasMany(Section::class, 'structable_id', 'id')
+            ->where('structable_type', 'department')
+            ->with([
+                'structuredSectors:id,name,structable_id,structable_type',
+            ]);
+    }
+
+    public function positions(){
+        return $this->belongsToMany(
+            Positions::class,
+            'structure_positions',
+            'structure_id',
+            'position_id'
+        )
+        ->withPivot('quantity')
+        ->where('structure_type', 'department');
+    }
+
+    public function structuredSectors(){
+        return $this->hasMany(Sector::class, 'structable_id', 'id')
+            ->where('structable_type', 'department');
+    }
+
+    public function getStructureTypeAttribute(){
+        return 'department';
     }
 
     public function scopeWithAllRelations($query){
