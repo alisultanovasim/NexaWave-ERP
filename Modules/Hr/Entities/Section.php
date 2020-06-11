@@ -11,6 +11,13 @@ class Section extends Model
 
     protected $guarded = [];
 
+    protected $hidden = [
+        'structable_type',
+        'structable_id'
+    ];
+
+    protected $appends = ['structure_type'];
+
     public function department()
     {
         return $this->belongsTo(Department::class);
@@ -26,6 +33,17 @@ class Section extends Model
             ->where('structable_type', 'section');
     }
 
+    public function positions(){
+        return $this->belongsToMany(
+            Positions::class,
+            'structure_positions',
+            'structure_id',
+            'position_id'
+        )
+        ->withPivot('quantity')
+        ->where('structure_type', 'section');
+    }
+
     public function scopeWithAllRelations($query){
         return $query->with([
             'department' => function ($query){
@@ -35,6 +53,10 @@ class Section extends Model
                 $query->select(['id', 'name']);
             },
         ]);
+    }
+
+    public function getStructureTypeAttribute(){
+        return 'section';
     }
 
     public function children(){

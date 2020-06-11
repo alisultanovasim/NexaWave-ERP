@@ -471,7 +471,6 @@ class UserController extends Controller
             User::where('id' ,$id)->update($data);
 
 
-
         $data = $request->only([
             'fin',
             'birthday',

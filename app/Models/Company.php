@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Modules\Hr\Entities\Department;
+use Modules\Hr\Entities\Positions;
 use Modules\Hr\Entities\Section;
 use Modules\Hr\Entities\Sector;
 
@@ -45,6 +46,17 @@ class Company extends Model
             'company_modules',
             'company_id',
             'module_id');
+    }
+
+    public function positions(){
+        return $this->belongsToMany(
+            Positions::class,
+            'structure_positions',
+            'structure_id',
+            'position_id'
+        )
+        ->withPivot('quantity')
+        ->where('structure_type', 'company');
     }
 
     /**

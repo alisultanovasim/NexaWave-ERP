@@ -69,7 +69,6 @@ class ContractController extends Controller
             $data['contract'] = self::save($request->file('contract'), $request->get('company_id'), 'contracts');
 
 
-
         return Contract::create($data);
     }
 

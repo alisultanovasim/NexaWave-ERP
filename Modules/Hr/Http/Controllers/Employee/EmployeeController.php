@@ -80,7 +80,6 @@ class EmployeeController extends Controller
                 'contracts.position',
                 'contracts.currency'
             ])
-//            ->orderBy('id' , 'desc')
             ->paginate($request->get('paginateCount'));
 
         return $this->successResponse($employees);
@@ -142,18 +141,6 @@ class EmployeeController extends Controller
                 'tabel_no' => $request->get('tabel_no')
             ]);
 
-            if ($request->get('create_contract')) {
-
-                $this->validate($request, ContractController::getValidateRules());
-
-                $relations = $request->only(['department_id', 'section_id', 'sector_id', 'position_id']);
-
-                if ($notExists = $this->companyInfo($request->get('company_id'), $relations)) return $this->errorResponse($notExists , 422);
-
-                $request->request->set('employee_id', $employee->id);
-
-                ContractController::storeContract($request);
-            }
             DB::commit();
             return $this->successResponse('ok');
         } catch (QueryException  $exception) {
@@ -223,30 +210,22 @@ class EmployeeController extends Controller
         return $this->successResponse('ok');
     }
 
-    //todo create left-job logic
-    //todo delete user roles in this company
-
     public function delete(Request $request, $id)
     {
         $this->validate($request, [
             'company_id' => ['required', 'integer']
         ]);
-        try {
-            $employee = Employee::where('company_id', $request->get('company_id'))
-                ->where('id', $id)
-                ->exists();
-            if (!$employee) return $this->errorResponse(trans('response.employeeNotFound'));
-
-            Employee::where('id', $id)->delete();
+        $employee = Employee::where('company_id', $request->get('company_id'))
+            ->where('id', $id)
+            ->firstOrFail(['id', 'user_id']);
+        DB::transaction(function () use ($request, $employee){
+            $employee->delete();
             UserRole::where([
                 'user_id' => $employee->user_id,
                 'company_id' => $request->get('company_id')
             ])->delete();
-
-            return $this->successResponse('ok');
-        } catch (\Exception $exception) {
-            return $this->errorResponse(trans('response.tryLater'), Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
+        });
+        return $this->successResponse('ok');
     }
 
 
