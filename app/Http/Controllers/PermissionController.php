@@ -168,9 +168,10 @@ class PermissionController extends Controller
         if (!$request->get('role_id') and $request->get('role_name')){
             $role = $this->saveRole($request, $this->role);
         }
-        $permissions = $this->preparePermissionsInsertData($role->getKey(), $request->get('modules'));
-        return DB::transaction(function () use ($request, $permissions, $role){
-            RoleModulePermission::where('role_id', $role->getKey())->delete();
+        $roleId = isset($role) ? $role->getKey() : $request->get('role_id');
+        $permissions = $this->preparePermissionsInsertData($roleId, $request->get('modules'));
+        return DB::transaction(function () use ($request, $permissions, $roleId){
+            RoleModulePermission::where('role_id', $roleId)->delete();
             RoleModulePermission::insert($permissions);
             return $this->successResponse(trans('responses.OK'));
         });
