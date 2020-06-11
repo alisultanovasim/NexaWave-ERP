@@ -30,7 +30,8 @@ class DemandController extends Controller
 
         $demands = Demand::with([
             'product:id,product_mark,product_model,amount,kind_id,title_id,unit_id',
-            'product.kind:id,name',
+            'product.kind',
+            'product.model',
             'product.unit:id,name',
             'product.title:id,name',
             'employee:id,user_id,tabel_no',
@@ -72,7 +73,7 @@ class DemandController extends Controller
         $this->validate($request, array_merge(ProductController::getValidationRules(), [
             'demand_description' => ['nullable', 'string'],
             'want_till' => ['nullable', 'date_format:Y-m-d H:i:s'],
-            'storage_id' => ['nullable', 'integer']
+            'storage_id' => ['nullable', 'integer'],
         ]));
 
 
@@ -101,7 +102,13 @@ class DemandController extends Controller
             'product.unit',
             'product.title',
             'employee',
+            'assignment',
+            'assignment.employee',
+            'assignment.items',
+            'product.model',
             'employee.user',
+            'buy_from_country' ,
+            'made_in_country'
         ])
             ->where('company_id', $request->get('company_id'))
             ->where('id', $id)
