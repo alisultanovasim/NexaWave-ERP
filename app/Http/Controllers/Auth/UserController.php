@@ -254,7 +254,7 @@ class UserController extends Controller
     {
         $user = self::createUser($request);
 
-//         SendMailCreatePassword::dispatch($user);
+         SendMailCreatePassword::dispatch($user);
 
         return $this->successResponse('ok');
     }
@@ -383,7 +383,7 @@ class UserController extends Controller
             'driving_license_categories' => ['nullable' , 'string' , 'max:255'],
             'driving_license_organ' => ['nullable' , 'string' , 'max:255'],
             'driving_license_get_at' => ['nullable' , 'date', 'date_format:Y-m-d'],
-                'driving_license_expire_at' => ['nullable' , 'date', 'date_format:Y-m-d'],
+            'driving_license_expire_at' => ['nullable' , 'date', 'date_format:Y-m-d'],
             'foreign_passport_number' => ['nullable' , 'string' , 'max:255'],
             'foreign_passport_organ' => ['nullable' , 'string' , 'max:255'],
             'foreign_passport_get_at' => ['nullable' , 'date', 'date_format:Y-m-d'],
@@ -463,6 +463,8 @@ class UserController extends Controller
     {
         Validator::make($request->all(), self::updateRules())->validate();
         $data = $request->only('name' , 'email' , 'voen' , 'surname');
+        if($request->has('fin'))
+            $data['username'] = $request->get('fin');
 
         if ($data)
             User::where('id' ,$id)->update($data);
