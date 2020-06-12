@@ -92,6 +92,93 @@ class CompanyStructureController extends Controller
         return $this->successResponse($employees);
     }
 
+    public function createCompanyStructure(Request $request): JsonResponse {
+        $this->validate($request, [
+            'structure' => 'required|array',
+            'structure.*.structure_id' => 'required|numeric',
+            'structure.*.structure_type' => [
+                'required',
+                Rule::in(['department', 'section', 'sector'])
+            ],
+            'structure.*.link' => 'required|array',
+            'structure.*.link.id' => 'required|numeric',
+            'structure.*.link.type' => [
+                'required',
+                Rule::in(['company', 'department', 'section', 'sector'])
+            ],
+        ]);
+        $links = [];
+        $linkedStructures = [
+            'department' => [
+                'model' => $this->getStructureModelByType('department'),
+                'ids' => []
+            ],
+            'section' => [
+                'model' => $this->getStructureModelByType('section'),
+                'ids' => []
+            ],
+            'sector' => [
+                'model' => $this->getStructureModelByType('sector'),
+                'ids' => []
+            ]
+        ];
+        foreach ($request->get('structure') as $structure){
+            $link = $structure['link'];
+            $this->ifStructureTriesLinkSmallerStructureThrowException($structure['structure_type'], $link['type']);
+            $structableId = $link['type'] == 'company' ? $request->get('company_id') : $link['id'];
+            $key = $structableId . '-' . $structure['structure_type'] . '-' . $link['type'];
+            /*
+             * Group structure links to  mysql queries
+             */
+            if (!isset($links[$key])){
+                $links[$key] = [
+                    'model' => $this->getStructureModelByType($structure['structure_type']),
+                    'structure_type' => $structure['structure_type'],
+                    'structable_id' => $structableId,
+                    'structable_type' => $link['type'],
+                    'connectorsIds' => []
+                ];
+            }
+            $links[$key]['connectorsIds'][] = $structure['structure_id'];
+
+            /*
+             * Group linked structure ids by structure type (later to remove from company structure which is not in array)
+             */
+            $linkedStructures[$structure['structure_type']]['ids'][] = $structure['structure_id'];
+        }
+        DB::transaction(function () use ($request, $links, $linkedStructures){
+            foreach ($links as $link){
+                $link['model']->whereIn('id', $link['connectorsIds'])
+                ->where('company_id', $request->get('company_id'))
+                ->update([
+                    'structable_id' => $link['structable_id'],
+                    'structable_type' => $link['structable_type']
+                ]);
+            }
+            foreach ($linkedStructures as $link){
+                $link['model']->whereNotIn('id', $link['ids'])
+                ->where('company_id', $request->get('company_id'))
+                ->update([
+                    'structable_id' => null,
+                    'structable_type' => null
+                ]);
+            }
+        });
+        return $this->successResponse(trans('messages.saved'), 200);
+    }
+
+    private function ifStructureTriesLinkSmallerStructureThrowException($structureType, $linkStructureType){
+        $throw = false;
+        if ($structureType == 'department' and $linkStructureType != 'company')
+            $throw = true;
+        if ($structureType == 'section' and  !in_array($linkStructureType, ['company', 'department']))
+            $throw = true;
+        if ($structureType == 'sector' and  !in_array($linkStructureType, ['company', 'department', 'section']))
+            $throw = true;
+        if ($throw)
+            throw new BadRequestHttpException(trans('messages.remove_sub_structures_before_update_parent_structure'));
+    }
+
 
     /**
      * @param Request $request
@@ -229,6 +316,8 @@ class CompanyStructureController extends Controller
             $structure = $this->section;
         if ($type == 'sector')
             $structure = $this->sector;
+        if ($type == 'company')
+            $structure = $this->company;
         return $structure;
     }
 
