@@ -66,7 +66,6 @@ class DocumentController extends Controller
             'order_by' => 'sometimes|required|string|max:255',
             'direction' => 'sometimes|required|in:desc,asc'
         ]);
-
         try {
             $perPage = $request->has("per_page") ? $request->per_page : 10;
             $documents = Document::with([

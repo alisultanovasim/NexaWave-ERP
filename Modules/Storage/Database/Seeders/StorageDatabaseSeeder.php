@@ -23,30 +23,30 @@ class StorageDatabaseSeeder extends Seeder
     {
         Model::unguard();
 
-//        $arr = [
-//            [
-//                "name" => "kq",
-//                "full_name" => "Kilogram",
-//                "column_type" => "int"
-//            ],
-//        ];
-//
-//        foreach ($arr as $a) {
-//            Unit::create($a);
-//        }
-//
-//        $arr = [
-//            "Təzə",
-//            "Köhnə yararlı",
-//            "Köknə yararsiz",
-//            "Təmirə ehtiyaci olan",
-//        ];
-//
-//        foreach ($arr as $a) {
-//            ProductState::create([
-//                "name" => $a
-//            ]);
-//        }
+        $arr = [
+            [
+                "name" => "kq",
+                "full_name" => "Kilogram",
+                "column_type" => "int"
+            ],
+        ];
+
+        foreach ($arr as $a) {
+            Unit::create($a);
+        }
+
+        $arr = [
+            "Təzə",
+            "Köhnə yararlı",
+            "Köknə yararsiz",
+            "Təmirə ehtiyaci olan",
+        ];
+
+        foreach ($arr as $a) {
+            ProductState::create([
+                "name" => $a
+            ]);
+        }
 //
 //        ProductColor::insert([
 //            ['name' => 'Qırmızı', 'hex' => '#ff0000'],

@@ -16,7 +16,7 @@ class UserSeeder extends Seeder
             'username' => 'vusal123',
             'password' => \Illuminate\Support\Facades\Hash::make('12345678'),
             'email' => 'vusal@mail.ru',
-            'role_id' => \App\Models\User::EMPLOYEE,
+            'role_id' => 5,
             'name' => 'vusal',
         ]);
 
@@ -24,7 +24,7 @@ class UserSeeder extends Seeder
             'username' => 'zeka',
             'password' => \Illuminate\Support\Facades\Hash::make('12345678'),
             'email' => 'zeka@mail.ru',
-            'role_id' => \App\Models\User::EMPLOYEE,
+            'role_id' => 5,
             'name' => 'Zeka',
         ]);
 

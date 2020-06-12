@@ -25,8 +25,13 @@ class DepartmentController extends Controller
             'paginateCount' => ['sometimes' , 'integer']
         ]);
         $result = Department::with(['city:id,name'])
-            ->where('company_id' , $request->get('company_id'))
-            ->paginate($request->paginateCount);
+            ->where('company_id' , $request->get('company_id'));
+
+
+        if ($request->get('is_filter'))
+            $result = ['data' => $result->get(['id' ,'name','short_name'])];
+        else
+            $result = $result->paginate($request->get('paginateCount'));
 
         return $this->dataResponse($result);
     }

@@ -33,7 +33,11 @@ class CityController extends Controller
         if ($request->has('country_id'))
             $cities->where('country_id' , $request->get('country_id'));
 
-        $cities = $cities->paginate($request->get('paginateCount'));
+
+        if ($request->get('is_filter'))
+            $cities = ['data' => $cities->get(['id' ,'name'])];
+        else
+            $cities = $cities->paginate($request->get('paginateCount'));
 
         return $this->dataResponse($cities);
     }

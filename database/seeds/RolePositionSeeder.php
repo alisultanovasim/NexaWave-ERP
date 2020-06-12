@@ -20,6 +20,7 @@ class RolePositionSeeder extends Seeder
             'employee',
             'office',
             'dev',
+            'company_admin'
         ];
         foreach ($roles as $role)
             \App\Models\Role::create([

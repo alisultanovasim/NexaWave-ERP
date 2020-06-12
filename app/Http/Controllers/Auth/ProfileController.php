@@ -85,6 +85,7 @@ class ProfileController extends Controller
             'modules' => $modules,
             'office' => $office
         ]);
+
     }
 
     public function index(Request $request)
