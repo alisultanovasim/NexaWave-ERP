@@ -108,7 +108,20 @@ class CompanyStructureController extends Controller
             ],
         ]);
         $links = [];
-        $structureIdsWhichLinked = [];
+        $linkedStructures = [
+            'department' => [
+                'model' => $this->getStructureModelByType('department'),
+                'ids' => []
+            ],
+            'section' => [
+                'model' => $this->getStructureModelByType('section'),
+                'ids' => []
+            ],
+            'sector' => [
+                'model' => $this->getStructureModelByType('sector'),
+                'ids' => []
+            ]
+        ];
         foreach ($request->get('structure') as $structure){
             $link = $structure['link'];
             $this->ifStructureTriesLinkSmallerStructureThrowException($structure['structure_type'], $link['type']);
@@ -131,12 +144,9 @@ class CompanyStructureController extends Controller
             /*
              * Group linked structure ids by structure type (later to remove from company structure which is not in array)
              */
-            if (!isset($structureIdsWhichLinked[$structure['structure_type']])){
-                $structureIdsWhichLinked[$structure['structure_type']] = [];
-            }
-            $structureIdsWhichLinked[$structure['structure_type']][] = $structure['structure_id'];
+            $linkedStructures[$structure['structure_type']]['ids'][] = $structure['structure_id'];
         }
-        DB::transaction(function () use ($request, $links, $structureIdsWhichLinked){
+        DB::transaction(function () use ($request, $links, $linkedStructures){
             foreach ($links as $link){
                 $link['model']->whereIn('id', $link['connectorsIds'])
                 ->where('company_id', $request->get('company_id'))
@@ -144,7 +154,9 @@ class CompanyStructureController extends Controller
                     'structable_id' => $link['structable_id'],
                     'structable_type' => $link['structable_type']
                 ]);
-                $link['model']->whereNotIn('id', $structureIdsWhichLinked[$link['structure_type']])
+            }
+            foreach ($linkedStructures as $link){
+                $link['model']->whereNotIn('id', $link['ids'])
                 ->where('company_id', $request->get('company_id'))
                 ->update([
                     'structable_id' => null,
