@@ -17,13 +17,14 @@ class WorkSkipsController extends Controller
 
     private $workSkip;
 
+
     /**
-     * SickenLogController constructor.
-     * @param WorkSkip $sickenLog
+     * WorkSkipsController constructor.
+     * @param WorkSkip $workSkip
      */
-    public function __construct(WorkSkip $sickenLog)
+    public function __construct(WorkSkip $workSkip)
     {
-        $this->workSkip = $sickenLog;
+        $this->workSkip = $workSkip;
     }
 
     /**
@@ -113,12 +114,22 @@ class WorkSkipsController extends Controller
 
     /**
      * @param Request $request
-     * @param WorkSkip $sickenLog
+     * @param WorkSkip $workSkip
      */
-    private function saveWorkSkipDocument(Request $request, WorkSkip $sickenLog): void {
-        $fillable = array_keys($this->getWorkSkipRules());
-        $fillable[] = 'company_id';
-        $sickenLog->fill($request->only($fillable))->save();
+    private function saveWorkSkipDocument(Request $request, WorkSkip $workSkip): void {
+        $workSkip->fill($request->only([
+            'employee_id',
+            'document_number',
+            'reason_type',
+            'day',
+            'date_of_presentation',
+            'start_date',
+            'end_date',
+            'is_confirmed',
+            'confirmed_employee_id',
+            'work_start_date',
+            'note'
+        ]))->save();
     }
 
     /**

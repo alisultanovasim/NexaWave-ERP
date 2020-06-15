@@ -44,6 +44,7 @@ class PositionController extends Controller
                 'note' => $request->get('note'),
                 'is_closed' => $request->get('is_closed'),
                 'company_id' => $request->get('company_id'),
+                'position' => $request->get('position')
             ]);
 
             if ($position->getAttribute('is_closed'))
@@ -73,7 +74,10 @@ class PositionController extends Controller
         {
             DB::beginTransaction();
             $saved = true;
-            $position = Positions::where('id', $id)->where('company_id' , $request->get('company_id'))->exists();
+            $position = Positions::where('id', $id)->where(function ($query) use ($request){
+                $query->whereNull('company_id')
+                ->orWhere('company_id' , $request->get('company_id'));
+            })->exists();
             if (!$position)
                 return $this->errorResponse(trans('messages.not_found'), 404);
             Positions::where('id', $id)->update([
@@ -82,6 +86,7 @@ class PositionController extends Controller
                 'note' => $request->get('note'),
                 'closing_date' => $request->get('closing_date'),
                 'is_closed' => $request->get('is_closed'),
+                'position' => $request->get('position')
             ]);
             DB::commit();
         }
@@ -110,6 +115,7 @@ class PositionController extends Controller
             'closing_date' => 'date',
             'is_closed' => 'boolean',
             'company_id' => ['required' , 'integer'],
+            'position' => 'nullable|numeric'
         ];
         $validator = \Validator::make($input, $validationArray);
 
