@@ -64,7 +64,9 @@ class ProfileController extends Controller
 
         $modules = $modules->get([
             'id',
-            'name'
+            'name',
+            'icon',
+            'route'
         ]);
 
         if (
@@ -83,6 +85,7 @@ class ProfileController extends Controller
             'modules' => $modules,
             'office' => $office
         ]);
+
     }
 
     public function index(Request $request)

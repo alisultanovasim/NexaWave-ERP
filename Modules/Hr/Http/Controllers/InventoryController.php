@@ -40,8 +40,14 @@ class InventoryController extends Controller
             'employee:id,user_id',
             'employee.user:id,name,surname'
         ])
-        ->orderBy('id', 'desc')
-        ->paginate($request->get('per_page'));
+        ->orderBy('id', 'desc');
+        if ($request->get('user_id'))
+        {
+            $inventories = $inventories->whereHas('employee.user', function ($query) use ($request){
+                $query->where('id', $request->get('user_id'));
+            });
+        }
+        $inventories = $inventories->paginate($request->get('per_page'));
 
         return $this->dataResponse($inventories);
     }

@@ -27,7 +27,7 @@ class Product extends Model
         'model_id',
 //        'product_model',
         'product_mark',
-        'product_no',
+        '',
         'color_id',
         'main_funds',
         'inv_no',

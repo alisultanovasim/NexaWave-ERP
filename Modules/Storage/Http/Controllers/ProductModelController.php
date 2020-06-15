@@ -21,7 +21,7 @@ class ProductModelController extends Controller
             'kind_id' => ['required', 'integer'],
             "per_page" => ['nullable' , 'integer']
         ]);
-        $models = ProductModel::query()->company()->where('kind_id'  , $request->get('kind_id'))
+        $models = ProductModel::with(['kind'])->company()->where('kind_id'  , $request->get('kind_id'))
             ->get();
         return $this->successResponse($models);
     }
@@ -51,7 +51,7 @@ class ProductModelController extends Controller
             'name' => ['required', 'string', 'max:255'],
         ]);
 
-        $data = ProductModel::with('kind')->company()->where('id', $id)->first();
+        $data = ProductModel::with(['kind'])->company()->where('id', $id)->first();
 
         return $this->successResponse($data);
     }

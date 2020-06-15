@@ -60,7 +60,9 @@ class PermissionController extends Controller
         ])
         ->get([
             'id',
-            'name'
+            'name',
+            'icon',
+            'route'
         ]);
         if (
             (in_array($this->role->getCompanyAdminRoleId(), \auth()->user()->getUserRolesForRequest())) or
@@ -104,7 +106,9 @@ class PermissionController extends Controller
         $modules = $modules->get([
             'id',
             'name',
-            'parent_id'
+            'parent_id',
+            'icon',
+            'route'
         ]);
         return $this->successResponse($modules);
     }
@@ -135,7 +139,7 @@ class PermissionController extends Controller
         $roles = $this->role;
         if ($request->get('company_id'))
             $roles = $roles->companyId($request->get('company_id'));
-        $roles = $roles->get(['id', 'name']);
+        $roles = $roles->get(['id', 'name', 'created_at', 'updated_at']);
         return $this->successResponse($roles);
     }
 
@@ -164,9 +168,10 @@ class PermissionController extends Controller
         if (!$request->get('role_id') and $request->get('role_name')){
             $role = $this->saveRole($request, $this->role);
         }
-        $permissions = $this->preparePermissionsInsertData($role->getKey(), $request->get('modules'));
-        return DB::transaction(function () use ($request, $permissions, $role){
-            RoleModulePermission::where('role_id', $role->getKey())->delete();
+        $roleId = isset($role) ? $role->getKey() : $request->get('role_id');
+        $permissions = $this->preparePermissionsInsertData($roleId, $request->get('modules'));
+        return DB::transaction(function () use ($request, $permissions, $roleId){
+            RoleModulePermission::where('role_id', $roleId)->delete();
             RoleModulePermission::insert($permissions);
             return $this->successResponse(trans('responses.OK'));
         });
@@ -221,10 +226,7 @@ class PermissionController extends Controller
                     'name' => $module->module_name,
                     'permissions' => []
                 ];
-            if (
-                (in_array($this->role->getCompanyAdminRoleId(), \auth()->user()->getUserRolesForRequest())) or
-                (in_array($this->role->getSuperAdminRoleId(), \auth()->user()->getUserRolesForRequest()))
-            ){
+            if ($roleWithPermissions->id == $this->role->getCompanyAdminRoleId()){
                 $modules[$module->id]['permissions'] = ['*'];
             }
             else {

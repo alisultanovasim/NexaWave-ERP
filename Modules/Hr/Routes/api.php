@@ -553,5 +553,14 @@ Route::group([
 
     });
 
+    Route::group(['prefix' => 'company/structure'], function (){
+        Route::get('/', 'CompanyStructureController@index');
+        Route::post('/', 'CompanyStructureController@addStructureLink');
+        Route::post('/set', 'CompanyStructureController@createCompanyStructure');
+        Route::post('/positions', 'CompanyStructureController@setStructurePositions');
+        Route::get('/positions', 'CompanyStructureController@getStructurePositions');
+        Route::get('/employees', 'CompanyStructureController@getEmployees');
+    });
+
 });
 

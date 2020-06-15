@@ -48,8 +48,10 @@ class SalaryController extends Controller
             'salaryType:id,name',
             'currency:id,name'
         ])
-        ->orderBy('id', 'desc')
-        ->paginate($request->get('per_page'));
+        ->orderBy('id', 'desc');
+        if ($request->get('user_id'))
+            $salaries = $salaries->where('user_id', $request->get('user_id'));
+        $salaries = $salaries->paginate($request->get('per_page'));
         return $this->successResponse($salaries);
     }
 

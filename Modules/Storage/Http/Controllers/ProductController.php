@@ -36,7 +36,18 @@ class ProductController extends Controller
 //            ->where('id', $request->get('title_id'))
 //            ->where('company_id', $request->get('company_id'))
 //            ->first();
-        $products = Product::with('model:id,name')->where('company_id', $request->get('company_id'));
+        $products = Product::with([
+            'kind',
+            'model:id,name',
+            'kind.unit',
+            'title:id,name',
+            'state:id,name',
+            'color:id,name',
+            'storage:id,name',
+            'kind.unit',
+            'buy_from_country:id,name:short_name',
+            'made_in_country:id,name:short_name'
+        ])->where('company_id', $request->get('company_id'));
 
         if ($request->has('status'))
             $products->where('status', $request->get('status'));
@@ -54,7 +65,7 @@ class ProductController extends Controller
 //            'title' => $title   ,
 //            'products' => $products
 //        ]
-        return $this->dataResponse($products);
+            return $this->dataResponse($products);
     }
 
     public function firstPage(Request $request)
@@ -79,7 +90,8 @@ class ProductController extends Controller
     public function show(Request $request, $id)
     {
         $product = Product::with([
-            'kind:id,name',
+            'kind',
+            'kind.unit',
             'model:id,name',
             'title:id,name',
             'state:id,name',
@@ -111,7 +123,7 @@ class ProductController extends Controller
             ['company_id', '=', $request->get('company_id')],
             ['id', '=', $request->get('kind_id')],
         ])->exists();
-        if (!$check) return $this->errorResponse(trans('response.fieldIsNotFindInDatabase'));
+        if (!$check) return $this->errorResponse(trans('response.fieldIsNotFindInDatabase'),404);
         $product = new Product();
         $product
             ->fill(array_merge($request->all(), ['status' => Product::STATUS_ACTIVE]))
@@ -236,13 +248,15 @@ class ProductController extends Controller
             'make_date' => ['nullable', 'date', 'date_format:Y-m-d'],
             'income_description' => ['nullable', 'string'],
             'model_id' => ['nullable' , 'integer'],
-            'sell_act_id' => ['nullable' , 'integer']
+            'sell_act_id' => ['nullable' , 'integer'],
+            'product_no' => ['nullable' , 'max:255']
         ];
     }
 
     public static function getUpdateRules()
     {
         return [
+            'product_no' => ['nullable' , 'max:255'],
             'unit_id' => ['nullable', 'integer', 'min:1'],
             'less_value' => ['nullable', 'boolean'],
             'quickly_old' => ['nullable', 'boolean'],

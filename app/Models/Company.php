@@ -3,7 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Modules\Hr\Entities\Department;
+use Modules\Hr\Entities\Positions;
+use Modules\Hr\Entities\Section;
+use Modules\Hr\Entities\Sector;
 
 /**
  * @property integer $id
@@ -43,8 +48,19 @@ class Company extends Model
             'module_id');
     }
 
+    public function positions(){
+        return $this->belongsToMany(
+            Positions::class,
+            'structure_positions',
+            'structure_id',
+            'position_id'
+        )
+        ->withPivot('quantity')
+        ->where('structure_type', 'company');
+    }
+
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     * @return BelongsToMany
      */
     public function users()
     {
@@ -56,4 +72,27 @@ class Company extends Model
         return $this->belongsToMany('App\Models\Role', 'company_role_users');
 
     }
+
+    public function structuredDepartments(){
+        return $this->hasMany(Department::class, 'structable_id', 'id')
+            ->where('structable_type', 'company')
+            ->with([
+                'structuredSections:id,name,structable_id,structable_type',
+                'structuredSectors:id,name,structable_id,structable_type'
+            ]);
+    }
+
+    public function structuredSections(){
+        return $this->hasMany(Section::class, 'structable_id', 'id')
+            ->where('structable_type', 'company')
+            ->with([
+                'structuredSectors:id,name,structable_id,structable_type',
+            ]);
+    }
+
+    public function structuredSectors(){
+        return $this->hasMany(Sector::class, 'structable_id', 'id')
+            ->where('structable_type', 'company');
+    }
+
 }

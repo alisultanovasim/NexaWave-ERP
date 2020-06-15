@@ -31,7 +31,10 @@ class CountryController extends Controller
         if ($request->has('name'))
             $countries->where('name', $request->get('name'));
 
-        $countries = $countries->paginate($request->get('paginateCount'));
+        if ($request->get('is_filter'))
+            $countries = ['data' => $countries->get(['id' ,'name','short_name'])];
+        else
+            $countries = $countries->paginate($request->get('paginateCount'));
         return $this->dataResponse($countries);
     }
 

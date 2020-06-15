@@ -5,6 +5,7 @@ namespace Modules\Plaza\Http\Controllers;
 
 
 use App\Models\User;
+use App\Models\UserRole;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Support\Facades\Hash;
 use Modules\Plaza\Entities\Contact;
@@ -894,7 +895,14 @@ class OfficeController extends Controller
             'password' => Hash::make($request->get('password')),
             'username' => $request->get('username'),
             'is_office_user' => true,
-            'office_company_id' => $request->get('company_id')
+            'office_company_id' => $request->get('company_id'),
+            'role_id' => User::OFFICE
+        ]);
+
+        UserRole::create([
+            'user_id' => $users->getKey(),
+            'role_id' => User::OFFICE,
+            'company_id' => $request->get('company_id')
         ]);
 
         OfficeUser::create([
@@ -902,6 +910,7 @@ class OfficeController extends Controller
             'user_id' => $users->id,
             'company_id' => $request->get('company_id')
         ]);
+
         DB::commit();
         return $this->successResponse('OK');
 
