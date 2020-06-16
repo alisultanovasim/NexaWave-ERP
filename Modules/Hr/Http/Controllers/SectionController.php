@@ -98,7 +98,7 @@ class SectionController extends Controller
         $validationArray = [
             'name' => 'required|max:256',
             'code' => 'required|max:50',
-            'short_name' => 'required|max:50',
+            'short_name' => 'nullable|max:50',
             'is_closed' => 'boolean',
             'closing_date' => 'nullable|date_format:Y-m-d',
             'position' => 'required|numeric',
