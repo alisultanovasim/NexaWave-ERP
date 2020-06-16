@@ -8,8 +8,10 @@ use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
+use Modules\Hr\Entities\Employee\Employee;
 use Modules\Storage\Entities\Demand;
 use Modules\Storage\Entities\DemandAssignment;
 use Modules\Storage\Entities\DemandItem;
@@ -24,7 +26,7 @@ class DemandAssignmentController extends Controller
             'per_page' => ['nullable', 'integer'],
             'demand_id' => ['required', 'integer'],
         ]);
-        $assignments = DemandAssignment::with(['items', 'items.employee', 'items.employee.user'])
+        $assignments = DemandAssignment::with(['items', 'items.employee', 'items.employee.user' , 'employee.user'])
             ->company()
             ->where('demand_id', $request->get('demand_id'))
             ->get();
@@ -46,9 +48,9 @@ class DemandAssignmentController extends Controller
 
         if ($notExists = $this->companyInfo($request->get('company_id'), $request->only(['demand_id'])))
             return $this->errorResponse($notExists);
-
         $demandAssignment = DemandAssignment::firstOrCreate([
             'demand_id' => $request->get('demand_id'),
+            'employee_id' => Auth::user()->getEmployeeId($request->get('company_id'))
         ], [
             'expiry_time' => $request->get('expiry_time'),
             'description' => $request->get('description')

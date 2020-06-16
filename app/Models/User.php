@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Passport\HasApiTokens;
 use Modules\Hr\Entities\Employee\Employee;
@@ -101,5 +102,11 @@ class User extends Authenticatable
         $this->userRolesForRequest = $userRolesForRequest;
     }
 
+    public function getEmployeeId($company) : int{
+        return  Employee::where([
+            ['user_id' , '='  , Auth::id()],
+            ['company_id' , '='  , $company],
+        ])->first(['id'])->id;
+    }
 
 }
