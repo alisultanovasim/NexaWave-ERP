@@ -11,10 +11,9 @@ class Demand extends Model
 
     use SoftDeletes;
 
-    const STATUS_WAIT = 0;
-    const STATUS_ASSIGNED = 1;
-    const STATUS_REJECTED = 2;
-    const STATUS_ACCEPTED = 3;
+    const STATUS_WAIT = 2;
+    const STATUS_REJECTED = 0;
+    const STATUS_ACCEPTED = 1;
 
     protected $guarded = ['id'];
 

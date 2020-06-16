@@ -32,6 +32,16 @@ Route::group([
     }); //products
 
     Route::group([
+        'prefix' => 'assignment'
+    ], function ($q) {
+        Route::get('/', 'ProductAssignmentController@index');
+        Route::get('/{id}', 'ProductAssignmentController@show');
+        Route::put('/{id}', 'ProductAssignmentController@update');
+        Route::post('/', 'ProductAssignmentController@store');
+        Route::delete('{id}', 'ProductAssignmentController@delete');
+    }); //assignment
+
+    Route::group([
         'prefix' => 'titles'
     ], function ($q) {
         Route::get('/', 'ProductTitleController@index');
@@ -107,7 +117,6 @@ Route::group([
             'prefix' => 'assignments'
         ], function () {
             Route::get('/', 'DemandAssignmentController@index');
-            Route::get('/{id}', 'DemandAssignmentController@show');
             Route::post('/', 'DemandAssignmentController@store');
             Route::put('/{id}', 'DemandAssignmentController@update');
             Route::delete('/{id}', 'DemandAssignmentController@delete');

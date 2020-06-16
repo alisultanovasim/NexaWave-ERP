@@ -45,7 +45,6 @@ class ColorController extends Controller
                 'name' => $request->get('name'),
                 'code' => $request->get('code'),
                 'position' => 0,
-                'company_id' => 1
             ]);
         }
         catch (\Exception $exception)

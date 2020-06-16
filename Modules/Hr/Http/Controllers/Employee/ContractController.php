@@ -64,10 +64,8 @@ class ContractController extends Controller
             'duration_limit_reason'
         ]);
 
-
         if ($request->has('contract') and $request->hasFile('contract'))
             $data['contract'] = self::save($request->file('contract'), $request->get('company_id'), 'contracts');
-
 
         return Contract::create($data);
     }
@@ -124,33 +122,34 @@ class ContractController extends Controller
             'employee_id' => ['sometimes', 'required', 'integer'],
             'employee_status' => ['sometimes', 'required', 'in:0,1,2'],
         ]);
-            $contract = Contract::with([
-                'employee:id,user_id,is_active',
-                'employee.user:id,name,surname',
-                'position:id,name',
-                'section:id,name,short_name',
-                'sector:id,name,short_name',
-                'department:id,name,short_name',
-                'currency',
 
-            ])->whereHas('employee', function ($q) use ($request) {
-                $q->where('company_id', $request->get('company_id'));
-                if ($request->has('employee_status') and $request->get('employee_status') != 2) {
-                    $q->where('is_active', $request->get('employee_status'));
-                } else {
-                    $q->where('is_active', true);
-                }
-            });
+        $contract = Contract::with([
+            'employee:id,user_id,is_active',
+            'employee.user:id,name,surname',
+            'position:id,name',
+            'section:id,name,short_name',
+            'sector:id,name,short_name',
+            'department:id,name,short_name',
+            'currency',
 
-            if ($request->has('status') and $request->get('status') != 2) {
-                $contract->where('is_active', $request->get('status'));
+        ])->whereHas('employee', function ($q) use ($request) {
+            $q->where('company_id', $request->get('company_id'));
+            if ($request->has('employee_status') and $request->get('employee_status') != 2) {
+                $q->where('is_active', $request->get('employee_status'));
             } else {
-                $contract->where('is_active', true);
+                $q->where('is_active', true);
             }
+        });
 
-            $contract = $contract->paginate();
+        if ($request->has('status') and $request->get('status') != 2) {
+            $contract->where('is_active', $request->get('status'));
+        } else {
+            $contract->where('is_active', true);
+        }
 
-            return $this->successResponse($contract);
+        $contract = $contract->paginate();
+
+        return $this->successResponse($contract);
 
     }
 

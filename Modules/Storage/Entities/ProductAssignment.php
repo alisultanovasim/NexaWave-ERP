@@ -10,5 +10,15 @@ class ProductAssignment extends Model
 
 
     const ASSIGN_TO_USER = 1 ;
-    const ASSIGN_TO_SECTION = 2 ;
+    const ASSIGN_TO_PLACE = 2 ;
+
+    public function scopeCompany($q){
+        return $q->where('company_id', request('company_id'));
+    }
+
+    public function employee(){}
+    public function department(){}
+    public function section(){}
+    public function sector(){}
+
 }

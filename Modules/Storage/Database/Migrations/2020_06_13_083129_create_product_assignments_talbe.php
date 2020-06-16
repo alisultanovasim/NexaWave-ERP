@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateProductAssignmentTable extends Migration
+class CreateProductAssignmentsTalbe extends Migration
 {
     /**
      * Run the migrations.
@@ -13,17 +13,16 @@ class CreateProductAssignmentTable extends Migration
      */
     public function up()
     {
-        Schema::create('product_assignment', function (Blueprint $table) {
+        Schema::create('product_assignments', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->unsignedInteger('product_id');
+            $table->unsignedTinyInteger('assignment_type');
             $table->unsignedBigInteger('department_id')->nullable();
             $table->unsignedBigInteger('section_id')->nullable();
             $table->unsignedBigInteger('sector_id')->nullable();
             $table->unsignedBigInteger('employee_id')->nullable();
-            $table->float('amount')->default(1);
-            $table->unsignedInteger('initial_status')->nullable();
-            $table->unsignedInteger('finish_status')->nullable();
-            $table->date('return_date')->nullable();
+            $table->unsignedBigInteger('product_id')->nullable();
+            $table->float('amount');
+            $table->unsignedBigInteger('company_id');
             $table->timestamps();
         });
     }
@@ -35,6 +34,6 @@ class CreateProductAssignmentTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('product_assignment');
+        Schema::dropIfExists('product_assignments');
     }
 }

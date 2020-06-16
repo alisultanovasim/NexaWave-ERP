@@ -22,10 +22,11 @@ class DemandAssignmentController extends Controller
     {
         $this->validate($request, [
             'per_page' => ['nullable', 'integer'],
-            'demand_id' => ['nullable', 'integer'],
+            'demand_id' => ['required', 'integer'],
         ]);
         $assignments = DemandAssignment::with(['items', 'items.employee', 'items.employee.user'])
-            ->where('demand_id' , $request->get('demand_id'))
+            ->company()
+            ->where('demand_id', $request->get('demand_id'))
             ->get();
 
         return $this->successResponse($assignments);
@@ -35,43 +36,39 @@ class DemandAssignmentController extends Controller
     {
         $this->validate($request, [
             'employees' => ['nullable', 'array'],
-            'employees.*.id' => ['require_with:employees', 'integer'],
-                'employees.*.expiry_time' => ['nullable', 'date', 'date_format:Y-m-d H:i:s'],
+            'employees.*.id' => ['required_with:employees', 'integer'],
+            'employees.*.expiry_time' => ['nullable', 'date', 'date_format:Y-m-d H:i:s'],
             'expiry_time' => ['nullable', 'date', 'date_format:Y-m-d H:i:s'],
             'demand_id' => ['required', 'integer']
         ]);
 
         DB::beginTransaction();
 
-
         if ($notExists = $this->companyInfo($request->get('company_id'), $request->only(['demand_id'])))
             return $this->errorResponse($notExists);
 
-        $demand = DemandAssignment::firstOrCreate([
-            'employee_id' => $request->get('employee_id'),
+        $demandAssignment = DemandAssignment::firstOrCreate([
             'demand_id' => $request->get('demand_id'),
         ], [
             'expiry_time' => $request->get('expiry_time'),
             'description' => $request->get('description')
         ]);
 
-
         //todo check employee
-        if ($request->has('employee_id')) {
+        if ($request->has('employees')) {
             $data = [];
             foreach ($request->get('employees') as $assignment) {
                 $data = [
-                    'demand_id' => $demand->id,
-                    'expiry_time' => $assignment["expiry_time"],
-                    'description' => $assignment["description"],
-                    "employee_id" => $assignment["employee_id"],
+                    'demand_assignment_id' => $demandAssignment->id,
+                    'expiry_time' => isset($assignment["expiry_time"]) ? $assignment["expiry_time"] : null,
+                    'description' => isset($assignment["description"]) ? $assignment["description"] : null,
+                    "employee_id" => $assignment["id"],
                     'status' => DemandItem::WAIT
                 ];
             }
             DemandItem::insert($data);
         }
         DB::commit();
-
         return $this->successResponse('ok');
     }
 
@@ -85,18 +82,28 @@ class DemandAssignmentController extends Controller
                 DemandAssignment::STATUS_ACCEPTED,
             ])]
         ]);
-        $demand = DemandAssignment::where('id', $id)
-            ->where('company_id', $request->get('company_id'))
-            ->first();
-        $demand->update($request->only(['expiry_time', 'description', 'status']));
+        $demandAssignment = DemandAssignment::where('id', $id)
+            ->company()
+            ->first(['id', 'demand_id']);
+
+        if (!$demandAssignment)
+            return $this->errorResponse(trans('response.demandAssignmentNotFound') , 404);
+
+        $demandAssignment->update($request->only(['expiry_time', 'description', 'status']));
+
+        Demand::where('id' , $demandAssignment->demand_id)
+            ->update([
+                'status' => $request->get('status')
+            ]);
+
+        return $this->successResponse('ok');
     }
 
     public function delete(Request $request, $id)
     {
-        $demand = DemandAssignment::where('id', $id)
-            ->where('company_id', $request->get('company_id'))
+        $demand = DemandAssignment::company()->where('id', $id)
             ->delete();
-        return $this->successResponse('ok');
+        return $this->successResponse($demand);
     }
 
     public function addItem(Request $request)
@@ -107,9 +114,7 @@ class DemandAssignmentController extends Controller
             'demand_assignment_id' => ['required', 'integer']
         ]);
 
-
         if (!DemandAssignment::company()
-            ->where('id', $request->get('company_id'))
             ->exists())
             return $this->errorResponse(trans('response.assignmentNotFound'), 404);
 
@@ -139,7 +144,7 @@ class DemandAssignmentController extends Controller
         ])->exists())
             return $this->errorResponse(trans('response.ItemNotFound'), 404);
 
-        DemandItem::where('id' , $id)
+        DemandItem::where('id', $id)
             ->update($request->only([
                 'employee_id',
                 'expiry_time',
@@ -151,7 +156,7 @@ class DemandAssignmentController extends Controller
 
     public function deleteItem(Request $request, $id)
     {
-         DemandItem::company()->where([
+        DemandItem::company()->where([
             ['id', '=', $id],
         ])->delete();
         return $this->successResponse('ok');
@@ -162,7 +167,7 @@ class DemandAssignmentController extends Controller
         $this->validate($request, [
             'employee_id' => ['nullable', 'integer'],
             'expiry_time' => ['nullable', 'date_format:Y-m-d H:i:s'],
-            'status' => ['nullable' , 'integer' , Rule::in([
+            'status' => ['nullable', 'integer', Rule::in([
                 DemandItem::ACCEPTED,
                 DemandItem::REJECTED,
             ])]
@@ -178,9 +183,8 @@ class DemandAssignmentController extends Controller
             ['id', '=', $id],
         ])->update([
             'description' => $request->get('description'),
-            'status' => $request->get('status')??0
+            'status' => $request->get('status') ?? 0
         ]);
-
         return $this->successResponse('ok');
 
 

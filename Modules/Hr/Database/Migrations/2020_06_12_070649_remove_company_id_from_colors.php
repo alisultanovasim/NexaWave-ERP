@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AddCompanyToProductAssignment extends Migration
+class RemoveCompanyIdFromColors extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,8 @@ class AddCompanyToProductAssignment extends Migration
      */
     public function up()
     {
-        Schema::table('product_assignment', function (Blueprint $table) {
-            $table->unsignedBigInteger('company_id');
+        Schema::table('colors', function (Blueprint $table) {
+            $table->dropColumn('company_id');
         });
     }
 
@@ -25,8 +25,8 @@ class AddCompanyToProductAssignment extends Migration
      */
     public function down()
     {
-        Schema::table('product_assignment', function (Blueprint $table) {
-            $table->dropColumn('company_id');
+        Schema::table('colors', function (Blueprint $table) {
+            $table->unsignedBigInteger('company_id');
         });
     }
 }

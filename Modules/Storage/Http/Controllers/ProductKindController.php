@@ -84,7 +84,7 @@ class ProductKindController extends Controller
             if ($notExists = $this->companyInfo($request->get('company_id') , $request->only('title_id')))
                  return $this->errorResponse($notExists);
 
-        ProductKind::where('id', $id)->update($request->get('unit_id' , 'name'));
+        ProductKind::where('id', $id)->update($request->only('unit_id' , 'name'));
         return $this->successResponse('ok');
     }
 
