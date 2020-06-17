@@ -88,6 +88,19 @@ class DocumentController extends Controller
                 ->where("company_id", $request->company_id)
                 ->where("status", "!=", Document::DRAFT);
 
+
+            //check permission
+            if (!Auth::user()->can("read-Sənəd Dövriyyəsi")){
+                $documents->where(function ($q) use ($request){
+                    $q->whereHas('assignment' , function ($q){
+                        $q->whereHas('items' ,function ($q){
+                            $q->where('user_id' , Auth::id());
+                        });
+                    })->orWhere('from' , Auth::id())
+                        ->orWhere('company_user' , Auth::user()->getEmployeeId($request->get('company')));
+                });
+            }
+
             /**  Start filter  */
             if ($request->has("status")) {
                 $documents->where("status", $request->get('status'));
@@ -103,9 +116,6 @@ class DocumentController extends Controller
 
             if ($request->has('send_form'))
                 $documents->where("send_type", $request->send_form);
-
-//            if ($request->has("from"))
-//                $documents->where("from", $request->from);
 
             if ($request->has("time_from"))
                 $documents->where("created_at", ">", $request->time_from);
@@ -166,15 +176,15 @@ class DocumentController extends Controller
                 $documents->where("company_user", $request->to);
             }
 
-            if ($request->get('tome')){
-                $documents->where(function ($q){
-                    $q->whereHas('assignment' , function ($q){
-                        $q->whereHas('items' ,function ($q){
-                            $q->where('user_id' , Auth::id());
-                        });
-                    })->orWhere('from' , Auth::id());
-                });
-            }
+//            if ($request->get('tome')){
+//                $documents->where(function ($q){
+//                    $q->whereHas('assignment' , function ($q){
+//                        $q->whereHas('items' ,function ($q){
+//                            $q->where('user_id' , Auth::id());
+//                        });
+//                    })->orWhere('from' , Auth::id());
+//                });
+//            }
             if ($request->has('section_id')) {
                 $documents->whereIn('section_id', $request->section_id);
                 if (count($request->section_id) == 1) {
@@ -203,7 +213,6 @@ class DocumentController extends Controller
 
             return $this->successResponse($documents);
         } catch (QueryException $ex) {
-            dd($ex);
             if ($ex->errorInfo[1] == 1054)
                 return $this->errorMessage(['order_by' => ['not valid data']], Response::HTTP_UNPROCESSABLE_ENTITY);
             return $this->errorResponse(trans('apiResponse.tryLater'), Response::HTTP_INTERNAL_SERVER_ERROR);

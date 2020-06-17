@@ -2,5 +2,6 @@
     "Esd": true,
     "Hr": true,
     "Plaza": true,
-    "Storage": true
+    "Storage": true,
+    "Contracts": true
 }

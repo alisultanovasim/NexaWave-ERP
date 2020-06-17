@@ -176,7 +176,7 @@ class DemandAssignmentController extends Controller
         ]);
 
         if (!DemandItem::company()->where([
-            ['employee_id', '=', $request->get('auth_employee_id')],
+            ['employee_id', '=', Auth::user()->getEmployeeId($request->get('company_id'))],
             ['id', '=', $id],
         ])->exists())
             return $this->errorResponse(trans('response.ItemNotFound'), 404);
