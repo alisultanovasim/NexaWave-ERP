@@ -88,7 +88,6 @@ class DocumentController extends Controller
                 ->where("company_id", $request->company_id)
                 ->where("status", "!=", Document::DRAFT);
 
-
             //check permission
             if (!Auth::user()->can("read-Sənəd Dövriyyəsi")){
                 $documents->where(function ($q) use ($request){

@@ -13,6 +13,7 @@ use Illuminate\Validation\ValidationException;
 use Modules\Storage\Entities\Product;
 use Modules\Storage\Entities\ProductKind;
 use Modules\Storage\Entities\ProductTitle;
+use function Deployer\get;
 
 class ProductController extends Controller
 {
@@ -123,7 +124,7 @@ class ProductController extends Controller
             ['company_id', '=', $request->get('company_id')],
             ['id', '=', $request->get('kind_id')],
         ])->exists();
-        if (!$check) return $this->errorResponse(trans('response.fieldIsNotFindInDatabase'),404);
+        if (!$check) return $this->errorResponse(trans('response.productKindNotFound'),404);
         $product = new Product();
         $product
             ->fill(array_merge($request->all(), ['status' => Product::STATUS_ACTIVE]))
@@ -216,10 +217,21 @@ class ProductController extends Controller
 
     public function delete(Request $request, $id)
     {
-        Product::where([
+        $this->validate($request , [
+            'amount' => ['required' , 'numeric']
+        ]);
+        $product = Product::where([
             ['id', '=', $id],
             ['company_id', '=', $request->get('company_id')],
-        ])->delete();
+        ])->first(['id' , 'amount']);
+        if (!$product) return $this->errorResponse(trans('response.productNotFound') , 404);
+        if ($request->has('amount')){
+            if ($product->amount < $request->get('amount'))
+                return $this->errorResponse(trans('response.amountError') , 422);
+            $product->decrement('amount' , $request->get('amount'));
+        }else{
+            $product->delete();
+        }
         return $this->successResponse('ok');
 
     }
