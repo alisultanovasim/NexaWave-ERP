@@ -72,6 +72,8 @@ class AssignmentController extends Controller
             $assignmentItems = [];
             foreach ($helper as $k => $v) {
                 $assignmentItems[$k] = [
+
+                    //front send employee id
                     "user_id" => $v,
                     "assignment_id" => $assignment->id,
                 ];
