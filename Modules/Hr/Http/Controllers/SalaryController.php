@@ -12,6 +12,7 @@ use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
+use Modules\Hr\Entities\Employee\Employee;
 use Modules\Hr\Entities\Salary;
 use Psy\Util\Json;
 
@@ -49,8 +50,9 @@ class SalaryController extends Controller
             'currency:id,name'
         ])
         ->orderBy('id', 'desc');
-        if ($request->get('user_id'))
-            $salaries = $salaries->where('user_id', $request->get('user_id'));
+        if ($request->get('user_id')){
+            $salaries = $salaries->whereIn('employee_id', $this->getEmployeeIdsByUserAndCompanyId($request->get('user_id'), $request->get('company_id')));
+        }
         $salaries = $salaries->paginate($request->get('per_page'));
         return $this->successResponse($salaries);
     }
@@ -110,6 +112,13 @@ class SalaryController extends Controller
         return $salary->delete()
             ? $this->successResponse(trans('messages.saved'), 200)
             : $this->errorResponse(trans('messages.not_saved'), 400);
+    }
+
+    private function getEmployeeIdsByUserAndCompanyId($userId, $companyId): array {
+        return Employee::where([
+            'company_id' => $companyId,
+            'user_id' => $userId
+        ])->pluck('id')->toArray();
     }
 
     /**
