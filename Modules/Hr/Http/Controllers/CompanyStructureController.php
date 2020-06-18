@@ -227,8 +227,7 @@ class CompanyStructureController extends Controller
         $this->validate($request, [
             'structure_id' => 'nullable|numeric',
             'structure_type' => [
-                'nullable',
-                Rule::in(['department', 'section', 'sector'])
+                Rule::in(['company', 'department', 'section', 'sector'])
             ],
         ]);
         if ($request->get('structure_type')){
@@ -269,7 +268,7 @@ class CompanyStructureController extends Controller
             'positions' => 'required|array|min:1',
             'positions.*.id' => [
                 'required',
-                Rule::exists('positions', 'id')->where('company_id', $request->get('company_id'))
+//                Rule::exists('positions', 'id')->where('company_id', $request->get('company_id'))
             ],
             'positions.*.quantity' => 'required|numeric',
         ]);

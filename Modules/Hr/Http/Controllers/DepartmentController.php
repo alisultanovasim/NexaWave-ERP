@@ -26,13 +26,10 @@ class DepartmentController extends Controller
         ]);
         $result = Department::with(['city:id,name'])
             ->where('company_id' , $request->get('company_id'));
-
-
         if ($request->get('is_filter'))
-            $result = ['data' => $result->get(['id' ,'name','short_name'])];
+            $result = ['data' => $result->get(['id' ,'name','is_closed', 'closing_date', 'position', 'code'])];
         else
             $result = $result->paginate($request->get('paginateCount'));
-
         return $this->dataResponse($result);
     }
 
