@@ -2,10 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="690b112f-ffd8-4eb7-abf9-50bbc8008595" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.github/workflows/main.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/main.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/oneOffice.iml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/php.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/php.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -180,11 +176,47 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1592555240392</updated>
-      <workItem from="1592555244860" duration="3637000" />
+      <workItem from="1592555244860" duration="4694000" />
     </task>
+    <task id="LOCAL-00001" summary="deployment">
+      <created>1592567941322</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1592567941322</updated>
+    </task>
+    <task id="LOCAL-00002" summary="deployment">
+      <created>1592568025657</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1592568025657</updated>
+    </task>
+    <task id="LOCAL-00003" summary="deployment">
+      <created>1592568098862</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1592568098862</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="2" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="deployment" />
+    <option name="LAST_COMMIT_MESSAGE" value="deployment" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="495" y="99" width="919" height="916" key="CommitChangelistDialog2" timestamp="1592568098798">
+      <screen x="0" y="27" width="1920" height="1053" />
+    </state>
+    <state x="495" y="99" width="919" height="916" key="CommitChangelistDialog2/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1592568098798" />
+    <state x="555" y="289" width="800" height="535" key="Vcs.Push.Dialog.v2" timestamp="1592568100788">
+      <screen x="0" y="27" width="1920" height="1053" />
+    </state>
+    <state x="555" y="289" width="800" height="535" key="Vcs.Push.Dialog.v2/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1592568100788" />
   </component>
 </project>

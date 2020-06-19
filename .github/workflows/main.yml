@@ -29,4 +29,11 @@ jobs:
           APP_DEPLOY_PATH: ${{ secrets.APP_DEPLOY_PATH }}
           APP_DEPLOY_USER: ${{ secrets.APP_DEPLOY_USER }}
           APP_DEPLOY_DEFAULT: ${{ secrets.APP_DEPLOY_DEFAULT }}
-        run: php artisan deploy time-vps1.serverxx.com -s upload -vvv
+
+        run: |
+          eval $(ssh-agent -s)
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" | tr -d '\r' | ssh-add - > /dev/null
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          [[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
+        php artisan deploy time-vps1.serverxx.com -s upload -vvv
