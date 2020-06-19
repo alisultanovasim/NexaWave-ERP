@@ -36,4 +36,4 @@ jobs:
           mkdir -p ~/.ssh
           chmod 700 ~/.ssh
           [[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
-        php artisan deploy time-vps1.serverxx.com -s upload -vvv
+          php artisan deploy time-vps1.serverxx.com -s upload -vvv
