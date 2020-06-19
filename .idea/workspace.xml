@@ -272,17 +272,19 @@
     <option name="LAST_COMMIT_MESSAGE" value="deployment" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="495" y="99" width="919" height="916" key="CommitChangelistDialog2" timestamp="1592582664430">
+    <state x="495" y="99" width="1047" height="916" key="CommitChangelistDialog2" timestamp="1592583239846">
       <screen x="0" y="27" width="1920" height="1053" />
     </state>
     <state x="495" y="99" width="919" height="916" key="CommitChangelistDialog2/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1592582664430" />
+    <state x="495" y="99" width="1047" height="916" key="CommitChangelistDialog2/0.27.1920.1053@0.27.1920.1053" timestamp="1592583239846" />
     <state x="449" y="188" width="1022" height="737" key="SettingsEditor" timestamp="1592582882581">
       <screen x="0" y="27" width="1920" height="1053" />
     </state>
     <state x="449" y="188" width="1022" height="737" key="SettingsEditor/0.27.1920.1053@0.27.1920.1053" timestamp="1592582882581" />
-    <state x="555" y="289" width="800" height="535" key="Vcs.Push.Dialog.v2" timestamp="1592582669274">
+    <state x="555" y="289" width="800" height="535" key="Vcs.Push.Dialog.v2" timestamp="1592583241690">
       <screen x="0" y="27" width="1920" height="1053" />
     </state>
     <state x="555" y="289" width="800" height="535" key="Vcs.Push.Dialog.v2/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1592582669274" />
+    <state x="555" y="289" width="800" height="535" key="Vcs.Push.Dialog.v2/0.27.1920.1053@0.27.1920.1053" timestamp="1592583241690" />
   </component>
 </project>
