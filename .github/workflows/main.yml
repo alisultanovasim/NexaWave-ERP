@@ -19,9 +19,9 @@ jobs:
         run: composer install
       - name: Setup Deployer
         uses: atymic/deployer-php-action@master
-        with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-          ssh-known-hosts: ${{ secrets.SSH_KNOWN_HOSTS }}
+      with:
+        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+        ssh-known-hosts: ${{ secrets.SSH_KNOWN_HOSTS }}
       - name: Run Deployment
         env:
           DOT_ENV: ${{ secrets.DOT_ENV }}
@@ -29,11 +29,4 @@ jobs:
           APP_DEPLOY_PATH: ${{ secrets.APP_DEPLOY_PATH }}
           APP_DEPLOY_USER: ${{ secrets.APP_DEPLOY_USER }}
           APP_DEPLOY_DEFAULT: ${{ secrets.APP_DEPLOY_DEFAULT }}
-
-        run: |
-          mkdir -p ~/.ssh
-              echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-              chmod 600 ~/.ssh/id_rsa
-              ssh-keyscan github.com >> ~/.ssh/known_hosts
-              ssh-keyscan git.eu.s5y.io >> ~/.ssh/known_hosts
-          php artisan deploy time-vps1.serverxx.com -s upload -vvv
+          run: php artisan deploy -vvv
