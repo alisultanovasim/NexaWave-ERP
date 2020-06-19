@@ -9,16 +9,11 @@ jobs:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/master'
     steps:
-      - uses: actions/checkout@v1
-      - name: Download build assets
-        uses: actions/download-artifact@v1
-        with:
-          name: assets
-          path: public
+      - uses: actions/checkout@v2
       - name: Setup PHP
         uses: shivammathur/setup-php@master
         with:
-          php-version: 7.4
+          php-version: 7.2
           extensions: mbstring, bcmath
       - name: Composer install
         run: composer install
