@@ -1,1 +1,53 @@
+name: CI-CD
 
+on:
+  push:
+    branches: master
+
+jobs:
+  test-php:
+    name: Test/Lint PHP
+    runs-on: ubuntu-latest
+    needs: build-js
+    steps:
+      - uses: actions/checkout@v1
+      - name: Setup PHP
+        uses: shivammathur/setup-php@master
+        with:
+          php-version: 7.2
+          extension-csv: mbstring, bcmath
+      - name: Composer install
+        run: composer install
+      - name: Run Tests
+        run: ./vendor/bin/phpunit
+  deploy:
+    name: Deploy to production
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master'
+    steps:
+      - uses: actions/checkout@v1
+      - name: Download build assets
+        uses: actions/download-artifact@v1
+        with:
+          name: assets
+          path: public
+      - name: Setup PHP
+        uses: shivammathur/setup-php@master
+        with:
+          php-version: 7.2
+          extensions: mbstring, bcmath
+      - name: Composer install
+        run: composer install
+      - name: Setup Deployer
+        uses: atymic/deployer-php-action@master
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+          ssh-known-hosts: ${{ secrets.SSH_KNOWN_HOSTS }}
+      - name: Run Deployment
+        env:
+          DOT_ENV: ${{ secrets.DOT_ENV }}
+          APP_HOST: ${{ secrets.APP_HOST }}
+          APP_DEPLOY_PATH: ${{ secrets.APP_DEPLOY_PATH }}
+          APP_DEPLOY_USER: ${{ secrets.APP_DEPLOY_USER }}
+          APP_DEPLOY_DEFAULT: ${{ secrets.APP_DEPLOY_DEFAULT }}
+        run: php artisan deploy time-vps1.serverxx.com -s upload -vvv
