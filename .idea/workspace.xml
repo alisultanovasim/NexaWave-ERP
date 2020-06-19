@@ -162,7 +162,7 @@
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
     <property name="nodejs_package_manager_path" value="npm" />
-    <property name="settings.editor.selected.configurable" value="reference.settings.ide.settings.file-colors" />
+    <property name="settings.editor.selected.configurable" value="orchideLicense" />
   </component>
   <component name="RunManager">
     <configuration name="phpunit.xml" type="PHPUnitRunConfigurationType" factoryName="PHPUnit">
@@ -181,7 +181,8 @@
       <option name="presentableId" value="Default" />
       <updated>1592555240392</updated>
       <workItem from="1592555244860" duration="8955000" />
-      <workItem from="1592581442886" duration="981000" />
+      <workItem from="1592581442886" duration="1298000" />
+      <workItem from="1592582867442" duration="18000" />
     </task>
     <task id="LOCAL-00001" summary="deployment">
       <created>1592567941322</created>
@@ -225,7 +226,21 @@
       <option name="project" value="LOCAL" />
       <updated>1592576586535</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="deployment">
+      <created>1592582454128</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1592582454129</updated>
+    </task>
+    <task id="LOCAL-00008" summary="deployment">
+      <created>1592582664480</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1592582664480</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -236,13 +251,17 @@
     <option name="LAST_COMMIT_MESSAGE" value="deployment" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="495" y="99" width="919" height="916" key="CommitChangelistDialog2" timestamp="1592576586450">
+    <state x="495" y="99" width="919" height="916" key="CommitChangelistDialog2" timestamp="1592582664430">
       <screen x="0" y="27" width="1920" height="1053" />
     </state>
-    <state x="495" y="99" width="919" height="916" key="CommitChangelistDialog2/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1592576586450" />
-    <state x="555" y="289" width="800" height="535" key="Vcs.Push.Dialog.v2" timestamp="1592576594979">
+    <state x="495" y="99" width="919" height="916" key="CommitChangelistDialog2/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1592582664430" />
+    <state x="449" y="188" width="1022" height="737" key="SettingsEditor" timestamp="1592582882581">
       <screen x="0" y="27" width="1920" height="1053" />
     </state>
-    <state x="555" y="289" width="800" height="535" key="Vcs.Push.Dialog.v2/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1592576594979" />
+    <state x="449" y="188" width="1022" height="737" key="SettingsEditor/0.27.1920.1053@0.27.1920.1053" timestamp="1592582882581" />
+    <state x="555" y="289" width="800" height="535" key="Vcs.Push.Dialog.v2" timestamp="1592582669274">
+      <screen x="0" y="27" width="1920" height="1053" />
+    </state>
+    <state x="555" y="289" width="800" height="535" key="Vcs.Push.Dialog.v2/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1592582669274" />
   </component>
 </project>
