@@ -162,18 +162,22 @@ class ModulesSeeder extends Seeder
             ],
             "Maliyyə Hesabatı" => [
                 "sub_modules" => [],
+                "new_permissions" => [],
                 'icon' => '/assets/images/svg/financial-report.svg'
             ],
             "Ehtiyatlar" => [
                 "sub_modules" => [],
+                "new_permissions" => [],
                 'icon' => '/assets/images/svg/depo.svg'
             ],
             "Tapşırıqların İdarə Edilməsi" => [
                 "sub_modules" => [],
+                "new_permissions" => [],
                 'icon' =>  '/assets/images/svg/project.svg'
             ],
             "Müqavilələr" => [
                 "sub_modules" => [],
+                "new_permissions" => [],
                 'icon' =>  '/assets/images/svg/doc-management.svg'
             ]
         ];

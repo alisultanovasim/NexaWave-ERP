@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="690b112f-ffd8-4eb7-abf9-50bbc8008595" name="Default Changelist" comment="" />
+    <list default="true" id="690b112f-ffd8-4eb7-abf9-50bbc8008595" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/seeds/ModulesSeeder.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/seeds/ModulesSeeder.php" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -150,6 +153,7 @@
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.path.for.package.eslint" value="project" />
@@ -160,6 +164,11 @@
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
     <property name="nodejs_package_manager_path" value="npm" />
     <property name="settings.editor.selected.configurable" value="orchideLicense" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$" />
+    </key>
   </component>
   <component name="RunManager">
     <configuration name="phpunit.xml" type="PHPUnitRunConfigurationType" factoryName="PHPUnit">
@@ -180,7 +189,8 @@
       <workItem from="1592555244860" duration="8955000" />
       <workItem from="1592581442886" duration="1298000" />
       <workItem from="1592582867442" duration="18000" />
-      <workItem from="1592582901318" duration="981000" />
+      <workItem from="1592582901318" duration="2398000" />
+      <workItem from="1592645269449" duration="502000" />
     </task>
     <task id="LOCAL-00001" summary="deployment">
       <created>1592567941322</created>
@@ -301,7 +311,21 @@
       <option name="project" value="LOCAL" />
       <updated>1592583766158</updated>
     </task>
-    <option name="localTasksCounter" value="18" />
+    <task id="LOCAL-00018" summary="deployment">
+      <created>1592583913447</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1592583913447</updated>
+    </task>
+    <task id="LOCAL-00019" summary="deployment">
+      <created>1592584125965</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1592584125965</updated>
+    </task>
+    <option name="localTasksCounter" value="20" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -312,20 +336,20 @@
     <option name="LAST_COMMIT_MESSAGE" value="deployment" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="495" y="99" width="1047" height="916" key="CommitChangelistDialog2" timestamp="1592583913389">
+    <state x="495" y="99" width="1047" height="916" key="CommitChangelistDialog2" timestamp="1592584125873">
       <screen x="0" y="27" width="1920" height="1053" />
     </state>
     <state x="495" y="99" width="919" height="916" key="CommitChangelistDialog2/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1592582664430" />
-    <state x="495" y="99" width="1047" height="916" key="CommitChangelistDialog2/0.27.1920.1053@0.27.1920.1053" timestamp="1592583913389" />
+    <state x="495" y="99" width="1047" height="916" key="CommitChangelistDialog2/0.27.1920.1053@0.27.1920.1053" timestamp="1592584125873" />
     <state x="449" y="188" width="1022" height="737" key="SettingsEditor" timestamp="1592582882581">
       <screen x="0" y="27" width="1920" height="1053" />
     </state>
     <state x="449" y="188" width="1022" height="737" key="SettingsEditor/0.27.1920.1053@0.27.1920.1053" timestamp="1592582882581" />
-    <state x="555" y="289" width="800" height="535" key="Vcs.Push.Dialog.v2" timestamp="1592583938242">
+    <state x="555" y="289" width="800" height="535" key="Vcs.Push.Dialog.v2" timestamp="1592584127501">
       <screen x="0" y="27" width="1920" height="1053" />
     </state>
     <state x="555" y="289" width="800" height="535" key="Vcs.Push.Dialog.v2/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1592582669274" />
-    <state x="555" y="289" width="800" height="535" key="Vcs.Push.Dialog.v2/0.27.1920.1053@0.27.1920.1053" timestamp="1592583938242" />
+    <state x="555" y="289" width="800" height="535" key="Vcs.Push.Dialog.v2/0.27.1920.1053@0.27.1920.1053" timestamp="1592584127501" />
     <state x="623" y="259" width="672" height="678" key="search.everywhere.popup" timestamp="1592583756570">
       <screen x="0" y="27" width="1920" height="1053" />
     </state>
