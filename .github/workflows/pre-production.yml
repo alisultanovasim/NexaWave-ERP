@@ -1,11 +1,11 @@
 name: Deploy to Pre-production
 
-#on:
+on:
 #  push:
 #    branches: pre-production
-pull_request:
-  branches:
-    - pre-production
+  pull_request:
+    branches:
+      - pre-production
 jobs:
   deploy:
     name: Deploy to production
