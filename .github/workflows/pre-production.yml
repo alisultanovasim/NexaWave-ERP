@@ -1,8 +1,8 @@
 name: Deploy to Pre-production
 
 on:
-#  push:
-#    branches: pre-production
+  push:
+    branches: pre-production
   pull_request:
     branches:
       - pre-production
