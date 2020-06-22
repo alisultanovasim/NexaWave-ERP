@@ -26,6 +26,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="690b112f-ffd8-4eb7-abf9-50bbc8008595" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.github/workflows/pre-production.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/pre-production.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -38,6 +39,11 @@
     <execution />
   </component>
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="master" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="PhpWorkspaceProjectConfiguration">
@@ -215,6 +221,7 @@
       <workItem from="1592582867442" duration="18000" />
       <workItem from="1592582901318" duration="2398000" />
       <workItem from="1592645269449" duration="4231000" />
+      <workItem from="1592808537574" duration="2624000" />
     </task>
     <task id="LOCAL-00001" summary="deployment">
       <created>1592567941322</created>
@@ -370,7 +377,14 @@
       <option name="project" value="LOCAL" />
       <updated>1592658665441</updated>
     </task>
-    <option name="localTasksCounter" value="23" />
+    <task id="LOCAL-00023" summary="pre-prod and development env added to project">
+      <created>1592808583228</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1592808583228</updated>
+    </task>
+    <option name="localTasksCounter" value="24" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -398,6 +412,7 @@
         </entry>
       </map>
     </option>
+    <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="deployment" />
@@ -411,10 +426,10 @@
       <screen x="0" y="27" width="3840" height="1053" />
     </state>
     <state x="670" y="355" width="570" height="403" key="#com.intellij.fileTypes.FileTypeChooser/0.27.3840.1053@0.27.3840.1053" timestamp="1592655336870" />
-    <state x="1920" y="99" width="1920" height="916" key="CommitChangelistDialog2" timestamp="1592658665392">
-      <screen x="0" y="27" width="3840" height="1053" />
+    <state x="495" y="99" width="1920" height="916" key="CommitChangelistDialog2" timestamp="1592808583074">
+      <screen x="0" y="27" width="1920" height="1053" />
     </state>
-    <state x="495" y="99" width="919" height="916" key="CommitChangelistDialog2/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1592582664430" />
+    <state x="495" y="99" width="919" height="916" key="CommitChangelistDialog2/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1592808583074" />
     <state x="495" y="99" width="1047" height="916" key="CommitChangelistDialog2/0.27.1920.1053@0.27.1920.1053" timestamp="1592645810931" />
     <state x="1920" y="99" width="1920" height="916" key="CommitChangelistDialog2/0.27.3840.1053@0.27.3840.1053" timestamp="1592658665392" />
     <state x="449" y="188" width="1022" height="737" key="SettingsEditor" timestamp="1592582882581">
