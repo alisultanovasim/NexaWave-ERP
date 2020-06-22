@@ -1,8 +1,11 @@
 name: Deploy to Pre-production
 
-on:
-  push:
-    branches: pre-production
+#on:
+#  push:
+#    branches: pre-production
+pull_request:
+  branches:
+    - pre-production
 jobs:
   deploy:
     name: Deploy to production
@@ -37,4 +40,4 @@ jobs:
           APP_DEPLOY_PATH: ${{ secrets.PROD_DEPLOY_PATH }}
           APP_DEPLOY_USER: ${{ secrets.PROD_DEPLOY_USER }}
           APP_DEPLOY_DEFAULT: ${{ secrets.APP_DEPLOY_DEFAULT }}
-        run: php artisan deploy -vvv
+        run: php artisan deploy 213.136.78.83 -s upload
