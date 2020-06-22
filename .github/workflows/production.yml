@@ -1,0 +1,40 @@
+#name: CI-CD
+#
+#on:
+#  push:
+#    branches: master
+#jobs:
+#  deploy:
+#    name: Deploy to production
+#    runs-on: ubuntu-latest
+#    if: github.ref == 'refs/heads/master'
+#    steps:
+#      - uses: actions/checkout@v2
+#      - name: Setup PHP
+#        uses: shivammathur/setup-php@master
+#        with:
+#          php-version: 7.2
+#          extensions: mbstring, bcmath
+#      - name: Composer install
+#        run: composer install
+#      - name: Setup Deployer
+#        uses: atymic/deployer-php-action@master
+#        with:
+#          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+#          ssh-known-hosts: ${{ secrets.SSH_KNOWN_HOSTS }}
+#      - name: "Prepare SSH key and known hosts"
+#        run: |
+#          mkdir -p ~/.ssh
+#          echo "${{ secrets.SSH_KEY_PRIVATE }}" > ~/.ssh/id_rsa
+#          chmod 600 ~/.ssh/id_rsa
+#          ssh-keyscan github.com >> ~/.ssh/known_hosts
+#          ssh-keyscan git.eu.s5y.io >> ~/.ssh/known_hosts
+#          ssh-keyscan time-vps1.serverxx.com >> ~/.ssh/known_hosts
+#      - name: Run Deployment
+#        env:
+#          DOT_ENV: ${{ secrets.DOT_ENV }}
+#          APP_HOST: ${{ secrets.APP_HOST }}
+#          APP_DEPLOY_PATH: ${{ secrets.APP_DEPLOY_PATH }}
+#          APP_DEPLOY_USER: ${{ secrets.APP_DEPLOY_USER }}
+#          APP_DEPLOY_DEFAULT: ${{ secrets.APP_DEPLOY_DEFAULT }}
+#        run: php artisan deploy -vvv
