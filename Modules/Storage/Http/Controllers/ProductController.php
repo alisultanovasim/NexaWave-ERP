@@ -213,6 +213,9 @@ class ProductController extends Controller
         Product::where('id', $id)
             ->update($request->except('status'));
 
+
+        return $this->successResponse('ok');
+
     }
 
     public function delete(Request $request, $id)
