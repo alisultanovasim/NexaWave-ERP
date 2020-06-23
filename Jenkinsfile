@@ -15,13 +15,17 @@ pipeline {
 
     stage('Deploy') {
       steps {
-        sh '''eval $(ssh-agent -s)
-  echo "${TEST_SSH_PRIVATE_KEY}" | tr -d \'\\r\' | ssh-add - > /dev/null
-  mkdir -p ~/.ssh
-  chmod 700 ~/.ssh
-  [[ -f /.dockerenv ]] && echo -e "Host *\\n\\tStrictHostKeyChecking no\\n\\n" > ~/.ssh/config'''
-        sh '''find . -type f -not -path "./vendor/*" -exec chmod 664 {} \\;
-  find . -type d -not -path "./vendor/*" -exec chmod 775 {} \\;'''
+        sh 'eval $(ssh-agent -s)'
+        withCredentials([file(credentialsId: 'ssh-prod-private-key', variable: 'my-private-key')]) {
+           sh "cp \$my-private-key /src/main/resources/my-private-key.der"
+           sh "echo $my-private-key | tr -d '\r' | ssh-add - > /dev/null"
+        }
+        sh 'mkdir -p ~/.ssh'
+        sh 'chmod 700 ~/.ssh'
+        sh "[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config"
+
+        sh 'find . -type f -not -path "./vendor/*" -exec chmod 664 {};
+            find . -type d -not -path "./vendor/*" -exec chmod 775 {} ;'
         sh 'php artisan deploy 213.136.78.83 -s upload'
       }
     }
