@@ -33,7 +33,7 @@
     <list default="true" id="690b112f-ffd8-4eb7-abf9-50bbc8008595" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Jenkinsfile" beforeDir="false" afterPath="$PROJECT_DIR$/Jenkinsfile" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/jenkinsfile" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/deploy.php" beforeDir="false" afterPath="$PROJECT_DIR$/config/deploy.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -230,7 +230,7 @@
       <workItem from="1592808537574" duration="3399000" />
       <workItem from="1592832613443" duration="1674000" />
       <workItem from="1592897604231" duration="762000" />
-      <workItem from="1592911175430" duration="806000" />
+      <workItem from="1592911175430" duration="2030000" />
     </task>
     <task id="LOCAL-00001" summary="deployment">
       <created>1592567941322</created>
@@ -456,7 +456,14 @@
       <option name="project" value="LOCAL" />
       <updated>1592827752799</updated>
     </task>
-    <option name="localTasksCounter" value="33" />
+    <task id="LOCAL-00033" summary="jenkins file issue fixed">
+      <created>1592915194566</created>
+      <option name="number" value="00033" />
+      <option name="presentableId" value="LOCAL-00033" />
+      <option name="project" value="LOCAL" />
+      <updated>1592915194566</updated>
+    </task>
+    <option name="localTasksCounter" value="34" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -493,7 +500,8 @@
     <MESSAGE value="pre-prod and development env added to project" />
     <MESSAGE value="deploy to pre prod" />
     <MESSAGE value="jenkins file added" />
-    <option name="LAST_COMMIT_MESSAGE" value="jenkins file added" />
+    <MESSAGE value="jenkins file issue fixed" />
+    <option name="LAST_COMMIT_MESSAGE" value="jenkins file issue fixed" />
   </component>
   <component name="WindowStateProjectService">
     <state x="335" y="355" width="601" height="403" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1592827724797">
@@ -501,10 +509,10 @@
     </state>
     <state x="335" y="355" width="601" height="403" key="#com.intellij.fileTypes.FileTypeChooser/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1592827724797" />
     <state x="670" y="355" width="570" height="403" key="#com.intellij.fileTypes.FileTypeChooser/0.27.3840.1053@0.27.3840.1053" timestamp="1592655336870" />
-    <state x="495" y="99" width="922" height="916" key="CommitChangelistDialog2" timestamp="1592827752740">
+    <state x="495" y="99" width="922" height="916" key="CommitChangelistDialog2" timestamp="1592915194501">
       <screen x="0" y="27" width="1920" height="1053" />
     </state>
-    <state x="495" y="99" width="922" height="916" key="CommitChangelistDialog2/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1592827752740" />
+    <state x="495" y="99" width="922" height="916" key="CommitChangelistDialog2/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1592915194501" />
     <state x="495" y="99" width="1047" height="916" key="CommitChangelistDialog2/0.27.1920.1053@0.27.1920.1053" timestamp="1592645810931" />
     <state x="1920" y="99" width="1920" height="916" key="CommitChangelistDialog2/0.27.3840.1053@0.27.3840.1053" timestamp="1592658665392" />
     <state x="449" y="188" width="1022" height="737" key="SettingsEditor" timestamp="1592832600099">
@@ -512,12 +520,16 @@
     </state>
     <state x="449" y="188" key="SettingsEditor/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1592832600099" />
     <state x="449" y="188" width="1022" height="737" key="SettingsEditor/0.27.1920.1053@0.27.1920.1053" timestamp="1592582882581" />
-    <state x="555" y="289" width="800" height="535" key="Vcs.Push.Dialog.v2" timestamp="1592827755016">
+    <state x="555" y="289" width="800" height="535" key="Vcs.Push.Dialog.v2" timestamp="1592915198808">
       <screen x="0" y="27" width="1920" height="1053" />
     </state>
-    <state x="555" y="289" width="800" height="535" key="Vcs.Push.Dialog.v2/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1592827755016" />
+    <state x="555" y="289" width="800" height="535" key="Vcs.Push.Dialog.v2/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1592915198808" />
     <state x="555" y="289" width="800" height="535" key="Vcs.Push.Dialog.v2/0.27.1920.1053@0.27.1920.1053" timestamp="1592645814022" />
     <state x="320" y="289" width="800" height="535" key="Vcs.Push.Dialog.v2/0.27.3840.1053@0.27.3840.1053" timestamp="1592658668933" />
+    <state x="1654" y="50" width="1310" height="1009" maximized="true" key="dock-window-1" timestamp="1592915393286">
+      <screen x="1920" y="0" width="1920" height="1080" />
+    </state>
+    <state x="1654" y="50" width="1310" height="1009" maximized="true" key="dock-window-1/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1592915393286" />
     <state x="631" y="247" width="647" height="619" key="git4idea.branch.GitSmartOperationDialog" timestamp="1592812158309">
       <screen x="0" y="27" width="1920" height="1053" />
     </state>

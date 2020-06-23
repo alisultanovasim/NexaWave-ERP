@@ -16,7 +16,10 @@ pipeline {
     stage('Deploy') {
       steps {
         sh 'eval $(ssh-agent -s)'
-        sh "echo '${TEST_SSH_PRIVATE_KEY}' | tr -d '\r' | ssh-add - > /dev/null"
+        withCredentials([file(credentialsId: 'ssh-prod-private-key', variable: 'my-private-key')]) {
+           sh "cp \$my-private-key /src/main/resources/my-private-key.der"
+           sh "echo $my-private-key | tr -d '\r' | ssh-add - > /dev/null"
+        }
         sh 'mkdir -p ~/.ssh'
         sh 'chmod 700 ~/.ssh'
         sh "[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config"

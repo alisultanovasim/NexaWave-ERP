@@ -118,7 +118,7 @@ return [
         ],
         "213.136.78.83" => [
             'deploy_path' => '/var/www/sites/demo.api.oneof.az',
-            'user' => 'root',
+            'user' => 'developer',
         ]
     ],
 
