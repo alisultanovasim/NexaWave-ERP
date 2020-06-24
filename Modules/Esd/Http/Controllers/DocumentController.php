@@ -307,13 +307,8 @@ class DocumentController extends Controller
                 }
             }
 
-            return $this->errorResponse(trans('apiResponse.tryLater'), Response::HTTP_INTERNAL_SERVER_ERROR);
+            return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
 
-        } catch (ValidationException $exception) {
-            return $this->errorResponse($exception->errors());
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return $this->errorResponse(trans("apiResponse.tryLater"), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
