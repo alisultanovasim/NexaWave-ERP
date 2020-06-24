@@ -162,18 +162,22 @@ class ModulesSeeder extends Seeder
             ],
             "Maliyyə Hesabatı" => [
                 "sub_modules" => [],
+                "new_permissions" => [],
                 'icon' => '/assets/images/svg/financial-report.svg'
             ],
             "Ehtiyatlar" => [
                 "sub_modules" => [],
+                "new_permissions" => [],
                 'icon' => '/assets/images/svg/depo.svg'
             ],
             "Tapşırıqların İdarə Edilməsi" => [
                 "sub_modules" => [],
+                "new_permissions" => [],
                 'icon' =>  '/assets/images/svg/project.svg'
             ],
             "Müqavilələr" => [
                 "sub_modules" => [],
+                "new_permissions" => [],
                 'icon' =>  '/assets/images/svg/doc-management.svg'
             ]
         ];
@@ -185,11 +189,12 @@ class ModulesSeeder extends Seeder
                 "parent_id" => null
             ]);
             $this->create($value["sub_modules"], $parent->id);
-            foreach ($value["new_permissions"] as $permission)
-                \App\Models\Permission::create([
-                    'module_id' => $parent->id,
-                    "name" => $permission
-                ]);
+            if (isset($value["new_permissions"]))
+                    foreach ($value["new_permissions"] as $permission)
+                        \App\Models\Permission::create([
+                            'module_id' => $parent->id,
+                            "name" => $permission
+                        ]);
         }
 
 
@@ -205,7 +210,8 @@ class ModulesSeeder extends Seeder
             ]);
             $this->create($value["sub_modules"], $parent->id);
 
-            foreach ($value["new_permissions"] as $permission ){
+            if (isset($value["new_permissions"]))
+                foreach ($value["new_permissions"] as $permission ){
                 \App\Models\Permission::create([
                     'module_id' => $parent->id,
                     "name" => $permission

@@ -14,7 +14,9 @@ class Product extends Model
 
     const STATUS_ACTIVE = 1;
     const STATUS_DEMAND = 2;
+    const TOTAL_DELETED = 3;
     protected $fillable = [
+        'initial_amount',
         'unit_id',
         'less_value',
         'quickly_old',
@@ -40,6 +42,23 @@ class Product extends Model
         'status',
         'sell_act_id'
     ];
+
+    public const CAT_UPDATE = [
+        'product_mark',
+        'color_id',
+        'state_id',
+        'less_value',
+        'quickly_old',
+        'main_funds',
+        'description'
+    ];
+
+    public function deletes_logs(){
+        return $this->hasMany(ProductDelete::class , 'product_id' , 'id');
+    }
+    public function updates_logs(){
+        return $this->hasMany(ProductUpdate::class , 'product_id' , 'id');
+    }
 
     protected $hidden = ['mark_id' , 'product_model'];
 

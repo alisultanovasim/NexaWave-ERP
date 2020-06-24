@@ -49,15 +49,15 @@ class ProductAssignmentController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
-            'product_id' => ['required', 'integer'],
-            'amount' => ['required', 'float'],
-            'assignment_type' => ['required', 'integer',
-                Rule::in([ProductAssignment::ASSIGN_TO_PLACE, ProductAssignment::ASSIGN_TO_USER])
-            ],
-            'employee_id' => ['nullable', 'integer'],
-            'section_id' => ['nullable', 'integer'],
-            'sector_id' => ['nullable', 'integer'],
-            'department_id' => ['nullable', 'integer'],
+                'product_id' => ['required', 'integer'],
+                'amount' => ['required', 'float'],
+                'assignment_type' => ['required', 'integer',
+                    Rule::in([ProductAssignment::ASSIGN_TO_PLACE, ProductAssignment::ASSIGN_TO_USER])
+                ],
+                'employee_id' => ['nullable', 'integer'],
+                'section_id' => ['nullable', 'integer'],
+                'sector_id' => ['nullable', 'integer'],
+                'department_id' => ['nullable', 'integer'],
         ]);
 
         $product = Product::company()
