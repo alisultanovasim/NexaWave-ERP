@@ -197,22 +197,19 @@ class ProductController extends Controller
         if (!$product)
             return $this->errorResponse(trans('response.productNotFound'), 422);
 
-        if ($notExists = $this->companyInfo(
-            $request->get('company_id'),
-            $request->only('storage_id', 'title_id', 'state_id')))
-            return $this->errorResponse($notExists);
-
-        if ($request->has('kind_id')) {
-            $check = ProductKind::where([
-                ['company_id', '=', $request->get('company_id')],
-                ['id', '=', $request->get('kind_id')],
-            ])->exists();
-            if (!$check) return $this->errorResponse(trans('response.fieldIsNotFindInDatabase'));
-        }
-
-        Product::where('id', $id)
-            ->update($request->except('status'));
-
+//        if ($notExists = $this->companyInfo(
+//            $request->get('company_id'),
+//            $request->only('storage_id', 'title_id', 'state_id')))
+//            return $this->errorResponse($notExists);
+        $data = $request->only([
+            'product_mark',
+            'color_id',
+            'state_id',
+            'less_value',
+            'quickly_old',
+            'main_funds',
+            'description'
+        ]);
 
         return $this->successResponse('ok');
 
