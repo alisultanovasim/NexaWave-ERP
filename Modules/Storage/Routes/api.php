@@ -23,12 +23,13 @@ Route::group([
     ], function ($q) {
         Route::get('/all', 'ProductController@index');
         Route::get('/', 'ProductController@firstPage');
+        Route::get('/history/{id}', 'ProductController@showHistory');
         Route::get('/{id}', 'ProductController@show');
         Route::put('/{id}', 'ProductController@update');
         Route::post('/', 'ProductController@store');
         Route::post('/increase/{id}', 'ProductController@increase');
         Route::post('/reduce/{id}', 'ProductController@reduce');
-        Route::delete('{id}', 'ProductController@delete');
+        Route::post('/delete/{id}', 'ProductController@delete');
     }); //products
 
     Route::group([
