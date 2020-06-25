@@ -248,4 +248,23 @@ class EmployeeController extends Controller
         return $this->successResponse($employee);
     }
 
+    public function setAuthorizedEmployees(Request $request){
+        $this->validate($request, [
+            'employee_ids' => 'required|array'
+        ]);
+
+        DB::transaction(function () use ($request){
+            Employee::where('company_id', $request->get('company_id'))
+                ->whereIn('id', $request->get('employee_ids'))->update([
+                    'is_authorized_employee' => 1
+                ]);
+            Employee::where('company_id', $request->get('company_id'))
+                ->whereNotIn('id', $request->get('employee_ids'))->update([
+                    'is_authorized_employee' => 0
+                ]);
+        });
+
+        return $this->successResponse(trans('messages.saved'), 200);
+    }
+
 }
