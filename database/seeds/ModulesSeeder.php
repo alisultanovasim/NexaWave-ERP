@@ -197,8 +197,6 @@ class ModulesSeeder extends Seeder
                         ]);
         }
 
-
-
     }
 
     public function create($module, $parent_id)

@@ -113,7 +113,8 @@ class UserController extends Controller
             $employee->save();
             EmployeeContract::create([
                 'employee_id' => $employee->getKey(),
-                'position_id' => Positions::DIRECTOR,
+//                'position_id' => Positions::DIRECTOR,
+                'position_id' => $this->createDirectorPositionAndGetId($company->getKey()),
             ]);
             $this->saveCompanyModules($company->getKey());
             UserRole::create([
@@ -124,6 +125,15 @@ class UserController extends Controller
             $request->merge(['username' => $request->get('fin')]);
             return $this->login($request);
         });
+    }
+
+    private function createDirectorPositionAndGetId($companyId){
+        $position = Positions::create([
+            'name' => 'Direktor',
+            'short_name' => 'Direktor',
+            'company_id' => $companyId
+        ]);
+        return $position->getKey();
     }
 
     private function saveCompanyModules($companyId){

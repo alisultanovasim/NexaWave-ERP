@@ -20,7 +20,7 @@ class CreateWorkSkipsTable extends Migration
             $table->integer('reason_type');
             $table->char('document_number')->nullable()->default(null);
             $table->integer('day');
-            $table->date('date_of_presentation');
+            $table->date('date_of_presentation')->nullable()->default(null);
             $table->date('start_date');
             $table->date('end_date');
             $table->boolean('is_confirmed')->default(0);

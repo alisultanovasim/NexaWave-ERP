@@ -47,6 +47,13 @@ Route::group([
         Route::delete('/{id}', 'NotificationCaseController@destroy');
     });
 
+    Route::group(['prefix' => 'notification/types'], function ($router) {
+        Route::get('/', 'NotificationTypeController@index');
+        Route::post('/', 'NotificationTypeController@create');
+        Route::put('/{id}', 'NotificationTypeController@update');
+        Route::delete('/{id}', 'NotificationTypeController@destroy');
+    });
+
     Route::group(['prefix' => 'address/types'], function ($router) {
         Route::get('/', 'AddressTypeController@index');
         Route::post('/', 'AddressTypeController@create');
