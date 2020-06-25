@@ -1,9 +1,7 @@
-name: Deploy to Development
-
+name: CI-CD
 on:
   push:
     branches: development
-  
 jobs:
   deploy:
     name: Deploy to production
