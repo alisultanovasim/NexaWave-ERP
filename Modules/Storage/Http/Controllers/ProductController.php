@@ -4,21 +4,24 @@ namespace Modules\Storage\Http\Controllers;
 
 use App\Models\User;
 use App\Traits\ApiResponse;
+use App\Traits\DocumentUploader;
 use App\Traits\Query;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use Modules\Storage\Entities\Product;
+use Modules\Storage\Entities\ProductDelete;
 use Modules\Storage\Entities\ProductKind;
 use Modules\Storage\Entities\ProductTitle;
+use Modules\Storage\Entities\ProductUpdate;
 use function Deployer\get;
 
 class ProductController extends Controller
 {
-    use  ApiResponse, ValidatesRequests, Query;
-
+    use  ApiResponse, ValidatesRequests, Query , DocumentUploader;
 
     public function index(Request $request)
     {
@@ -31,12 +34,6 @@ class ProductController extends Controller
             'status' => ['nullable', 'integer', 'min:1']
         ]);
 
-//        $title = ProductTitle::with(['kinds' => function ($q) use ($request) {
-//            $q->where('id', $request->get('kind_id'));
-//        }])
-//            ->where('id', $request->get('title_id'))
-//            ->where('company_id', $request->get('company_id'))
-//            ->first();
         $products = Product::with([
             'kind',
             'model:id,name',
@@ -57,6 +54,7 @@ class ProductController extends Controller
 
         if ($request->has('act_id'))
             $products->where('act_id' , $request->get('act_id'));
+
         $products = $products
             ->orderBy('id' , 'desc')
             ->where('kind_id', $request->get('kind_id'))
@@ -90,6 +88,10 @@ class ProductController extends Controller
 
     public function show(Request $request, $id)
     {
+        $this->validate($request , [
+            'show_deletes_logs' => ['nullable' , 'boolean' ],
+            'show_updates_logs' => ['nullable' , 'boolean' ],
+        ]);
         $product = Product::with([
             'kind',
             'kind.unit',
@@ -101,13 +103,61 @@ class ProductController extends Controller
             'buy_from_country:id,name:short_name',
             'made_in_country:id,name:short_name'
         ])
-            ->where('company_id', $request->get('company_id'))
-            ->where('id', $id)
+            ->where('company_id', $request->get('company_id'));
+
+
+
+        if ($request->get('show_deletes_logs')){
+            $product->with([
+                'deletes_logs',
+                'deletes_logs.employee',
+                'deletes_logs.employee.user:id,name,surname'
+            ]);
+        }
+        if ($request->get('show_updates_logs')){
+            $product->with([
+                'updates_logs',
+                'updates_logs.employee',
+                'updates_logs.employee.user:id,name,surname'
+            ]);
+        }
+
+
+        $product = $product->where('id', $id)
             ->first();
 
         if (!$product)
             return $this->errorResponse(trans('response.ProductNotFound'));
 
+
+        return $this->successResponse($product);
+    }
+
+    public function showHistory(Request $request , $id){
+        $product = Product::with([
+            'kind',
+            'kind.unit',
+            'title:id,name',
+            'model:id,name',
+        ])
+            ->where('company_id', $request->get('company_id'))
+            ->where('id', $id)
+            ->first([
+                'amount' , 'id' , 'initial_amount','kind_id' , 'title_id' , 'model_id' , 'product_mark'
+            ]);
+
+        if (!$product)
+            return $this->errorResponse(trans('response.ProductNotFound'));
+
+
+            $product->with([
+                'deletes_logs',
+                'deletes_logs.employee',
+                'deletes_logs.employee.user:id,name,surname',
+                'updates_logs',
+                'updates_logs.employee',
+                'updates_logs.employee.user:id,name,surname'
+            ]);
         return $this->successResponse($product);
     }
 
@@ -117,17 +167,20 @@ class ProductController extends Controller
         DB::beginTransaction();
         if ($notExists = $this->companyInfo(
             $request->get('company_id'),
-            $request->only('storage_id', 'title_id', 'state_id' , 'sell_act_id' )))
+            $request->only( 'storage_id', 'title_id', 'state_id' , 'sell_act_id' )))
             return $this->errorResponse($notExists);
-
         $check = ProductKind::where([
+            ['title_id' , '=' ,   $request->get('title_id')],
             ['company_id', '=', $request->get('company_id')],
             ['id', '=', $request->get('kind_id')],
         ])->exists();
-        if (!$check) return $this->errorResponse(trans('response.productKindNotFound'),404);
+        if (!$check) return $this->errorResponse(trans('response.productKindNotFoundOrNotBelongToTitle'),400);
         $product = new Product();
         $product
-            ->fill(array_merge($request->all(), ['status' => Product::STATUS_ACTIVE]))
+            ->fill(array_merge($request->all(), [
+                'status' => Product::STATUS_ACTIVE,
+                'initial_amount' => $request->get('amount')
+            ]))
             ->save();
         DB::commit();
         return $this->successResponse('ok');
@@ -188,50 +241,75 @@ class ProductController extends Controller
 
     public function update(Request $request, $id)
     {
-        $this->validate($request, self::getUpdateRules());
+        $this->validate($request, array_merge(self::getUpdateRules(), [
+            'reasons' => ['required', 'array','min:1'],
+            'reasons.*' => ['required' , 'string' ]
+        ]));
+
+        DB::beginTransaction();
+
+
         $product = Product::where([
             ['company_id', '=', $request->get('company_id')],
             ['id', '=', $id],
-        ])->exists();
+        ])->first(Product::CAT_UPDATE);
 
         if (!$product)
             return $this->errorResponse(trans('response.productNotFound'), 422);
 
-        if ($notExists = $this->companyInfo(
-            $request->get('company_id'),
-            $request->only('storage_id', 'title_id', 'state_id')))
-            return $this->errorResponse($notExists);
+        $data = $request->only(Product::CAT_UPDATE);
+        Product::where('id' , $id)
+            ->update($data);
 
-        if ($request->has('kind_id')) {
-            $check = ProductKind::where([
-                ['company_id', '=', $request->get('company_id')],
-                ['id', '=', $request->get('kind_id')],
-            ])->exists();
-            if (!$check) return $this->errorResponse(trans('response.fieldIsNotFindInDatabase'));
-        }
 
-        Product::where('id', $id)
-            ->update($request->except('status'));
+        ProductUpdate::create([
+            'employee_id' => Auth::user()->getEmployeeId($request->get('company_id')),
+            'product_id' => $id,
+            'updates' => [
+                'from' => $product,
+                'to' => $data,
+                'reasons' => $request->get('reasons')
+            ]
+        ]);
+
+        DB::commit();
+        return $this->successResponse('ok');
 
     }
 
     public function delete(Request $request, $id)
     {
         $this->validate($request , [
-            'amount' => ['required' , 'numeric']
+            'amount' => ['required' , 'numeric'],
+            'act' => ['required' , 'mimes:png,jpg,pdf,doc,docx,xls,xlsx'],
         ]);
         $product = Product::where([
             ['id', '=', $id],
             ['company_id', '=', $request->get('company_id')],
         ])->first(['id' , 'amount']);
         if (!$product) return $this->errorResponse(trans('response.productNotFound') , 404);
+
+        $deleted = [
+            'product_id' => $product->id,
+            'employee_id' => Auth::user()->getEmployeeId($request->get('company_id')),
+            'act' => $this->uploadFile($request->act,$request->get('company_id') ,'delete-acts')
+        ];
+
         if ($request->has('amount')){
             if ($product->amount < $request->get('amount'))
                 return $this->errorResponse(trans('response.amountError') , 422);
             $product->decrement('amount' , $request->get('amount'));
+            $deleted['amount'] = $request->get('amount');
         }else{
-            $product->delete();
+            $product->update([
+                'status' => Product::TOTAL_DELETED,
+                'amount' => $product->amount
+            ]);
+            $deleted['amount'] =  $product->amount;
         }
+
+        ProductDelete::create($deleted);
+
         return $this->successResponse('ok');
 
     }

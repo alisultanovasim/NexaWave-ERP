@@ -189,11 +189,12 @@ class ModulesSeeder extends Seeder
                 "parent_id" => null
             ]);
             $this->create($value["sub_modules"], $parent->id);
-            foreach ($value["new_permissions"] as $permission)
-                \App\Models\Permission::create([
-                    'module_id' => $parent->id,
-                    "name" => $permission
-                ]);
+            if (isset($value["new_permissions"]))
+                    foreach ($value["new_permissions"] as $permission)
+                        \App\Models\Permission::create([
+                            'module_id' => $parent->id,
+                            "name" => $permission
+                        ]);
         }
 
     }
@@ -207,7 +208,8 @@ class ModulesSeeder extends Seeder
             ]);
             $this->create($value["sub_modules"], $parent->id);
 
-            foreach ($value["new_permissions"] as $permission ){
+            if (isset($value["new_permissions"]))
+                foreach ($value["new_permissions"] as $permission ){
                 \App\Models\Permission::create([
                     'module_id' => $parent->id,
                     "name" => $permission

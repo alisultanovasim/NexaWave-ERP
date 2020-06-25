@@ -48,53 +48,55 @@ class StorageDatabaseSeeder extends Seeder
             ]);
         }
 //
-//        ProductColor::insert([
-//            ['name' => 'Qırmızı', 'hex' => '#ff0000'],
-//            ['name' => 'Göy', 'hex' => '#0d00ff'],
-//            ['name' => 'Qara', 'hex' => '#000000'],
-//        ]);
+        ProductColor::insert([
+            ['name' => 'Qırmızı', 'hex' => '#ff0000'],
+            ['name' => 'Göy', 'hex' => '#0d00ff'],
+            ['name' => 'Qara', 'hex' => '#000000'],
+        ]);
+
+        $title = ProductTitle::create([
+            'company_id' => 1,
+            'name' => 'Elektrotexnika'
+        ]);
+
+        $kind = ProductKind::create([
+            'title_id' => $title->id,
+            'name' => 'Kompyuter',
+            'company_id' => 1,
+            'unit_id' => 1
+        ]);
+
+        Storage::create([
+            'company_id' => 1,
+            'name' => '28 time plaza',
+            'size' => 170.00
+        ]);
 //
-//        $title = ProductTitle::create([
-//            'company_id' => 1,
-//            'name' => 'Elektrotexnika'
-//        ]);
-//
-//        $kind = ProductKind::create([
-//            'title_id' => $title->id,
-//            'name' => 'Kompyuter',
-//            'company_id' => 1,
-//        ]);
-//
-//        Storage::create([
-//            'company_id' => 1,
-//            'name' => '28 time plaza',
-//            'size' => 170.00
-//        ]);
-//
-//        Product::create([
-//            "company_id" => 1,
-//            "unit_id" => 1,
-//            "less_value" => true,
-//            "quickly_old" => false,
-//            "title_id" => $title->id,
-//            "kind_id" => $kind->id,
-//            "state_id" => 1,
-//            "description" => 'About: 16 ram  , 156 gb , i7',
-//            "amount" => 2,
-//            "storage_id" => 1,
-//            "product_model" => 'Apple',
-//            "product_mark" => 'Mac book pro',
-//            "product_no" => '123456789',
-//            "color_id" => 1,
-//            "main_funds" => true,
-//            "inv_no" => 'ik-16-265',
-//            "exploitation_date" => '2025-05-13',
-//            "size" => 1600,
-//            "made_in_country" => 1,
-//            "buy_from_country" => 1,
-//            "make_date" => '2014-05-13',
-//            'status' => 1
-//        ]);
+        Product::create([
+            "company_id" => 1,
+            "unit_id" => 1,
+            "less_value" => true,
+            "quickly_old" => false,
+            "title_id" => $title->id,
+            "kind_id" => $kind->id,
+            "state_id" => 1,
+            "description" => 'About: 16 ram  , 156 gb , i7',
+            "amount" => 2,
+            "storage_id" => 1,
+            "product_model" => 'Apple',
+            "product_mark" => 'Mac book pro',
+            "product_no" => '123456789',
+            "color_id" => 1,
+            "main_funds" => true,
+            "inv_no" => 'ik-16-265',
+            "exploitation_date" => '2025-05-13',
+            "size" => 1600,
+            "made_in_country" => 1,
+            "buy_from_country" => 1,
+            "make_date" => '2014-05-13',
+            'status' => 1,
+            'initial_amount'=>2
+        ]);
     }
 }
 
