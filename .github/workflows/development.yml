@@ -27,7 +27,6 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan github.com >> ~/.ssh/known_hosts
           ssh-keyscan time-vps1.serverxx.com >> ~/.ssh/known_hosts
-          ssh-keygen -R time-vps1.serverxx.com
       - name: Run Deployment
         env:
           DOT_ENV: ${{ secrets.DOT_ENV }}
@@ -35,4 +34,4 @@ jobs:
           APP_DEPLOY_PATH: ${{ secrets.APP_DEPLOY_PATH }}
           APP_DEPLOY_USER: ${{ secrets.APP_DEPLOY_USER }}
           APP_DEPLOY_DEFAULT: ${{ secrets.APP_DEPLOY_DEFAULT }}
-        run: php artisan deploy -vvv
+        run: php artisan deploy time-vps1.serverxx.com -s upload
