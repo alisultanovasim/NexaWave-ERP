@@ -1,13 +1,13 @@
-name: CI-CD
+name: Deploy to Development
 
 on:
   push:
     branches: development
+  
 jobs:
   deploy:
     name: Deploy to production
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/master'
     steps:
       - uses: actions/checkout@v2
       - name: Setup PHP
