@@ -27,6 +27,7 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan github.com >> ~/.ssh/known_hosts
           ssh-keyscan time-vps1.serverxx.com >> ~/.ssh/known_hosts
+          ssh-keygen -R time-vps1.serverxx.com
       - name: Run Deployment
         env:
           DOT_ENV: ${{ secrets.DOT_ENV }}
