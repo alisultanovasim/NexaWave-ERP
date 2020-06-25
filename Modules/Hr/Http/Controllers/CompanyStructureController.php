@@ -73,14 +73,19 @@ class CompanyStructureController extends Controller
                     'department', 'section', 'sector'
                 ])
             ],
-            'position_id' => 'required|numeric'
+            'position_id' => 'nullable|numeric'
         ]);
         $employees = Employee::query()
         ->whereHas('contracts', function ($query) use ($request){
-            $query->where([
-                'structure_id' => $request->get('structure_id'),
-                'structure_type' => $request->get('structure_type')
-            ]);
+            if ($request->get('structure_id')){
+                $query->where(['structure_id' => $request->get('structure_id')]);
+            }
+            if ($request->get('structure_type')){
+                $query->where(['structure_type' => $request->get('structure_type')]);
+            }
+            if ($request->get('position_id')){
+                $query->where(['position_id' => $request->get('position_id')]);
+            }
             $query->where(function ($query){
                 $query->where('end_date', '>', Carbon::now());
                 $query->orWhere('end_date', null);
