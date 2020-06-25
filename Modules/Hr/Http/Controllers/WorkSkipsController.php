@@ -49,8 +49,12 @@ class WorkSkipsController extends Controller
             'confirmedEmployee:id,user_id',
             'confirmedEmployee.user:id,name,surname',
         ])
-        ->orderBy('id', 'desc')
-        ->paginate($request->get('per_page'));
+        ->orderBy('id', 'desc');
+        if ($request->get('reason_type'))
+            $workSkips = $workSkips->where('reason_type', $request->get('reason_type'));
+        if ($request->get('employee_id'))
+            $workSkips = $workSkips->where('employee_id', $request->get('employee_id'));
+        $workSkips = $workSkips->paginate($request->get('per_page'));
 
         return $this->successResponse($workSkips);
     }
@@ -118,6 +122,7 @@ class WorkSkipsController extends Controller
      */
     private function saveWorkSkipDocument(Request $request, WorkSkip $workSkip): void {
         $workSkip->fill($request->only([
+            'company_id',
             'employee_id',
             'document_number',
             'reason_type',
@@ -141,13 +146,13 @@ class WorkSkipsController extends Controller
                 'required',
                 Rule::exists('employees', 'id')->where('company_id', \request()->get('company_id'))
             ],
-            'document_number' => 'nullable|required|max:255',
+            'document_number' => 'required_if:reason_type,1|max:255',
             'reason_type' => [
                 'required',
                 Rule::in($this->workSkip->getReasonTypes())
             ],
             'day' => 'required|integer',
-            'date_of_presentation' => 'required|date',
+            'date_of_presentation' => 'required_if:reason_type,1|date',
             'start_date' => 'required|date',
             'end_date' => 'required|date',
             'is_confirmed' => 'required|boolean',

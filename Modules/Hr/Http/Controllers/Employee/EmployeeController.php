@@ -229,4 +229,23 @@ class EmployeeController extends Controller
     }
 
 
+    public function getEmployeeWithStructureData(Request $request, $id){
+        $employee = Employee::where([
+            'id' => $id,
+            'company_id' => $request->get('company_id'),
+            'is_active' => 1
+        ])
+        ->select([
+            'id',
+            'user_id',
+            'tabel_no'
+        ])
+        ->with([
+            'user:id,name,surname',
+            'user.details:user_id,father_name'
+        ])
+        ->firstOrFail();
+        return $this->successResponse($employee);
+    }
+
 }

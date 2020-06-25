@@ -69,13 +69,8 @@ class CompanyWorkingHourController extends Controller
      * @throws ValidationException
      */
     public function create(Request $request): JsonResponse {
-        try {
-            $this->validate($request, $this->getWorkingHourRules());
-            $this->saveWorkingHour($request, $this->workingHour);
-        }catch (\Exception $exception){
-            dd($exception->getMessage());
-        }
-
+        $this->validate($request, $this->getWorkingHourRules());
+        $this->saveWorkingHour($request, $this->workingHour);
         return $this->successResponse(trans('messages.saved'), 201);
     }
 
