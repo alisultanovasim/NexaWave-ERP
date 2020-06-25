@@ -20,22 +20,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="690b112f-ffd8-4eb7-abf9-50bbc8008595" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/Modules/Hr/Entities/EmployeeOrders/ContractConclusion.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Modules/Hr/Entities/EmployeeOrders/Contracts/OrderType.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Modules/Hr/Database/Migrations/2020_05_24_104421_create_work_skips_table.php" beforeDir="false" afterPath="$PROJECT_DIR$/Modules/Hr/Database/Migrations/2020_05_24_104421_create_work_skips_table.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Modules/Hr/Http/Controllers/CompanyWorkingHourController.php" beforeDir="false" afterPath="$PROJECT_DIR$/Modules/Hr/Http/Controllers/CompanyWorkingHourController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Modules/Hr/Http/Controllers/CountryController.php" beforeDir="false" afterPath="$PROJECT_DIR$/Modules/Hr/Http/Controllers/CountryController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Modules/Hr/Http/Controllers/Employee/EmployeeController.php" beforeDir="false" afterPath="$PROJECT_DIR$/Modules/Hr/Http/Controllers/Employee/EmployeeController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Modules/Hr/Http/Controllers/PositionController.php" beforeDir="false" afterPath="$PROJECT_DIR$/Modules/Hr/Http/Controllers/PositionController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Modules/Hr/Http/Controllers/WorkSkipsController.php" beforeDir="false" afterPath="$PROJECT_DIR$/Modules/Hr/Http/Controllers/WorkSkipsController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Auth/UserController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Auth/UserController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/PermissionController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/PermissionController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Middleware/CheckUserAccess.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Middleware/CheckUserAccess.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Models/Role.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Models/Role.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/composer.json" beforeDir="false" afterPath="$PROJECT_DIR$/composer.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database/seeds/ModulesSeeder.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/seeds/ModulesSeeder.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Modules/Hr/Http/Controllers/ContractTypeController.php" beforeDir="false" afterPath="$PROJECT_DIR$/Modules/Hr/Http/Controllers/ContractTypeController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Modules/Hr/Routes/api.php" beforeDir="false" afterPath="$PROJECT_DIR$/Modules/Hr/Routes/api.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -234,7 +221,7 @@
       <workItem from="1592815322183" duration="13110000" />
       <workItem from="1592893925462" duration="1047000" />
       <workItem from="1592896118137" duration="17260000" />
-      <workItem from="1593069024808" duration="475000" />
+      <workItem from="1593069024808" duration="1738000" />
     </task>
     <task id="LOCAL-00001" summary="deployment">
       <created>1592567941322</created>
