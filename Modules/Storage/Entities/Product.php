@@ -71,30 +71,28 @@ class Product extends Model
     public function title(){
         return $this->belongsTo(ProductTitle::class);
     }
-
     public function model(){
         return $this->belongsTo(ProductModel::class);
     }
-
     public function state(){
         return $this->belongsTo(ProductState::class);
     }
-
     public function color(){
         return $this->belongsTo(ProductColor::class);
     }
     public function storage(){
         return $this->belongsTo(Storage::class);
     }
-
-
-
+    public function assignments(){
+        return $this->hasMany(ProductAssignment::class , 'product_id' , 'id');
+    }
+    public function deletes(){
+        return $this->hasMany(ProductDelete::class , 'product_id' , 'id');
+    }
     public function buy_from_country(){
         return $this->belongsTo(Country::class , 'buy_from_country');
     }
-
     public function made_in_country(){
         return $this->belongsTo(Country::class , 'made_in_country');
     }
-
 }

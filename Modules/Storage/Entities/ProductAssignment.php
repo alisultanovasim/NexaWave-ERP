@@ -3,6 +3,8 @@
 namespace Modules\Storage\Entities;
 
 use Illuminate\Database\Eloquent\Model;
+use Modules\Hr\Entities\Department;
+use Modules\Hr\Entities\Employee\Employee;
 
 class ProductAssignment extends Model
 {
@@ -16,9 +18,17 @@ class ProductAssignment extends Model
         return $q->where('company_id', request('company_id'));
     }
 
-    public function employee(){}
-    public function department(){}
-    public function section(){}
-    public function sector(){}
+    public function employee(){
+        return $this->belongsTo(Employee::class);
+    }
+    public function department(){
+        return $this->belongsTo(Department::class);
+    }
+    public function section(){
+        return $this->belongsTo(Employee::class);
+    }
+    public function sector(){
+        return $this->belongsTo(Employee::class);
+    }
 
 }
