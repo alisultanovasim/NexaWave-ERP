@@ -2,7 +2,8 @@ name: CI-CD
 on:
   push:
     branches: development
-  pull_request: development
+  pull_request:
+    branches: development
 jobs:
   deploy:
     name: Deploy to production
