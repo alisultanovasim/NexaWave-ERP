@@ -1,0 +1,322 @@
+{
+    "module_and_permissions": [
+        {
+            "name": "Sənəd Dövriyyəsi",
+            "route": "",
+            "icon": "/assets/images/svg/doc-management.svg",
+            "sub_modules": [
+                {
+                    "name": "Daxil olan sənədlər",
+                    "route": "",
+                    "icon": "",
+                    "sub_modules": [],
+                    "permissions": [
+                        {
+                            "name": "Create",
+                            "slug": "create"
+                        },
+                        {
+                            "name": "Update",
+                            "slug": "update"
+                        },
+                        {
+                            "name": "Delete",
+                            "slug": "delete"
+                        },
+                        {
+                            "name": "Change Status",
+                            "slug": "change_status"
+                        }
+                    ]
+                },
+                {
+                    "name": "Göndərilən sənədlər",
+                    "route": "",
+                    "icon": "",
+                    "sub_modules": [],
+                    "permissions": [
+                        {
+                            "name": "Create",
+                            "slug": "create"
+                        },
+                        {
+                            "name": "Update",
+                            "slug": "update"
+                        },
+                        {
+                            "name": "Delete",
+                            "slug": "delete"
+                        },
+                        {
+                            "name": "Change Status",
+                            "slug": "change_status"
+                        }
+                    ]
+                },
+                {
+                    "name": "Struktur daxili sənədlər",
+                    "route": "",
+                    "icon": "",
+                    "sub_modules": [],
+                    "permissions": [
+                        {
+                            "name": "Create",
+                            "slug": "create"
+                        },
+                        {
+                            "name": "Update",
+                            "slug": "update"
+                        },
+                        {
+                            "name": "Delete",
+                            "slug": "delete"
+                        },
+                        {
+                            "name": "Change Status",
+                            "slug": "change_status"
+                        }
+                    ]
+                },
+                {
+                    "name": "Arxiv sənədlər",
+                    "route": "",
+                    "icon": "",
+                    "sub_modules": [],
+                    "permissions": []
+                },
+                {
+                    "name": "Qaralamalar",
+                    "route": "",
+                    "icon": "",
+                    "sub_modules": [],
+                    "permissions": []
+                },
+                {
+                    "name": "Hesabat",
+                    "route": "",
+                    "icon": "",
+                    "sub_modules": [],
+                    "permissions": []
+                }
+            ],
+            "permissions": []
+        },
+        {
+            "name": "Biznes Mərkəzinin İdarə Edilməsi",
+            "route": "",
+            "icon": "/assets/images/svg/marketing.svg",
+            "sub_modules": [
+                {
+                    "name": "Biznes Mərkəzinin İdarə Edilməsi",
+                    "route": "",
+                    "icon": "",
+                    "sub_modules": [],
+                    "permissions": []
+                },
+                {
+                    "name": "Görüş otağı reservi",
+                    "route": "",
+                    "icon": "",
+                    "sub_modules": [],
+                    "permissions": [ ]
+                },
+                {
+                    "name": "Resepsiya",
+                    "route": "",
+                    "icon": "",
+                    "sub_modules": [],
+                    "permissions": [ ]
+                },
+                {
+                    "name": "Satış",
+                    "route": "",
+                    "icon": "",
+                    "sub_modules": [],
+                    "permissions": [
+                        {
+                            "name": "Floors Edit",
+                            "slug": "floors_edit"
+                        },
+                        {
+                            "name": "Floors Update",
+                            "slug": "floors_update"
+                        },
+                        {
+                            "name": "Floors Read",
+                            "slug": "floors_read"
+                        },
+                        {
+                            "name": "Floors Delete",
+                            "slug": "floors_delete"
+                        },
+                        {
+                            "name": "Card Edit",
+                            "slug": "card_edit"
+                        },
+                        {
+                            "name": "Card Update",
+                            "slug": "card_update"
+                        },
+                        {
+                            "name": "Card Read",
+                            "slug": "card_read"
+                        },
+                        {
+                            "name": "Card Delete",
+                            "slug": "card_delete"
+                        },
+                        {
+                            "name": "Offers Edit",
+                            "slug": "offers_edit"
+                        },
+                        {
+                            "name": "Offers Update",
+                            "slug": "offers_update"
+                        },
+                        {
+                            "name": "Offers Read",
+                            "slug": "offers_read"
+                        },
+                        {
+                            "name": "Offers Delete",
+                            "slug": "offers_delete"
+                        }
+                    ]
+                },
+                {
+                    "name": "Qonaq siyahısı",
+                    "route": "",
+                    "icon": "",
+                    "sub_modules": [],
+                    "permissions": []
+                }
+            ],
+            "permissions": []
+        },
+        {
+            "name": "İnsan Resursları",
+            "route": "",
+            "icon": "/assets/images/svg/marketing.svg",
+            "sub_modules": [
+                {
+                    "name": "İnzibatçı",
+                    "route": "",
+                    "icon": "",
+                    "sub_modules": [
+                        {
+                            "name": "Səlahiyyətin rolları",
+                            "route": "",
+                            "icon": "",
+                            "permissions": []
+                        },
+                        {
+                            "name": "İstifadəçilər",
+                            "route": "",
+                            "icon": "",
+                            "permissions": []
+                        },
+                        {
+                            "name": "Cədvəllərin redaktə edilməsi",
+                            "route": "",
+                            "icon": "",
+                            "permissions": []
+                        },
+                        {
+                            "name": "Xəbərdarlıq",
+                            "route": "",
+                            "icon": "",
+                            "permissions": []
+                        }
+                    ],
+                    "permissions": []
+                },
+                {
+                    "name": "Struktur",
+                    "route": "",
+                    "icon": "",
+                    "sub_modules": [
+                        {
+                            "name": "Təşkilat və vəzifə bağlantıları",
+                            "route": "",
+                            "icon": "",
+                            "sub_modules": [],
+                            "permissions": []
+                        },
+                        {
+                            "name": "Ştat cədvəli",
+                            "route": "",
+                            "icon": "",
+                            "sub_modules": [],
+                            "permissions": []
+                        }
+                    ],
+                    "permissions": []
+                },
+                {
+                    "name": "Əməkdaşlar",
+                    "route": "",
+                    "icon": "",
+                    "sub_modules": [],
+                    "permissions": []
+                },
+                {
+                    "name": "Müqavilələr",
+                    "route": "",
+                    "icon": "",
+                    "sub_modules": [],
+                    "permissions": []
+                },
+                {
+                    "name": "Sənədlər",
+                    "route": "",
+                    "icon": "",
+                    "sub_modules": [],
+                    "permissions": []
+                },
+                {
+                    "name": "Hesabatlar",
+                    "route": "",
+                    "icon": "",
+                    "sub_modules": [],
+                    "permissions": []
+                },
+                {
+                    "name": "İşin Uçotu",
+                    "route": "",
+                    "icon": "",
+                    "sub_modules": [],
+                    "permissions": []
+                }
+            ],
+            "permissions": []
+        },
+        {
+            "name": "Maliyyə Hesabatı",
+            "route": "",
+            "icon": "/assets/images/svg/financial-report.svg",
+            "sub_modules": [],
+            "permission": []
+        },
+        {
+            "name": "Ehtiyatlar",
+            "route": "",
+            "icon": "/assets/images/svg/depo.svg",
+            "sub_modules": [],
+            "permission": []
+        },
+        {
+            "name": "Tapşırıqların İdarə Edilməsi",
+            "route": "",
+            "icon": "/assets/images/svg/project.svg",
+            "sub_modules": [],
+            "permission": []
+        },
+        {
+            "name": "Müqavilələr",
+            "route": "",
+            "icon": "/assets/images/svg/doc-management.svg",
+            "sub_modules": [],
+            "permission": []
+        }
+    ]
+}

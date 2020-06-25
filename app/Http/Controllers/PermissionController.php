@@ -55,6 +55,7 @@ class PermissionController extends Controller
                 $query->select([
                     'permissions.id',
                     'permissions.name',
+                    'permissions.slug',
                 ]);
             }
         ])
@@ -98,7 +99,7 @@ class PermissionController extends Controller
     public function getModules(Request $request): JsonResponse {
         $modules = Module::with([
                 'subModules',
-                'permissions:id,name,module_id'
+                'permissions:id,name,slug,module_id'
             ])
             ->where('parent_id', null);
         if ($request->get('company_id'))
@@ -233,6 +234,7 @@ class PermissionController extends Controller
                 $modules[$module->id]['permissions'][] = [
                     'id' => $module->pivot->permission_id,
                     'name' => $module->pivot->permission_name,
+                    'slug' => $module->pivot->permission_slug,
                 ];
             }
         }

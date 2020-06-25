@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/one-office-backend.iml" filepath="$PROJECT_DIR$/.idea/one-office-backend.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/api.1of.com.iml" filepath="$PROJECT_DIR$/.idea/api.1of.com.iml" />
     </modules>
   </component>
 </project>

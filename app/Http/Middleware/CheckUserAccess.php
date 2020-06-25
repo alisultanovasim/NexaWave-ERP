@@ -41,7 +41,6 @@ class CheckUserAccess
             $headers = apache_request_headers();
             $this->companyId =  array_key_exists('company_id' , (array)$headers) ? $headers['company_id'] : $request->get('company_id');
         }
-//        $this->companyId = $request->get('company_id') ?? $request->header('company_id');
         $this->userRoles = UserRole::where('user_id', Auth::id())->get(['role_id', 'company_id']);
         $this->permissionProvider = new PermissionProvider($role, $this->companyId);
         $this->roleModel = $role;
@@ -86,8 +85,7 @@ class CheckUserAccess
     private function validateUserCompanyAndMergeToRequest($companyId) {
         $userRolesForThisRequest = [];
         foreach ($this->userRoles as $role){
-            //todo update if condition
-            if ($role->company_id == $companyId or $role->role_id == $this->roleModel->getCompanyAdminRoleId()){
+            if ($role->company_id == $companyId){
                 $userRolesForThisRequest[] = $role;
             }
         }

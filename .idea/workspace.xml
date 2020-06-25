@@ -1,12 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="BranchesTreeState">
+    <expand>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="LOCAL_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:origin" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+    </expand>
+    <select />
+  </component>
   <component name="ChangeListManager">
     <list default="true" id="690b112f-ffd8-4eb7-abf9-50bbc8008595" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.github/workflows/main.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/development.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Modules/Hr/Entities/EmployeeOrders/ContractConclusion.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Modules/Hr/Entities/EmployeeOrders/Contracts/OrderType.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.rnd" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/nullable()" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/sdasd" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Modules/Hr/Database/Migrations/2020_05_24_104421_create_work_skips_table.php" beforeDir="false" afterPath="$PROJECT_DIR$/Modules/Hr/Database/Migrations/2020_05_24_104421_create_work_skips_table.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Modules/Hr/Http/Controllers/CompanyWorkingHourController.php" beforeDir="false" afterPath="$PROJECT_DIR$/Modules/Hr/Http/Controllers/CompanyWorkingHourController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Modules/Hr/Http/Controllers/CountryController.php" beforeDir="false" afterPath="$PROJECT_DIR$/Modules/Hr/Http/Controllers/CountryController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Modules/Hr/Http/Controllers/Employee/EmployeeController.php" beforeDir="false" afterPath="$PROJECT_DIR$/Modules/Hr/Http/Controllers/Employee/EmployeeController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Modules/Hr/Http/Controllers/PositionController.php" beforeDir="false" afterPath="$PROJECT_DIR$/Modules/Hr/Http/Controllers/PositionController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Modules/Hr/Http/Controllers/WorkSkipsController.php" beforeDir="false" afterPath="$PROJECT_DIR$/Modules/Hr/Http/Controllers/WorkSkipsController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Auth/UserController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Auth/UserController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/PermissionController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/PermissionController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Middleware/CheckUserAccess.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Middleware/CheckUserAccess.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Models/Role.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Models/Role.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/composer.json" beforeDir="false" afterPath="$PROJECT_DIR$/composer.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/seeds/ModulesSeeder.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/seeds/ModulesSeeder.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -19,6 +48,9 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="PackageJsonUpdateNotifier">
+    <dismissed value="$PROJECT_DIR$/package.json" />
   </component>
   <component name="PhpWorkspaceProjectConfiguration">
     <include_path>
@@ -156,7 +188,7 @@
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../Freelances/api.smartorder.com" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.path.for.package.eslint" value="project" />
@@ -166,6 +198,7 @@
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
     <property name="nodejs_package_manager_path" value="npm" />
+    <property name="php.override.implement.member.chooser.php.doc" value="NONE" />
     <property name="settings.editor.selected.configurable" value="orchideLicense" />
   </component>
   <component name="RecentsManager">
@@ -194,6 +227,14 @@
       <workItem from="1592582867442" duration="18000" />
       <workItem from="1592582901318" duration="2398000" />
       <workItem from="1592645269449" duration="1552000" />
+      <workItem from="1592771099579" duration="209000" />
+      <workItem from="1592771326839" duration="90000" />
+      <workItem from="1592771433508" duration="814000" />
+      <workItem from="1592774748851" duration="49000" />
+      <workItem from="1592815322183" duration="13110000" />
+      <workItem from="1592893925462" duration="1047000" />
+      <workItem from="1592896118137" duration="17260000" />
+      <workItem from="1593069024808" duration="475000" />
     </task>
     <task id="LOCAL-00001" summary="deployment">
       <created>1592567941322</created>
@@ -341,21 +382,46 @@
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="2" />
   </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="oldMeFiltersMigrated" value="true" />
+  </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="deployment" />
     <MESSAGE value="module seeder permission issue fixed" />
     <option name="LAST_COMMIT_MESSAGE" value="module seeder permission issue fixed" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="670" y="355" width="570" height="403" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1592655336870">
-      <screen x="0" y="27" width="3840" height="1053" />
+    <state x="335" y="355" width="586" height="403" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1592896309102">
+      <screen x="0" y="27" width="1920" height="1053" />
     </state>
+    <state x="335" y="355" width="586" height="403" key="#com.intellij.fileTypes.FileTypeChooser/0.27.1920.1053@0.27.1920.1053" timestamp="1592896309102" />
     <state x="670" y="355" width="570" height="403" key="#com.intellij.fileTypes.FileTypeChooser/0.27.3840.1053@0.27.3840.1053" timestamp="1592655336870" />
+    <state x="768" y="272" width="412" height="569" key="#com.intellij.ide.util.MemberChooser" timestamp="1592900082939">
+      <screen x="0" y="27" width="1920" height="1053" />
+    </state>
+    <state x="768" y="272" width="412" height="569" key="#com.intellij.ide.util.MemberChooser/0.27.1920.1053@0.27.1920.1053" timestamp="1592900082939" />
     <state x="495" y="99" width="1047" height="916" key="CommitChangelistDialog2" timestamp="1592645810931">
       <screen x="0" y="27" width="1920" height="1053" />
     </state>
     <state x="495" y="99" width="919" height="916" key="CommitChangelistDialog2/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1592582664430" />
     <state x="495" y="99" width="1047" height="916" key="CommitChangelistDialog2/0.27.1920.1053@0.27.1920.1053" timestamp="1592645810931" />
+    <state x="743" y="311" width="424" height="491" key="FileChooserDialogImpl" timestamp="1592903230384">
+      <screen x="0" y="27" width="1920" height="1053" />
+    </state>
+    <state x="743" y="311" width="424" height="491" key="FileChooserDialogImpl/0.27.1920.1053@0.27.1920.1053" timestamp="1592903230384" />
+    <state x="603" y="375" width="865" height="568" key="NewPhpClassDialog" timestamp="1592900022897">
+      <screen x="0" y="27" width="1920" height="1053" />
+    </state>
+    <state x="603" y="375" width="865" height="568" key="NewPhpClassDialog/0.27.1920.1053@0.27.1920.1053" timestamp="1592900022897" />
     <state x="449" y="188" width="1022" height="737" key="SettingsEditor" timestamp="1592582882581">
       <screen x="0" y="27" width="1920" height="1053" />
     </state>
@@ -366,9 +432,17 @@
     <state x="555" y="289" width="800" height="535" key="Vcs.Push.Dialog.v2/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1592582669274" />
     <state x="555" y="289" width="800" height="535" key="Vcs.Push.Dialog.v2/0.27.1920.1053@0.27.1920.1053" timestamp="1592645814022" />
     <state x="320" y="289" key="Vcs.Push.Dialog.v2/0.27.3840.1053@0.27.3840.1053" timestamp="1592656444012" />
-    <state x="623" y="259" width="672" height="678" key="search.everywhere.popup" timestamp="1592583756570">
+    <state x="570" y="167" width="770" height="780" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser" timestamp="1592914111259">
       <screen x="0" y="27" width="1920" height="1053" />
     </state>
-    <state x="623" y="259" width="672" height="678" key="search.everywhere.popup/0.27.1920.1053@0.27.1920.1053" timestamp="1592583756570" />
+    <state x="570" y="167" width="770" height="780" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser/0.27.1920.1053@0.27.1920.1053" timestamp="1592914111259" />
+    <state x="624" y="252" key="run.anything.popup" timestamp="1592825822034">
+      <screen x="0" y="27" width="1920" height="1053" />
+    </state>
+    <state x="624" y="252" key="run.anything.popup/0.27.1920.1053@0.27.1920.1053" timestamp="1592825822034" />
+    <state x="623" y="259" width="672" height="678" key="search.everywhere.popup" timestamp="1592909496909">
+      <screen x="0" y="27" width="1920" height="1053" />
+    </state>
+    <state x="623" y="259" width="672" height="678" key="search.everywhere.popup/0.27.1920.1053@0.27.1920.1053" timestamp="1592909496909" />
   </component>
 </project>

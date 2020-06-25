@@ -4,7 +4,7 @@
 namespace Modules\Hr\Entities\EmployeeOrders\Contracts;
 
 
-class OrderType
+interface OrderType
 {
-
+    public function getRules(): array;
 }

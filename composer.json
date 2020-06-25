@@ -20,7 +20,9 @@
         "laravel/tinker": "^2.0",
         "lorisleiva/laravel-deployer": "^0.3.0",
         "nwidart/laravel-modules": "^6.2",
-        "rennokki/laravel-eloquent-query-cache": "^2.0"
+        "rennokki/laravel-eloquent-query-cache": "^2.0",
+      "ext-apache": "*",
+      "ext-http": "*"
     },
     "require-dev": {
         "facade/ignition": "^2.0",
