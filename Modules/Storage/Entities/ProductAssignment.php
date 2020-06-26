@@ -8,6 +8,10 @@ use Modules\Hr\Entities\Employee\Employee;
 
 class ProductAssignment extends Model
 {
+    const RETURNED = 1;
+    const ACTIVE = 2;
+    const ALL = 3;
+
     protected $guarded = [];
 
 
@@ -30,5 +34,17 @@ class ProductAssignment extends Model
     public function sector(){
         return $this->belongsTo(Employee::class);
     }
+    public function product(){
+        return $this->belongsTo(Product::class);
+    }
 
+    public function setReasonsAttribute($value)
+    {
+        $this->attributes['reasons'] = \GuzzleHttp\json_encode($value);
+
+    }
+    public function getReasonsAttribute($value)
+    {
+        return \GuzzleHttp\json_decode($value);
+    }
 }

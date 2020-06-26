@@ -29,7 +29,7 @@ class Product extends Model
         'model_id',
 //        'product_model',
         'product_mark',
-        '',
+        'product_no',
         'color_id',
         'main_funds',
         'inv_no',
@@ -94,5 +94,9 @@ class Product extends Model
     }
     public function made_in_country(){
         return $this->belongsTo(Country::class , 'made_in_country');
+    }
+
+    public function scopeCompany($q){
+        return $q->where('company_id' , request('company_id'));
     }
 }
