@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AddActsToProduc\tDeletesTable extends Migration
+class ChangeNullableShortnamePositionsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,8 @@ class AddActsToProduc\tDeletesTable extends Migration
      */
     public function up()
     {
-        Schema::table('produc\t_deletes', function (Blueprint $table) {
-
+        Schema::table('positions', function (Blueprint $table) {
+            $table->string('short_name')->nullable()->change();
         });
     }
 
@@ -25,8 +25,8 @@ class AddActsToProduc\tDeletesTable extends Migration
      */
     public function down()
     {
-        Schema::table('produc\t_deletes', function (Blueprint $table) {
-
-        });
+        Schema::table('positions', function (Blueprint $table) {
+            $table->string('short_name', 100)->change();
+        }); 
     }
 }

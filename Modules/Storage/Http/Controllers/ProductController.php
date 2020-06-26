@@ -142,7 +142,14 @@ class ProductController extends Controller
         ])
             ->where('company_id', $request->get('company_id'))
             ->where('id', $id)
-            ->first([
+            ->with([
+               'deletes_logs',
+                'deletes_logs.employee',
+                'deletes_logs.employee.user:id,name,surname',
+                'updates_logs',
+                'updates_logs.employee',
+                'updates_logs.employee.user:id,name,surname'
+            ])->first([
                 'amount' , 'id' , 'initial_amount','kind_id' , 'title_id' , 'model_id' , 'product_mark'
             ]);
 
@@ -150,14 +157,7 @@ class ProductController extends Controller
             return $this->errorResponse(trans('response.ProductNotFound'));
 
 
-            $product->with([
-                'deletes_logs',
-                'deletes_logs.employee',
-                'deletes_logs.employee.user:id,name,surname',
-                'updates_logs',
-                'updates_logs.employee',
-                'updates_logs.employee.user:id,name,surname'
-            ]);
+
         return $this->successResponse($product);
     }
 
@@ -369,5 +369,4 @@ class ProductController extends Controller
             'income_description' => ['nullable', 'string'],
         ];
     }
-
 }
