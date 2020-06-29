@@ -40,11 +40,15 @@ class PermissionController extends Controller
      * @param Request $request
      * @param $moduleId
      * @return JsonResponse
-     */
+     */t
     public function userGetPermissionsByModuleId(Request $request, $moduleId): JsonResponse {
         $modules = Module::where('parent_id', $moduleId)->with('subModuleIds:id,parent_id');
         if ($request->get('company_id'))
             $modules = $modules->hasCompany($request->get('company_id'));
+        if (!Auth::user()->getAttribute('is_office_user'))
+            $modules = $modules->where('is_office_module', 0);
+        else
+            $modules = $modules->where('is_office_module', 1);
         $modules = $modules->get(['id']);
         $moduleIds = $this->convertNestedModulesToModelsArray($modules);
         $modules = Module::whereIn('id', $moduleIds)
@@ -68,6 +72,7 @@ class PermissionController extends Controller
         if (
             (in_array($this->role->getCompanyAdminRoleId(), \auth()->user()->getUserRolesForRequest())) or
             (in_array($this->role->getSuperAdminRoleId(), \auth()->user()->getUserRolesForRequest()))
+            (in_array($this->role->getOfficeAdminRoleId(), \auth()->user()->getUserRolesForRequest()))
         ){
             foreach ($modules as $key => $module){
                 $modules[$key]['permission_list'] = ['*'];
@@ -104,6 +109,10 @@ class PermissionController extends Controller
             ->where('parent_id', null);
         if ($request->get('company_id'))
             $modules = $modules->hasCompany($request->get('company_id'));
+        if (!Auth::user()->getAttribute('is_office_user'))
+            $modules = $modules->where('is_office_module', 0);
+        else
+            $modules = $modules->where('is_office_module', 1);
         $modules = $modules->get([
             'id',
             'name',
@@ -124,8 +133,9 @@ class PermissionController extends Controller
             ->with([
                 'modules'
             ]);
-        if ($request->get('company_id'))
+        if ($request->get('company_id')){
             $permissions = $permissions->companyId($request->get('company_id'));
+        }
         $permissions = $permissions->firstOrFail(['id', 'name']);
         return $this->successResponse(
             $this->formatRolePermissionsResponse($permissions)

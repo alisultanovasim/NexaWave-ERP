@@ -20,7 +20,7 @@ class NotificationCaseController extends Controller
             'company_id' => ['required' , 'integer'],
             'paginateCount' => ['sometimes' , 'integer']
         ]);
-        $result = NotificationCase::paginate($request->get('paginateCount'));
+        $result = NotificationCase::with('type:id,name')->paginate($request->get('paginateCount'));
         return $this->dataResponse($result);
     }
 
@@ -53,7 +53,7 @@ class NotificationCaseController extends Controller
         try{
             DB::beginTransaction();
             $saved = true;
-            $notificationCase = NotificationCase::where('id', $id)->where('company_id' , $request->get('company_id'))->exists();
+            $notificationCase = NotificationCase::where('id', $id)->exists();
             if (!$notificationCase)
                 return $this->errorResponse(trans('messages.not_found'), 404);
             NotificationCase::where('id', $id)->update([
@@ -73,10 +73,7 @@ class NotificationCaseController extends Controller
     }
 
     public function destroy(Request $request, $id){
-        $this->validate($request , [
-            'company_id' => ['required' , 'integer']
-        ]);
-        return NotificationCase::where('id', $id)->where('company_id' , $request->get('company_id'))->delete()
+        return NotificationCase::where('id', $id)->delete()
             ? $this->successResponse(trans('messages.saved'))
             : $this->errorResponse(trans('messages.not_saved'));
     }
