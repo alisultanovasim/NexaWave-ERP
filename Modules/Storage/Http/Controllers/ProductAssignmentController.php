@@ -28,8 +28,7 @@ class ProductAssignmentController extends Controller
                 ProductAssignment::RETURNED,
                 ProductAssignment::ACTIVE,
                 ProductAssignment::ALL
-            ])
-                ]
+            ])]
         ]);
 
         $assignments = ProductAssignment::with(['employee:id,user_id' ,'employee.user:id,name,surname' , 'department' , 'section' , 'sector' , 'product' ,'product.kind','product.kind.unit'])
@@ -52,6 +51,9 @@ class ProductAssignmentController extends Controller
 
         if ($request->get('product_id'))
             $assignments->where('product_id' , $request->get('product_id'));
+
+        if ($request->get('assignment_type'))
+            $assignments->where('assignment_type' , $request->get('assignment_type'));
 
 
         if ($request->get('section_id'))
