@@ -23,6 +23,7 @@ class User extends Authenticatable
     const DEV = 4;
 
     private $userRolesForRequest = [];
+    private $userWorkingOfficeId;
 
     /**
      * The attributes that are mass assignable.
@@ -107,6 +108,22 @@ class User extends Authenticatable
             ['user_id' , '='  , Auth::id()],
             ['company_id' , '='  , $company],
         ])->first(['id'])->id;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getUserWorkingOfficeId()
+    {
+        return $this->userWorkingOfficeId;
+    }
+
+    /**
+     * @param mixed $userWorkingOfficeId
+     */
+    public function setUserWorkingOfficeId($userWorkingOfficeId): void
+    {
+        $this->userWorkingOfficeId = $userWorkingOfficeId;
     }
 
 }

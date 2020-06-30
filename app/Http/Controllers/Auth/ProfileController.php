@@ -59,8 +59,13 @@ class ProfileController extends Controller
             }
         ]);
 
-        if ($request->get('company_id'))
+        if ($request->get('company_id')){
             $modules = $modules->hasCompany($request->get('company_id'));
+            if (!Auth::user()->getAttribute('is_office_user'))
+                $modules = $modules->where('is_office_module', 0);
+            else
+                $modules = $modules->where('is_office_module', 1);
+        }
 
         $modules = $modules->get([
             'id',
@@ -71,7 +76,8 @@ class ProfileController extends Controller
 
         if (
             (in_array($role->getCompanyAdminRoleId(), \auth()->user()->getUserRolesForRequest())) or
-            (in_array($role->getSuperAdminRoleId(), \auth()->user()->getUserRolesForRequest()))
+            (in_array($role->getSuperAdminRoleId(), \auth()->user()->getUserRolesForRequest())) or
+            (in_array($role->getOfficeAdminRoleId(), \auth()->user()->getUserRolesForRequest()))
         ){
             foreach ($modules as $key => $module){
                 $modules[$key]['permission_list'] = ['*'];

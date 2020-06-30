@@ -56,7 +56,7 @@ class UserController extends Controller
         return $this->dataResponse([
             'token_type' => 'Bearer',
             'access_token' => $token,
-            'user' => Auth::user()->load('roles:roles.id,user_roles.company_id'),
+            'user' => Auth::user()->load('roles:roles.id,user_roles.company_id,user_roles.office_id'),
         ]);
     }
 
