@@ -37,11 +37,11 @@ class CheckUserAccess
         $this->request = $request;
         if ($request->hasHeader('company_id')){
             $this->companyId = $request->header('company_id');
-        }else{
+        } else {
             $headers = apache_request_headers();
             $this->companyId =  array_key_exists('company_id' , (array)$headers) ? $headers['company_id'] : $request->get('company_id');
         }
-        $this->userRoles = UserRole::where('user_id', Auth::id())->get(['role_id', 'company_id']);
+        $this->userRoles = UserRole::where('user_id', Auth::id())->get(['role_id', 'company_id', 'office_id']);
         $this->permissionProvider = new PermissionProvider($role, $this->companyId);
         $this->roleModel = $role;
     }
@@ -86,6 +86,14 @@ class CheckUserAccess
         $userRolesForThisRequest = [];
         foreach ($this->userRoles as $role){
             if ($role->company_id == $companyId){
+
+                /*
+                 * if user if office user set office id instance variable
+                 */
+                if (Auth::user()->getAttribute('is_office_user')){
+                    Auth::user()->setUserWorkingOfficeId($role['office_id']);
+                }
+
                 $userRolesForThisRequest[] = $role;
             }
         }

@@ -14,6 +14,6 @@ class NotificationCase extends Model
     ];
 
     public function type(){
-        return $this->belongsTo('Modules\Hr\EntitiesNotificationType', 'type_id', 'id');
+        return $this->belongsTo(NotificationType::class, 'type_id', 'id');
     }
 }

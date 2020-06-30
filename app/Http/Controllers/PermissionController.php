@@ -45,6 +45,10 @@ class PermissionController extends Controller
         $modules = Module::where('parent_id', $moduleId)->with('subModuleIds:id,parent_id');
         if ($request->get('company_id'))
             $modules = $modules->hasCompany($request->get('company_id'));
+        if (!Auth::user()->getAttribute('is_office_user'))
+            $modules = $modules->where('is_office_module', 0);
+        else
+            $modules = $modules->where('is_office_module', 1);
         $modules = $modules->get(['id']);
         $moduleIds = $this->convertNestedModulesToModelsArray($modules);
         $modules = Module::whereIn('id', $moduleIds)
@@ -67,7 +71,8 @@ class PermissionController extends Controller
         ]);
         if (
             (in_array($this->role->getCompanyAdminRoleId(), \auth()->user()->getUserRolesForRequest())) or
-            (in_array($this->role->getSuperAdminRoleId(), \auth()->user()->getUserRolesForRequest()))
+            (in_array($this->role->getSuperAdminRoleId(), \auth()->user()->getUserRolesForRequest())) or
+            (in_array($this->role->getOfficeAdminRoleId(), \auth()->user()->getUserRolesForRequest()))
         ){
             foreach ($modules as $key => $module){
                 $modules[$key]['permission_list'] = ['*'];
@@ -104,6 +109,10 @@ class PermissionController extends Controller
             ->where('parent_id', null);
         if ($request->get('company_id'))
             $modules = $modules->hasCompany($request->get('company_id'));
+        if (!Auth::user()->getAttribute('is_office_user'))
+            $modules = $modules->where('is_office_module', 0);
+        else
+            $modules = $modules->where('is_office_module', 1);
         $modules = $modules->get([
             'id',
             'name',
@@ -124,8 +133,15 @@ class PermissionController extends Controller
             ->with([
                 'modules'
             ]);
-        if ($request->get('company_id'))
+        if ($request->get('company_id')){
             $permissions = $permissions->companyId($request->get('company_id'));
+            if (!Auth::user()->getAttribute('is_office_user')){
+                $permissions = $permissions->where('office_id', null);
+            }
+            else {
+                $permissions = $permissions->where('office_id', Auth::user()->getUserWorkingOfficeId());
+            }
+        }
         $permissions = $permissions->firstOrFail(['id', 'name']);
         return $this->successResponse(
             $this->formatRolePermissionsResponse($permissions)
@@ -138,8 +154,15 @@ class PermissionController extends Controller
      */
     public function getRoles(Request $request): JsonResponse {
         $roles = $this->role;
-        if ($request->get('company_id'))
+        if ($request->get('company_id')){
             $roles = $roles->companyId($request->get('company_id'));
+            if (!Auth::user()->getAttribute('is_office_user')){
+                $roles = $roles->where('office_id', null);
+            }
+            else {
+                $roles = $roles->where('office_id', Auth::user()->getUserWorkingOfficeId());
+            }
+        }
         $roles = $roles->get(['id', 'name', 'created_at', 'updated_at']);
         return $this->successResponse($roles);
     }
@@ -182,6 +205,7 @@ class PermissionController extends Controller
         $role->fill([
             'name' => $request->get('role_name'),
             'company_id' => $request->get('company_id'),
+            'office_id' => Auth::user()->getUserWorkingOfficeId(),
             'created_by' => Auth::id()
         ])->save();
         return $role;
@@ -253,33 +277,72 @@ class PermissionController extends Controller
             'modules.*.permissions.*.id' => 'required|exists:permissions,id',
         ];
         if ($companyId){
-            $rules['role_name'] = [
-                'nullable',
-                'max:255',
-                Rule::unique('roles', 'name')->where('company_id', $companyId)
-            ];
-            $rules['role_id'] = 'nullable|exists:roles,id,company_id,'.$companyId;
-            $rules['modules.*.module_id'] = [
-                'required',
-                Rule::exists('company_modules', 'module_id')
-                    ->where('is_active', true)
-                    ->where('company_id', $companyId)
-            ];
+            if (Auth::user()->getUserWorkingOfficeId())
+                $rules = array_merge($rules, $this->getRoleRulesForOffice($companyId, Auth::user()->getUserWorkingOfficeId()));
+            else
+                $rules = array_merge($rules, $this->getRoleRulesForCompany($companyId));
         }
         else {
-            $rules['role_name'] = [
-                'nullable',
-                'max:255',
-                Rule::unique('roles', 'name')->where('company_id',  $companyId)
-            ];
-            $rules['role_id'] = 'nullable|exists:roles,id';
-            $rules['modules.*.module_id'] = [
-                'required',
-                Rule::exists('modules', 'id')
-                    ->where('is_active', true)
-            ];
+            $rules = array_merge($rules, $this->getRoleRulesForPlatform());
         }
         return  $rules;
+    }
+
+    private function getRoleRulesForCompany($companyId): array {
+        $rules = [];
+        $rules['role_name'] = [
+            'nullable',
+            'max:255',
+            Rule::unique('roles', 'name')->where('company_id', function ($query) use ($companyId){
+                $query->where('company_id', $companyId);
+                $query->where('office_id', null);
+            })
+        ];
+        $rules['role_id'] = 'nullable|exists:roles,id,company_id,'.$companyId;
+        $rules['modules.*.module_id'] = [
+            'required',
+            Rule::exists('company_modules', 'module_id')
+                ->where('is_active', true)
+                ->where('company_id', $companyId)
+                ->where('if_office_module', false),
+        ];
+        return $rules;
+    }
+
+    private function getRoleRulesForPlatform(): array {
+        $rules = [];
+        $rules['role_name'] = [
+            'nullable',
+            'max:255',
+            Rule::unique('roles', 'name')->where('company_id',  null)
+        ];
+        $rules['role_id'] = 'nullable|exists:roles,id';
+        $rules['modules.*.module_id'] = [
+            'required',
+            Rule::exists('modules', 'id')
+                ->where('is_active', true)
+        ];
+        return $rules;
+    }
+
+    private function getRoleRulesForOffice($companyId, $officeId): array {
+        $rules = [];
+        $rules['role_name'] = [
+            'nullable',
+            'max:255',
+            Rule::unique('roles', 'name')->where('office_id', $officeId)
+        ];
+        $rules['role_id'] = 'nullable|exists:roles,id,office_id,'.$officeId;
+        $rules['modules.*.module_id'] = [
+            'required',
+            Rule::exists('company_modules', 'module_id')
+                ->where('is_active', true)
+                ->where('company_id', $companyId),
+            Rule::exists('modules', 'id')
+                ->where('is_active', true)
+                ->where('is_office_module', true),
+        ];
+        return $rules;
     }
 
 }
