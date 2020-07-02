@@ -32,7 +32,7 @@ class Order extends Model
         return $query->where('confirmed_date', '!=', null);
     }
 
-    public function orderEmployees(){
+    public function employees(){
         return $this->hasMany(OrderEmployee::class);
     }
 

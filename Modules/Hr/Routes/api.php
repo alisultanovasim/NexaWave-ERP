@@ -575,5 +575,12 @@ Route::group([
         Route::delete('/', 'CompanyAuthorizedUsersController@removeEmployeeFromAuthorizedUsers');
     });
 
+    Route::group(['prefix' => 'company/orders'], function (){
+        Route::post('', 'CompanyOrderController@create');
+        Route::put('/id', 'CompanyOrderController@update');
+        Route::put('/confirm/id', 'CompanyOrderController@confirm');
+        Route::delete('/', 'CompanyOrderController@destroy');
+    });
+
 });
 

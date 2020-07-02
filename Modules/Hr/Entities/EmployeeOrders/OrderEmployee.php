@@ -10,4 +10,8 @@ class OrderEmployee extends Model
     use SoftDeletes;
 
     protected $guarded = ['id'];
+
+    protected $casts = [
+        'details' => 'json'
+    ];
 }

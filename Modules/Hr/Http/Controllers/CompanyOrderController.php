@@ -6,7 +6,9 @@ use App\Traits\ApiResponse;
 use http\Exception\InvalidArgumentException;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
+use Modules\Hr\Entities\Employee\Employee;
 use Modules\Hr\Entities\EmployeeOrders\ContractConclusion;
 use Modules\Hr\Entities\EmployeeOrders\Contracts\OrderType;
 use Modules\Hr\Entities\EmployeeOrders\Order;
@@ -14,7 +16,7 @@ use Illuminate\Http\Request;
 use Modules\Hr\Entities\EmployeeOrders\OrderEmployee;
 
 
-class EmployeeOrderController extends Controller
+class CompanyOrderController extends Controller
 {
     use ApiResponse, ValidatesRequests;
 
@@ -58,22 +60,31 @@ class EmployeeOrderController extends Controller
         $this->validate($request, $this->getRules());
         $order = $this->order->where([
             'id' => $id,
-            'company_id' => $request->get('company_id')
+            'company_id' => $request->get('company_id'),
+            'confirmed_date' => null
         ])->firstOrFail(['id']);
         $this->saveOrder($request, $order);
         return $this->successResponse(trans('messages.saved'));
     }
 
     public function saveOrder(Request $request, Order $order){
-        $order->fill($request->only([
-            'company_id',
-            'type',
-            'number',
-            'labor_code_id',
-            'order_sign_date'
-        ]));
+        $order->fill([
+            'company_id' => $request->get('company_id'),
+            'type' => $request->get('type'),
+            'number' => $request->get('number'),
+            'labor_code_id' => $request->get('labor_code_id'),
+            'order_sign_date' => $request->get('order_sign_date'),
+            'created_by' => ($this->getEmployeeByUserId(Auth::id(), $request->get('company_id')))->getKey()
+        ]);
         $order->save();
         $this->saveOrderEmployees($order->getKey(), $request->get('order_employees'));
+    }
+
+    private function getEmployeeByUserId(int $userId, int $companyId): Employee {
+        return Employee::where([
+            'user_id' => $userId,
+            'company_id' => $companyId
+        ])->first();
     }
 
     private function saveOrderEmployees(int $orderId, array $orderEmployees): void {
@@ -111,7 +122,7 @@ class EmployeeOrderController extends Controller
     }
 
     private function getRules(): array {
-        $baseRules = [
+        $rules = [
             'type' => [
                 'required',
                 Rule::in($this->order->getTypeIds())
@@ -119,10 +130,15 @@ class EmployeeOrderController extends Controller
             'number' => 'required|min:2|max:255',
             'labor_code_id' => 'required|exists:labor_codes,id',
             'order_sign_date' => 'required|date|date_format:Y-m-d',
-            'order_employees' => 'required|array'
+            'employees' => 'required|array'
         ];
-        $rulesByDocumentType = $this->getOrderModelByType(\request()->get('type'))->getRules();
-        return array_merge($rulesByDocumentType, $baseRules);
+        if (\request()->get('type')){
+            $rules = array_merge(
+                $rules,
+                $this->getOrderModelByType(\request()->get('type'))->getRules()
+            );
+        }
+        return $rules;
     }
 
     private function getOrderModelByType($typeId): OrderType {
@@ -131,7 +147,7 @@ class EmployeeOrderController extends Controller
         else if ($typeId == 2)
             return new ContractConclusion();
         else
-            throw new InvalidArgumentException();
+           throw new InvalidArgumentException('Invalid order type');
     }
 
 }
