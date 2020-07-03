@@ -15,6 +15,7 @@ class ChangeIndexFromProductsTable extends Migration
     {
         Schema::table('products', function (Blueprint $table) {
             $table->dropForeign('products_color_id_foreign');
+
             $table->foreign('color_id')
                 ->references('id')
                 ->on('colors');
@@ -29,10 +30,7 @@ class ChangeIndexFromProductsTable extends Migration
     public function down()
     {
         Schema::table('products', function (Blueprint $table) {
-            $table->dropIndex('products_color_id_foreign');
-            $table->foreign('color_id')
-                ->references('id')
-                ->on('colors');
+
         });
     }
 }
