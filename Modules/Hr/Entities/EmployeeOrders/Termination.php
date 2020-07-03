@@ -3,11 +3,11 @@
 
 namespace Modules\Hr\Entities\EmployeeOrders;
 
-use Illuminate\Database\Eloquent\Builder;
+
 use Illuminate\Validation\Rule;
 use Modules\Hr\Entities\EmployeeOrders\Contracts\OrderType;
 
-class ContractConclusion extends Order implements OrderType
+class Termination extends Order implements OrderType
 {
 
     public function getEmployeeValidateRules(): array
@@ -32,24 +32,14 @@ class ContractConclusion extends Order implements OrderType
             'employees.*.details.sector_name' => 'nullable|min:3|max:255',
             'employees.*.details.position_id' => 'nullable|integer',
             'employees.*.details.position_name' => 'nullable|min:3|max:255',
+            'employees.*.details.qualification_degree' => 'nullable|min:3|max:255',
             'employees.*.details.personal_category_id' => 'nullable|integer',
             'employees.*.details.personal_category_name' => 'nullable|min:3|max:255',
-            'employees.*.details.qualification_degree' => 'nullable|min:3|max:255',
             'employees.*.details.recruitment_date' => 'required|date|date_format:Y-m-d',
             'employees.*.details.contract_date' => 'required|date|date_format:Y-m-d',
             'employees.*.details.contract_number' => 'required|min:3|max:255',
-            'employees.*.details.probation_time' => 'required|max:255',
-            'employees.*.details.salary' => 'required|integer',
+            'employees.*.details.termination_date' => 'required|date|date_format:Y-m-d',
             'employees.*.details.note' => 'nullable|min:3|max:255',
         ];
-    }
-
-
-    protected static function boot()
-    {
-        parent::boot();
-        static::addGlobalScope('type', function (Builder $builder) {
-            $builder->where('type', 1);
-        });
     }
 }
