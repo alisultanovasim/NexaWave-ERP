@@ -48,11 +48,7 @@ class StorageDatabaseSeeder extends Seeder
             ]);
         }
 //
-        ProductColor::insert([
-            ['name' => 'Qırmızı', 'hex' => '#ff0000'],
-            ['name' => 'Göy', 'hex' => '#0d00ff'],
-            ['name' => 'Qara', 'hex' => '#000000'],
-        ]);
+
 
         $title = ProductTitle::create([
             'company_id' => 1,
