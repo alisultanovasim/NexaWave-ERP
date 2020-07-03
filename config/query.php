@@ -24,4 +24,5 @@ return [
     'demand_id'  => 'demands' ,
     'sell_act_id' => 'sell_acts',
     'supplier_id' => 'suppliers',
+    'contract_id' => 'contracts'
 ];

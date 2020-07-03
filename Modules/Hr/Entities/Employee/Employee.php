@@ -47,6 +47,12 @@ class Employee extends Model
         return $q->where('is_active', true);
     }
 
+
+    public function scopeCompany($q)
+    {
+        return $q->where('company_id', request('company_id'));
+    }
+
     public function scopeIsAuthorizedCompanyEmployee($query){
         return $query->whereHas('authorizedDetails');
     }
