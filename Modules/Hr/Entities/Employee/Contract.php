@@ -13,7 +13,6 @@ class Contract extends Model
         'versions' => 'json',
         'additions' => 'json',
     ];
-
     const ACTIVE = 1;
     const DRAFT = 2;
 
@@ -23,6 +22,11 @@ class Contract extends Model
     // y - year
     const AWARD_PERIODS = [
         'w' , 'm', 't' ,'y'
+    ];
+
+
+    const WORK_PLACE_TYPES = [
+        'main', 'extra'
     ];
 
     const WEEK_DAYS = [
