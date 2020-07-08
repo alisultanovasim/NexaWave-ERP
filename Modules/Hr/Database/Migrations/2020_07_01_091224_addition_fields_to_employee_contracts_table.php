@@ -76,3 +76,4 @@ class AdditionFieldsToEmployeeContractsTable extends Migration
     }
 }
 
+//todo add is yeri novu

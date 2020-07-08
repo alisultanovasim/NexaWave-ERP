@@ -292,7 +292,8 @@ class ProductController extends Controller
         $deleted = [
             'product_id' => $product->id,
             'employee_id' => Auth::user()->getEmployeeId($request->get('company_id')),
-            'act' => $this->uploadFile($request->act,$request->get('company_id') ,'delete-acts')
+            'act' => $this->uploadFile($request->act,$request->get('company_id') ,'delete-acts'),
+            'reason' => $request->get('reason')
         ];
 
         if ($request->has('amount')){
