@@ -700,21 +700,17 @@ class OfficeController extends Controller
             'document_id' => 'required|integer',
             'document' => 'required|mimes::jpeg,png,jpg,gif,svg,pdf,docx,doc,txt,xls,xlsx'
         ]);
-        try {
-            $office = $this->officeExists($id, $request->company_id);
-            if (!$office) return $this->errorResponse('apiResponse.officeNotFound');
+        $office = $this->officeExists($id, $request->company_id);
+        if (!$office) return $this->errorResponse('apiResponse.officeNotFound');
 
-            $check = Document::where([['office_id', $id], ['id', $request->document_id]])->update([
-                'url' => $this->uploadImage($request->company_id, $request->document, 'documents')
-            ]);
+        $check = Document::where([['office_id', $id], ['id', $request->document_id]])->update([
+            'url' => $this->uploadImage($request->company_id, $request->document, 'documents')
+        ]);
 
-            if (!$check) return $this->errorResponse('apiResponse.documentNotFound');
+        if (!$check) return $this->errorResponse('apiResponse.documentNotFound');
 
-            return $this->successResponse('OK');
+        return $this->successResponse('OK');
 
-        } catch (\Exception $e) {
-            return $this->errorResponse(trans('apiResponse.tryLater'), Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
     }
 
     public function documentDestroy(Request $request, $id)

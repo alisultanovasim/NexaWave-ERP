@@ -20,12 +20,9 @@ class AssignmentTemplates extends  Controller
             'company_id' => 'required|integer',
         ]);
 
-        try{
-            $companies = AssignmentTemplate::where('company_id' , $request->company_id)->get(['id', 'name']);
-            return $this->successResponse($companies);
-        }catch (\Exception $exception){
-            return $this->errorResponse(trans('apiResponse.tryLater') , Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
+        $companies = AssignmentTemplate::where('company_id' , $request->company_id)->get(['id', 'name']);
+        return $this->successResponse($companies);
+
 
     }
 
@@ -34,15 +31,12 @@ class AssignmentTemplates extends  Controller
             'company_id' => 'required|integer',
             'name'=> 'required|min:2'
         ]);
-        try{
-            AssignmentTemplate::create([
-                'name'=> $request->name,
-                'company_id' => $request->company_id
-            ]);
-            return $this->successResponse('OK');
-        }catch (\Exception $exception){
-            return $this->errorResponse(trans('apiResponse.tryLater') , Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
+        AssignmentTemplate::create([
+            'name'=> $request->name,
+            'company_id' => $request->company_id
+        ]);
+        return $this->successResponse('OK');
+
     }
 
     public function update(Request $request){
@@ -51,7 +45,6 @@ class AssignmentTemplates extends  Controller
             'assignment_template_id'=> 'required|integer',
             'name'=> 'required|min:2'
         ]);
-        try{
             $check = AssignmentTemplate::where([
                 'id'=> $request->assignment_template_id,
                 'company_id' => $request->company_id
@@ -60,9 +53,7 @@ class AssignmentTemplates extends  Controller
             ]);
             if (!$check) return $this->errorResponse(trans('apiResponse.unProcess'));
             return $this->successResponse('OK');
-        }catch (\Exception $exception){
-            return $this->errorResponse(trans('apiResponse.tryLater') , Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
+
     }
 
     public function delete(Request $request){
@@ -70,16 +61,13 @@ class AssignmentTemplates extends  Controller
             'company_id' => 'required|integer',
             'assignment_template_id'=> 'required|integer',
         ]);
-        try{
             $check = AssignmentTemplate::where([
                 'id'=> $request->assignment_template_id,
                 'company_id' => $request->company_id
             ])->delete();
             if (!$check) return $this->errorResponse(trans('apiResponse.unProcess'));
             return $this->successResponse('OK');
-        }catch (\Exception $exception){
-            return $this->errorResponse(trans('apiResponse.tryLater') , Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
+
     }
 
 }

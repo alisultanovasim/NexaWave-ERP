@@ -23,35 +23,32 @@ class  AdjustmentController extends Controller
             'company_id' => 'required|integer',
             'section_type' => 'required|integer',
         ]);
-        try{
-            $adjustments = Adjustment::with([])->where('user_id' ,Auth::id())->where('section_type' , $request->section_type)->get([
-                'name',
-                'field',
-                'is_active',
-                'position' ,
-                'type'
-            ]);
-            if ($adjustments->count() == 0){
-                $arr = config("esd.document.adjustments.initial_rules.coulmns{$request->section_type}");
-                if($arr == null) return $this->successResponse([]);
-                $sendArr = [];
-                foreach ($arr  as $k => $v) {
-                    $arr[$k]['type'] = (int)$arr[$k]['type'];
-                    $arr[$k]['is_active'] = (int)$arr[$k]['is_active'];
-                    $arr[$k]['position'] = (int)$arr[$k]['position'];
+        $adjustments = Adjustment::with([])->where('user_id' ,Auth::id())->where('section_type' , $request->section_type)->get([
+            'name',
+            'field',
+            'is_active',
+            'position' ,
+            'type'
+        ]);
+        if ($adjustments->count() == 0){
+            $arr = config("esd.document.adjustments.initial_rules.coulmns{$request->section_type}");
+            if($arr == null) return $this->successResponse([]);
+            $sendArr = [];
+            foreach ($arr  as $k => $v) {
+                $arr[$k]['type'] = (int)$arr[$k]['type'];
+                $arr[$k]['is_active'] = (int)$arr[$k]['is_active'];
+                $arr[$k]['position'] = (int)$arr[$k]['position'];
 
-                    $sendArr[$k] = $arr[$k];
-                    $arr[$k]['user_id'] = Auth::id();
-                    $arr[$k]['section_type'] = $request->section_type;
-                }
-                Adjustment::insert($arr);
-                unset($arr);
-                $adjustments = $sendArr;
+                $sendArr[$k] = $arr[$k];
+                $arr[$k]['user_id'] = Auth::id();
+                $arr[$k]['section_type'] = $request->section_type;
             }
-            return $this->successResponse($adjustments);
-        }catch (\Exception $exception){
-            return $this->errorResponse(trans('apiResponse.tryLater') , Response::HTTP_INTERNAL_SERVER_ERROR);
+            Adjustment::insert($arr);
+            unset($arr);
+            $adjustments = $sendArr;
         }
+        return $this->successResponse($adjustments);
+
     }
 
     public function update(Request $request){
@@ -66,18 +63,14 @@ class  AdjustmentController extends Controller
             'data.*.field' => 'required|string|max:255',
             'section_type' => 'sometimes|integer'
         ]);
-        try{
-            Adjustment::where('user_id' ,Auth::id())->where('section_type' , $request->section_type)->delete();
-            $arr = $request->data;
-            foreach ($arr  as $k => $v) {
-                $arr[$k]['user_id'] = Auth::id();
-                $arr[$k]['section_type'] = $request->section_type;
-            }
-            Adjustment::insert($arr);
-            return $this->successResponse("OK");
-        }catch (\Exception $exception){
-            return $this->errorResponse(trans('apiResponse.tryLater') , Response::HTTP_INTERNAL_SERVER_ERROR);
-
+        Adjustment::where('user_id' ,Auth::id())->where('section_type' , $request->section_type)->delete();
+        $arr = $request->data;
+        foreach ($arr  as $k => $v) {
+            $arr[$k]['user_id'] = Auth::id();
+            $arr[$k]['section_type'] = $request->section_type;
         }
+        Adjustment::insert($arr);
+        return $this->successResponse("OK");
+
     }
 }

@@ -91,11 +91,6 @@ class AssignmentController extends Controller
             if ($e->errorInfo[1] == 1062) {
                 return $this->errorResponse(['error' => trans("apiResponse.assignmentAlreadyExists")]);
             }
-            return $this->errorResponse(trans("apiResponse.tryLater"), Response::HTTP_INTERNAL_SERVER_ERROR);
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return $this->errorResponse(trans("apiResponse.tryLater"), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
     }
@@ -111,7 +106,6 @@ class AssignmentController extends Controller
             'base' => 'required_with:user_ids|integer',
             'is_extension' => ['required' , 'boolean']
         ]);
-        try {
             DB::beginTransaction();
             $document = Document::where([
                 ["id", $id],
@@ -200,10 +194,6 @@ class AssignmentController extends Controller
 
             return $this->successResponse('OK');
 
-        } catch (\Exception $e) {
-            dd($e);
-            return $this->errorResponse(trans('apiResponse.tryLater'), Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
     }
 
     /**
@@ -215,7 +205,6 @@ class AssignmentController extends Controller
             'company_id' => 'required|integer',
         ]);
         $company_id = $request->company_id;
-        try {
             $document = Document::where("id", $id)
                 ->where("company_id", $company_id)
                 ->exists();
@@ -226,10 +215,6 @@ class AssignmentController extends Controller
 
             return $this->successResponse("OK");
 
-        } catch (\Exception $e) {
-            return $this->errorResponse(trans("apiResponse.tryLater"), Response::HTTP_INTERNAL_SERVER_ERROR);
-
-        }
 
     }
 
@@ -241,55 +226,51 @@ class AssignmentController extends Controller
             'user_ids' => ['required', 'array', 'max:255'],
             'user_ids.*' => ['required', 'integer']
         ]);
-        try {
-            $helper = array_unique($request->user_ids);
+        $helper = array_unique($request->user_ids);
 
-            if (in_array(Auth::id() , $helper)) return $this->errorResponse(trans('response.selfsend'),422);
+        if (in_array(Auth::id() , $helper)) return $this->errorResponse(trans('response.selfsend'),422);
 
-            if (!$this->checkUser($helper , $request))
-                return $this->errorResponse(trans('response.unProcess'));
+        if (!$this->checkUser($helper , $request))
+            return $this->errorResponse(trans('response.unProcess'));
 
 
-            $assignment = Assignment::whereHas('document', function ($q) use ($request, $id) {
-                $q->where('company_id', $request->company_id)
-                    ->where('status', Document::ACTIVE)
-                    ->where('id', $id);
-            })->first(['id']);
+        $assignment = Assignment::whereHas('document', function ($q) use ($request, $id) {
+            $q->where('company_id', $request->company_id)
+                ->where('status', Document::ACTIVE)
+                ->where('id', $id);
+        })->first(['id']);
 
-            if (!$assignment) return $this->errorResponse(['assignment' => trans('apiResponse.assignmentNotFound')]);
-
+        if (!$assignment) return $this->errorResponse(['assignment' => trans('apiResponse.assignmentNotFound')]);
 
 
 
-            $base = AssignmentItem::where('assignment_id', $assignment->id)
-                ->where('user_id', Auth::id())
-                ->where('is_base', 1)
-                ->first(['id']);
-            if (!$base) return $this->errorResponse(['error' => trans('apiResponse.permissionDeny')]);
 
-            AssignmentItem::where('assignment_id', $assignment->id)
-                ->whereNotIn('user_id', $helper)
-                ->where('parent_id', $base->id)
-                ->delete();
+        $base = AssignmentItem::where('assignment_id', $assignment->id)
+            ->where('user_id', Auth::id())
+            ->where('is_base', 1)
+            ->first(['id']);
+        if (!$base) return $this->errorResponse(['error' => trans('apiResponse.permissionDeny')]);
 
-            $items = [];
+        AssignmentItem::where('assignment_id', $assignment->id)
+            ->whereNotIn('user_id', $helper)
+            ->where('parent_id', $base->id)
+            ->delete();
 
-            foreach ($helper as $user_id) {
-                $items[] = [
-                    'parent_id' => $base->id,
-                    'assignment_id' => $assignment->id,
-                    'user_id' => $user_id,
-                    'status' => AssignmentItem::NOT_SEEN
-                ];
-            }
+        $items = [];
 
-            AssignmentItem::insertOrIgnore($items);
-
-            return $this->successResponse('ok');
-
-        } catch (\Exception $exception) {
-            return $this->errorResponse(trans('apiResponse.tryLater'), Response::HTTP_INTERNAL_SERVER_ERROR);
+        foreach ($helper as $user_id) {
+            $items[] = [
+                'parent_id' => $base->id,
+                'assignment_id' => $assignment->id,
+                'user_id' => $user_id,
+                'status' => AssignmentItem::NOT_SEEN
+            ];
         }
+
+        AssignmentItem::insertOrIgnore($items);
+
+        return $this->successResponse('ok');
+
     }
 
     public function show(Request $request, $id)
@@ -299,7 +280,6 @@ class AssignmentController extends Controller
             'company_id' => 'required|integer',
         ]);
         $company_id = $request->company_id;
-        try {
             $document = Document::where("id", $id)
                 ->where("company_id", $company_id)
                 ->exists();
@@ -308,9 +288,7 @@ class AssignmentController extends Controller
             $assignment = Assignment::with(['items', 'items.notes','items.rejects', 'items.employee.user'])
                 ->where('document_id', $id)->first();
             return $this->successResponse($assignment);
-        } catch (\Exception $e) {
-            return $this->errorResponse(trans("apiResponse.tryLater"), Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
+
     }
 
     public function index(Request $request)
@@ -351,7 +329,6 @@ class AssignmentController extends Controller
             'company_id' => 'required|integer'
         ]);
         $company_id = $request->company_id;
-        try {
             $document = Document::where("id", $id)
                 ->where("company_id", $company_id)
                 ->where("status", Document::ACTIVE)
@@ -374,9 +351,7 @@ class AssignmentController extends Controller
             $notes = array_merge($request->get('notes')??[] , $request->notes??[]);
             Note::insert($this->saveNotes($assignmentItem, $notes, $request, $str = 'notes'));
             return $this->successResponse("OK");
-        } catch (\Exception $e) {
-            return $this->errorResponse(trans("apiResponse.tryLater"), Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
+
     }
 
     public function updateNote(Request $request, $id)
@@ -388,7 +363,6 @@ class AssignmentController extends Controller
         ]);
         $company_id = $request->company_id;
 
-        try {
             $document = Document::where("id", $id)
                 ->where("company_id", $company_id)
                 ->where("status", Document::ACTIVE)
@@ -431,11 +405,7 @@ class AssignmentController extends Controller
             $note->save();
 
             return $this->successResponse("OK");
-        } catch (\Exception $e) {
-            dd($e);
-            return $this->errorResponse(trans("apiResponse.tryLater"), Response::HTTP_INTERNAL_SERVER_ERROR);
 
-        }
     }
 
     public function deleteNote(Request $request, $id)
@@ -445,7 +415,6 @@ class AssignmentController extends Controller
 //            'user_id' => 'required|integer'
 
         ]);
-        try {
             $document = Document::where("id", $id)
                 ->where("company_id", $request->company_id)
                 ->where("status", Document::ACTIVE)
@@ -474,9 +443,7 @@ class AssignmentController extends Controller
                 return $this->errorResponse(trans("apiResponse.unProcess"));
 
             return $this->successResponse('OK');
-        } catch (\Exception $e) {
-            return $this->errorResponse(trans('apiResponse.tryLater'), Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
+
 
     }
 
@@ -487,7 +454,6 @@ class AssignmentController extends Controller
             'company_id' => 'required|integer'
         ]);
         $company_id = $request->company_id;
-        try {
             $assignment = Assignment::whereHas('document', function ($q) use ($id, $company_id) {
                 $q->where("id", $id)
                     ->where("company_id", $company_id)
@@ -508,10 +474,7 @@ class AssignmentController extends Controller
                 return $this->errorResponse(trans("apiResponse.unProcess"));
             return $this->successResponse("OK");
 
-        } catch (\Exception $e) {
-            return $this->errorResponse(trans("apiResponse.tryLater"), Response::HTTP_INTERNAL_SERVER_ERROR);
 
-        }
     }
 
     public function done(Request $request, $id)
@@ -522,8 +485,6 @@ class AssignmentController extends Controller
             'return' => 'sometimes|required|boolean'
         ]);
         $company_id = $request->company_id;
-        try {
-
             $assignment = Assignment::whereHas('document', function ($q) use ($id, $company_id) {
                 $q->where("id", $id)
                     ->where("company_id", $company_id)
@@ -559,9 +520,6 @@ class AssignmentController extends Controller
 
             return $this->successResponse("OK");
 
-        } catch (\Exception $e) {
-            $this->errorResponse(trans('apiResponse.tryLater'), Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
     }
 
     public function changeStatus(Request $request, $id)
@@ -572,8 +530,6 @@ class AssignmentController extends Controller
             'return' => 'sometimes|required|boolean',
             'status' => 'required|integer|in:1,2,3'
         ]);
-
-        try {
             DB::beginTransaction();
             $assignment = Assignment::whereHas('document', function ($q) use ($id, $request) {
                 $q->where("id", $id)
@@ -600,10 +556,7 @@ class AssignmentController extends Controller
                 ]);
             DB::commit();
             return $this->successResponse('OK');
-        } catch (\Exception $e) {
-            DB::rollBack();
-            $this->errorResponse(trans('apiResponse.tryLater'), Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
+
     }
 
     protected function LastMakeDone($assignmentId , $without = null){
