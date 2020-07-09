@@ -41,13 +41,18 @@ class CompanyOrderController extends Controller
     }
 
     public function index(Request $request){
+//        dd(trans('hr_orders.type.1.agreements'));
         $sql = "select type, count(type) as count, (case when confirmed_date is not null then 1 else 0 end) as is_confirmed from orders where company_id = ? group by type, is_confirmed";
         $orders = DB::select($sql, [$request->get('company_id')]);
         $response = [];
 
         foreach ($this->order->getTypeIds() as $id){
+//            dd($id);
             $response[$id] = [
                 'type' => $id,
+                'name' => trans('hr_orders.type.'.$id.'.name'),
+                'description' => trans('hr_orders.type.'.$id.'.description'),
+                'route' => trans('hr_orders.type.'.$id.'.route'),
                 'sum' => 0,
                 'sum_of_confirmed' => 0,
                 'sum_of_not_confirmed' => 0
@@ -145,7 +150,8 @@ class CompanyOrderController extends Controller
                 ],
                 [
                     'order_id' => $orderId,
-                    'details' => $this->trimOrderEmployeeDetailsJsonFromUnvalidatedFields($orderEmployee['details'], $orderType)
+                    'details' => $orderEmployee['details']
+//                    'details' => $this->trimOrderEmployeeDetailsJsonFromUnvalidatedFields($orderEmployee['details'], $orderType)
                 ]
             );
             $ids[] = $orderEmployee->getKey();
