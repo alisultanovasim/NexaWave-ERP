@@ -64,6 +64,11 @@ class CompanyStructureController extends Controller
         return  $this->successResponse($structure);
     }
 
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     * @throws ValidationException
+     */
     public function getEmployees(Request $request): JsonResponse {
         $this->validate($request, [
             'structure_id' => 'nullable|numeric',
@@ -97,6 +102,11 @@ class CompanyStructureController extends Controller
         return $this->successResponse($employees);
     }
 
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     * @throws ValidationException
+     */
     public function createCompanyStructure(Request $request): JsonResponse {
         $this->validate($request, [
             'structure' => 'required|array',
@@ -172,6 +182,10 @@ class CompanyStructureController extends Controller
         return $this->successResponse(trans('messages.saved'), 200);
     }
 
+    /**
+     * @param $structureType
+     * @param $linkStructureType
+     */
     private function ifStructureTriesLinkSmallerStructureThrowException($structureType, $linkStructureType){
         $throw = false;
         if ($structureType == 'department' and $linkStructureType != 'company')
@@ -183,7 +197,6 @@ class CompanyStructureController extends Controller
         if ($throw)
             throw new BadRequestHttpException(trans('messages.remove_sub_structures_before_update_parent_structure'));
     }
-
 
     /**
      * @param Request $request
@@ -228,6 +241,11 @@ class CompanyStructureController extends Controller
         return $this->successResponse(trans('messages.saved'), 200);
     }
 
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     * @throws ValidationException
+     */
     public function getStructurePositions(Request $request): JsonResponse {
         $this->validate($request, [
             'structure_id' => 'nullable|numeric',
@@ -312,6 +330,10 @@ class CompanyStructureController extends Controller
         });
     }
 
+    /**
+     * @param string $type
+     * @return Model
+     */
     private function getStructureModelByType(string $type): Model {
         $structure = null;
         if ($type == 'department')
