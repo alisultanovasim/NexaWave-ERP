@@ -10,6 +10,7 @@ use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
@@ -61,7 +62,55 @@ class CompanyStructureController extends Controller
             'id',
             'name'
         ]);
+        if ($request->get('with_nested_structure')){
+            //when update company structure unset company-structure-comapnyId-* cache keys
+            $cacheKey = 'company-structure-'. $request->get('company_id') . '-' . md5(serialize($structure));
+            if (Cache::has($cacheKey)){
+                $structure->children = Cache::get($cacheKey);
+            }
+            else {
+                $children = $this->getNestedStructure($structure);
+                Cache::put($cacheKey, $children, 24 * 60 * 60);
+                $structure->children = $children;
+            }
+            unset($structure->structuredDepartments);
+            unset($structure->structuredSections);
+            unset($structure->structuredSectors);
+        }
         return  $this->successResponse($structure);
+    }
+
+
+    private function getNestedStructure($structure = [], $children = []){
+        $formattedStructure = [];
+
+        foreach ($structure['structuredDepartments'] ?? [] as $department){
+            $formattedStructure[] = [
+                'id' => $department['id'],
+                'name' => $department['name'],
+                'type' => 'department',
+                'children' => $this->getNestedStructure($department)
+            ];
+        }
+
+        foreach ($structure['structuredSections'] ?? [] as $section){
+            $formattedStructure[] = [
+                'id' => $section['id'],
+                'name' => $section['name'],
+                'type' => 'section',
+                'children' => $this->getNestedStructure($section)
+            ];
+        }
+
+        foreach ($structure['structuredSectors'] ?? [] as $sector){
+            $formattedStructure[] = [
+                'id' => $sector['id'],
+                'name' => $sector['name'],
+                'type' => 'sector',
+                'children' => $this->getNestedStructure($sector)
+            ];
+        }
+        return $formattedStructure;
     }
 
     /**
@@ -326,6 +375,7 @@ class CompanyStructureController extends Controller
                 'structure_type' => $request->get('structure_type'),
             ])->delete();
             DB::table('structure_positions')->insert($positions);
+            Cache::forget('company-structure-'. $request->get('company_id') . '-' . '*');
            return $this->successResponse(trans('messages.saved'), 200);
         });
     }

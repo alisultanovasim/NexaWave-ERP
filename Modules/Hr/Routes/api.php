@@ -407,6 +407,7 @@ Route::group([
             Route::get("/{id}", 'ContractController@show');
             Route::post("/", 'ContractController@store');
             Route::post("/update/{id}", 'ContractController@update');
+            Route::post("/add/{id}", 'ContractController@add');
             Route::delete("/{id}", 'ContractController@delete');
         });
     });

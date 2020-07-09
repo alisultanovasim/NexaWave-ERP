@@ -28,8 +28,8 @@ class CreateOrdersTable extends Migration
 
             $table->foreign('company_id')->references('id')->on('companies');
             $table->foreign('labor_code_id')->references('id')->on('labor_codes');
-            $table->foreign('created_by')->references('id')->on('employees');
-            $table->foreign('confirmed_by')->references('id')->on('employees');
+            $table->foreign('created_by')->references('id')->on('users');
+            $table->foreign('confirmed_by')->references('id')->on('users');
         });
     }
 

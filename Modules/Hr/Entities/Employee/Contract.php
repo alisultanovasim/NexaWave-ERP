@@ -8,6 +8,31 @@ use Illuminate\Database\Eloquent\Model;
 class Contract extends Model
 {
 
+    protected $casts = [
+        'rest_days' => 'json',
+        'versions' => 'json',
+        'additions' => 'json',
+    ];
+    const ACTIVE = 1;
+    const DRAFT = 2;
+
+    // w - week
+    // m - month
+    // t - term
+    // y - year
+    const AWARD_PERIODS = [
+        'w' , 'm', 't' ,'y'
+    ];
+
+
+    const WORK_PLACE_TYPES = [
+        'main', 'extra'
+    ];
+
+    const WEEK_DAYS = [
+        'sun' , 'mon', 'tues' ,'wed', 'thus','fri','sat'
+    ];
+
     protected  $guarded = [];
 
     protected $table = 'employee_contracts';
@@ -40,13 +65,4 @@ class Contract extends Model
     public function scopeActive($q){
         return $q -> where('is_active' , true);
     }
-    public function acceptor(){
-        return $this->belongsTo('Modules\Hr\Entities\Employee\Employee');
-    }
-    public function getContractAttribute($value)
-    {
-        if ($value) return env('APP_URL' , "http://office-backend.vac.az")."/documents/".$value;
-        return $value;
-    }
-
 }
