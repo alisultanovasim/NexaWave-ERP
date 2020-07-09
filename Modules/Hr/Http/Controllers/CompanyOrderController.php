@@ -41,13 +41,18 @@ class CompanyOrderController extends Controller
     }
 
     public function index(Request $request){
+//        dd(trans('hr_orders.type.1.agreements'));
         $sql = "select type, count(type) as count, (case when confirmed_date is not null then 1 else 0 end) as is_confirmed from orders where company_id = ? group by type, is_confirmed";
         $orders = DB::select($sql, [$request->get('company_id')]);
         $response = [];
 
         foreach ($this->order->getTypeIds() as $id){
+//            dd($id);
             $response[$id] = [
                 'type' => $id,
+                'name' => trans('hr_orders.type.'.$id.'.name'),
+                'description' => trans('hr_orders.type.'.$id.'.description'),
+                'route' => trans('hr_orders.type.'.$id.'.route'),
                 'sum' => 0,
                 'sum_of_confirmed' => 0,
                 'sum_of_not_confirmed' => 0
@@ -131,18 +136,11 @@ class CompanyOrderController extends Controller
                 'created_by' => ($this->getEmployeeByUserId(Auth::id(), $request->get('company_id')))->getKey()
             ]);
             $order->save();
-            $this->saveOrderEmployees($order->getKey(), $request->get('employees'));
+            $this->saveOrderEmployees($order->getKey(), $request->get('employees'), $this->getOrderModelByType($request->get('type')));
         });
     }
 
-    private function getEmployeeByUserId(int $userId, int $companyId): Employee {
-        return Employee::where([
-            'user_id' => $userId,
-            'company_id' => $companyId
-        ])->first();
-    }
-
-    private function saveOrderEmployees(int $orderId, array $orderEmployees): void {
+    private function saveOrderEmployees(int $orderId, array $orderEmployees, OrderType $orderType): void {
         $ids = [];
         foreach ($orderEmployees as $orderEmployee){
             $orderEmployee = $this->orderEmployee->updateOrCreate(
@@ -153,6 +151,7 @@ class CompanyOrderController extends Controller
                 [
                     'order_id' => $orderId,
                     'details' => $orderEmployee['details']
+//                    'details' => $this->trimOrderEmployeeDetailsJsonFromUnvalidatedFields($orderEmployee['details'], $orderType)
                 ]
             );
             $ids[] = $orderEmployee->getKey();
@@ -160,6 +159,15 @@ class CompanyOrderController extends Controller
         if (count($ids)){
             $this->deleteOrderEmployeesWhichIsNotInArray($orderId, $ids);
         }
+    }
+
+    private function trimOrderEmployeeDetailsJsonFromUnvalidatedFields($details, OrderType $orderType){
+        $rules = $orderType->getEmployeeValidateRules();
+        $newRules = [];
+        foreach ($rules as $ruleName => $rule){
+            $newRules[] = explode('employees.*.details', $ruleName);
+        }
+//        dd($rules);
     }
 
     private function deleteOrderEmployeesWhichIsNotInArray(int $orderId, array $ids): void {
@@ -175,6 +183,13 @@ class CompanyOrderController extends Controller
         return $order->delete()
             ? $this->successResponse(trans('messages.saved'))
             : $this->errorMessage(trans('messages.not_saved'), 400);
+    }
+
+    private function getEmployeeByUserId(int $userId, int $companyId): Employee {
+        return Employee::where([
+            'user_id' => $userId,
+            'company_id' => $companyId
+        ])->first();
     }
 
     private function getRules(): array {

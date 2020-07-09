@@ -80,6 +80,7 @@ class CompanyStructureController extends Controller
         return  $this->successResponse($structure);
     }
 
+
     private function getNestedStructure($structure = [], $children = []){
         $formattedStructure = [];
 
@@ -245,7 +246,6 @@ class CompanyStructureController extends Controller
         if ($throw)
             throw new BadRequestHttpException(trans('messages.remove_sub_structures_before_update_parent_structure'));
     }
-
 
     /**
      * @param Request $request
