@@ -101,7 +101,7 @@ class ContractController extends Controller
     public static function getValidateRules()
     {
         return [
-            'draft'=>['sometimes' , 'boolean'],
+            'draft' => ['sometimes', 'boolean'],
             'department_id' => ['sometimes', 'required', 'integer'], //exists m
             'section_id' => ['sometimes', 'required', 'integer'], //exists m
             'sector_id' => ['sometimes', 'required', 'integer'],//exists m
@@ -163,7 +163,7 @@ class ContractController extends Controller
             'user_personal_property' => ['nullable', 'string', 'max:255'],
             'provided_transport' => ['nullable', 'string', 'max:255'],
             'res_days' => ['nullable', Rule::in(Contract::WEEK_DAYS)],
-            'work_place_type' => ['nullable' , Rule::in(Contract::WORK_PLACE_TYPES)]
+            'work_place_type' => ['nullable', Rule::in(Contract::WORK_PLACE_TYPES)]
         ];
     }
 
@@ -209,7 +209,7 @@ class ContractController extends Controller
             $contract->where('employee_id', $request->get('employee_id'));
 
 
-        $contract = $contract->orderBy('id','desc')->paginate();
+        $contract = $contract->orderBy('id', 'desc')->paginate();
 
         return $this->successResponse($contract);
 
@@ -218,48 +218,42 @@ class ContractController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, self::getValidateRules());
-        try {
 
-            DB::beginTransaction();
+        DB::beginTransaction();
 
-            if ($notExists = $this->companyInfo($request->get('company_id'), $request->only(
-                ['department_id', 'section_id', 'position_id', 'sector_id', 'contract_id']
-            ))) return $notExists;
+        if ($notExists = $this->companyInfo($request->get('company_id'), $request->only(
+            ['department_id', 'section_id', 'position_id', 'sector_id', 'contract_id']
+        ))) return $notExists;
 
-            $employee = Employee::where('id', $request->get('employee_id'))
-                ->where('company_id', $request->get('company_id'))
-                ->first(['id', 'is_active']);
+        $employee = Employee::where('id', $request->get('employee_id'))
+            ->where('company_id', $request->get('company_id'))
+            ->first(['id', 'is_active']);
 
-            if (!$employee) return $this->errorResponse(trans('response.employeeNotFound'), 404);
+        if (!$employee) return $this->errorResponse(trans('response.employeeNotFound'), 404);
 
-            if (!$employee->is_active) return $this->errorResponse(trans('response.employeeIsOut'), 404);
+        if (!$employee->is_active) return $this->errorResponse(trans('response.employeeIsOut'), 404);
 
-            if ($request->has('company_authorized_employee_id')) {
-                $check = CompanyAuthorizedEmployee::wherehHas('employee', function ($q) {
-                    $q->active()->company();
-                })->where('id', $request->get('company_authorized_employee_id'))
-                    ->exists();
-                if (!$check) return $this->errorResponse(trans('response.company_authorized_employee_not_found'), 404);
-            }
-
-            self::storeContract($request);
-
-            DB::commit();
-
-            return $this->successResponse('ok');
-
-        } catch (QueryException $exception) {
-            if ($exception->errorInfo[1] == 1452)
-                return $this->errorResponse([trans('response.SomeFiledIsNotFoundInDatabase')], 422);
-            return $this->errorResponse(trans('response.tryLater'), 500);
+        if ($request->has('company_authorized_employee_id')) {
+            $check = CompanyAuthorizedEmployee::wherehHas('employee', function ($q) {
+                $q->active()->company();
+            })->where('id', $request->get('company_authorized_employee_id'))
+                ->exists();
+            if (!$check) return $this->errorResponse(trans('response.company_authorized_employee_not_found'), 404);
         }
+
+        self::storeContract($request);
+
+        DB::commit();
+
+        return $this->successResponse('ok');
+
     }
 
     public function update(Request $request, $id)
     {
 
         $rules = [
-            'draft' => ['nullable' , 'boolean'],
+            'draft' => ['nullable', 'boolean'],
             'department_id' => ['sometimes', 'required', 'integer'],
             'section_id' => ['sometimes', 'required', 'integer'],
             'sector_id' => ['sometimes', 'required', 'integer'],
@@ -307,11 +301,11 @@ class ContractController extends Controller
             'vacation_social_benefits' => ['nullable', 'numeric'],
             'vacation_start_date' => ['nullable', 'date_format:Y-m-d'],
             'vacation_end_date' => ['nullable', 'date_format:Y-m-d'],
-            'work_place_type' => ['nullable' , Rule::in(Contract::WORK_PLACE_TYPES)]
+            'work_place_type' => ['nullable', Rule::in(Contract::WORK_PLACE_TYPES)]
         ];
         $this->validate($request, $rules);
 
-        if (!$request->only(array_keys($rules))) return $this->successResponse(trans('response.nothingToUpdate'),400);
+        if (!$request->only(array_keys($rules))) return $this->successResponse(trans('response.nothingToUpdate'), 400);
         DB::beginTransaction();
 
         if ($notExists = $this->companyInfo($request->get('company_id'), $request->only([
@@ -330,7 +324,7 @@ class ContractController extends Controller
 
         if (!$contract->versions) $contract->versions = [];
 
-        $originalProgram  = $contract->versions;
+        $originalProgram = $contract->versions;
 
         $originalProgram[] = [
             'user' => Auth::user(),
