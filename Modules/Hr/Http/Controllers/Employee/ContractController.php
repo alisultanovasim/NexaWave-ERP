@@ -218,7 +218,6 @@ class ContractController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, self::getValidateRules());
-
         try {
 
             DB::beginTransaction();

@@ -522,11 +522,11 @@ Route::group([
     Route::group(['prefix' => 'time/tracking'], function (){
 
         Route::group(['prefix' => 'work/events'], function ($router) {
-            Route::get('/', 'WokEventController@index');
-            Route::get('/{id}', 'WokEventController@show');
-            Route::post('/', 'WokEventController@create');
-            Route::put('/{id}', 'WokEventController@update');
-            Route::delete('/{id}', 'WokEventController@destroy');
+            Route::get('/', 'WorkEventController@index');
+            Route::get('/{id}', 'WorkEventController@show');
+            Route::post('/', 'WorkEventController@create');
+            Route::put('/{id}', 'WorkEventController@update');
+            Route::delete('/{id}', 'Work        EventController@destroy');
         });
 
         Route::group(['prefix' => 'vacation/planning'], function (){

@@ -322,7 +322,6 @@ class DocumentController extends Controller
 
         $company_id = $request->company_id;
 
-        try {
             $document = Document::where("id", $id)
                 ->where("company_id", $company_id)
                 ->whereIn("status", [Document::WAIT, Document::ACTIVE])
@@ -337,10 +336,6 @@ class DocumentController extends Controller
 
             return $this->successResponse("OK");
 
-        } catch (\Exception $e) {
-            return $this->errorResponse(trans('response.tryLater'), Response::HTTP_INTERNAL_SERVER_ERROR);
-
-        }
     }
 
     public function updateDocument(Request $request, $id)
@@ -351,7 +346,6 @@ class DocumentController extends Controller
             "doc_id" => "required|integer",
         ]);
         $company_id = $request->company_id;
-        try {
             $document = Document::where("id", $id)
                 ->where("company_id", $company_id)
                 ->whereIn("status", [Document::WAIT, Document::ACTIVE])
@@ -383,10 +377,7 @@ class DocumentController extends Controller
             $doc->save();
 
             return $this->successResponse("OK");
-        } catch (\Exception $e) {
 
-            return $this->successResponse(trans("apiResponse.tryLater"), Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
 
     }
 
@@ -395,7 +386,6 @@ class DocumentController extends Controller
         $this->validate($request, [
             'company_id' => 'required|integer'
         ]);
-        try {
             $document = Document::where([
                 "id" => $id,
                 "company_id" => $request->company_id
@@ -426,9 +416,7 @@ class DocumentController extends Controller
 
             $document = $document->first($data);
             return $this->successResponse($document);
-        } catch (\Exception $e) {
-            return $this->errorResponse(trans('response.tryLater'), Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
+
     }
 
     public function update(Request $request, $id)
@@ -522,11 +510,6 @@ class DocumentController extends Controller
             }
 
             return $this->errorResponse(trans('apiResponse.tryLater'), Response::HTTP_INTERNAL_SERVER_ERROR);
-        } catch (ValidationException $exception) {
-            return $this->errorResponse($exception->errors());
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return $this->errorResponse(trans("apiResponse.tryLater"), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -535,7 +518,6 @@ class DocumentController extends Controller
         $this->validate($request, [
             'company_id' => 'required|integer'
         ]);
-        try {
             $check = Document::where("id", $id)
                 ->where("company_id", $request->company_id)
                 ->where("status", "=", Document::WAIT)
@@ -543,9 +525,6 @@ class DocumentController extends Controller
             if ($check)
                 return $this->errorResponse(trans("apiResponse.unProcess"));
             return $this->successResponse("OK");
-        } catch (\Exception $e) {
-            return $this->errorResponse(trans("apiResponse.tryLater"), Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
     }
 
     public function makeActive(Request $request, $id)
@@ -553,7 +532,6 @@ class DocumentController extends Controller
         $this->validate($request, [
             'company_id' => 'required|integer'
         ]);
-        try {
             $check = Document::where("id", $id)
                 ->where("status", Document::WAIT)
                 ->where("company_id", $request->company_id)
@@ -563,9 +541,6 @@ class DocumentController extends Controller
                 return $this->errorResponse(trans("apiResponse.unProcess"));
             return $this->successResponse("OK");
 
-        } catch (\Exception $e) {
-            return $this->errorResponse(trans("apiResponse.tryLater"), Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
     }
 
     public function getDocumentsNo(Request $request)
@@ -622,7 +597,6 @@ class DocumentController extends Controller
 
             'has_permission' => 'sometimes|required|in:0,1'
         ]);
-        try {
             $document = Document::where('id', $id)
                 ->where('company_id', $request->company_id)->first(['status']);
 
@@ -643,9 +617,7 @@ class DocumentController extends Controller
                 ->update($update);
 
             return $this->successResponse('OK');
-        } catch (\Exception $e) {
-            return $this->errorResponse(trans('apiResponse.tryLater'), Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
+
     }
 }
 

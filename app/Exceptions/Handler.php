@@ -104,7 +104,7 @@ class Handler extends ExceptionHandler
             }
         }
         else {
-            if (env('APP_DEBUG'))
+            if (config('app.debug'))
                 return parent::render($request, $exception);
             else
                 return $this->errorResponse('Try later', Response::HTTP_INTERNAL_SERVER_ERROR);
