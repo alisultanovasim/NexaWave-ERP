@@ -64,16 +64,18 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Throwable $exception)
     {
+        //todo optimize Exception Handler
         if ($exception instanceof HttpException) {
             $code = $exception->getStatusCode();
             $message = \Symfony\Component\HttpFoundation\Response::$statusTexts[$code];
             return $this->errorResponse($message, $code);
         }
-        else if ($exception instanceof QueryException) {
-            if ($exception->errorInfo[1] == 1452)
+        else if (($exception instanceof QueryException) and $exception->errorInfo[1] == 1452) {
                 return $this->errorResponse([trans('response.SomeFiledIsNotFoundInDatabase')], 422);
-            return $this->errorResponse(trans('response.serverError. code : 222'), 422);
         }
+//        else if ($exception instanceof QueryException) { //if want to handle queryException
+//            return $this->errorResponse([trans('response.SomeFiledIsNotFoundInDatabase')], 422);
+//        }
         else if ($exception instanceof ModelNotFoundException) {
             $model = strtolower(class_basename($exception->getModel()));
             return $this->errorResponse("Does not exist any instance of {$model} with the given id", Response::HTTP_NOT_FOUND);
@@ -93,7 +95,7 @@ class Handler extends ExceptionHandler
             return $this->errorResponse($errors, Response::HTTP_BAD_REQUEST);
         }
         else if ($exception instanceof ClientException){
-            if (env('APP_DEBUG')){
+            if (config('app.debug')){
                 $response = $exception->getResponse();
                 $errors = json_decode($response->getBody()->getContents());
                 $code = $response->getStatusCode();
@@ -109,5 +111,6 @@ class Handler extends ExceptionHandler
             else
                 return $this->errorResponse('Try later', Response::HTTP_INTERNAL_SERVER_ERROR);
         }
+
     }
 }
