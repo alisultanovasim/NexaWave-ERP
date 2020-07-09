@@ -334,7 +334,7 @@ class ProductController extends Controller
             'inv_no' => ['nullable', 'string', 'max:255'],
             'exploitation_date' => ['nullable', 'date', 'date_format:Y-m-d'],
             'size' => ['nullable', 'numeric'],
-            'made_in_country ' => ['nullable', 'regex:[0-9]+', 'min:1'],//
+            'made_in_country ' => ['nullable', 'integer', 'min:1'],//
             'buy_from_country ' => ['nullable', 'integer', 'min:1'],//
             'make_date' => ['nullable', 'date', 'date_format:Y-m-d'],
             'income_description' => ['nullable', 'string'],
