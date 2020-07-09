@@ -111,6 +111,5 @@ class Handler extends ExceptionHandler
             else
                 return $this->errorResponse('Try later', Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-
     }
 }
