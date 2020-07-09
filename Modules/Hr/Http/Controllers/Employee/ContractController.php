@@ -25,6 +25,7 @@ class ContractController extends Controller
     public static function storeContract(Request $request)
     {
         $data = $request->only([
+            'work_place_type',
             'draft',
             'department_id',
             'section_id',
@@ -162,6 +163,7 @@ class ContractController extends Controller
             'user_personal_property' => ['nullable', 'string', 'max:255'],
             'provided_transport' => ['nullable', 'string', 'max:255'],
             'res_days' => ['nullable', Rule::in(Contract::WEEK_DAYS)],
+            'work_place_type' => ['nullable' , Rule::in(Contract::WORK_PLACE_TYPES)]
         ];
     }
 
@@ -306,6 +308,7 @@ class ContractController extends Controller
             'vacation_social_benefits' => ['nullable', 'numeric'],
             'vacation_start_date' => ['nullable', 'date_format:Y-m-d'],
             'vacation_end_date' => ['nullable', 'date_format:Y-m-d'],
+            'work_place_type' => ['nullable' , Rule::in(Contract::WORK_PLACE_TYPES)]
         ];
         $this->validate($request, $rules);
 

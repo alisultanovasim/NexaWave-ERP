@@ -6,5 +6,5 @@ namespace Modules\Hr\Entities\EmployeeOrders\Contracts;
 
 interface OrderType
 {
-    public function getRules(): array;
+    public function getEmployeeValidateRules(): array;
 }
