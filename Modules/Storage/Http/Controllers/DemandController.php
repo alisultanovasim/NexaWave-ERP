@@ -84,6 +84,7 @@ class DemandController extends Controller
             ['user_id' , Auth::id()],
             ['company_id' , $request->get('company_id')]
         ])->first(['id']);
+
         Demand::create([
             'description' => $request->get('demand_description'),
             'want_till' => $request->get('want_till'),
