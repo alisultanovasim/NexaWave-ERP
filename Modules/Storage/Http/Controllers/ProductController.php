@@ -243,7 +243,7 @@ class ProductController extends Controller
     {
         $this->validate($request, array_merge(self::getUpdateRules(), [
             'reasons' => ['required', 'array','min:1'],
-            'reasons.*' => ['required' , 'string' ]
+            'reasons.*.reason' => ['required_with:reasons', 'string'],
         ]));
 
         DB::beginTransaction();
