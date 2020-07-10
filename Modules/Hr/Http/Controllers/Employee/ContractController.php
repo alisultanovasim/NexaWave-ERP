@@ -235,8 +235,9 @@ class ContractController extends Controller
 
         if ($request->has('company_authorized_employee_id')) {
             $check = CompanyAuthorizedEmployee::whereHas('employee', function ($q) {
-                $q->active()->company();
-            })->where('id', $request->get('company_authorized_employee_id'))
+                $q->active()->where('company_id' , request('company_id'));
+            })
+                ->where('id', $request->get('company_authorized_employee_id'))
                 ->exists();
             if (!$check) return $this->errorResponse(trans('response.company_authorized_employee_not_found'), 404);
         }
