@@ -55,6 +55,15 @@ class ProductController extends Controller
         if ($request->has('act_id'))
             $products->where('act_id' , $request->get('act_id'));
 
+    
+            if ($request->get('show_updates_logs')){
+                $products->with([
+                    'updates_logs',
+                    'updates_logs.employee',
+                    'updates_logs.employee.user:id,name,surname'
+                ]);
+            }
+
         $products = $products
             ->orderBy('id' , 'desc')
             ->where('kind_id', $request->get('kind_id'))
@@ -64,6 +73,8 @@ class ProductController extends Controller
 //            'title' => $title   ,
 //            'products' => $products
 //        ]
+
+
             return $this->dataResponse($products);
     }
 
