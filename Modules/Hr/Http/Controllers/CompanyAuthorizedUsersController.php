@@ -26,7 +26,7 @@ class CompanyAuthorizedUsersController extends Controller
         ->isAuthorizedCompanyEmployee()
         ->with([
             'user:id,name',
-            'authorizedDetails:employee_id,position'
+            'authorizedDetails:id,employee_id,position'
         ])
         ->get([
             'id',
