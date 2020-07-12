@@ -156,7 +156,74 @@ class CompanyStructureController extends Controller
      * @return JsonResponse
      * @throws ValidationException
      */
-    public function createCompanyStructure(Request $request): JsonResponse {
+    public function companyCreateStructure(Request $request): JsonResponse {
+        $structureModel = $this->getStructureModelByType($request->get('structure_type'));
+        $this->validate($request, [
+            'structure_type' => [
+                'required',
+                Rule::in(['department', 'section', 'sector'])
+            ],
+            'structures' => 'required|array',
+            'structures.*.name' => 'required|min:2|max:255',
+            'structures.*.code' => [
+                'required',
+                'min:3',
+                'max:3',
+                Rule::unique($structureModel->getTable(), 'code')->where('company_id', $request->get('company_id'))
+            ]
+        ]);
+        $insertData = [];
+        foreach ($request->get('structures') as $structure){
+            $insertData[] = [
+                'name' => $structure['name'],
+                'code' => $structure['code'],
+                'company_id' => $request->get('company_id'),
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now()
+            ];
+        }
+        $structureModel->insert($insertData);
+        return $this->successResponse(trans('messages.saved'), 200);
+    }
+
+    /**
+     * @param Request $request
+     * @param $id
+     * @return JsonResponse
+     * @throws ValidationException
+     */
+    public function companyUpdateStructure(Request $request, $id): JsonResponse {
+        $structureModel = $this->getStructureModelByType($request->get('structure_type'));
+        $this->validate($request, [
+            'structure_type' => [
+                'required',
+                Rule::in(['department', 'section', 'sector'])
+            ],
+            'name' => 'required|min:2|max:255',
+            'code' => [
+                'required',
+                'min:3',
+                'max:3',
+                Rule::unique($structureModel->getTable(), 'code')->where(function ($query) use ($request, $id){
+                    $query->where('company_id', $request->get('company_id'));
+                    $query->where('id', '!=', $id);
+                })
+            ]
+        ]);
+        $structureModel = $structureModel->where([
+            'id' => $id,
+            'company_id' => $request->get('company_id')
+        ])->firstOrFail(['id']);
+        $structureModel->update($request->only(['name', 'code', 'is_closed', 'closed_date']));
+        return $this->successResponse(trans('messages.saved'), 200);
+    }
+
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     * @throws ValidationException
+     */
+    public function setCompanyStructure(Request $request): JsonResponse {
         $this->validate($request, [
             'structure' => 'required|array',
             'structure.*.structure_id' => 'required|numeric',
