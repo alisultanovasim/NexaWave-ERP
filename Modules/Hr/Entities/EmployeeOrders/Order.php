@@ -5,6 +5,7 @@ namespace Modules\Hr\Entities\EmployeeOrders;
 use App\Traits\Filterable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Modules\Hr\Entities\Employee\Employee;
 
 class Order extends Model
 {
@@ -35,6 +36,10 @@ class Order extends Model
 
     public function employees(){
         return $this->hasMany(OrderEmployee::class);
+    }
+
+    public function confirmedPerson(){
+        return $this->belongsTo(Employee::class, 'confirmed_by', 'id');
     }
 
     /**

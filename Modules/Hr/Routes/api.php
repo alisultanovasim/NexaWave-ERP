@@ -552,6 +552,7 @@ Route::group([
         });
 
         Route::group(['prefix' => 'work/skips'], function (){
+            Route::get('/main', 'WorkSkipsController@getMainWorkSkips');
             Route::get('/', 'WorkSkipsController@index');
             Route::get('/{id}', 'WorkSkipsController@show');
             Route::post('/', 'WorkSkipsController@create');
