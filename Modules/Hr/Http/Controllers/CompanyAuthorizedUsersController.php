@@ -25,8 +25,10 @@ class CompanyAuthorizedUsersController extends Controller
         $employees = Employee::where('company_id', $request->get('company_id'))
         ->isAuthorizedCompanyEmployee()
         ->with([
-            'user:id,name',
-            'authorizedDetails:id,employee_id,position'
+            'user:id,name,surname',
+            'authorizedDetails:id,employee_id,position',
+            'contracts:id,employee_id,position_id',
+            'contracts.position:id,name'
         ])
         ->get([
             'id',

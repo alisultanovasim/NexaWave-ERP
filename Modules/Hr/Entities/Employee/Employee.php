@@ -48,8 +48,6 @@ class Employee extends Model
     }
 
 
-
-
     public function scopeIsAuthorizedCompanyEmployee($query){
         return $query->whereHas('authorizedDetails');
     }
