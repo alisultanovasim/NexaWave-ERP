@@ -34,5 +34,12 @@ class Positions extends Model
         return $this->hasMany(PositionModulePermission::class , 'position_id');
     }
 
+    public function structures(){
+        return $this->hasMany(StructurePosition::class, 'position_id', 'id');
+    }
+
+    public function scopeExistsInStructure($query){
+        return $query->whereHas('structures');
+    }
 
 }
