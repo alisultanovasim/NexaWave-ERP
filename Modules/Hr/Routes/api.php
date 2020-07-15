@@ -30,7 +30,10 @@ Route::group([
         Route::put('/{id}', 'OrganizationController@update');
         Route::delete('/{id}', 'OrganizationController@destroy');
     });
-
+    Route::group(['prefix' => "paragraphs"], function ($router) {
+        Route::get('/', 'ParagraphContoller@index');
+        Route::get('/{id}', 'ParagraphContoller@store');
+    });
 
 
     Route::group(['prefix' => "countries"], function ($router) {

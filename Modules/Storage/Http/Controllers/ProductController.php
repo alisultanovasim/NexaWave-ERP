@@ -55,8 +55,8 @@ class ProductController extends Controller
         if ($request->has('act_id'))
             $products->where('act_id' , $request->get('act_id'));
 
-    
-            if ($request->get('show_updates_logs')){
+
+        if ($request->get('show_updates_logs')){
                 $products->with([
                     'updates_logs',
                     'updates_logs.employee',
@@ -68,12 +68,6 @@ class ProductController extends Controller
             ->orderBy('id' , 'desc')
             ->where('kind_id', $request->get('kind_id'))
             ->paginate($request->get('per_page'));
-
-//        [
-//            'title' => $title   ,
-//            'products' => $products
-//        ]
-
 
             return $this->dataResponse($products);
     }
@@ -380,5 +374,40 @@ class ProductController extends Controller
             'make_date' => ['nullable', 'date', 'date_format:Y-m-d'],
             'income_description' => ['nullable', 'string'],
         ];
+    }
+
+    public function getDeletes(Request $request){
+        $this->validate($request , [
+            'product_id' => ['nullable' , 'integer'],
+            'employee_id' => ['nullable' , 'integer'],
+            'from' => ['nullable' , 'date_format:Y-m-d'],
+            'per_page' => ['nullable' , 'integer'],
+            'to' => ['nullable' , 'date_format:Y-m-d'],
+        ]);
+
+        $deletes = ProductDelete::with([
+            'employee',
+            'employee.user',
+            'product',
+        ])->whereHas('product' , function ($q){
+            $q->company();
+        });
+
+        if ($request->get('product_id'))
+            $deletes->where('product_id' , $request->get('product_id'));
+
+        if ($request->get('employee_id'))
+            $deletes->where('employee_id' , $request->get('employee_id'));
+
+        if ($request->get('from'))
+            $deletes->where('created_at' , '>=' , $request->get('from'));
+
+        if ($request->get('to'))
+            $deletes->where('created_at' , '<=' , $request->get('to'));
+
+        $deletes = $deletes->paginate($request->get('per_page'));
+
+
+        return $this->successResponse($deletes);
     }
 }

@@ -15,11 +15,11 @@ use App\Traits\ApiResponse;
 use App\Traits\Query;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Modules\Hr\Entities\Paragraph;
 use Modules\Hr\Traits\DocumentUploader;
 
 class ContractController extends Controller
 {
-
     use ApiResponse, Query, DocumentUploader, ValidatesRequests;
 
     public static function storeContract(Request $request)
@@ -253,6 +253,10 @@ class ContractController extends Controller
     public function update(Request $request, $id)
     {
 
+        $this->validate($request , [
+            'paragraph_id' => ['required' , 'boolean']
+        ]);
+
         $rules = [
             'draft' => ['nullable' , 'boolean'],
             'department_id' => ['sometimes', 'required', 'integer'],
@@ -304,6 +308,9 @@ class ContractController extends Controller
             'vacation_end_date' => ['nullable', 'date_format:Y-m-d'],
             'work_place_type' => ['nullable' , Rule::in(Contract::WORK_PLACE_TYPES)]
         ];
+
+        $paragraph = Paragraph::with('fields')->findOrFail($id);
+
         $this->validate($request, $rules);
 
         if (!$request->only(array_keys($rules))) return $this->successResponse(trans('response.nothingToUpdate'),400);
@@ -400,6 +407,4 @@ class ContractController extends Controller
             })->where('id', $id)->first();
         return $this->successResponse($contract);
     }
-
-
 }
