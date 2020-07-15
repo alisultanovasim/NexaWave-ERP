@@ -286,7 +286,7 @@ class ProductController extends Controller
     {
         $this->validate($request , [
             'amount' => ['required' , 'numeric'],
-            'act' => ['required' , 'mimes:png,jpg,pdf,doc,docx,xls,xlsx'],
+            'act' => ['nullable' , 'mimes:png,jpg,pdf,doc,docx,xls,xlsx'],
         ]);
         $product = Product::where([
             ['id', '=', $id],
@@ -406,7 +406,6 @@ class ProductController extends Controller
             $deletes->where('created_at' , '<=' , $request->get('to'));
 
         $deletes = $deletes->paginate($request->get('per_page'));
-
 
         return $this->successResponse($deletes);
     }

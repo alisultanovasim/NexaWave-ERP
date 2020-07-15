@@ -252,10 +252,9 @@ class ContractController extends Controller
 
     public function update(Request $request, $id)
     {
-
-        $this->validate($request , [
-            'paragraph_id' => ['required' , 'boolean']
-        ]);
+//        $this->validate($request , [
+//            'paragraph_id' => ['required' , 'boolean']
+//        ]);
 
         $rules = [
             'draft' => ['nullable' , 'boolean'],
@@ -309,11 +308,13 @@ class ContractController extends Controller
             'work_place_type' => ['nullable' , Rule::in(Contract::WORK_PLACE_TYPES)]
         ];
 
-        $paragraph = Paragraph::with('fields')->findOrFail($id);
-
+//        $paragraph = Paragraph::with('fields')->findOrFail($id);
+//
         $this->validate($request, $rules);
 
-        if (!$request->only(array_keys($rules))) return $this->successResponse(trans('response.nothingToUpdate'),400);
+
+        $data=  $request->only(array_keys($rules));
+        if (!$data) return $this->successResponse(trans('response.nothingToUpdate'),400);
         DB::beginTransaction();
 
         if ($notExists = $this->companyInfo($request->get('company_id'), $request->only([
@@ -326,7 +327,7 @@ class ContractController extends Controller
             'section:id,name',
             'sector:id,name',
             'department:id,name',
-        ])->where('id', $id)->first(['id', 'versions'] + array_keys($rules));
+        ])->where('id', $id)->first(['id', 'versions'] + $data);
 
         if (!$contract) return $this->errorResponse(trans('response.contractNotFound'), 404);
 
@@ -342,7 +343,7 @@ class ContractController extends Controller
 
         $contract->versions = $originalProgram;
 
-        $contract->fill($request->only(array_keys($rules)));
+        $contract->fill($request->only($data));
 
         $contract->save();
 
