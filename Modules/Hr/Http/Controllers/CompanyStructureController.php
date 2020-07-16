@@ -16,6 +16,7 @@ use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Modules\Hr\Entities\Department;
 use Modules\Hr\Entities\Employee\Employee;
+use Modules\Hr\Entities\Positions;
 use Modules\Hr\Entities\Section;
 use Modules\Hr\Entities\Sector;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -38,7 +39,7 @@ class CompanyStructureController extends Controller
      * @param Sector $sector
      */
     public function __construct(
-        Request $request, Company $company, Department $department,
+        Company $company, Department $department,
         Section $section, Sector $sector
     ){
         $this->company = $company;
@@ -54,9 +55,9 @@ class CompanyStructureController extends Controller
     public function index(Request $request): JsonResponse {
         $structure = $this->company->where('id', $request->get('company_id'))
         ->with([
-            'structuredDepartments:id,name,structable_id,structable_type',
-            'structuredSections:id,name,structable_id,structable_type',
-            'structuredSectors:id,name,structable_id,structable_type',
+            'structuredDepartments:id,name,is_closed,structable_id,structable_type',
+            'structuredSections:id,name,is_closed,structable_id,structable_type',
+            'structuredSectors:id,name,is_closed,structable_id,structable_type',
         ])
         ->first([
             'id',
@@ -81,13 +82,14 @@ class CompanyStructureController extends Controller
     }
 
 
-    private function getNestedStructure($structure = [], $children = []){
+    private function getNestedStructure($structure = []){
         $formattedStructure = [];
 
         foreach ($structure['structuredDepartments'] ?? [] as $department){
             $formattedStructure[] = [
                 'id' => $department['id'],
                 'name' => $department['name'],
+                'is_closed' => $department['is_closed'],
                 'type' => 'department',
                 'children' => $this->getNestedStructure($department)
             ];
@@ -97,6 +99,7 @@ class CompanyStructureController extends Controller
             $formattedStructure[] = [
                 'id' => $section['id'],
                 'name' => $section['name'],
+                'is_closed' => $section['is_closed'],
                 'type' => 'section',
                 'children' => $this->getNestedStructure($section)
             ];
@@ -106,6 +109,7 @@ class CompanyStructureController extends Controller
             $formattedStructure[] = [
                 'id' => $sector['id'],
                 'name' => $sector['name'],
+                'is_closed' => $sector['is_closed'],
                 'type' => 'sector',
                 'children' => $this->getNestedStructure($sector)
             ];
@@ -366,9 +370,13 @@ class CompanyStructureController extends Controller
         $this->validate($request, [
             'structure_id' => 'nullable|numeric',
             'structure_type' => [
+                'nullable',
                 Rule::in(['company', 'department', 'section', 'sector'])
             ],
         ]);
+        if (!$request->get('structure_id') and !$request->get('structure_type')){
+            return $this->getPositionsWhichExistsInAnyStructure($request, $request->get('company_id'));
+        }
         if ($request->get('structure_type')){
             $structure = $this->getStructureModelByType($request->get('structure_type'));
             $structure = $structure->where('id', $request->get('structure_id'));
@@ -390,6 +398,13 @@ class CompanyStructureController extends Controller
             ];
         }
         return $this->successResponse($response);
+    }
+
+    private function getPositionsWhichExistsInAnyStructure(Request $request, $companyId){
+        $positions = Positions::where('company_id', $companyId)
+            ->existsInStructure()
+        ->get(['id', 'name']);
+        return $this->successResponse($positions);
     }
 
     /**

@@ -11,5 +11,14 @@ class ProductDelete extends Model
     public function employee(){
         return $this->belongsTo(Employee::class , 'employee_id' , 'id');
     }
+
+    public function product(){
+        return $this->belongsTo(Product::class);
+    }
+
+    public function getActAttribute($value){
+        if (!$value) return null;
+        return config('app.url') . "/documents/" . $value ;
+    }
 }
 

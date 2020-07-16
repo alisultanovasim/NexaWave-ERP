@@ -22,6 +22,7 @@ Route::group([
         'prefix' => 'products'
     ], function ($q) {
         Route::get('/all', 'ProductController@index');
+        Route::get('/deleted', 'ProductController@getDeletes');
         Route::get('/', 'ProductController@firstPage');
         Route::get('/history/{id}', 'ProductController@showHistory');
         Route::get('/{id}', 'ProductController@show');
