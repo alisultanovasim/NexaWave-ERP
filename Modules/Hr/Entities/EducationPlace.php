@@ -5,6 +5,7 @@ namespace Modules\Hr\Entities;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Rennokki\QueryCache\Traits\QueryCacheable;
 
 /**
  * Class EducationPlace
@@ -13,6 +14,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class EducationPlace extends Model
 {
     use SoftDeletes;
+    use QueryCacheable;
+
+    public $cacheFor = 604800;
+
+    protected static $flushCacheOnUpdate = true;
 
     /**
      * @var array

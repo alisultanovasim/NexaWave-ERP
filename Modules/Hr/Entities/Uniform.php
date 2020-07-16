@@ -7,10 +7,16 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Modules\Hr\Entities\Employee\Employee;
 use Modules\Hr\Entities\UniformType;
+use Rennokki\QueryCache\Traits\QueryCacheable;
 
 class Uniform extends Model
 {
     use SoftDeletes;
+    use QueryCacheable;
+
+    public $cacheFor = 604800;
+
+    protected static $flushCacheOnUpdate = true;
 
     /**
      * @var string[]

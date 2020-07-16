@@ -4,9 +4,16 @@ namespace Modules\Hr\Entities;
 
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
+use Rennokki\QueryCache\Traits\QueryCacheable;
 
 class LaborActivity extends Model
 {
+    use QueryCacheable;
+
+    public $cacheFor = 604800;
+
+    protected static $flushCacheOnUpdate = true;
+
     protected $guarded = ['id'];
 
     public function country(){

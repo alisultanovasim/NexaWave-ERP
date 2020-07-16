@@ -5,10 +5,16 @@ namespace Modules\Hr\Entities;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Rennokki\QueryCache\Traits\QueryCacheable;
 
 class UserSocialState extends Model
 {
     use SoftDeletes;
+    use QueryCacheable;
+
+    public $cacheFor = 604800;
+
+    protected static $flushCacheOnUpdate = true;
 
     protected $guarded = ['id'];
 
