@@ -134,7 +134,7 @@ class RewardController extends Controller
             'amount' => 'required|numeric',
             'date_of_issue' => 'required|date',
             'expire_date' => 'required|date',
-            'note'
+            'note' => 'nullable|max:255|min:3'
         ];
     }
 }
