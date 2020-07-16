@@ -6,15 +6,10 @@ use App\Traits\Filterable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Modules\Hr\Entities\Employee\Employee;
-use Rennokki\QueryCache\Traits\QueryCacheable;
 
 class Order extends Model
 {
-    use SoftDeletes, Filterable, QueryCacheable;
-
-    public $cacheFor = 604800;
-
-    protected static $flushCacheOnUpdate = true;
+    use SoftDeletes, Filterable;
 
     protected $guarded = ['id'];
 

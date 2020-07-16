@@ -5,16 +5,10 @@ namespace Modules\Hr\Entities;
 use App\Models\PositionModulePermission;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Rennokki\QueryCache\Traits\QueryCacheable;
 
 class Positions extends Model
 {
     use SoftDeletes;
-    use QueryCacheable;
-
-    public $cacheFor = 604800;
-
-    protected static $flushCacheOnUpdate = true;
 
     const DIRECTOR = 1;
 

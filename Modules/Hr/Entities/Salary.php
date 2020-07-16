@@ -6,17 +6,11 @@ use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Modules\Hr\Entities\Employee\Employee;
-use Rennokki\QueryCache\Traits\QueryCacheable;
 
 class Salary extends Model
 {
     use SoftDeletes;
-    use QueryCacheable;
-
-    public $cacheFor = 604800;
-
-    protected static $flushCacheOnUpdate = true;
-
+    
     protected $guarded = ['id'];
 
     public function employee(){
