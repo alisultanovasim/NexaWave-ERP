@@ -46,30 +46,45 @@ class PermissionProvider
             }
         });
 
+
         /*
          * Define gates for remain roles
          */
         foreach ($this->getRoleModulePermissions() as $permission) {
-            $abilityName = $permission->permission_name . '-' . $permission->module_name;
+//            $abilityName = $permission->permission_name . '-' . $permission->module_name;
+            $abilityName = $permission->permission_slug . '-' . $permission->module_name;
             Gate::define($abilityName, function (User $user) use ($userRoles, $permission){
-                return $this->userHasAccess($userRoles, $permission->module_id, $permission->permission_id);
+                return $this->userHasAccess(
+                    $userRoles,
+                    $permission->module_id,
+                    $permission->is_office_module,
+                    $permission->permission_id
+                );
             });
         }
 
     }
 
+
     /**
      * @param array $userRoles
      * @param $moduleId
+     * @param $isOfficeModule
      * @param $permissionId
      * @return bool
      */
-    private function userHasAccess(array $userRoles, $moduleId, $permissionId): bool {
+    private function userHasAccess(array $userRoles, $moduleId, $isOfficeModule, $permissionId): bool {
 
         /*
          * Company admin has permission to all subscribed modules
          */
-        if (in_array($this->roleModel->getCompanyAdminRoleId(), $userRoles))
+        if (in_array($this->roleModel->getCompanyAdminRoleId(), $userRoles) and !$isOfficeModule)
+            return true;
+
+        /*
+         * Office admin has permission to all subscribed modules
+         */
+        if (in_array($this->roleModel->getOfficeAdminRoleId(), $userRoles) and $isOfficeModule)
             return true;
 
         /*
@@ -105,7 +120,9 @@ class PermissionProvider
 
         $permissions = $permissions->get([
             'modules.name as module_name',
+            'modules.is_office_module as is_office_module',
             'permissions.name as permission_name',
+            'permissions.slug as permission_slug',
             'modules.id as module_id',
             'permissions.id as permission_id'
         ]);
