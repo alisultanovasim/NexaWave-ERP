@@ -5,6 +5,7 @@ namespace Modules\Hr\Entities;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Rennokki\QueryCache\Traits\QueryCacheable;
 
 /**
  * @property integer $id
@@ -18,6 +19,12 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class City extends Model
 {
+    use QueryCacheable;
+
+    public $cacheFor = 604800;
+
+    protected static $flushCacheOnUpdate = true;
+
     /**
      * The "type" of the auto-incrementing ID.
      *

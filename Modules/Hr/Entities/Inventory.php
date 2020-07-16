@@ -6,11 +6,17 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Modules\Hr\Entities\Employee\Employee;
+use Rennokki\QueryCache\Traits\QueryCacheable;
 
 
 class Inventory extends Model
 {
     use SoftDeletes;
+    use QueryCacheable;
+
+    public $cacheFor = 604800;
+
+    protected static $flushCacheOnUpdate = true;
 
     /**
      * @var string[]

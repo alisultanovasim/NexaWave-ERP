@@ -3,6 +3,7 @@
 namespace Modules\Hr\Entities;
 
 use Illuminate\Database\Eloquent\Model;
+use Rennokki\QueryCache\Traits\QueryCacheable;
 
 /**
  * @property integer $id
@@ -27,6 +28,11 @@ use Illuminate\Database\Eloquent\Model;
  */
 class BankInformation extends Model
 {
+    use QueryCacheable;
+
+    public $cacheFor = 604800;
+
+    protected static $flushCacheOnUpdate = true;
     /**
      * The table associated with the model.
      *
