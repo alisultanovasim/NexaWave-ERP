@@ -44,6 +44,9 @@ class Contract extends Model
     public function department(){
         return $this->belongsTo('Modules\Hr\Entities\Department' );
     }
+    public function personalCategory(){
+        return $this->belongsTo('Modules\Hr\Entities\PersonalCategory', '');
+    }
     public function section(){
         return $this->belongsTo('Modules\Hr\Entities\Section' );
     }
