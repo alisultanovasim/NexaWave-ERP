@@ -18,9 +18,9 @@ class LanguageLevelController extends Controller
     public function index(Request $request)
     {
         $this->validate($request , [
-            'paginateCount' => ['sometimes','required' , 'integer'],
+            'per_page' => ['sometimes','required' , 'integer'],
         ]);
-        $result = LanguageLevel::paginate($request->get('company_id'));
+        $result = LanguageLevel::paginate($request->get('per_page'));
 
         return $this->dataResponse($result);
     }
