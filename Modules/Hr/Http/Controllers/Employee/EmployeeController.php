@@ -93,12 +93,6 @@ class EmployeeController extends Controller
         ]);
         $employees = Employee::with([
             'user',
-            'contracts',
-            'contracts.department:id,name',
-            'contracts.section:id,name',
-            'contracts.sector:id,name',
-            'contracts.specializationDegree',
-            'contracts.personalCategory',
             'user.roles:user_roles.user_id,user_roles.role_id',
             'user.details',
             'user.details.nationality',
