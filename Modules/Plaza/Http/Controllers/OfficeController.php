@@ -192,7 +192,6 @@ class OfficeController extends Controller
                     'size' => $location['size'],
                     'number' => isset($location['number']) ? $location['number'] : null,
                     'office_id' => $office->id,
-
                 ];
 
                 if (isset($location['schema'])) {
@@ -239,9 +238,6 @@ class OfficeController extends Controller
             }
             return $this->errorResponse(trans('apiResponse.tryLater'), Response::HTTP_INTERNAL_SERVER_ERROR);
 
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return $this->errorResponse(trans('apiResponse.tryLater'), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 

@@ -94,6 +94,7 @@ class EmployeeController extends Controller
         $employees = Employee::with([
             'user',
             'contracts',
+            'contracts.position',
             'contracts.department:id,name',
             'contracts.section:id,name',
             'contracts.sector:id,name',
