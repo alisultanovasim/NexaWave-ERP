@@ -17,7 +17,7 @@ use Modules\Hr\Entities\Employee\Employee;
 use Modules\Plaza\Entities\OfficeUser;
 
 
-class CheckUserAccess
+class CheckUserRole
 {
     use ApiResponse;
 
@@ -79,7 +79,7 @@ class CheckUserAccess
          */
         $userRoles = collect($this->userRoles)->pluck('role_id')->toArray();
         \auth()->user()->setUserRolesForRequest($userRoles);
-        $this->permissionProvider->boot($userRoles);
+        $this->permissionProvider->boot();
 
         return $next($this->request);
     }

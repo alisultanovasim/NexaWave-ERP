@@ -7,6 +7,7 @@ use App\Models\Role;
 use App\Models\RoleModulePermission;
 use App\Models\User;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Modules\Hr\Entities\Employee\Employee;
@@ -33,15 +34,15 @@ class PermissionProvider
     /**
      * Boot Provider after validation company id
      * Example usage $this->authorize('permissionName-moduleName')   ( $this->authorize('edit-users') )
-     * @param array $userRoles
      */
-    public function boot(array $userRoles)
+    public function boot()
     {
+
         /*
          * Give all access to super admin
          */
-        Gate::before(function (User $user, $ability) use ($userRoles) {
-            if (in_array($this->roleModel->getSuperAdminRoleId(), $userRoles)) {
+        Gate::before(function (User $user, $ability) {
+            if (in_array($this->roleModel->getSuperAdminRoleId(), $user->getUserRolesForRequest())) {
                 return true;
             }
         });
@@ -51,18 +52,16 @@ class PermissionProvider
          * Define gates for remain roles
          */
         foreach ($this->getRoleModulePermissions() as $permission) {
-//            $abilityName = $permission->permission_name . '-' . $permission->module_name;
             $abilityName = $permission->permission_slug . '-' . $permission->module_name;
-            Gate::define($abilityName, function (User $user) use ($userRoles, $permission){
+            Gate::define($abilityName, function (User $user) use ($permission){
                 return $this->userHasAccess(
-                    $userRoles,
+                    $user->getUserRolesForRequest(),
                     $permission->module_id,
                     $permission->is_office_module,
                     $permission->permission_id
                 );
             });
         }
-
     }
 
 
@@ -74,13 +73,11 @@ class PermissionProvider
      * @return bool
      */
     private function userHasAccess(array $userRoles, $moduleId, $isOfficeModule, $permissionId): bool {
-
         /*
          * Company admin has permission to all subscribed modules
          */
         if (in_array($this->roleModel->getCompanyAdminRoleId(), $userRoles) and !$isOfficeModule)
             return true;
-
         /*
          * Office admin has permission to all subscribed modules
          */
@@ -126,6 +123,7 @@ class PermissionProvider
             'modules.id as module_id',
             'permissions.id as permission_id'
         ]);
+
 
         return $permissions;
     }
