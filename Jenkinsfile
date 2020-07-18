@@ -6,8 +6,8 @@ pipeline {
   }
   stages {
     when {
-                  branch 'development'
-           }
+           branch 'development'
+         }
     stage('build') {
       steps {
         sh 'composer install --prefer-dist --no-ansi --no-interaction --no-progress --no-scripts'
