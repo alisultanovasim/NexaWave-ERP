@@ -16,7 +16,6 @@ pipeline {
     }
     stage('Deploy') {
       steps {
-        sh 'eval $(ssh-agent -s)'
        withCredentials(bindings: [sshUserPrivateKey(credentialsId: 'jenkins_private_key',
                                                     keyFileVariable: 'SSH_PRIVATE_KEY_FILE',
                                                     passphraseVariable: '',
