@@ -24,7 +24,6 @@ pipeline {
          sh "echo '$SSH_PRIVATE_KEY_FILE' | tr -d '\r' | ssh-add - > /dev/null"
          sh "mkdir -p ~/.ssh"
          sh "chmod 700 ~/.ssh"
-         // sh "[[ -f /.dockerenv ]] && echo -e 'Host *\n\tStrictHostKeyChecking no\n\n' > ~/.ssh/config"
 
        }
         sh 'mkdir -p ~/.ssh'
