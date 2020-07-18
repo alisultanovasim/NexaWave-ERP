@@ -1,7 +1,7 @@
 pipeline {
   agent {
     docker {
-      image 'lorisleiva/laravel-docker:latest'
+      image 'ismatbabir/laravel-jenkins:latest'
     }
   }
   stages {
