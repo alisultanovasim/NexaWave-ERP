@@ -577,7 +577,7 @@ Route::group([
     });
 
     Route::group(['prefix' => 'company/authorized/employees'], function (){
-        Route::get('/', 'CompanyAuthorizedUsersController@index')->middleware('can:edit-test');
+        Route::get('/', 'CompanyAuthorizedUsersController@index');
         Route::post('/', 'CompanyAuthorizedUsersController@addOrUpdateAuthorizedEmployee');
         Route::delete('/', 'CompanyAuthorizedUsersController@removeEmployeeFromAuthorizedUsers');
     });
