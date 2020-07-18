@@ -26,9 +26,9 @@ pipeline {
          sh "chmod 700 ~/.ssh"
 
        }
-        sh 'find . -type f -not -path "./vendor/*" -exec chmod 664 {};
-            find . -type d -not -path "./vendor/*" -exec chmod 775 {} ;'
-        sh 'php artisan deploy 213.136.78.83 -s upload'
+        // sh 'find . -type f -not -path "./vendor/*" -exec chmod 664 {};
+        //     find . -type d -not -path "./vendor/*" -exec chmod 775 {} ;'
+        // sh 'php artisan deploy 213.136.78.83 -s upload'
 
       }
     }
