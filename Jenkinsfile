@@ -14,7 +14,6 @@ pipeline {
         sh 'cp .env.example .env'
       }
     }
-
     stage('Deploy') {
       steps {
         sh 'eval $(ssh-agent -s)'
