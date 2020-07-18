@@ -20,7 +20,7 @@ pipeline {
                                                     keyFileVariable: 'SSH_PRIVATE_KEY_FILE',
                                                     passphraseVariable: '',
                                                     usernameVariable: 'USERNAME')]) {
-         sh "eval $(ssh-agent -s)"
+         sh 'eval "$(ssh-agent -s)"'
          sh "echo '$SSH_PRIVATE_KEY_FILE' | tr -d '\r' | ssh-add - > /dev/null"
          sh "mkdir -p ~/.ssh"
          sh "chmod 700 ~/.ssh"
