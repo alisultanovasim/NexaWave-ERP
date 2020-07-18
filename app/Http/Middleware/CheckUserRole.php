@@ -17,7 +17,7 @@ use Modules\Hr\Entities\Employee\Employee;
 use Modules\Plaza\Entities\OfficeUser;
 
 
-class CheckUserAccess
+class CheckUserRole
 {
     use ApiResponse;
 
@@ -68,11 +68,18 @@ class CheckUserAccess
         }
 
         /*
+         * If user has no remain roles after filter throw exception
+         */
+        if (!count($this->userRoles)) {
+            throw new AuthorizationException();
+        }
+
+        /*
          * Boot permissions and set user roles
          */
         $userRoles = collect($this->userRoles)->pluck('role_id')->toArray();
         \auth()->user()->setUserRolesForRequest($userRoles);
-        $this->permissionProvider->boot($userRoles);
+        $this->permissionProvider->boot();
 
         return $next($this->request);
     }
@@ -80,7 +87,6 @@ class CheckUserAccess
 
     /**
      * @param $companyId
-     * @throws AuthorizationException
      */
     private function validateUserCompanyAndMergeToRequest($companyId) {
         $userRolesForThisRequest = [];
@@ -97,16 +103,11 @@ class CheckUserAccess
                 $userRolesForThisRequest[] = $role;
             }
         }
-        if (!count($userRolesForThisRequest)) {
-            throw new AuthorizationException();
-        }
         $this->request->merge(['company_id' => $companyId]);
         $this->userRoles = $userRolesForThisRequest;
     }
 
-    /**
-     * @throws AuthorizationException
-     */
+
     private function removeCompanyRolesFromUserRoleListForThisRequest(): void {
         /*
          * Remove company roles
@@ -115,13 +116,6 @@ class CheckUserAccess
             if ($role->company_id !== null){
                 unset($this->userRoles[$key]);
             }
-        }
-
-        /*
-         * If user has no remain roles (user has not platform roles)
-         */
-        if (!count($this->userRoles)){
-            throw new AuthorizationException();
         }
     }
 
