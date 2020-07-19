@@ -23,11 +23,10 @@ pipeline {
                                                     passphraseVariable: '',
                                                     usernameVariable: 'USERNAME')]) {
          sh 'eval "$(ssh-agent -s)"'
+         sh 'echo "$SSH_PRIVATE_KEY_FILE" | tr -d "\r" | ssh-add - > /dev/null'
          sh "mkdir -p ~/.ssh"
-         sh 'echo "$SSH_PRIVATE_KEY_FILE" > ~/.ssh/id_rsa'
-         sh 'cat "$SSH_PRIVATE_KEY_FILE" > ~/.ssh/id_rsa'
          sh "chmod 700 ~/.ssh"
-         sh "chmod 600 ~/.ssh/id_rsa"
+//          sh "chmod 600 ~/.ssh/id_rsa"
          sh "ssh-keyscan jenkins.timesoft.az >> ~/.ssh/known_hosts"
          sh "ssh-keyscan 213.136.78.83 >> ~/.ssh/known_hosts"
          sh 'php artisan deploy 213.136.78.83 -s upload'
