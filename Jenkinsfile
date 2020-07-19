@@ -21,14 +21,14 @@ pipeline {
                                                     passphraseVariable: '',
                                                     usernameVariable: 'USERNAME')]) {
 //          sh 'eval "$(ssh-agent -s)"'
-         sh "mkdir -p ~/.ssh"
-         sh 'echo "$SSH_PRIVATE_KEY_FILE" > ~/.ssh/id_rsa'
-         sh "chmod 700 ~/.ssh"
+//          sh "mkdir -p ~/.ssh"
+//          sh 'echo "$SSH_PRIVATE_KEY_FILE" > ~/.ssh/id_rsa'
+//          sh "chmod 700 ~/.ssh"
 
        }
         // sh 'find . -type f -not -path "./vendor/*" -exec chmod 664 {};
         //     find . -type d -not -path "./vendor/*" -exec chmod 775 {} ;'
-        // sh 'php artisan deploy 213.136.78.83 -s upload'
+        sh 'php artisan deploy 213.136.78.83 -s upload'
 
       }
     }
