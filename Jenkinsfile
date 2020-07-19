@@ -26,10 +26,11 @@ pipeline {
          sh "mkdir -p ~/.ssh"
          sh 'echo "$SSH_PRIVATE_KEY_FILE" > ~/.ssh/id_rsa'
          sh "chmod 700 ~/.ssh"
+         sh "ssh-keyscan -t rsa 213.136.78.83 >> ~/.ssh/known_hosts"
 
        }
-        // sh 'find . -type f -not -path "./vendor/*" -exec chmod 664 {};
-        //     find . -type d -not -path "./vendor/*" -exec chmod 775 {} ;'
+        sh 'find . -type f -not -path "./vendor/*" -exec chmod 664 {};'
+        sh 'find . -type d -not -path "./vendor/*" -exec chmod 775 {} ;'
         sh 'php artisan deploy 213.136.78.83 -s upload'
 
       }
