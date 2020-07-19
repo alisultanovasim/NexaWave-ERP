@@ -28,7 +28,7 @@ pipeline {
          sh 'cat ~/.ssh/id_rsa'
          sh "chmod 700 ~/.ssh"
          sh "chmod 600 ~/.ssh/id_rsa"
-         sh "ssh-keyscan github.com >> ~/.ssh/known_hosts"
+         sh "ssh-keyscan jenkins.timesoft.az >> ~/.ssh/known_hosts"
          sh "ssh-keyscan 213.136.78.83 >> ~/.ssh/known_hosts"
 
        }
