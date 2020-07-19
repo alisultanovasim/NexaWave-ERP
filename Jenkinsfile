@@ -26,7 +26,9 @@ pipeline {
          sh "mkdir -p ~/.ssh"
          sh 'echo "$SSH_PRIVATE_KEY_FILE" > ~/.ssh/id_rsa'
          sh "chmod 700 ~/.ssh"
-         sh "ssh-keyscan -t rsa 213.136.78.83 >> ~/.ssh/known_hosts"
+         sh "chmod 600 ~/.ssh/id_rsa"
+         sh "ssh-keyscan github.com >> ~/.ssh/known_hosts"
+         sh "ssh-keyscan 213.136.78.83 >> ~/.ssh/known_hosts"
 
        }
 //         sh 'find . -type f -not -path "./vendor/*" -exec chmod 664 {};'
