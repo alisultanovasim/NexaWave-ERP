@@ -2,7 +2,7 @@ pipeline {
   agent {
     docker {
       image 'ismatbabir/laravel-jenkins:latest'
-      args "-e HOME=${JENKINS_HOME} -e USER=root"
+      args "-e USER=root"
 
     }
   }
@@ -23,7 +23,7 @@ pipeline {
                                                     passphraseVariable: '',
                                                     usernameVariable: 'USERNAME')]) {
          sh 'eval "$(ssh-agent -s)"'
-         sh "mkdir ~/.ssh"
+         sh "mkdir -p ~/.ssh"
          sh 'echo "$SSH_PRIVATE_KEY_FILE" > ~/.ssh/id_rsa'
          sh "chmod 700 ~/.ssh"
 
