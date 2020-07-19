@@ -2,6 +2,8 @@ pipeline {
   agent {
     docker {
       image 'ismatbabir/laravel-jenkins:latest'
+      args "-e HOME=${JENKINS_HOME}"
+
     }
   }
   stages {
