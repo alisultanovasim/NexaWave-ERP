@@ -28,8 +28,8 @@ pipeline {
          sh "chmod 700 ~/.ssh"
          sh "chmod 600 ~/.ssh/id_rsa"
          sh '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
-         sh "ssh-keyscan jenkins.timesoft.az >> ~/.ssh/known_hosts"
-         sh "ssh-keyscan 213.136.78.83 >> ~/.ssh/known_hosts"
+//          sh "ssh-keyscan jenkins.timesoft.az >> ~/.ssh/known_hosts"
+//          sh "ssh-keyscan 213.136.78.83 >> ~/.ssh/known_hosts"
          sh 'cat ~/.ssh/known_hosts'
          sh 'php artisan deploy 213.136.78.83 -s upload'
 
