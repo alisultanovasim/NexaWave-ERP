@@ -28,7 +28,7 @@ pipeline {
          sh "chmod 700 ~/.ssh"
          sh "chmod 600 ~/.ssh/id_rsa"
          sh "ssh-keyscan 213.136.78.83 >> ~/.ssh/known_hosts"
-         sh "ls -lah  ~/.ssh/"
+         sh "cat  ~/.ssh/id_rsa"
          sh 'ssh developer@213.136.78.83 "whoami"'
          sh 'php artisan deploy 213.136.78.83 -s upload'
 
