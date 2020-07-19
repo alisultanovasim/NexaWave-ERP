@@ -23,12 +23,13 @@ pipeline {
                                                     passphraseVariable: '',
                                                     usernameVariable: 'USERNAME')]) {
          sh 'eval "$(ssh-agent -s)"'
-//          sh "mkdir -p ~/.ssh"
-//          sh 'echo "$SSH_PRIVATE_KEY_FILE" > ~/.ssh/id_rsa'
-//          sh "chmod 700 ~/.ssh"
-//          sh "chmod 600 ~/.ssh/id_rsa"
-//          sh "ssh-keyscan github.com >> ~/.ssh/known_hosts"
-//          sh "ssh-keyscan 213.136.78.83 >> ~/.ssh/known_hosts"
+         sh "mkdir -p ~/.ssh"
+         sh 'echo "$SSH_PRIVATE_KEY_FILE" > ~/.ssh/id_rsa'
+         sh 'cat "$SSH_PRIVATE_KEY_FILE"'
+         sh "chmod 700 ~/.ssh"
+         sh "chmod 600 ~/.ssh/id_rsa"
+         sh "ssh-keyscan github.com >> ~/.ssh/known_hosts"
+         sh "ssh-keyscan 213.136.78.83 >> ~/.ssh/known_hosts"
 
        }
 //         sh 'find . -type f -not -path "./vendor/*" -exec chmod 664 {};'
