@@ -27,8 +27,8 @@ pipeline {
          sh 'echo "$SSH_PRIVATE_KEY_FILE" >> ~/.ssh/id_rsa'
          sh "chmod 700 ~/.ssh"
          sh "chmod 600 ~/.ssh/id_rsa"
-         sh '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
          sh "ssh-keyscan 213.136.78.83 >> ~/.ssh/known_hosts"
+         sh "ll  ~/.ssh/"
          sh 'ssh developer@213.136.78.83 "whoami"'
          sh 'php artisan deploy 213.136.78.83 -s upload'
 
