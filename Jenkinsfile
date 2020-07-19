@@ -24,7 +24,7 @@ pipeline {
                                                     usernameVariable: 'USERNAME')]) {
 //          sh 'eval "$(ssh-agent -s)"'
          sh "mkdir -p ~/.ssh"
-         sh 'echo "${SSH_PRIVATE_KEY_FILE}" > ~/.ssh/id_rsa'
+         sh 'echo $SSH_PRIVATE_KEY_FILE > ~/.ssh/id_rsa'
          sh "chmod 600 ~/.ssh/id_rsa"
          sh "ssh-keyscan 213.136.78.83 >> ~/.ssh/known_hosts"
          sh 'cat ~/.ssh/id_rsa'
