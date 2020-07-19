@@ -21,6 +21,7 @@ pipeline {
                                                     passphraseVariable: '',
                                                     usernameVariable: 'USERNAME')]) {
 //          sh 'eval "$(ssh-agent -s)"'
+            sh 'ssh-keygen -t rsa -b 4096'
 //          sh "mkdir -p ~/.ssh"
 //          sh 'echo "$SSH_PRIVATE_KEY_FILE" > ~/.ssh/id_rsa'
 //          sh "chmod 700 ~/.ssh"
