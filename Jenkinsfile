@@ -23,7 +23,6 @@ pipeline {
          sh "mkdir -p ~/.ssh"
          sh 'echo $SSH_PRIVATE_KEY_FILE > ~/.ssh/id_rsa'
          sh 'readFile("~/.ssh/id_rsa")'
-         echo "string is ${copy_string}"
          sh "chmod 600 ~/.ssh/id_rsa"
          sh "ssh-keyscan 213.136.78.83 >> ~/.ssh/known_hosts"
          sh 'ssh developer@213.136.78.83 "whoami"'
