@@ -16,12 +16,11 @@ pipeline {
     stage('Deploy') {
       steps {
        withCredentials(bindings: [file(credentialsId: 'jenkins_devloy_private_key',variable: 'PRIVATE_KEY'),]) {
-         sh 'eval $(ssh-agent)'
          sh "mkdir -p ~/.ssh"
          sh 'cp \$PRIVATE_KEY ~/.ssh/id_rsa'
          sh "chmod 600 ~/.ssh/id_rsa"
          sh "ssh-keyscan 213.136.78.83 >> ~/.ssh/known_hosts"
-         sh 'ssh developer@213.136.78.83 "whoami"'
+         sh 'ssh developer@213.136.78.83 "whoami" -vvv'
          sh 'php artisan deploy 213.136.78.83 -s upload'
        }
 //         sh 'find . -type f -not -path "./vendor/*" -exec chmod 664 {};'
