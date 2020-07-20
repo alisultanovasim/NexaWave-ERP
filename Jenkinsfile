@@ -25,7 +25,7 @@ pipeline {
          sh 'cp \$PUBLIC_KEY ~/.ssh/id_rsa.pub'
          sh "chmod 600 ~/.ssh/id_rsa"
          sh "ssh-keyscan 213.136.78.83 >> ~/.ssh/known_hosts"
-         sh "echo "Host StrictHostKeyChecking no\n\n" >> ~/.ssh/config"
+         sh "echo "Host StrictHostKeyChecking no" > ~/.ssh/config"
          sh 'php artisan deploy 213.136.78.83 -s upload'
        }
 //         sh 'find . -type f -not -path "./vendor/*" -exec chmod 664 {};'
