@@ -22,7 +22,7 @@ pipeline {
          sh "openssl pkey -noout -text < ~/.ssh/id_rsa"
          sh "chmod 600 ~/.ssh/id_rsa"
          sh "umask 077"
-         sh 'openssl pkey < id_rsa > id_rsa.pkcs8'
+         sh 'openssl pkey < ~/.ssh/id_rsa > id_rsa.pkcs8'
          sh 'ssh-add id_rsa.pkcs8'
          sh "cat ~/.ssh/id_rsa"
          sh "ssh-keyscan 213.136.78.83 >> ~/.ssh/known_hosts"
