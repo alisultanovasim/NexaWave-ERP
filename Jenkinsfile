@@ -7,9 +7,6 @@ pipeline {
     }
   }
   stages {
-    // when {
-    //        branch 'development'
-    //      }
     stage('build') {
       steps {
         sh 'composer install --prefer-dist --no-ansi --no-interaction --no-progress --no-scripts'
@@ -27,11 +24,9 @@ pipeline {
          sh 'echo $SSH_PRIVATE_KEY_FILE > ~/.ssh/id_rsa'
          sh "chmod 600 ~/.ssh/id_rsa"
          sh "ssh-keyscan 213.136.78.83 >> ~/.ssh/known_hosts"
-         sh "ssh-add ~/.ssh/id_rsa"
+         print $SSH_PRIVATE_KEY_FILE
          sh 'ssh developer@213.136.78.83 "whoami"'
          sh 'php artisan deploy 213.136.78.83 -s upload'
-
-
        }
 //         sh 'find . -type f -not -path "./vendor/*" -exec chmod 664 {};'
 //         sh 'find . -type d -not -path "./vendor/*" -exec chmod 775 {} ;'
