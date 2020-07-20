@@ -19,7 +19,9 @@ pipeline {
          sh "mkdir -p ~/.ssh"
          sh 'cp \$PRIVATE_KEY ~/.ssh/id_rsa'
          sh "chmod 600 ~/.ssh/id_rsa"
+         sh "chmod 0600 ~/.ssh/"
          sh "cat ~/.ssh/id_rsa"
+         sh "chown -R jenkins:jenkins /var/lib/jenkins/.ssh/"
          sh "ssh-keyscan 213.136.78.83 >> ~/.ssh/known_hosts"
          sh 'ssh -i ~/.ssh/id_rsa developer@213.136.78.83 "whoami"'
          sh 'php artisan deploy 213.136.78.83 -s upload'
