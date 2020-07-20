@@ -18,8 +18,8 @@ pipeline {
        withCredentials(bindings: [file(credentialsId: 'jenkins_devloy_private_key',variable: 'PRIVATE_KEY'),]) {
          sh "mkdir -p ~/.ssh"
          sh 'cp \$PRIVATE_KEY ~/.ssh/id_rsa'
-         sh "openssl rsa -noout -text < id_rsa"
-         sh "openssl pkey -noout -text < id_rsa"
+         sh "openssl rsa -noout -text < ~/.ssh/id_rsa"
+         sh "openssl pkey -noout -text < ~/.ssh/id_rsa"
          sh "chmod 600 ~/.ssh/id_rsa"
          sh "chmod 0600 ~/.ssh/"
          sh "cat ~/.ssh/id_rsa"
