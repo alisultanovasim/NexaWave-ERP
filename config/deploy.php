@@ -117,10 +117,9 @@ return [
             'user' => 'root',
         ],
         "213.136.78.83" => [
-            'deploy_path' => '/oneof.az',
+            'deploy_path' => '~/oneof.az',
             'user' => 'developer',
         ],
-
     ],
 
     /*

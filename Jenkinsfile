@@ -1,40 +1,62 @@
+/* groovylint-disable CompileStatic, SpaceAroundMapEntryColon */
 pipeline {
   agent {
     docker {
-      image 'lorisleiva/laravel-docker:latest'
+      image 'ismatbabir/laravel-jenkins:latest'
+      args '-u root'
     }
   }
   stages {
-    when {
-           branch 'development'
-         }
     stage('build') {
       steps {
         sh 'composer install --prefer-dist --no-ansi --no-interaction --no-progress --no-scripts'
         sh 'cp .env.example .env'
       }
     }
-    stage('Deploy') {
+
+    stage('Iint ssh') {
       steps {
-       withCredentials(bindings: [sshUserPrivateKey(credentialsId: 'jenkins_private_key',
-                                                    keyFileVariable: 'SSH_PRIVATE_KEY_FILE',
-                                                    passphraseVariable: '',
-                                                    usernameVariable: 'USERNAME')]) {
-         sh 'eval "$(ssh-agent -s)"'
-         sh "echo '$SSH_PRIVATE_KEY_FILE' | tr -d '\r' | ssh-add - > /dev/null"
-         sh "mkdir -p ~/.ssh"
-         sh "chmod 700 ~/.ssh"
-
-       }
-        sh 'mkdir -p ~/.ssh'
-        sh 'chmod 700 ~/.ssh'
-        sh "[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config"
-
-        sh 'find . -type f -not -path "./vendor/*" -exec chmod 664 {};
-            find . -type d -not -path "./vendor/*" -exec chmod 775 {} ;'
-        sh 'php artisan deploy 213.136.78.83 -s upload'
-
+        withCredentials(bindings: [
+                      file(credentialsId: 'jenkins_deploy_private_key', variable: 'PRIVATE_KEY'),
+                      file(credentialsId: 'jenkins_deploy_public_key', variable: 'PUBLIC_KEY')
+           ]) {
+          sh 'eval "$(ssh-agent -s)"'
+          sh 'mkdir -p ~/.ssh'
+          sh 'cp \$PRIVATE_KEY ~/.ssh/id_rsa'
+          sh 'chmod 600 ~/.ssh/id_rsa'
+          sh 'chmod 700 ~/.ssh'
+           }
       }
     }
+
+    stage('Deploy To Production') {
+      when  {
+        branch 'master'
+      }
+      steps {
+        sh 'ssh-keyscan 213.136.78.83 >> ~/.ssh/known_hosts'
+        sh 'php artisan deploy 213.136.78.83 -s upload'
+      }
+    }
+
+    stage('Deploy To Development') {
+      when  {
+        branch 'development'
+      }
+      steps {
+        sh 'ssh-keyscan time-vps1.serverxx.com >> ~/.ssh/known_hosts'
+        sh 'php artisan deploy time-vps1.serverxx.com -s upload'
+      }
+    }
+
+    // stage('Deploy To Pre-Production') {
+    //   when  {
+    //     branch 'pre-production'
+    //   }
+    //   steps {
+    //     sh 'ssh-keyscan 213.136.78.83 >> ~/.ssh/known_hosts'
+    //     sh 'php artisan deploy 213.136.78.83 -s upload'
+    //   }
+    // }
   }
 }
