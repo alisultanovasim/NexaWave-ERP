@@ -15,10 +15,8 @@ pipeline {
     }
     stage('Deploy') {
       steps {
-       withCredentials(bindings: [sshUserPrivateKey(credentialsId: 'jenkins_private_key',
-                                                    keyFileVariable: 'SSH_PRIVATE_KEY_FILE',
-                                                    passphraseVariable: '',
-                                                    usernameVariable: 'USERNAME')]) {
+       withCredentials(bindings: [file(credentialsId: 'jenkins_devloy_private_key',variable: 'PRIVATE_KEY'),]) {
+         sh 'cat $PRIVATE_KEY'
          sh 'eval $(ssh-agent)'
          sh "mkdir -p ~/.ssh"
          sh 'echo $SSH_PRIVATE_KEY_FILE > ~/.ssh/id_rsa'
