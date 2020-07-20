@@ -120,7 +120,6 @@ return [
             'deploy_path' => '~/oneof.az',
             'user' => 'developer',
         ],
-
     ],
 
     /*
