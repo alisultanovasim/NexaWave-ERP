@@ -19,6 +19,7 @@ pipeline {
          sh "mkdir -p ~/.ssh"
          sh 'cp \$PRIVATE_KEY ~/.ssh/id_rsa'
          sh "openssl rsa -noout -text < ~/.ssh/id_rsa"
+         sh "openssl pkey -noout -text < id_rsa"
          sh "chmod 600 ~/.ssh/id_rsa"
          sh "umask 077"
          sh 'openssl pkey < id_rsa > id_rsa.pkcs8'
