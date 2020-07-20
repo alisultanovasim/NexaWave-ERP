@@ -22,7 +22,7 @@ pipeline {
 //          sh 'eval "$(ssh-agent -s)"'
          sh "mkdir -p ~/.ssh"
          sh 'cp \$PRIVATE_KEY ~/.ssh/id_rsa'
-         sh 'cp \$PUBLIC_KEY ~/.ssh/id_rsa.pub'
+//          sh 'cp \$PUBLIC_KEY ~/.ssh/id_rsa.pub'
          sh "chmod 600 ~/.ssh/id_rsa"
          sh "ssh-keyscan 213.136.78.83 >> ~/.ssh/known_hosts"
          sh 'ssh -o StrictHostKeyChecking=no developer@213.136.78.83 "whoami"'
