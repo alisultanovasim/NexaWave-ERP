@@ -16,10 +16,10 @@ pipeline {
     stage('Deploy') {
       steps {
        withCredentials(bindings: [file(credentialsId: 'jenkins_devloy_private_key',variable: 'PRIVATE_KEY'),]) {
-         sh 'cp \$PRIVATE_KEY ~/.ssh/id_rsa'
-         sh 'cat ~/.ssh/id_rsa'
          sh 'eval $(ssh-agent)'
          sh "mkdir -p ~/.ssh"
+         sh 'cp \$PRIVATE_KEY ~/.ssh/id_rsa'
+         sh 'cat ~/.ssh/id_rsa'
          sh 'echo $SSH_PRIVATE_KEY_FILE > ~/.ssh/id_rsa'
          sh 'echo readFile("~/.ssh/id_rsa")'
          sh "chmod 600 ~/.ssh/id_rsa"
