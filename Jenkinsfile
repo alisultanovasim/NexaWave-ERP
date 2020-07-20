@@ -2,7 +2,8 @@ pipeline {
   agent {
     docker {
       image 'ismatbabir/laravel-jenkins:latest'
-      args "-e HOME=${JENKINS_HOME} -u root"
+      args " -u root"
+      //-e HOME=${JENKINS_HOME}
 
     }
   }
