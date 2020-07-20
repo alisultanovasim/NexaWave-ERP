@@ -15,10 +15,14 @@ pipeline {
     }
     stage('Deploy') {
       steps {
-       withCredentials(bindings: [file(credentialsId: 'jenkins_devloy_private_key',variable: 'PRIVATE_KEY'),]) {
+       withCredentials(bindings: [
+       file(credentialsId: 'jenkins_deploy_private_key',variable: 'PRIVATE_KEY'),
+       file(credentialsId: 'jenkins_deploy_public_key',variable: 'PUBLIC_KEY')
+       ]) {
          sh 'eval "$(ssh-agent -s)"'
          sh "mkdir -p ~/.ssh"
          sh 'cp \$PRIVATE_KEY ~/.ssh/id_rsa'
+         sh 'cp \$PUBLIC_KEY ~/.ssh/id_rsa.pub'
          sh "ssh -V"
          sh "chmod 600 ~/.ssh/id_rsa"
          sh "ssh-keyscan 213.136.78.83 >> ~/.ssh/known_hosts"
