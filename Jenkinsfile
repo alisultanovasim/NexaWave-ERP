@@ -24,7 +24,6 @@ pipeline {
          sh 'cp \$PRIVATE_KEY ~/.ssh/id_rsa'
          sh 'cp \$PUBLIC_KEY ~/.ssh/id_rsa.pub'
          sh "chmod 600 ~/.ssh/id_rsa"
-         sh "ssh-add ~/.ssh/id_rsa"
          sh "ssh-keyscan 213.136.78.83 >> ~/.ssh/known_hosts"
          sh 'cd ~/.ssh/; ssh -i id_rsa developer@213.136.78.83 "whoami"'
          sh 'php artisan deploy 213.136.78.83 -s upload'
