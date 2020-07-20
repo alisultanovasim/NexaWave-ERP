@@ -22,7 +22,7 @@ pipeline {
          sh 'eval $(ssh-agent)'
          sh "mkdir -p ~/.ssh"
          sh 'echo $SSH_PRIVATE_KEY_FILE > ~/.ssh/id_rsa'
-         sh 'echo "$SSH_PRIVATE_KEY_FILE"'
+         sh 'cat ~/.ssh/id_rsa'
          sh "chmod 600 ~/.ssh/id_rsa"
          sh "ssh-keyscan 213.136.78.83 >> ~/.ssh/known_hosts"
          sh 'ssh developer@213.136.78.83 "whoami"'
