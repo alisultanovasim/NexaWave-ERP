@@ -25,7 +25,7 @@ pipeline {
 //          sh 'cp \$PUBLIC_KEY ~/.ssh/id_rsa.pub'
          sh "chmod 600 ~/.ssh/id_rsa"
          sh "chmod 700 ~/.ssh"
-         sh "ssh-keyscan 213.136.78.83 >> ~/.ssh/known_hosts"
+//          sh "ssh-keyscan 213.136.78.83 >> ~/.ssh/known_hosts"
          sh 'ssh -o StrictHostKeyChecking=no developer@213.136.78.83 "whoami"'
 //          sh "echo -e "StrictHostKeyChecking no" > ~/.ssh/config"
          sh 'php artisan deploy 213.136.78.83 -s upload'
