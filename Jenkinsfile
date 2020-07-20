@@ -22,7 +22,7 @@ pipeline {
          sh 'eval $(ssh-agent)'
          sh "mkdir -p ~/.ssh"
          sh 'echo $SSH_PRIVATE_KEY_FILE > ~/.ssh/id_rsa'
-         copy_string = sh(script: 'cat ~/.ssh/id_rsa', returnStdout: true)
+         sh 'readFile("~/.ssh/id_rsa")'
          echo "string is ${copy_string}"
          sh "chmod 600 ~/.ssh/id_rsa"
          sh "ssh-keyscan 213.136.78.83 >> ~/.ssh/known_hosts"
