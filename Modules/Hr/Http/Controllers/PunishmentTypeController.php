@@ -22,7 +22,8 @@ class PunishmentTypeController extends Controller
             'paginateCount' => ['sometimes' , 'required' , 'integer']
         ]);
 
-        $result = PunishmentType::where('company_id' , $request->get('company_id'))->paginate($request->get('paginateCount'));
+//        $result = PunishmentType::where('company_id' , $request->get('company_id'))->paginate($request->get('paginateCount'));
+        $result = PunishmentType::paginate($request->get('paginateCount'));
 
 
         return $this->dataResponse($result);
