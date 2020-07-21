@@ -101,7 +101,7 @@ class ContractController extends Controller
     public static function getValidateRules()
     {
         return [
-            'draft'=>['sometimes' , 'boolean'],
+            'draft' => ['sometimes', 'boolean'],
             'department_id' => ['sometimes', 'required', 'integer'], //exists m
             'section_id' => ['sometimes', 'required', 'integer'], //exists m
             'sector_id' => ['sometimes', 'required', 'integer'],//exists m
@@ -163,7 +163,7 @@ class ContractController extends Controller
             'user_personal_property' => ['nullable', 'string', 'max:255'],
             'provided_transport' => ['nullable', 'string', 'max:255'],
             'res_days' => ['nullable', Rule::in(Contract::WEEK_DAYS)],
-            'work_place_type' => ['nullable' , Rule::in(Contract::WORK_PLACE_TYPES)]
+            'work_place_type' => ['nullable', Rule::in(Contract::WORK_PLACE_TYPES)]
         ];
     }
 
@@ -209,7 +209,7 @@ class ContractController extends Controller
             $contract->where('employee_id', $request->get('employee_id'));
 
 
-        $contract = $contract->orderBy('id','desc')->paginate();
+        $contract = $contract->orderBy('id', 'desc')->paginate();
 
         return $this->successResponse($contract);
 
@@ -235,7 +235,7 @@ class ContractController extends Controller
 
         if ($request->has('company_authorized_employee_id')) {
             $check = CompanyAuthorizedEmployee::whereHas('employee', function ($q) {
-                $q->active()->where('company_id' , request('company_id'));
+                $q->active()->where('company_id', request('company_id'));
             })
                 ->where('id', $request->get('company_authorized_employee_id'))
                 ->exists();
@@ -252,98 +252,53 @@ class ContractController extends Controller
 
     public function update(Request $request, $id)
     {
-//        $this->validate($request , [
-//            'paragraph_id' => ['required' , 'boolean']
-//        ]);
+        $this->validate($request, [
+            'paragraph_id' => ['required', 'boolean']
+        ]);
 
-        $rules = [
-            'draft' => ['nullable' , 'boolean'],
-            'department_id' => ['sometimes', 'required', 'integer'],
-            'section_id' => ['sometimes', 'required', 'integer'],
-            'sector_id' => ['sometimes', 'required', 'integer'],
-            'position_id' => ['sometimes', 'required', 'integer'],
-//            'salary' => ['sometimes', 'required', 'numeric'],
-            'contract' => ['sometimes', 'mimes:pdf,doc,docx'],
-            'start_date' => ['sometimes', 'required', 'date'],
-            'end_date' => ['sometimes', 'required', 'date'],
-            'personal_category_id' => ['nullable', 'integer'],
-            'specialization_degree_id' => ['nullable', 'integer'],//exists
-            'work_environment_id' => ['nullable', 'integer'],//exists
-            'state_value' => ['nullable', 'numeric'],
-            'contract_type_id' => ['nullable', 'integer'],//exists
-            'position_description' => ['nullable', 'string'],
-            'currency_id' => ['nullable', 'integer'],//exists
-            'position_salary_praise_about' => ['nullable', 'numeric'],
-            'addition_package_fee' => ['nullable', 'numeric', "min:0", "max:100"],
-            'award_amount' => ['nullable', 'numeric'],
-            'award_period' => ['nullable', Rule::in(Contract::AWARD_PERIODS)],
-            'work_environment_addition' => ['nullable', 'numeric'],
-            'overtime_addition' => ['nullable', 'numeric'],
-            'labor_protection_addition' => ['nullable', 'string'],
-            'labor_meal_addition' => ['nullable', 'string'],
-            'work_start_date' => ['nullable', 'date_format:Y-m-d'],
-            'work_end_date' => ['nullable', 'date_format:Y-m-d'],
-            'break_time_start' => ['nullable', 'date_format:H:i'],
-            'break_time_end' => ['nullable', 'date_format:H:i'],
-            'incomplete_work_hours' => ['nullable', 'numeric', "min:0", 'max:12'],
-            'work_days_in_week' => ['nullable', 'integer', 'min:1', 'max:7'],
-            'work_shift_count' => ['nullable', 'integer', 'min:0'],
-            'first_shift_start_at' => ['nullable', 'date_format:H:i'],
-            'first_shift_end_at' => ['nullable', 'date_format:H:i'],
-            'second_shift_start_at' => ['nullable', 'date_format:H:i'],
-            'second_shift_end_at' => ['nullable', 'date_format:H:i'],
-            'third_shift_start_at' => ['nullable', 'date_format:H:i'],
-            'third_shift_end_at' => ['nullable', 'date_format:H:i'],
-            'provided_transport' => ['nullable', 'string', 'max:255'],
-            'res_days' => ['nullable', Rule::in(Contract::WEEK_DAYS)],
-            'vacation_main' => ['nullable', 'integer'],
-            'vacation_work_insurance' => ['nullable', 'integer'],
-            'vacation_work_envs' => ['nullable', 'integer'],
-            'vacation_for_child' => ['nullable', 'integer'],
-            'vacation_collective_contract' => ['nullable', 'integer'],
-            'vacation_total' => ['nullable', 'integer'],
-            'vacation_social_benefits' => ['nullable', 'numeric'],
-            'vacation_start_date' => ['nullable', 'date_format:Y-m-d'],
-            'vacation_end_date' => ['nullable', 'date_format:Y-m-d'],
-            'work_place_type' => ['nullable' , Rule::in(Contract::WORK_PLACE_TYPES)]
-        ];
+        $InitialRules = self::getValidationRules();
 
-//        $paragraph = Paragraph::with('fields')->findOrFail($id);
-//
+        $paragraph = Paragraph::with('fields:paragraph_id,field')
+            ->where('id', '=', $request->get('paragraph_id'))
+            ->first();
+
+        $keys = $paragraph->fields->pluck('field')->toArray();
+
+        $rules = [];
+        foreach ($InitialRules as $key => $value)
+            if (in_array($key, $keys))
+                $rules[$key] = $value;
+
         $this->validate($request, $rules);
 
+        $data = $request->only($keys);
 
-        $data=  $request->only(array_keys($rules));
-        if (!$data) return $this->successResponse(trans('response.nothingToUpdate'),400);
+
+        if (!$data) return $this->successResponse(trans('response.nothingToUpdate'), 400);
         DB::beginTransaction();
-
-        if ($notExists = $this->companyInfo($request->get('company_id'), $request->only([
-            'department_id', 'section_id', 'position_id', 'sector_id', 'contract_id'
-        ]))) return $notExists;
-
 
         $contract = Contract::with([
             'position',
             'section:id,name',
             'sector:id,name',
             'department:id,name',
-        ])->where('id', $id)->first(['id', 'versions'] + $data);
+        ])->where('id', $id)->first(['id', 'versions'] + $keys);
 
         if (!$contract) return $this->errorResponse(trans('response.contractNotFound'), 404);
 
         if (!$contract->versions) $contract->versions = [];
 
-        $originalProgram  = $contract->versions;
+        $originalProgram = $contract->versions;
 
         $originalProgram[] = [
             'user' => Auth::user(),
             'updated_at' => Carbon::now()->toDateTimeLocalString(),
-            'from' => $contract,
+            //todo change contract
+            'to' => $contract,
+
         ];
 
         $contract->versions = $originalProgram;
-
-        $contract->fill($request->only($data));
 
         $contract->save();
 
@@ -408,4 +363,62 @@ class ContractController extends Controller
             })->where('id', $id)->first();
         return $this->successResponse($contract);
     }
+
+    public static function getValidationRules()
+    {
+        return [
+            'draft' => ['nullable', 'boolean'],
+            'department_id' => ['sometimes', 'required', 'integer'],
+            'section_id' => ['sometimes', 'required', 'integer'],
+            'sector_id' => ['sometimes', 'required', 'integer'],
+            'position_id' => ['sometimes', 'required', 'integer'],
+//            'salary' => ['sometimes', 'required', 'numeric'],
+//            'contract' => ['sometimes', 'mimes:pdf,doc,docx'],
+            'start_date' => ['sometimes', 'required', 'date'],
+            'end_date' => ['sometimes', 'required', 'date'],
+            'personal_category_id' => ['nullable', 'integer'],
+            'specialization_degree_id' => ['nullable', 'integer'],//exists
+            'work_environment_id' => ['nullable', 'integer'],//exists
+            'state_value' => ['nullable', 'numeric'],
+            'contract_type_id' => ['nullable', 'integer'],//exists
+            'position_description' => ['nullable', 'string'],
+            'currency_id' => ['nullable', 'integer'],//exists
+            'position_salary_praise_about' => ['nullable', 'numeric'],
+            'addition_package_fee' => ['nullable', 'numeric', "min:0", "max:100"],
+            'award_amount' => ['nullable', 'numeric'],
+            'award_period' => ['nullable', Rule::in(Contract::AWARD_PERIODS)],
+            'work_environment_addition' => ['nullable', 'numeric'],
+            'overtime_addition' => ['nullable', 'numeric'],
+            'labor_protection_addition' => ['nullable', 'string'],
+            'labor_meal_addition' => ['nullable', 'string'],
+            'work_start_date' => ['nullable', 'date_format:Y-m-d'],
+            'work_end_date' => ['nullable', 'date_format:Y-m-d'],
+            'break_time_start' => ['nullable', 'date_format:H:i'],
+            'break_time_end' => ['nullable', 'date_format:H:i'],
+            'incomplete_work_hours' => ['nullable', 'numeric', "min:0", 'max:12'],
+            'work_days_in_week' => ['nullable', 'integer', 'min:1', 'max:7'],
+            'work_shift_count' => ['nullable', 'integer', 'min:0'],
+            'first_shift_start_at' => ['nullable', 'date_format:H:i'],
+            'first_shift_end_at' => ['nullable', 'date_format:H:i'],
+            'second_shift_start_at' => ['nullable', 'date_format:H:i'],
+            'second_shift_end_at' => ['nullable', 'date_format:H:i'],
+            'third_shift_start_at' => ['nullable', 'date_format:H:i'],
+            'third_shift_end_at' => ['nullable', 'date_format:H:i'],
+            'provided_transport' => ['nullable', 'string', 'max:255'],
+            'res_days' => ['nullable', Rule::in(Contract::WEEK_DAYS)],
+            'vacation_main' => ['nullable', 'integer'],
+            'vacation_work_insurance' => ['nullable', 'integer'],
+            'vacation_work_envs' => ['nullable', 'integer'],
+            'vacation_for_child' => ['nullable', 'integer'],
+            'vacation_collective_contract' => ['nullable', 'integer'],
+            'vacation_total' => ['nullable', 'integer'],
+            'vacation_social_benefits' => ['nullable', 'numeric'],
+            'vacation_start_date' => ['nullable', 'date_format:Y-m-d'],
+            'vacation_end_date' => ['nullable', 'date_format:Y-m-d'],
+            'work_place_type' => ['nullable', Rule::in(Contract::WORK_PLACE_TYPES)]
+        ];
+    }
+
 }
+
+

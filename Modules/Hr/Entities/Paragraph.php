@@ -11,6 +11,6 @@ class Paragraph extends Model
     public $timestamps = false;
 
     public function fields(){
-        return $this->belongsTo(ParagraphField::class);
+        return $this->hasMany(ParagraphField::class);
     }
 }
