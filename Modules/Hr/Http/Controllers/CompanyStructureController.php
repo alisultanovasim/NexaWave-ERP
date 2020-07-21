@@ -32,7 +32,6 @@ class CompanyStructureController extends Controller
 
     /**
      * CompanyStructureController constructor.
-     * @param Request $request
      * @param Company $company
      * @param Department $department
      * @param Section $section
@@ -160,7 +159,10 @@ class CompanyStructureController extends Controller
      * @return JsonResponse
      * @throws ValidationException
      */
-    public function companyCreateStructure(Request $request): JsonResponse {
+    public function companyCreateStructures(Request $request): JsonResponse {
+        if (!$request->get('is_batch_create')){
+            return $this->companyCreateStructure($request);
+        }
         $structureModel = $this->getStructureModelByType($request->get('structure_type'));
         $this->validate($request, [
             'structure_type' => [
@@ -188,6 +190,32 @@ class CompanyStructureController extends Controller
         }
         $structureModel->insert($insertData);
         return $this->successResponse(trans('messages.saved'), 200);
+    }
+
+    private function companyCreateStructure(Request $request): JsonResponse {
+        $structureModel = $this->getStructureModelByType($request->get('structure_type'));
+        $this->validate($request, [
+            'structure_type' => [
+                'required',
+                Rule::in(['department', 'section', 'sector'])
+            ],
+            'name' => 'required|min:2|max:255',
+            'code' => [
+                'required',
+                'min:3',
+                'max:3',
+                Rule::unique($structureModel->getTable(), 'code')->where('company_id', $request->get('company_id'))
+            ]
+        ]);
+        $structureModel->fill([
+            'name' => $request->get('name'),
+            'code' => $request->get('code'),
+            'company_id' => $request->get('company_id'),
+            'created_at' => Carbon::now(),
+            'updated_at' => Carbon::now()
+        ]);
+        $structureModel->save();
+        return $this->successResponse(['id' => $structureModel->getKey()], 200);
     }
 
     /**

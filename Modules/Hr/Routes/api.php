@@ -566,7 +566,7 @@ Route::group([
     });
 
     Route::group(['prefix' => 'company/structure'], function (){
-        Route::post('/add', 'CompanyStructureController@companyCreateStructure');
+        Route::post('/add', 'CompanyStructureController@companyCreateStructures');
         Route::put('/{id}', 'CompanyStructureController@companyUpdateStructure');
         Route::get('/', 'CompanyStructureController@index');
         Route::post('/', 'CompanyStructureController@addStructureLink');
