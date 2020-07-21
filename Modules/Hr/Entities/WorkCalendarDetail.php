@@ -10,4 +10,8 @@ class WorkCalendarDetail extends Model
     use SoftDeletes;
 
     protected $guarded = ['id'];
+
+    public function eventDetails(){
+        return $this->belongsTo(CompanyEvent::class, 'event_id', 'id');
+    }
 }

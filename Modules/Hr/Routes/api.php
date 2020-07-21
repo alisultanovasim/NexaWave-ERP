@@ -543,6 +543,13 @@ Route::group([
             Route::delete('/{id}', 'WorkCalendarController@remove');
         });
 
+        Route::group(['prefix' => 'event'], function (){
+            Route::get('/', 'CompanyEventController@index');
+            Route::post('/', 'CompanyEventController@create');
+            Route::put('/{id}', 'CompanyEventController@update');
+            Route::delete('/{id}', 'CompanyEventController@remove');
+        });
+
         Route::group(['prefix' => 'work/hours'], function (){
             Route::get('/', 'CompanyWorkingHourController@index');
             Route::get('/{id}', 'CompanyWorkingHourController@show');
