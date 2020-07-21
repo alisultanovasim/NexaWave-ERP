@@ -58,5 +58,4 @@ trait Query
     public function sqlQuery($field , $id , $companyId){
         return " EXISTS( SELECT id from " . config("query.$field") . " where (company_id = $companyId or company_id is null )  and id = $id ) as  {$field},";
     }
-
 }
