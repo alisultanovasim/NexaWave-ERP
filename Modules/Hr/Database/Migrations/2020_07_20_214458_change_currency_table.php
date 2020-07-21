@@ -15,7 +15,7 @@ class ChangeCurrencyTable extends Migration
     {
         Schema::table('currency', function (Blueprint $table) {
             $table->integer('code')->nullable()->default(null)->change();
-            $table->char('char')->nullable()->default(null)->change();
+            $table->string('char', 50)->nullable()->default(null)->change();
         });
     }
 
