@@ -10,6 +10,7 @@ use App\Models\UserRole;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Modules\Plaza\Entities\Contact;
 use Modules\Plaza\Entities\Contract;
 use Modules\Plaza\Entities\Document;
@@ -25,7 +26,6 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
-use Psy\Util\Str;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Illuminate\Routing\Controller;
 
@@ -137,9 +137,11 @@ class OfficeController extends Controller
             'documents' => 'sometimes|required|array',
             'documents.*' => 'sometimes|required|mimes::jpeg,png,jpg,gif,svg,pdf,docx,doc,txt,xls,xlsx',
 
+            'username' => ['required', 'string', 'min:6'],
 
             'user_email' => ['required', 'email', 'min:6'],
-            'password' => ['required', 'min:6'],
+            'set_password' => ['nullable' ,  'min:6']
+//            'password' => ['required', 'min:6'],
         ]);
         try {
             DB::beginTransaction();
@@ -225,11 +227,12 @@ class OfficeController extends Controller
             }
 
 
+            $ps = $request->has('set_password') ? $request->get('set_password')  :Str::random(9);
             $user = User::create([
                 'name' => $request->get('name'),
                 'email' => $request->get('user_email'),
                 'username' => $request->get('username'),
-                'password' => $request->get('password'),
+                'password' => Hash::make($ps),
                 'is_office_user' => true,
                 'office_company_id' => $request->get('company_id'),
             ]);
@@ -241,7 +244,7 @@ class OfficeController extends Controller
                 'company_id' => $request->get('company_id'),
             ]);
 
-            SendMailCreatePassword::dispatch($user, \Illuminate\Support\Str::random(9));
+            SendMailCreatePassword::dispatch($user, $ps);
 
             DB::commit();
             return $this->successResponse("OK");
@@ -288,21 +291,17 @@ class OfficeController extends Controller
         $this->validate($request, [
             'company_id' => 'required|integer'
         ]);
-        try {
-            $office = Office::with(['contract', 'contact', 'documents'])->where([
-                'id' => $id,
-                'company_id' => $request->company_id
-            ])->first();
+        $office = Office::with(['contract', 'contact', 'documents'])->where([
+            'id' => $id,
+            'company_id' => $request->company_id
+        ])->first();
 
-            if (!$office)
-                return $this->errorResponse(trans('apiResponse.unProcess'));
-            $office->load(['location', 'location.floor:id,number']);
-            $office->workers_count = DB::table('office_workers')
-                ->where("office_id", $office->id)->count();
-            return $this->successResponse($office);
-        } catch (\Exception $e) {
-            return $this->errorResponse(trans('apiResponse.tryLater'), Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
+        if (!$office)
+            return $this->errorResponse(trans('apiResponse.unProcess'));
+        $office->load(['location', 'location.floor:id,number']);
+        $office->workers_count = DB::table('office_workers')
+            ->where("office_id", $office->id)->count();
+        return $this->successResponse($office);
     }
 
     public function update(Request $request, $id)
@@ -745,6 +744,7 @@ class OfficeController extends Controller
             return $this->errorResponse(trans('apiResponse.tryLater'), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+
     /**
      * end documents
      */
@@ -850,20 +850,26 @@ class OfficeController extends Controller
         }
     }
 
-    public function getOfficeAssignedToUser(Request $request)
+    public function getOfficeAssignedToUser(Request $request , $id)
     {
         $this->validate($request, [
             'company_id' => 'required|integer',
             'per_page' => 'sometimes|required|integer'
         ]);
 
+        $check = Office::where('company_id', $request->get('company_id'))
+            ->where('id', $id)
+            ->exists();
+        if (!$check)
+            return $this->errorResponse('apiResponse.officeNotFound' , 404);
 
-//        $data = User::where('office_id' , )
+        $data = User::whereHas('roles' , function ($q) use ($id){
+            $q->where('roles.office_id' , "=" , $id);
+        })
+            ->where('is_office_user' , 1 )->paginate();
 
-//            $data = $data->paginate($request->get('per_page'));
 
-//            return $this->successResponse($data);
-
+        return $this->successResponse($data);
     }
 
     public function addUser(Request $request, $id)
@@ -882,7 +888,7 @@ class OfficeController extends Controller
             ->where('id', $id)
             ->exists();
         if (!$check)
-            return $this->errorResponse('apiResponse.unProcess');
+            return $this->errorResponse('apiResponse.officeNotFound' , 404);
 
         $check = Role::where('company_id', $request->get('company_id'))
             ->where('office_id', $id)
@@ -941,8 +947,8 @@ class OfficeController extends Controller
             if (!$check) return $this->errorResponse('apiResponse.roleNotFound');
         }
 
-        User::whereHas('roles' , function ($q) use ($id){
-            $q->where('office_id' , $id);
+        User::whereHas('roles', function ($q) use ($id) {
+            $q->where('office_id', $id);
         })->where('is_office_user', true)
             ->where('id', $request->get('user_id'))
             ->update($data);
@@ -958,8 +964,8 @@ class OfficeController extends Controller
             'user_id' => 'required|integer',
         ]);
 
-        User::whereHas('roles' , function ($q) use ($id){
-            $q->where('office_id' , $id);
+        User::whereHas('roles', function ($q) use ($id) {
+            $q->where('office_id', $id);
         })->where('id', $request->get('user_id'))
             ->where('is_office_user', true)
             ->delete();

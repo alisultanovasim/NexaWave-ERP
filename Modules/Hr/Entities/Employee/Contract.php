@@ -15,7 +15,6 @@ class Contract extends Model
         'additions' => 'json',
     ];
     const ACTIVE = 1;
-    const DRAFT = 2;
 
     // w - week
     // m - month
@@ -43,7 +42,7 @@ class Contract extends Model
         return $this->belongsTo('Modules\Hr\Entities\Employee\Employee' , 'employee_id', 'id');
     }
     public function department(){
-        return $this->belongsTo('Modules\Hr\Entities\Department' );
+        return $this->belongsTo('Modules\Hr\Entities\Department' ,'department_id' , 'id' );
     }
     public function personalCategory(){
         return $this->belongsTo('Modules\Hr\Entities\PersonalCategory');
@@ -72,12 +71,24 @@ class Contract extends Model
         return $this->belongsTo('Modules\Hr\Entities\DurationType' );
     }
     public function scopeActive($q){
-        return $q -> where('is_active' , true);
+        return $q -> where('is_active' , true)
+            ->where('draft' , 0)
+            ->whereNull('initial_contract_id');
+    }
+
+    public function scopeDraft($q){
+        return $q -> where('is_active' , true)
+            ->where('draft' , 1)
+            ->whereNull('initial_contract_id');
     }
 
     public function scopeCurrentlyActive($query){
         return $query->where('is_active', true)
                 ->where('start_date', '<', Carbon::now())
                 ->where('end_date', '>', Carbon::now());
+    }
+
+    public function scopeNoInitial($q){
+        return $q->whereNull('initial_contract_id');
     }
 }
