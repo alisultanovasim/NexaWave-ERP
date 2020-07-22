@@ -25,13 +25,22 @@ class CompanyAuthorizedUsersController extends Controller
     public function index(Request $request){
         $employees = Employee::where('company_id', $request->get('company_id'))
         ->isAuthorizedCompanyEmployee()
-        ->hasActiveContracts()
+        ->where(function ($query){
+            $query->whereHas('contract');
+            $query->orWhereHas('user', function ($query){
+                $query->whereHas('roles', function ($query){
+                    $query->where([
+                        'role_id' => 3
+                    ]);
+                });
+            });
+        })
         ->with([
             'user:id,name,surname',
             'authorizedDetails:id,employee_id,position',
             'contracts' => function ($query){
-                $query->currentlyActive();
                 $query->select(['id','employee_id','position_id']);
+                $query->active();
             },
             'contracts.position:id,name'
         ])
@@ -52,10 +61,9 @@ class CompanyAuthorizedUsersController extends Controller
             'employee_id' => [
                 'required',
                 Rule::exists('employees', 'id')->where('company_id', $request->get('company_id')),
-                Rule::exists('employee_contracts', 'employee_id')->where(function ($query){
+                Rule::exists('employee_contracts', 'employee_id')
+                ->where(function ($query){
                     $query->where('is_active', true);
-                    $query->where('start_date', '<', Carbon::now());
-                    $query->where('end_date', '>', Carbon::now());
                 })
             ],
             'position' => 'nullable|numeric'
