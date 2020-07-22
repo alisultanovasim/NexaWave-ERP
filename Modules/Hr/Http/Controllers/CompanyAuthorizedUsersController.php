@@ -3,6 +3,7 @@
 namespace Modules\Hr\Http\Controllers;
 
 use App\Traits\ApiResponse;
+use Carbon\Carbon;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -24,9 +25,15 @@ class CompanyAuthorizedUsersController extends Controller
     public function index(Request $request){
         $employees = Employee::where('company_id', $request->get('company_id'))
         ->isAuthorizedCompanyEmployee()
+        ->hasActiveContracts()
         ->with([
-            'user:id,name',
-            'authorizedDetails:id,employee_id,position'
+            'user:id,name,surname',
+            'authorizedDetails:id,employee_id,position',
+            'contracts' => function ($query){
+                $query->currentlyActive();
+                $query->select(['id','employee_id','position_id']);
+            },
+            'contracts.position:id,name'
         ])
         ->get([
             'id',
@@ -44,7 +51,12 @@ class CompanyAuthorizedUsersController extends Controller
         $this->validate($request, [
             'employee_id' => [
                 'required',
-                Rule::exists('employees', 'id')->where('company_id', $request->get('company_id'))
+                Rule::exists('employees', 'id')->where('company_id', $request->get('company_id')),
+                Rule::exists('employee_contracts', 'employee_id')->where(function ($query){
+                    $query->where('is_active', true);
+                    $query->where('start_date', '<', Carbon::now());
+                    $query->where('end_date', '>', Carbon::now());
+                })
             ],
             'position' => 'nullable|numeric'
         ]);

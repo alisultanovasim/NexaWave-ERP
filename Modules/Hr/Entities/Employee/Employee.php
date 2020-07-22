@@ -2,6 +2,7 @@
 
 namespace Modules\Hr\Entities\Employee;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Modules\Hr\Entities\CompanyAuthorizedEmployee;
@@ -47,10 +48,15 @@ class Employee extends Model
         return $q->where('is_active', true);
     }
 
-
-
-
     public function scopeIsAuthorizedCompanyEmployee($query){
         return $query->whereHas('authorizedDetails');
+    }
+
+    public function scopeHasActiveContracts($queyr){
+        return $queyr->whereHas('contracts', function ($query){
+            $query->where('is_active', true);
+            $query->where('start_date', '<', Carbon::now());
+            $query->where('end_date', '>', Carbon::now());
+        });
     }
 }

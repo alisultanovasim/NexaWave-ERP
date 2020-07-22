@@ -30,7 +30,10 @@ Route::group([
         Route::put('/{id}', 'OrganizationController@update');
         Route::delete('/{id}', 'OrganizationController@destroy');
     });
-
+    Route::group(['prefix' => "paragraphs"], function ($router) {
+        Route::get('/', 'ParagraphContoller@index');
+        Route::get('/{id}', 'ParagraphContoller@store');
+    });
 
 
     Route::group(['prefix' => "countries"], function ($router) {
@@ -570,9 +573,11 @@ Route::group([
     });
 
     Route::group(['prefix' => 'company/structure'], function (){
+        Route::post('/add', 'CompanyStructureController@companyCreateStructures');
+        Route::put('/{id}', 'CompanyStructureController@companyUpdateStructure');
         Route::get('/', 'CompanyStructureController@index');
         Route::post('/', 'CompanyStructureController@addStructureLink');
-        Route::post('/set', 'CompanyStructureController@createCompanyStructure');
+        Route::post('/set', 'CompanyStructureController@setCompanyStructure');
         Route::post('/positions', 'CompanyStructureController@setStructurePositions');
         Route::get('/positions', 'CompanyStructureController@getStructurePositions');
         Route::get('/employees', 'CompanyStructureController@getEmployees');

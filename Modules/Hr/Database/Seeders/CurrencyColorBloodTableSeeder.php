@@ -26,11 +26,11 @@ class CurrencyColorBloodTableSeeder extends Seeder
             ['name' => 'Müddətsiz'],
         ]);
 
-        Currency::create([
-            'char' => '$',
-            'name' => 'aze',
-            'code' => 1231,
-        ]);
+//        Currency::create([
+//            'char' => '$',
+//            'name' => 'aze',
+//            'code' => 1231,
+//        ]);
 
 //
         BloodGroup::insert([

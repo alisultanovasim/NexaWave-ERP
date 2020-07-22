@@ -16,6 +16,7 @@ use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Modules\Hr\Entities\Department;
 use Modules\Hr\Entities\Employee\Employee;
+use Modules\Hr\Entities\Positions;
 use Modules\Hr\Entities\Section;
 use Modules\Hr\Entities\Sector;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -31,14 +32,13 @@ class CompanyStructureController extends Controller
 
     /**
      * CompanyStructureController constructor.
-     * @param Request $request
      * @param Company $company
      * @param Department $department
      * @param Section $section
      * @param Sector $sector
      */
     public function __construct(
-        Request $request, Company $company, Department $department,
+        Company $company, Department $department,
         Section $section, Sector $sector
     ){
         $this->company = $company;
@@ -54,9 +54,9 @@ class CompanyStructureController extends Controller
     public function index(Request $request): JsonResponse {
         $structure = $this->company->where('id', $request->get('company_id'))
         ->with([
-            'structuredDepartments:id,name,structable_id,structable_type',
-            'structuredSections:id,name,structable_id,structable_type',
-            'structuredSectors:id,name,structable_id,structable_type',
+            'structuredDepartments:id,name,is_closed,structable_id,structable_type',
+            'structuredSections:id,name,is_closed,structable_id,structable_type',
+            'structuredSectors:id,name,is_closed,structable_id,structable_type',
         ])
         ->first([
             'id',
@@ -81,13 +81,14 @@ class CompanyStructureController extends Controller
     }
 
 
-    private function getNestedStructure($structure = [], $children = []){
+    private function getNestedStructure($structure = []){
         $formattedStructure = [];
 
         foreach ($structure['structuredDepartments'] ?? [] as $department){
             $formattedStructure[] = [
                 'id' => $department['id'],
                 'name' => $department['name'],
+                'is_closed' => $department['is_closed'],
                 'type' => 'department',
                 'children' => $this->getNestedStructure($department)
             ];
@@ -97,6 +98,7 @@ class CompanyStructureController extends Controller
             $formattedStructure[] = [
                 'id' => $section['id'],
                 'name' => $section['name'],
+                'is_closed' => $section['is_closed'],
                 'type' => 'section',
                 'children' => $this->getNestedStructure($section)
             ];
@@ -106,6 +108,7 @@ class CompanyStructureController extends Controller
             $formattedStructure[] = [
                 'id' => $sector['id'],
                 'name' => $sector['name'],
+                'is_closed' => $sector['is_closed'],
                 'type' => 'sector',
                 'children' => $this->getNestedStructure($sector)
             ];
@@ -156,7 +159,103 @@ class CompanyStructureController extends Controller
      * @return JsonResponse
      * @throws ValidationException
      */
-    public function createCompanyStructure(Request $request): JsonResponse {
+    public function companyCreateStructures(Request $request): JsonResponse {
+        if (!$request->get('is_batch_create')){
+            return $this->companyCreateStructure($request);
+        }
+        $structureModel = $this->getStructureModelByType($request->get('structure_type'));
+        $this->validate($request, [
+            'structure_type' => [
+                'required',
+                Rule::in(['department', 'section', 'sector'])
+            ],
+            'structures' => 'required|array',
+            'structures.*.name' => 'required|min:2|max:255',
+            'structures.*.code' => [
+                'required',
+                'min:3',
+                'max:3',
+                Rule::unique($structureModel->getTable(), 'code')->where('company_id', $request->get('company_id'))
+            ]
+        ]);
+        $insertData = [];
+        foreach ($request->get('structures') as $structure){
+            $insertData[] = [
+                'name' => $structure['name'],
+                'code' => $structure['code'],
+                'company_id' => $request->get('company_id'),
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now()
+            ];
+        }
+        $structureModel->insert($insertData);
+        return $this->successResponse(trans('messages.saved'), 200);
+    }
+
+    private function companyCreateStructure(Request $request): JsonResponse {
+        $structureModel = $this->getStructureModelByType($request->get('structure_type'));
+        $this->validate($request, [
+            'structure_type' => [
+                'required',
+                Rule::in(['department', 'section', 'sector'])
+            ],
+            'name' => 'required|min:2|max:255',
+            'code' => [
+                'required',
+                'min:3',
+                'max:3',
+                Rule::unique($structureModel->getTable(), 'code')->where('company_id', $request->get('company_id'))
+            ]
+        ]);
+        $structureModel->fill([
+            'name' => $request->get('name'),
+            'code' => $request->get('code'),
+            'company_id' => $request->get('company_id'),
+            'created_at' => Carbon::now(),
+            'updated_at' => Carbon::now()
+        ]);
+        $structureModel->save();
+        return $this->successResponse(['id' => $structureModel->getKey()], 200);
+    }
+
+    /**
+     * @param Request $request
+     * @param $id
+     * @return JsonResponse
+     * @throws ValidationException
+     */
+    public function companyUpdateStructure(Request $request, $id): JsonResponse {
+        $structureModel = $this->getStructureModelByType($request->get('structure_type'));
+        $this->validate($request, [
+            'structure_type' => [
+                'required',
+                Rule::in(['department', 'section', 'sector'])
+            ],
+            'name' => 'required|min:2|max:255',
+            'code' => [
+                'required',
+                'min:3',
+                'max:3',
+                Rule::unique($structureModel->getTable(), 'code')->where(function ($query) use ($request, $id){
+                    $query->where('company_id', $request->get('company_id'));
+                    $query->where('id', '!=', $id);
+                })
+            ]
+        ]);
+        $structureModel = $structureModel->where([
+            'id' => $id,
+            'company_id' => $request->get('company_id')
+        ])->firstOrFail(['id']);
+        $structureModel->update($request->only(['name', 'code', 'is_closed', 'closed_date']));
+        return $this->successResponse(trans('messages.saved'), 200);
+    }
+
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     * @throws ValidationException
+     */
+    public function setCompanyStructure(Request $request): JsonResponse {
         $this->validate($request, [
             'structure' => 'required|array',
             'structure.*.structure_id' => 'required|numeric',
@@ -299,9 +398,13 @@ class CompanyStructureController extends Controller
         $this->validate($request, [
             'structure_id' => 'nullable|numeric',
             'structure_type' => [
+                'nullable',
                 Rule::in(['company', 'department', 'section', 'sector'])
             ],
         ]);
+        if (!$request->get('structure_id') and !$request->get('structure_type')){
+            return $this->getPositionsWhichExistsInAnyStructure($request, $request->get('company_id'));
+        }
         if ($request->get('structure_type')){
             $structure = $this->getStructureModelByType($request->get('structure_type'));
             $structure = $structure->where('id', $request->get('structure_id'));
@@ -323,6 +426,13 @@ class CompanyStructureController extends Controller
             ];
         }
         return $this->successResponse($response);
+    }
+
+    private function getPositionsWhichExistsInAnyStructure(Request $request, $companyId){
+        $positions = Positions::where('company_id', $companyId)
+            ->existsInStructure()
+        ->get(['id', 'name']);
+        return $this->successResponse($positions);
     }
 
     /**

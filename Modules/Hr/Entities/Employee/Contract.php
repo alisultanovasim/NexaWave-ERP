@@ -2,6 +2,7 @@
 
 
 namespace Modules\Hr\Entities\Employee;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
 
@@ -44,6 +45,14 @@ class Contract extends Model
     public function department(){
         return $this->belongsTo('Modules\Hr\Entities\Department' );
     }
+    public function personalCategory(){
+        return $this->belongsTo('Modules\Hr\Entities\PersonalCategory');
+    }
+
+    public function specializationDegree(){
+        return $this->belongsTo('Modules\Hr\Entities\SpecializationDegree');
+
+    }
     public function section(){
         return $this->belongsTo('Modules\Hr\Entities\Section' );
     }
@@ -64,5 +73,11 @@ class Contract extends Model
     }
     public function scopeActive($q){
         return $q -> where('is_active' , true);
+    }
+
+    public function scopeCurrentlyActive($query){
+        return $query->where('is_active', true)
+                ->where('start_date', '<', Carbon::now())
+                ->where('end_date', '>', Carbon::now());
     }
 }

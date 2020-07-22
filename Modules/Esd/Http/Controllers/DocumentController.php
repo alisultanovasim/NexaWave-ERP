@@ -89,16 +89,16 @@ class DocumentController extends Controller
                 ->where("status", "!=", Document::DRAFT);
 
             //check permission
-            if (!Auth::user()->can("read-Sənəd Dövriyyəsi")){
-                $documents->where(function ($q) use ($request){
-                    $q->whereHas('assignment' , function ($q){
-                        $q->whereHas('items' ,function ($q){
-                            $q->where('user_id' , Auth::id());
-                        });
-                    })->orWhere('from' , Auth::id())
-                        ->orWhere('company_user' , Auth::user()->getEmployeeId($request->get('company')));
-                });
-            }
+//            if (!Auth::user()->can("read-Sənəd Dövriyyəsi")){
+//                $documents->where(function ($q) use ($request){
+//                    $q->whereHas('assignment' , function ($q){
+//                        $q->whereHas('items' ,function ($q){
+//                            $q->where('user_id' , Auth::id());
+//                        });
+//                    })->orWhere('from' , Auth::id())
+//                        ->orWhere('company_user' , Auth::user()->getEmployeeId($request->get('company')));
+//                });
+//            }
 
             /**  Start filter  */
             if ($request->has("status")) {
