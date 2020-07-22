@@ -26,6 +26,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
+use Modules\Hr\Entities\CompanyAuthorizedEmployee;
 use Modules\Hr\Entities\Employee\Contract as EmployeeContract;
 use Modules\Hr\Entities\Employee\Employee;
 use Modules\Hr\Entities\Employee\UserDetail;
@@ -121,6 +122,10 @@ class UserController extends Controller
                 'user_id' => $user->getKey(),
                 'role_id' => $role->getCompanyAdminRoleId(),
                 'company_id' => $company->getKey()
+            ]);
+            CompanyAuthorizedEmployee::create([
+                'employee_id' => $employee->getKey(),
+                'position' => 1
             ]);
             $request->merge(['username' => $request->get('fin')]);
             return $this->login($request);
