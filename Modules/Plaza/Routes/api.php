@@ -41,7 +41,7 @@ Route::group([
         Route::post("/users/add/{id}", 'OfficeController@addUser');
         Route::post("/users/update/{id}", 'OfficeController@updateUser');
         Route::post("/users/remove/{id}", 'OfficeController@removeUser');
-        Route::get("/users", 'OfficeController@getOfficeAssignedToUser');
+        Route::get("/users/{id}", 'OfficeController@getOfficeAssignedToUser');
 
 
         Route::group([
