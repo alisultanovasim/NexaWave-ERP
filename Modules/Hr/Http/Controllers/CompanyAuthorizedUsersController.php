@@ -2,6 +2,7 @@
 
 namespace Modules\Hr\Http\Controllers;
 
+use App\Models\Role;
 use App\Traits\ApiResponse;
 use Carbon\Carbon;
 use Illuminate\Foundation\Validation\ValidatesRequests;
@@ -22,15 +23,16 @@ class CompanyAuthorizedUsersController extends Controller
         $this->companyAuthorizedEmployee = $companyAuthorizedUser;
     }
 
-    public function index(Request $request){
+    public function index(Request $request, Role $role){
         $employees = Employee::where('company_id', $request->get('company_id'))
         ->isAuthorizedCompanyEmployee()
-        ->where(function ($query){
+        ->where(function ($query) use ($role, $request){
             $query->whereHas('contract');
-            $query->orWhereHas('user', function ($query){
-                $query->whereHas('roles', function ($query){
+            $query->orWhereHas('user', function ($query) use ($role, $request){
+                $query->whereHas('roles', function ($query) use ($role, $request){
                     $query->where([
-                        'role_id' => 3
+                        'user_roles.role_id' => $role->getCompanyAdminRoleId(),
+                        'user_roles.company_id' => $request->get('company_id')
                     ]);
                 });
             });
