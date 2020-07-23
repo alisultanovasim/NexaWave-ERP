@@ -31,8 +31,10 @@ Route::group([
         Route::delete('/{id}', 'OrganizationController@destroy');
     });
     Route::group(['prefix' => "paragraphs"], function ($router) {
-        Route::get('/', 'ParagraphContoller@index');
-        Route::get('/{id}', 'ParagraphContoller@store');
+        Route::get('/', 'ParagraphController@index');
+        Route::get('/{id}', 'ParagraphController@show');
+        Route::put('/{id}', 'ParagraphController@update');
+        Route::post('/', 'ParagraphController@store');
     });
 
 
