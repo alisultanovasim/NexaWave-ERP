@@ -277,6 +277,9 @@ class ContractController extends Controller
 
         $this->validate($request, $rules);
 
+
+        $keys = array_keys($rules);
+
         $data = $request->only($keys);
 
 
@@ -389,6 +392,20 @@ class ContractController extends Controller
         return $this->successResponse('ok');
     }
 
+    public function NoDraft(Request $request, $id){
+        $contract = Contract::whereHas('employee', function ($q) {
+            $q->company();
+        })->where('id', $id)
+                ->where('draft' , 0)
+            ->first(['id']);
+
+        if (!$contract) return $this->errorResponse(trans('response.contractNotFound'), 404);
+
+        $contract->update(['draft' => 1]);
+
+        return $this->successResponse('ok');
+    }
+
     public function show(Request $request, $id)
     {
         $contract = Contract::with([
@@ -410,21 +427,22 @@ class ContractController extends Controller
     public static function getValidationRules()
     {
         return [
-            'draft' => ['nullable', 'boolean'],
             'department_id' => ['sometimes', 'required', 'integer'],
             'section_id' => ['sometimes', 'required', 'integer'],
             'sector_id' => ['sometimes', 'required', 'integer'],
             'position_id' => ['sometimes', 'required', 'integer'],
+            'personal_category_id' => ['nullable', 'integer'],
+            'specialization_degree_id' => ['nullable', 'integer'],//exists
+            'work_environment_id' => ['nullable', 'integer'],//exists
+            'work_place_type' => ['nullable', Rule::in(Contract::WORK_PLACE_TYPES)],
+            'state_value' => ['nullable', 'numeric'],
+            'position_description' => ['nullable', 'string'],
+
 //            'salary' => ['sometimes', 'required', 'numeric'],
 //            'contract' => ['sometimes', 'mimes:pdf,doc,docx'],
             'start_date' => ['sometimes', 'required', 'date'],
             'end_date' => ['sometimes', 'required', 'date'],
-            'personal_category_id' => ['nullable', 'integer'],
-            'specialization_degree_id' => ['nullable', 'integer'],//exists
-            'work_environment_id' => ['nullable', 'integer'],//exists
-            'state_value' => ['nullable', 'numeric'],
             'contract_type_id' => ['nullable', 'integer'],//exists
-            'position_description' => ['nullable', 'string'],
             'currency_id' => ['nullable', 'integer'],//exists
             'position_salary_praise_about' => ['nullable', 'numeric'],
             'addition_package_fee' => ['nullable', 'numeric', "min:0", "max:100"],
@@ -458,7 +476,7 @@ class ContractController extends Controller
             'vacation_social_benefits' => ['nullable', 'numeric'],
             'vacation_start_date' => ['nullable', 'date_format:Y-m-d'],
             'vacation_end_date' => ['nullable', 'date_format:Y-m-d'],
-            'work_place_type' => ['nullable', Rule::in(Contract::WORK_PLACE_TYPES)]
         ];
     }
+
 }
