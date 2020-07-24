@@ -271,7 +271,7 @@ class CompanyStructureController extends Controller
             ],
         ]);
         $links = [];
-        $linkedStructures = [
+        $structuresToBeUnlinked = [
             'department' => [
                 'model' => $this->getStructureModelByType('department'),
                 'ids' => []
@@ -341,9 +341,9 @@ class CompanyStructureController extends Controller
             /*
              * Group linked structure ids by structure type (later to remove from company structure which is not in array)
              */
-            $linkedStructures[$structure['structure_type']]['ids'][] = $structure['structure_id'];
+            $structuresToBeUnlinked[$structure['structure_type']]['ids'][] = $structure['structure_id'];
         }
-        DB::transaction(function () use ($request, $links, $linkedStructures){
+        DB::transaction(function () use ($request, $links, $structuresToBeUnlinked){
             foreach ($links as $link){
                 $link['model']->whereIn('id', $link['connectorsIds'])
                 ->where('company_id', $request->get('company_id'))
@@ -352,7 +352,7 @@ class CompanyStructureController extends Controller
                     'structable_type' => $link['structable_type']
                 ]);
             }
-            foreach ($linkedStructures as $link){
+            foreach ($structuresToBeUnlinked as $link){
                 $link['model']->whereNotIn('id', $link['ids'])
                 ->where('company_id', $request->get('company_id'))
                 ->update([
