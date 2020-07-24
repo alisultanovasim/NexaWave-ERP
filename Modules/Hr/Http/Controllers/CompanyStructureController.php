@@ -258,13 +258,13 @@ class CompanyStructureController extends Controller
     public function setCompanyStructure(Request $request): JsonResponse {
         $this->validate($request, [
             'structure' => 'required|array',
-            'structure.*.structure_id' => 'required|numeric',
+            'structure.*.structure_id' => 'nullable|numeric',
             'structure.*.structure_type' => [
                 'required',
                 Rule::in(['department', 'section', 'sector'])
             ],
             'structure.*.link' => 'required|array',
-            'structure.*.link.id' => 'required|numeric',
+            'structure.*.link.id' => 'nullable|numeric',
             'structure.*.link.type' => [
                 'required',
                 Rule::in(['company', 'department', 'section', 'sector'])
@@ -287,6 +287,20 @@ class CompanyStructureController extends Controller
         ];
         foreach ($request->get('structure') as $structure){
             $link = $structure['link'];
+            if (!$link['id'] and $link['type'] != 'company'){
+                $link['id'] = $this->saveCompanyStructureAndGetId(
+                    ['name' => $link['name'], 'code' => $link['code'] ?? null],
+                    $request->get('company_id'),
+                    $link['type']
+                );
+            }
+            if (!$structure['structure_id']){
+                $structure['structure_id'] = $this->saveCompanyStructureAndGetId(
+                    ['name' => $structure['name'], 'code' => $structure['code'] ?? null],
+                    $request->get('company_id'),
+                    $structure['structure_type']
+                );
+            }
             $this->ifStructureTriesLinkSmallerStructureThrowException($structure['structure_type'], $link['type']);
             $structableId = $link['type'] == 'company' ? $request->get('company_id') : $link['id'];
             $key = $structableId . '-' . $structure['structure_type'] . '-' . $link['type'];
@@ -328,6 +342,17 @@ class CompanyStructureController extends Controller
             }
         });
         return $this->successResponse(trans('messages.saved'), 200);
+    }
+
+    private function saveCompanyStructureAndGetId($structure, $companyId, $structureType): int {
+        $structureModel = $this->getStructureModelByType($structureType);
+        $structureModel->fill([
+            'name' => $structure['name'],
+            'code' => $structure['code'] ?? null,
+            'company_id' => $companyId
+        ]);
+        $structureModel->save();
+        return $structureModel->getKey();
     }
 
     /**
