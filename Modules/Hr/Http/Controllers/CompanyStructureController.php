@@ -285,21 +285,41 @@ class CompanyStructureController extends Controller
                 'ids' => []
             ]
         ];
+        $structureIdByTempId = [];
         foreach ($request->get('structure') as $structure){
             $link = $structure['link'];
             if (!$link['id'] and $link['type'] != 'company'){
-                $link['id'] = $this->saveCompanyStructureAndGetId(
-                    ['name' => $link['name'], 'code' => $link['code'] ?? null],
-                    $request->get('company_id'),
-                    $link['type']
-                );
+                /*
+                 * When structure already created
+                 */
+                if (isset($structureIdByTempId[$link['temp_id']])){
+                    $link['id'] = $structureIdByTempId[$link['temp_id']];
+                }
+
+                /*
+                 * Else create structure and link temp and real id
+                 */
+                else {
+                    $link['id'] = $this->saveCompanyStructureAndGetId(
+                        ['name' => $link['name'], 'code' => $link['code'] ?? null],
+                        $request->get('company_id'),
+                        $link['type']
+                    );
+                    $structureIdByTempId[$link['temp_id']] = $link['id'];
+                }
             }
-            if (!$structure['structure_id']){
-                $structure['structure_id'] = $this->saveCompanyStructureAndGetId(
-                    ['name' => $structure['name'], 'code' => $structure['code'] ?? null],
-                    $request->get('company_id'),
-                    $structure['structure_type']
-                );
+            if (!isset($structure['structure_id']) or !$structure['structure_id']){
+                if (isset($structureIdByTempId[$structure['temp_id']])){
+                    $structure['structure_id'] = $structureIdByTempId[$structure['temp_id']];
+                }
+                else {
+                    $structure['structure_id'] = $this->saveCompanyStructureAndGetId(
+                        ['name' => $structure['name'], 'code' => $structure['code'] ?? null],
+                        $request->get('company_id'),
+                        $structure['structure_type']
+                    );
+                    $structureIdByTempId[$structure['temp_id']] = $structure['structure_id'];
+                }
             }
             $this->ifStructureTriesLinkSmallerStructureThrowException($structure['structure_type'], $link['type']);
             $structableId = $link['type'] == 'company' ? $request->get('company_id') : $link['id'];
