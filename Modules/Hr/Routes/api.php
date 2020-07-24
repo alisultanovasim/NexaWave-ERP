@@ -531,7 +531,7 @@ Route::group([
             Route::get('/{id}', 'WorkEventController@show');
             Route::post('/', 'WorkEventController@create');
             Route::put('/{id}', 'WorkEventController@update');
-            Route::delete('/{id}', 'Work        EventController@destroy');
+            Route::delete('/{id}', 'WorkEventController@destroy');
         });
 
         Route::group(['prefix' => 'vacation/planning'], function (){

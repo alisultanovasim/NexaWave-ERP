@@ -16,7 +16,15 @@ class ParagraphController extends Controller
 
     public function index(Request $request)
     {
-        $paragraphs = Paragraph::all();
+        $this->validate($request , [
+            'load_details' => ['nullable' , 'boolean']
+        ]);
+        $paragraphs = Paragraph::query();
+
+        if ($request->get('load_details')){
+            $paragraphs->with('fields');
+        }
+        $paragraphs = $paragraphs->get();
         return $this->successResponse($paragraphs);
     }
 
@@ -32,7 +40,7 @@ class ParagraphController extends Controller
     {
         $this->validate($request, [
             'name' => ['nullable', 'string', 'max:255'],
-            'can_update' => ['nullable', 'boolean'],
+                'can_update' => ['nullable', 'boolean'],
             'fields' => ['nullable', 'array'],
             'fields.*.field' => ['required_with:fields', 'string', 'max:255'],
             'fields.*.name' => ['required_with:fields', 'string', 'max:255']
@@ -62,7 +70,6 @@ class ParagraphController extends Controller
                     'paragraph_id' => $id,
                     'field' => $v['field'],
                     'name' => $v['name'],
-                    'can_update' => $v['can_update']
                 ]);
             }
 
@@ -75,7 +82,7 @@ class ParagraphController extends Controller
     }
 
 
-    public function store($request, $id)
+    public function store(Request $request)
     {
         $this->validate($request, [
             'name' => ['required', 'string', 'max:255'],
@@ -95,10 +102,8 @@ class ParagraphController extends Controller
                 'paragraph_id' => $p->id,
                 'field' => $v['field'],
                 'name' => $v['name'],
-                'can_update' => $v['can_update']
             ]);
         }
-
 
         ParagraphField::insert($data);
 
