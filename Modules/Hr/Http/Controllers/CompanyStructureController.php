@@ -365,7 +365,7 @@ class CompanyStructureController extends Controller
     }
 
     private function saveCompanyStructureAndGetId($structure, $companyId, $structureType): int {
-        $structureModel = $this->getStructureModelByType($structureType);
+        $structureModel = $this->getStructureModelNewInstanceByType($structureType);
         $structureModel->fill([
             'name' => $structure['name'],
             'code' => $structure['code'] ?? null,
@@ -549,6 +549,17 @@ class CompanyStructureController extends Controller
             $structure = $this->sector;
         if ($type == 'company')
             $structure = $this->company;
+        return $structure;
+    }
+
+    private function getStructureModelNewInstanceByType(string $type): Model {
+        $structure = null;
+        if ($type == 'department')
+            $structure = new Department();
+        if ($type == 'section')
+            $structure = new Section();
+        if ($type == 'sector')
+            $structure = new Sector();
         return $structure;
     }
 
