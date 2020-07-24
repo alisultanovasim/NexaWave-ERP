@@ -24,6 +24,10 @@ class CompanyOrderFilters extends QueryFilters {
         return $this->builder->where('type', $type);
     }
 
+    public function typeIds(array $ids): Builder {
+        return $this->builder->whereIn('type', $ids);
+    }
+
     public function isConfirmed(bool $isConfirmed): Builder {
         if ($isConfirmed)
             return $this->builder->where('confirmed_date', '!=', null);
@@ -47,4 +51,9 @@ class CompanyOrderFilters extends QueryFilters {
         return $this->builder->where('number', 'like', "%{$number}%");
     }
 
+    public function hasEmployeeId(int $id): Builder {
+        return $this->builder->whereHas('employees', function ($query) use ($id){
+            $query->where('details->employee_id', $id);
+        });
+    }
 }

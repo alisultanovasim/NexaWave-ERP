@@ -19,6 +19,10 @@ class OrderEmployeeFilters extends QueryFilters {
         parent::__construct($request);
     }
 
+    public function employeeId(int $id): Builder {
+        return $this->builder->where('details->employee_id', $id);
+    }
+
     public function employeeTableNo(string $tableNo): Builder {
         return $this->builder->where('details->employee_tabel_no', 'like', "{$tableNo}");
     }

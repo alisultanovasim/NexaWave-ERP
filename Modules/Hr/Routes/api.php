@@ -30,7 +30,12 @@ Route::group([
         Route::put('/{id}', 'OrganizationController@update');
         Route::delete('/{id}', 'OrganizationController@destroy');
     });
-
+    Route::group(['prefix' => "paragraphs"], function ($router) {
+        Route::get('/', 'ParagraphController@index');
+        Route::get('/{id}', 'ParagraphController@show');
+        Route::put('/{id}', 'ParagraphController@update');
+        Route::post('/', 'ParagraphController@store');
+    });
 
 
     Route::group(['prefix' => "countries"], function ($router) {
@@ -526,7 +531,7 @@ Route::group([
             Route::get('/{id}', 'WorkEventController@show');
             Route::post('/', 'WorkEventController@create');
             Route::put('/{id}', 'WorkEventController@update');
-            Route::delete('/{id}', 'Work        EventController@destroy');
+            Route::delete('/{id}', 'WorkEventController@destroy');
         });
 
         Route::group(['prefix' => 'vacation/planning'], function (){
@@ -552,6 +557,7 @@ Route::group([
         });
 
         Route::group(['prefix' => 'work/skips'], function (){
+            Route::get('/main', 'WorkSkipsController@getMainWorkSkips');
             Route::get('/', 'WorkSkipsController@index');
             Route::get('/{id}', 'WorkSkipsController@show');
             Route::post('/', 'WorkSkipsController@create');

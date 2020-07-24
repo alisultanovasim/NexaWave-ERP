@@ -293,7 +293,7 @@ class PermissionController extends Controller
         $rules['role_name'] = [
             'nullable',
             'max:255',
-            Rule::unique('roles', 'name')->where('company_id', function ($query) use ($companyId){
+            Rule::unique('roles', 'name')->where(function ($query) use ($companyId){
                 $query->where('company_id', $companyId);
                 $query->where('office_id', null);
             })
@@ -303,8 +303,7 @@ class PermissionController extends Controller
             'required',
             Rule::exists('company_modules', 'module_id')
                 ->where('is_active', true)
-                ->where('company_id', $companyId)
-                ->where('if_office_module', false),
+                ->where('company_id', $companyId),
         ];
         return $rules;
     }
