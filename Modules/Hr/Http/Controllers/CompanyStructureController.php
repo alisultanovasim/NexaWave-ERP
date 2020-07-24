@@ -308,7 +308,7 @@ class CompanyStructureController extends Controller
                     $structureIdByTempId[$link['temp_id']] = $link['id'];
                 }
             }
-            if (!isset($structure['structure_id']) or !$structure['structure_id']){
+            if (!$structure['structure_id']){
                 if (isset($structureIdByTempId[$structure['temp_id']])){
                     $structure['structure_id'] = $structureIdByTempId[$structure['temp_id']];
                 }
