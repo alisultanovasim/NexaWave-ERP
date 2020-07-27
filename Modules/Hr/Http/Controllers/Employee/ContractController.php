@@ -2,19 +2,18 @@
 
 namespace Modules\Hr\Http\Controllers\Employee;
 
+use App\Traits\ApiResponse;
+use App\Traits\Query;
 use Carbon\Carbon;
-use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Validation\ValidatesRequests;
+use Illuminate\Http\Request;
+use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Modules\Hr\Entities\CompanyAuthorizedEmployee;
 use Modules\Hr\Entities\Employee\Contract;
 use Modules\Hr\Entities\Employee\Employee;
-use App\Traits\ApiResponse;
-use App\Traits\Query;
-use Illuminate\Http\Request;
-use Illuminate\Routing\Controller;
 use Modules\Hr\Entities\Paragraph;
 use Modules\Hr\Traits\DocumentUploader;
 
@@ -339,16 +338,6 @@ class ContractController extends Controller
     public function add(Request $request, $id)
     {
 
-        $this->validate($request, [
-            'paragraph_id' => ['required', 'boolean']
-        ]);
-
-
-        $paragraph = Paragraph::where('id', '=', $request->get('paragraph_id'))
-            ->exists();
-
-        if (!$paragraph)
-            return $this->errorResponse(trans('response.nothingToUpdate'),404);
 
         $this->validate($request, [
             'data' => ['required', 'array'],
@@ -356,13 +345,21 @@ class ContractController extends Controller
             'data.*.value' => ['required', 'string', 'max:255'],
             'paragraph_id' => ['required', 'boolean']
         ]);
+
+
+        $paragraph = Paragraph::where('id', '=', $request->get('paragraph_id'))
+            ->first();
+
+        if (!$paragraph)
+            return $this->errorResponse(trans('response.nothingToUpdate'), 404);
+
         $contract = Contract::whereHas('employee', function ($q) {
             $q->company();
         })->where('id', $id)->first(['id', 'additions']);
 
         if (!$contract->additions) $contract->additions = [];
 
-        $contract->additions = array_merge((array)$request->additions,
+        $contract->additions = array_merge((array)$request->get('additions'),
             [
                 $request->only('data'),
                 'paragraph' => $paragraph
@@ -372,7 +369,6 @@ class ContractController extends Controller
         $contract->save();
 
         return $this->successResponse('ok');
-
     }
 
     public function delete(Request $request, $id)
@@ -392,11 +388,12 @@ class ContractController extends Controller
         return $this->successResponse('ok');
     }
 
-    public function NoDraft(Request $request, $id){
+    public function NoDraft(Request $request, $id)
+    {
         $contract = Contract::whereHas('employee', function ($q) {
             $q->company();
         })->where('id', $id)
-                ->where('draft' , 0)
+            ->where('draft', 0)
             ->first(['id']);
 
         if (!$contract) return $this->errorResponse(trans('response.contractNotFound'), 404);

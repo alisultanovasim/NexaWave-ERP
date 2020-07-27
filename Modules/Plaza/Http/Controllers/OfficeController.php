@@ -863,15 +863,43 @@ class OfficeController extends Controller
         if (!$check)
             return $this->errorResponse('apiResponse.officeNotFound' , 404);
 
-        $data = User::whereHas('roles' , function ($q) use ($id){
+        $data = User::with(['roles'  => function($q){
+            $q->first();
+        }])
+            ->whereHas('roles' , function ($q) use ($id){
             $q->where('roles.office_id' , "=" , $id);
         })
-            ->where('is_office_user' , 1 )->paginate();
-
+            ->where('is_office_user' , 1 )
+            ->paginate($request->get('per_page'));
 
         return $this->successResponse($data);
     }
 
+    public function getOfficeUser(Request $request , $id)
+    {
+        $this->validate($request, [
+            'company_id' => 'required|integer',
+            'per_page' => 'sometimes|required|integer' ,
+            'user_id' => ['required' , 'integer' ]
+        ]);
+        $check = Office::where('company_id', $request->get('company_id'))
+            ->where('id', $id)
+            ->exists();
+        if (!$check)
+            return $this->errorResponse('apiResponse.officeNotFound' , 404);
+
+        $data = User::with(['roles'  => function($q){
+            $q->first();
+        }])
+            ->whereHas('roles' , function ($q) use ($id){
+                $q->where('roles.office_id' , "=" , $id);
+            })
+            ->where('user_id' , $request->get('user_id'))
+            ->where('is_office_user' , 1 )
+            ->first();
+
+        return $this->successResponse($data);
+    }
     public function addUser(Request $request, $id)
     {
         $this->validate($request, [
