@@ -40,7 +40,7 @@ class ParagraphController extends Controller
     {
         $this->validate($request, [
             'name' => ['nullable', 'string', 'max:255'],
-                'can_update' => ['nullable', 'boolean'],
+            'can_update' => ['nullable', 'boolean'],
             'fields' => ['nullable', 'array'],
             'fields.*.field' => ['required_with:fields', 'string', 'max:255'],
             'fields.*.name' => ['required_with:fields', 'string', 'max:255']
