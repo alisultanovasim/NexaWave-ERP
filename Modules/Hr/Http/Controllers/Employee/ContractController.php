@@ -420,7 +420,6 @@ class ContractController extends Controller
             })->where('id', $id)->first();
         return $this->successResponse($contract);
     }
-
     public static function getValidationRules()
     {
         return [
@@ -448,6 +447,7 @@ class ContractController extends Controller
             'work_environment_addition' => ['nullable', 'numeric'],
             'overtime_addition' => ['nullable', 'numeric'],
             'labor_protection_addition' => ['nullable', 'string'],
+            'labor_sport_addition' => ['nullable', 'string'],
             'labor_meal_addition' => ['nullable', 'string'],
             'work_start_date' => ['nullable', 'date_format:Y-m-d'],
             'work_end_date' => ['nullable', 'date_format:Y-m-d'],
@@ -475,5 +475,4 @@ class ContractController extends Controller
             'vacation_end_date' => ['nullable', 'date_format:Y-m-d'],
         ];
     }
-
 }

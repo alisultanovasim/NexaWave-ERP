@@ -863,9 +863,7 @@ class OfficeController extends Controller
         if (!$check)
             return $this->errorResponse('apiResponse.officeNotFound' , 404);
 
-        $data = User::with(['roles'  => function($q){
-            $q->first();
-        }])
+        $data = User::with(['role'])
             ->whereHas('roles' , function ($q) use ($id){
             $q->where('roles.office_id' , "=" , $id);
         })
@@ -888,9 +886,7 @@ class OfficeController extends Controller
         if (!$check)
             return $this->errorResponse('apiResponse.officeNotFound' , 404);
 
-        $data = User::with(['roles'  => function($q){
-            $q->first();
-        }])
+        $data = User::with(['roles'])
             ->whereHas('roles' , function ($q) use ($id){
                 $q->where('roles.office_id' , "=" , $id);
             })
@@ -905,7 +901,7 @@ class OfficeController extends Controller
         $this->validate($request, [
             'email' => ['nullable', 'string', "min:6", 'max:255'],
             'username' => ['required', 'string', 'max:255', 'unique:users,username'],
-            'password' => ['required', 'string', "min:6", 'max:255'],
+            'password' => ['required', 'string', "min:8", 'max:255'],
             'name' => ['required', 'string', 'max:255'],
             'surname' => ['nullable', 'string', 'max:255'],
             'role_id' => ['required', 'integer']
@@ -949,7 +945,7 @@ class OfficeController extends Controller
         $this->validate($request, [
             'email' => ['nullable', 'string', "min:6", 'max:255'],
             'username' => ['nullable', 'string', 'max:255', 'unique:users,username'],
-            'password' => ['nullable', 'string', "min:6", 'max:255'],
+            'password' => ['nullable', 'string', "min:8", 'max:255'],
             'name' => ['nullable', 'string', 'max:255'],
             'surname' => ['nullable', 'string', 'max:255'],
             'user_id' => ['required', 'integer'],
@@ -993,8 +989,9 @@ class OfficeController extends Controller
         ]);
 
         User::whereHas('roles', function ($q) use ($id) {
-            $q->where('office_id', $id);
-        })->where('id', $request->get('user_id'))
+            $q->where('roles.office_id', $id);
+        })
+            ->where('id', $request->get('user_id'))
             ->where('is_office_user', true)
             ->delete();
 
