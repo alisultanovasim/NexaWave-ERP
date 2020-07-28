@@ -7,8 +7,15 @@ use App\Jobs\SendMailCreatePassword;
 use App\Models\Role;
 use App\Models\User;
 use App\Models\UserRole;
+use App\Traits\ApiResponse;
+use Exception;
+use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Validation\ValidatesRequests;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Modules\Plaza\Entities\Contact;
@@ -17,17 +24,8 @@ use Modules\Plaza\Entities\Document;
 use Modules\Plaza\Entities\Floor;
 use Modules\Plaza\Entities\Location;
 use Modules\Plaza\Entities\Office;
-use Modules\Plaza\Entities\OfficeUser;
 use Modules\Plaza\Entities\Worker;
-use App\Traits\ApiResponse;
-use Exception;
-use Illuminate\Database\QueryException;
-use Illuminate\Http\Request;
-use Illuminate\Http\Response;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Illuminate\Routing\Controller;
 
 class OfficeController extends Controller
 {
@@ -140,7 +138,7 @@ class OfficeController extends Controller
             'username' => ['required', 'string', 'min:6'],
 
             'user_email' => ['required', 'email', 'min:6'],
-            'set_password' => ['nullable' ,  'min:6']
+            'set_password' => ['nullable', 'min:6']
 //            'password' => ['required', 'min:6'],
         ]);
         try {
@@ -227,7 +225,7 @@ class OfficeController extends Controller
             }
 
 
-            $ps = $request->has('set_password') ? $request->get('set_password')  :Str::random(9);
+            $ps = $request->has('set_password') ? $request->get('set_password') : Str::random(9);
             $user = User::create([
                 'name' => $request->get('name'),
                 'email' => $request->get('user_email'),
@@ -850,7 +848,7 @@ class OfficeController extends Controller
         }
     }
 
-    public function getOfficeAssignedToUser(Request $request , $id)
+    public function getOfficeAssignedToUser(Request $request, $id)
     {
         $this->validate($request, [
             'company_id' => 'required|integer',
@@ -861,41 +859,42 @@ class OfficeController extends Controller
             ->where('id', $id)
             ->exists();
         if (!$check)
-            return $this->errorResponse('apiResponse.officeNotFound' , 404);
+            return $this->errorResponse('apiResponse.officeNotFound', 404);
 
         $data = User::with(['roles'])
-            ->whereHas('roles' , function ($q) use ($id){
-            $q->where('roles.office_id' , "=" , $id);
-        })
-            ->where('is_office_user' , 1 )
+            ->whereHas('roles', function ($q) use ($id) {
+                $q->where('roles.office_id', "=", $id);
+            })
+            ->where('is_office_user', 1)
             ->paginate($request->get('per_page'));
 
         return $this->successResponse($data);
     }
 
-    public function getOfficeUser(Request $request , $id)
+    public function getOfficeUser(Request $request, $id)
     {
         $this->validate($request, [
             'company_id' => 'required|integer',
-            'per_page' => 'sometimes|required|integer' ,
-            'user_id' => ['required' , 'integer' ]
+            'per_page' => 'sometimes|required|integer',
+            'user_id' => ['required', 'integer']
         ]);
         $check = Office::where('company_id', $request->get('company_id'))
             ->where('id', $id)
             ->exists();
         if (!$check)
-            return $this->errorResponse('apiResponse.officeNotFound' , 404);
+            return $this->errorResponse('apiResponse.officeNotFound', 404);
 
         $data = User::with(['roles'])
-            ->whereHas('roles' , function ($q) use ($id){
-                $q->where('roles.office_id' , "=" , $id);
+            ->whereHas('roles', function ($q) use ($id) {
+                $q->where('roles.office_id', "=", $id);
             })
-            ->where('user_id' , $request->get('user_id'))
-            ->where('is_office_user' , 1 )
+            ->where('user_id', $request->get('user_id'))
+            ->where('is_office_user', 1)
             ->first();
 
         return $this->successResponse($data);
     }
+
     public function addUser(Request $request, $id)
     {
         $this->validate($request, [
@@ -912,7 +911,7 @@ class OfficeController extends Controller
             ->where('id', $id)
             ->exists();
         if (!$check)
-            return $this->errorResponse('apiResponse.officeNotFound' , 404);
+            return $this->errorResponse('apiResponse.officeNotFound', 404);
 
         $check = Role::where('company_id', $request->get('company_id'))
             ->where('office_id', $id)
@@ -988,12 +987,24 @@ class OfficeController extends Controller
             'user_id' => 'required|integer',
         ]);
 
+
+        $user = User::whereHas('roles', function ($q) use ($id) {
+            $q->where('roles.office_id', $id);
+        })->where('id', $request->get('user_id'))
+            ->where('is_office_user', true)
+            ->exists();
+        if (!$user) {
+            return $this->errorResponse('not found', 404);
+        }
+
+        UserRole::where('user_id', $request->get('user_id'))
+            ->where('office_id', $id)
+            ->delete();
         User::whereHas('roles', function ($q) use ($id) {
             $q->where('roles.office_id', $id);
         })->where('id', $request->get('user_id'))
             ->where('is_office_user', true)
             ->delete();
-
         return $this->successResponse('OK');
     }
 
