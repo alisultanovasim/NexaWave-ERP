@@ -353,8 +353,8 @@ class ContractController extends Controller
         if (!$paragraph)
             return $this->errorResponse(trans('response.nothingToUpdate'), 404);
 
-        $contract = Contract::whereHas('employee', function ($q) {
-            $q->company();
+        $contract = Contract::whereHas('employee', function ($q) use ($request) {
+            $q->where('company_id', $request->get('company_id'));
         })->where('id', $id)->first(['id', 'additions']);
 
         if (!$contract->additions) $contract->additions = [];
@@ -377,8 +377,8 @@ class ContractController extends Controller
             'company_id' => ['required', 'integer']
         ]);
 
-        $contract = Contract::whereHas('employee', function ($q) {
-            $q->company();
+        $contract = Contract::whereHas('employee', function ($q) use ($request) {
+            $q->where('company_id', $request->get('company_id'));
         })->where('id', $id)->first(['id']);
 
         if (!$contract) return $this->errorResponse(trans('response.contractNotFound'), 404);
@@ -390,8 +390,8 @@ class ContractController extends Controller
 
     public function NoDraft(Request $request, $id)
     {
-        $contract = Contract::whereHas('employee', function ($q) {
-            $q->company();
+        $contract = Contract::whereHas('employee', function ($q) use ($request) {
+            $q->where('company_id', $request->get('company_id'));
         })->where('id', $id)
             ->where('draft', 0)
             ->first(['id']);
