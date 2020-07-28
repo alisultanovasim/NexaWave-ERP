@@ -257,7 +257,7 @@ class ContractController extends Controller
     public function update(Request $request, $id)
     {
         $this->validate($request, [
-            'paragraph_id' => ['required', 'boolean']
+            'paragraph_id' => ['required', 'integer']
         ]);
 
         $InitialRules = self::getValidationRules();
@@ -343,7 +343,7 @@ class ContractController extends Controller
             'data' => ['required', 'array'],
             'data.*.key' => ['required', 'string', 'max:255'],
             'data.*.value' => ['required', 'string', 'max:255'],
-            'paragraph_id' => ['required', 'boolean']
+            'paragraph_id' => ['required', 'integer']
         ]);
 
 
