@@ -112,9 +112,8 @@ trait DocumentUploader
 
     public function uploadFile(UploadedFile $file, $company_id, $str = "documents"): string
     {
-        $filename = rand(1, 10000) . time() . "." . $file->extension();
-        $file->move(base_path("public/documents/$company_id/$str"), $filename);
-        return "$company_id/$str/$filename";
+        return $file->store("documents/$company_id/$str");
+//        $file->move(base_path("storage/app/documents/$company_id/$str"), $filename);
     }
 
     private function SubDocumentsBuilder($document, $documents, $baseDoc, $request, $str = 'documents')
