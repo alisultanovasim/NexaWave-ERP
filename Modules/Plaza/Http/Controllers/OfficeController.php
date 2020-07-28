@@ -989,8 +989,9 @@ class OfficeController extends Controller
         ]);
 
         User::whereHas('roles', function ($q) use ($id) {
-            $q->where('office_id', $id);
-        })->where('id', $request->get('user_id'))
+            $q->where('roles.office_id', $id);
+        })
+            ->where('id', $request->get('user_id'))
             ->where('is_office_user', true)
             ->delete();
 
