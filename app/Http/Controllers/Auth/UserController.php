@@ -14,14 +14,12 @@ use App\Models\User;
 use App\Models\UserReset;
 use App\Models\UserRole;
 use App\Traits\ApiResponse;
-use App\Traits\DocumentUploader;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -31,7 +29,6 @@ use Modules\Hr\Entities\Employee\Contract as EmployeeContract;
 use Modules\Hr\Entities\Employee\Employee;
 use Modules\Hr\Entities\Employee\UserDetail;
 use Modules\Hr\Entities\Positions;
-use Modules\Plaza\Entities\OfficeUser;
 
 
 /**
@@ -132,7 +129,8 @@ class UserController extends Controller
         });
     }
 
-    private function createDirectorPositionAndGetId($companyId){
+    private function createDirectorPositionAndGetId($companyId)
+    {
         $position = Positions::create([
             'name' => 'Direktor',
             'short_name' => 'Direktor',
@@ -141,10 +139,11 @@ class UserController extends Controller
         return $position->getKey();
     }
 
-    private function saveCompanyModules($companyId){
+    private function saveCompanyModules($companyId)
+    {
         $insert = [];
         $modules = Module::query()->get(['id']);
-        foreach ($modules as $module){
+        foreach ($modules as $module) {
             $insert[] = [
                 'module_id' => $module['id'],
                 'company_id' => $companyId,
@@ -250,15 +249,15 @@ class UserController extends Controller
 
     public function index(Request $request)
     {
-        $this->validate($request , [
-           'paginateCount' => ['sometimes' , 'required' , 'integer'],
-            'name'=> ['sometimes' ,'string' , 'max:255'],
+        $this->validate($request, [
+            'paginateCount' => ['sometimes', 'required', 'integer'],
+            'name' => ['sometimes', 'string', 'max:255'],
         ]);
 
-        $user = User::orderBy('id' , 'desc');
+        $user = User::orderBy('id', 'desc');
 
         if ($request->has('name') and $request->get('name'))
-            $user->where('name' , $request->get('name'));
+            $user->where('name', $request->get('name'));
 
         $user = $user->paginate($request->get('paginateCount'));
 
@@ -269,36 +268,37 @@ class UserController extends Controller
     {
         $user = self::createUser($request);
 
-         SendMailCreatePassword::dispatch($user);
+        SendMailCreatePassword::dispatch($user);
 
         return $this->successResponse('ok');
     }
 
-    public function update(Request $request , $id)
+    public function update(Request $request, $id)
     {
-        self::updateUser($request , $id);
+        self::updateUser($request, $id);
 
         return $this->successResponse('ok');
     }
 
-    public function show(Request $request , $id){
+    public function show(Request $request, $id)
+    {
         $user = User::findOrFail($id);
         $user->load([
             'employment',
             'employment.contract',
-            'employment.contract.position:id,name' ,
+            'employment.contract.position:id,name',
             'employment.contract.section:id,name,short_name',
             'employment.contract.sector:id,name,short_name',
             'employment.contract.department:id,name,short_name',
             'employment.contract.currency',
-            'employment.company' ,
-            'details' ,
+            'employment.company',
+            'details',
             'details.nationality',
             'details.citizen',
             'details.birthdayCity',
             'details.birthdayCountry',
             'details.birthdayRegion',
-            'education' ,
+            'education',
             'education.speciality',
             'education.place:id,name',
             'education.level:id,name',
@@ -308,12 +308,13 @@ class UserController extends Controller
         return $this->successResponse($user);
     }
 
-    public function searchByFin(Request $request ){
-        $this->validate($request , [
-            'fin' => ['required' , 'string' , 'max:255']
+    public function searchByFin(Request $request)
+    {
+        $this->validate($request, [
+            'fin' => ['required', 'string', 'max:255']
         ]);
-        $user = User::whereHas('details' , function ($q) use ($request){
-            $q->where('fin' , $request->get('fin'));
+        $user = User::whereHas('details', function ($q) use ($request) {
+            $q->where('fin', $request->get('fin'));
         })->first();
         return $this->successResponse($user);
     }
@@ -341,26 +342,26 @@ class UserController extends Controller
             'passport_from_organ' => ['nullable', 'string', 'max:255'],
             'passport_get_at' => ['nullable', 'date', 'date_format:Y-m-d'],
             'passport_expire_at' => ['nullable', 'date', 'date_format:Y-m-d'],
-            'social_insurance_no' => ['nullable' , 'string' , 'max:255'],
-            'military_status' => ['nullable' , 'string' , 'max:255'],
-            'military_start_at' => ['nullable' , 'date', 'date_format:Y-m-d'],
-            'military_end_at' => ['nullable' , 'date', 'date_format:Y-m-d'],
-            'military_state_id' => ['nullable' , 'string' , 'max:255'],
-            'military_passport_number' => ['nullable' , 'string' , 'max:255'],
-            'military_place' => ['nullable' , 'string' , 'max:255'],
-            'driving_license_number' => ['nullable' , 'string' , 'max:255'],
-            'driving_license_categories' => ['nullable' , 'string' , 'max:255'],
-            'driving_license_organ' => ['nullable' , 'string' , 'max:255'],
-            'driving_license_get_at' => ['nullable' , 'date', 'date_format:Y-m-d'],
-            'driving_license_expire_at' => ['nullable' , 'date', 'date_format:Y-m-d'],
-            'foreign_passport_number' => ['nullable' , 'string' , 'max:255'],
-            'foreign_passport_organ' => ['nullable' , 'string' , 'max:255'],
-            'foreign_passport_get_at' => ['nullable' , 'date', 'date_format:Y-m-d'],
-            'foreign_passport_expire_at' => ['nullable' , 'date', 'date_format:Y-m-d'],
-            'family_status_document_number' => ['nullable' , 'string' , 'max:255'],
-            'family_status_state' => ['nullable' , 'string' , 'max:255'],
-            'family_status_register_at' => ['nullable' , 'date', 'date_format:Y-m-d'],
-            'avatar' => ['nullable' , 'mimes:png,jpg,jpeg'],
+            'social_insurance_no' => ['nullable', 'string', 'max:255'],
+            'military_status' => ['nullable', 'string', 'max:255'],
+            'military_start_at' => ['nullable', 'date', 'date_format:Y-m-d'],
+            'military_end_at' => ['nullable', 'date', 'date_format:Y-m-d'],
+            'military_state_id' => ['nullable', 'string', 'max:255'],
+            'military_passport_number' => ['nullable', 'string', 'max:255'],
+            'military_place' => ['nullable', 'string', 'max:255'],
+            'driving_license_number' => ['nullable', 'string', 'max:255'],
+            'driving_license_categories' => ['nullable', 'string', 'max:255'],
+            'driving_license_organ' => ['nullable', 'string', 'max:255'],
+            'driving_license_get_at' => ['nullable', 'date', 'date_format:Y-m-d'],
+            'driving_license_expire_at' => ['nullable', 'date', 'date_format:Y-m-d'],
+            'foreign_passport_number' => ['nullable', 'string', 'max:255'],
+            'foreign_passport_organ' => ['nullable', 'string', 'max:255'],
+            'foreign_passport_get_at' => ['nullable', 'date', 'date_format:Y-m-d'],
+            'foreign_passport_expire_at' => ['nullable', 'date', 'date_format:Y-m-d'],
+            'family_status_document_number' => ['nullable', 'string', 'max:255'],
+            'family_status_state' => ['nullable', 'string', 'max:255'],
+            'family_status_register_at' => ['nullable', 'date', 'date_format:Y-m-d'],
+            'avatar' => ['nullable', 'mimes:png,jpg,jpeg'],
         ];
     }
 
@@ -387,32 +388,32 @@ class UserController extends Controller
             'passport_from_organ' => ['nullable', 'string', 'max:255'],
             'passport_get_at' => ['nullable', 'date', 'date_format:Y-m-d'],
             'passport_expire_at' => ['nullable', 'date', 'date_format:Y-m-d'],
-            'social_insurance_no' => ['nullable' , 'string' , 'max:255'],
-            'military_status' => ['nullable' , 'string' , 'max:255'],
-            'military_start_at' => ['nullable' , 'date', 'date_format:Y-m-d'],
-            'military_end_at' => ['nullable' , 'date', 'date_format:Y-m-d'],
-            'military_state_id' => ['nullable' , 'string' , 'max:255'],
-            'military_passport_number' => ['nullable' , 'string' , 'max:255'],
-            'military_place' => ['nullable' , 'string' , 'max:255'],
-            'driving_license_number' => ['nullable' , 'string' , 'max:255'],
-            'driving_license_categories' => ['nullable' , 'string' , 'max:255'],
-            'driving_license_organ' => ['nullable' , 'string' , 'max:255'],
-            'driving_license_get_at' => ['nullable' , 'date', 'date_format:Y-m-d'],
-            'driving_license_expire_at' => ['nullable' , 'date', 'date_format:Y-m-d'],
-            'foreign_passport_number' => ['nullable' , 'string' , 'max:255'],
-            'foreign_passport_organ' => ['nullable' , 'string' , 'max:255'],
-            'foreign_passport_get_at' => ['nullable' , 'date', 'date_format:Y-m-d'],
-            'foreign_passport_expire_at' => ['nullable' , 'date', 'date_format:Y-m-d'],
-            'family_status_document_number' => ['nullable' , 'string' , 'max:255'],
-            'family_status_state' => ['nullable' , 'string' , 'max:255'],
-            'family_status_register_at' => ['nullable' , 'date', 'date_format:Y-m-d'],
-            'avatar' => ['nullable' , 'mimes:png,jpg,jpeg'],
+            'social_insurance_no' => ['nullable', 'string', 'max:255'],
+            'military_status' => ['nullable', 'string', 'max:255'],
+            'military_start_at' => ['nullable', 'date', 'date_format:Y-m-d'],
+            'military_end_at' => ['nullable', 'date', 'date_format:Y-m-d'],
+            'military_state_id' => ['nullable', 'string', 'max:255'],
+            'military_passport_number' => ['nullable', 'string', 'max:255'],
+            'military_place' => ['nullable', 'string', 'max:255'],
+            'driving_license_number' => ['nullable', 'string', 'max:255'],
+            'driving_license_categories' => ['nullable', 'string', 'max:255'],
+            'driving_license_organ' => ['nullable', 'string', 'max:255'],
+            'driving_license_get_at' => ['nullable', 'date', 'date_format:Y-m-d'],
+            'driving_license_expire_at' => ['nullable', 'date', 'date_format:Y-m-d'],
+            'foreign_passport_number' => ['nullable', 'string', 'max:255'],
+            'foreign_passport_organ' => ['nullable', 'string', 'max:255'],
+            'foreign_passport_get_at' => ['nullable', 'date', 'date_format:Y-m-d'],
+            'foreign_passport_expire_at' => ['nullable', 'date', 'date_format:Y-m-d'],
+            'family_status_document_number' => ['nullable', 'string', 'max:255'],
+            'family_status_state' => ['nullable', 'string', 'max:255'],
+            'family_status_register_at' => ['nullable', 'date', 'date_format:Y-m-d'],
+            'avatar' => ['nullable', 'mimes:png,jpg,jpeg'],
         ];
     }
 
     public static function createUser(Request $request)
     {
-        Validator::make($request->all(),self::rules())->validate();
+        Validator::make($request->all(), self::rules())->validate();
 
 
         $password = Str::random(9);
@@ -463,26 +464,29 @@ class UserController extends Controller
             'family_status_register_date',
             'social_insurance_no'
         ]);
-        if ($request->hasFile('avatar')){
+        if ($request->hasFile('avatar')) {
             $name = "{$user->id}.{$request->file('avatar')->getClientOriginalExtension()}";
-            $request->file('avatar')->move(public_path('users')  , $name);
+            // todo
+            // Zeka :D // change to storage
+            // return $file->store("documents/.../");
+            $request->file('avatar')->move(public_path('users'), $name);
             $data['avatar'] = $name;
         }
         $user->details()->create($data);
 
-        SendMailCreatePassword::dispatch($user , $password);
+        SendMailCreatePassword::dispatch($user, $password);
         return $user;
     }
 
-    public static function updateUser(Request $request , $id)
+    public static function updateUser(Request $request, $id)
     {
         Validator::make($request->all(), self::updateRules())->validate();
-        $data = $request->only('name' , 'email' , 'voen' , 'surname');
-        if($request->has('fin'))
+        $data = $request->only('name', 'email', 'voen', 'surname');
+        if ($request->has('fin'))
             $data['username'] = $request->get('fin');
 
         if ($data)
-            User::where('id' ,$id)->update($data);
+            User::where('id', $id)->update($data);
 
         $data = $request->only([
             'fin',
@@ -522,17 +526,16 @@ class UserController extends Controller
             'family_status_register_date',
             'social_insurance_no'
         ]);
-        if ($request->hasFile('avatar')){
+        if ($request->hasFile('avatar')) {
             $name = "$id.{$request->file('avatar')->getClientOriginalExtension()}";
-            $request->file('avatar')->move(public_path('users')  , $name);
+            $request->file('avatar')->move(public_path('users'), $name);
             $data['avatar'] = $name;
         }
-        UserDetail::where('user_id' , $id)
+        UserDetail::where('user_id', $id)
             ->update($data);
 
         return true;
     }
-
 
 
 }

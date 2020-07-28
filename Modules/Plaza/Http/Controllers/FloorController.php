@@ -69,9 +69,7 @@ class FloorController extends Controller
 
     public function uploadImage(UploadedFile $file, int $company_id, $str = "floors"): string
     {
-        $filename = time() . rand(0, 100) . "." . $file->extension();
-        $file->move(base_path("public/documents/$company_id/$str"), $filename);
-        return "$company_id/$str/$filename";
+        return $file->store("documents/$company_id/$str");
     }
 
     public function show(Request $request, $id)

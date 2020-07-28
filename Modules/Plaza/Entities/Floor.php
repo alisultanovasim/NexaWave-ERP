@@ -18,7 +18,7 @@ class Floor extends Model
     }
     public function getImageAttribute($value){
         if ($value)
-            return env('APP_URL') . '/documents/'  .  $value;
+            return config('app.url') . '/storage/' . $value;
         return $value;
     }
 

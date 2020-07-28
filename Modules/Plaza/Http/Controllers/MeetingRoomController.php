@@ -105,10 +105,7 @@ class MeetingRoomController extends Controller
     public function uploadImage($company_id, $file, $str = 'rooms')
     {
         if ($file instanceof UploadedFile) {
-            $filename = time() . rand(0, 100) . "." . $file->extension();
-            $file->move(base_path("public/documents/$company_id/$str"), $filename);
-            return "$company_id/$str/$filename";
-
+            return $file->store("documents/$company_id/$str");
         }
 
         return null;
