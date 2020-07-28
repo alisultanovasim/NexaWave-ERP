@@ -905,7 +905,7 @@ class OfficeController extends Controller
         $this->validate($request, [
             'email' => ['nullable', 'string', "min:6", 'max:255'],
             'username' => ['required', 'string', 'max:255', 'unique:users,username'],
-            'password' => ['required', 'string', "min:6", 'max:255'],
+            'password' => ['required', 'string', "min:8", 'max:255'],
             'name' => ['required', 'string', 'max:255'],
             'surname' => ['nullable', 'string', 'max:255'],
             'role_id' => ['required', 'integer']
@@ -949,7 +949,7 @@ class OfficeController extends Controller
         $this->validate($request, [
             'email' => ['nullable', 'string', "min:6", 'max:255'],
             'username' => ['nullable', 'string', 'max:255', 'unique:users,username'],
-            'password' => ['nullable', 'string', "min:6", 'max:255'],
+            'password' => ['nullable', 'string', "min:8", 'max:255'],
             'name' => ['nullable', 'string', 'max:255'],
             'surname' => ['nullable', 'string', 'max:255'],
             'user_id' => ['required', 'integer'],
