@@ -863,9 +863,7 @@ class OfficeController extends Controller
         if (!$check)
             return $this->errorResponse('apiResponse.officeNotFound' , 404);
 
-        $data = User::with(['roles'  => function($q){
-            $q->first();
-        }])
+        $data = User::with(['role'])
             ->whereHas('roles' , function ($q) use ($id){
             $q->where('roles.office_id' , "=" , $id);
         })
@@ -888,9 +886,7 @@ class OfficeController extends Controller
         if (!$check)
             return $this->errorResponse('apiResponse.officeNotFound' , 404);
 
-        $data = User::with(['roles'  => function($q){
-            $q->first();
-        }])
+        $data = User::with(['roles'])
             ->whereHas('roles' , function ($q) use ($id){
                 $q->where('roles.office_id' , "=" , $id);
             })
