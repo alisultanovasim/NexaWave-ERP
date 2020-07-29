@@ -57,12 +57,14 @@ class User extends Authenticatable
         return $this->hasOne(UserDetail::class);
     }
     public function role(){
-        return $this->belongsTo('App\Models\Role');
+        return $this->belongsToMany(Role::class,'user_roles')->first();
     }
 
     public function roles(){
         return $this->belongsToMany(Role::class, 'user_roles');
     }
+
+
 
     public function employment(){
         return $this->hasMany(Employee::class);

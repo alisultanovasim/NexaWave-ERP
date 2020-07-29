@@ -12,7 +12,8 @@ trait DocumentUploader
     {
         if ($file instanceof  UploadedFile){
             $filename = rand(1, 10000) . time() . "." . $file->extension();
-            $file->move(base_path("public/documents/$company/$subFolder"), $filename);
+
+//            $file->move(base_path("public/documents/$company/$subFolder"), $filename);
             return "$company/$subFolder/$filename";
         }
     }

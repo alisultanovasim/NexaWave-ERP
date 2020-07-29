@@ -2,6 +2,7 @@
 
 namespace Modules\Hr\Http\Controllers;
 
+use App\Models\Role;
 use App\Traits\ApiResponse;
 use Carbon\Carbon;
 use Illuminate\Foundation\Validation\ValidatesRequests;
@@ -22,16 +23,26 @@ class CompanyAuthorizedUsersController extends Controller
         $this->companyAuthorizedEmployee = $companyAuthorizedUser;
     }
 
-    public function index(Request $request){
+    public function index(Request $request, Role $role){
         $employees = Employee::where('company_id', $request->get('company_id'))
         ->isAuthorizedCompanyEmployee()
-        ->hasActiveContracts()
+        ->where(function ($query) use ($role, $request){
+            $query->whereHas('contract');
+            $query->orWhereHas('user', function ($query) use ($role, $request){
+                $query->whereHas('roles', function ($query) use ($role, $request){
+                    $query->where([
+                        'user_roles.role_id' => $role->getCompanyAdminRoleId(),
+                        'user_roles.company_id' => $request->get('company_id')
+                    ]);
+                });
+            });
+        })
         ->with([
             'user:id,name,surname',
             'authorizedDetails:id,employee_id,position',
             'contracts' => function ($query){
-                $query->currentlyActive();
                 $query->select(['id','employee_id','position_id']);
+                $query->active();
             },
             'contracts.position:id,name'
         ])
@@ -52,10 +63,9 @@ class CompanyAuthorizedUsersController extends Controller
             'employee_id' => [
                 'required',
                 Rule::exists('employees', 'id')->where('company_id', $request->get('company_id')),
-                Rule::exists('employee_contracts', 'employee_id')->where(function ($query){
+                Rule::exists('employee_contracts', 'employee_id')
+                ->where(function ($query){
                     $query->where('is_active', true);
-                    $query->where('start_date', '<', Carbon::now());
-                    $query->where('end_date', '>', Carbon::now());
                 })
             ],
             'position' => 'nullable|numeric'

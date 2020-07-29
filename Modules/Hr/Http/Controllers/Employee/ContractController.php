@@ -2,19 +2,18 @@
 
 namespace Modules\Hr\Http\Controllers\Employee;
 
+use App\Traits\ApiResponse;
+use App\Traits\Query;
 use Carbon\Carbon;
-use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Validation\ValidatesRequests;
+use Illuminate\Http\Request;
+use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Modules\Hr\Entities\CompanyAuthorizedEmployee;
 use Modules\Hr\Entities\Employee\Contract;
 use Modules\Hr\Entities\Employee\Employee;
-use App\Traits\ApiResponse;
-use App\Traits\Query;
-use Illuminate\Http\Request;
-use Illuminate\Routing\Controller;
 use Modules\Hr\Entities\Paragraph;
 use Modules\Hr\Traits\DocumentUploader;
 
@@ -88,14 +87,22 @@ class ContractController extends Controller
             'provided_transport',
             'res_days',
         ]);
-        return Contract::create($data + [
-                'salary' =>
-                    +$request->get('position_salary_praise_about') +
-                    +$request->header('addition_package_fee') +
-                    +$request->get('award_amount') +
-                    +$request->get('work_environment_addition') +
-                    +$request->get('overtime_addition')
-            ]);
+
+        $data['salary'] =
+            +$request->get('position_salary_praise_about') +
+            +$request->header('addition_package_fee') +
+            +$request->get('work_environment_addition') +
+            +$request->get('overtime_addition');
+
+        $contract = Contract::create($data);
+        Contract::create(
+            array_merge(
+                $data,
+                ['initial_contract_id' => $contract->id]
+            )
+        );
+
+        return $contract;
     }
 
     public static function getValidateRules()
@@ -192,17 +199,14 @@ class ContractController extends Controller
             } else {
                 $q->where('is_active', true);
             }
-        });
-
-        if ($request->has('status') and $request->get('status') != 2) {
-            $contract->where('is_active', $request->get('status'));
-        } else {
-            $contract->where('is_active', true);
-        }
+        })->noInitial();
 
 
         if ($request->has('draft'))
             $contract->where('draft', $request->get('draft'));
+
+        if ($request->has('is_active'))
+            $contract->where('is_active', $request->get('is_active'));
 
 
         if ($request->has('employee_id'))
@@ -253,7 +257,7 @@ class ContractController extends Controller
     public function update(Request $request, $id)
     {
         $this->validate($request, [
-            'paragraph_id' => ['required', 'boolean']
+            'paragraph_id' => ['required', 'integer']
         ]);
 
         $InitialRules = self::getValidationRules();
@@ -261,6 +265,7 @@ class ContractController extends Controller
         $paragraph = Paragraph::with('fields:paragraph_id,field')
             ->where('id', '=', $request->get('paragraph_id'))
             ->first();
+
 
         $keys = $paragraph->fields->pluck('field')->toArray();
 
@@ -271,20 +276,43 @@ class ContractController extends Controller
 
         $this->validate($request, $rules);
 
+
+        $keys = array_keys($rules);
+
         $data = $request->only($keys);
 
 
         if (!$data) return $this->successResponse(trans('response.nothingToUpdate'), 400);
-        DB::beginTransaction();
+
+//        DB::beginTransaction();
 
         $contract = Contract::with([
             'position',
             'section:id,name',
             'sector:id,name',
             'department:id,name',
-        ])->where('id', $id)->first(['id', 'versions'] + $keys);
+        ])->where('id', $id)->first(array_merge($keys, ['id', 'versions']));
+
 
         if (!$contract) return $this->errorResponse(trans('response.contractNotFound'), 404);
+
+        $from = (clone $contract)->toArray();
+
+        $contract->fill($data);
+
+        $contract->load([
+            'position',
+            'section:id,name',
+            'sector:id,name',
+            'department:id,name',
+        ]);
+
+        $to = (clone $contract)->toArray();
+
+        unset($to['id']);
+        unset($to['version']);
+        unset($from['id']);
+        unset($from['version']);
 
         if (!$contract->versions) $contract->versions = [];
 
@@ -292,10 +320,10 @@ class ContractController extends Controller
 
         $originalProgram[] = [
             'user' => Auth::user(),
+            'paragraph' => $paragraph,
             'updated_at' => Carbon::now()->toDateTimeLocalString(),
-            //todo change contract
-            'to' => $contract,
-
+            'from' => $from,
+            'to' => $to,
         ];
 
         $contract->versions = $originalProgram;
@@ -310,23 +338,37 @@ class ContractController extends Controller
     public function add(Request $request, $id)
     {
 
+
         $this->validate($request, [
             'data' => ['required', 'array'],
             'data.*.key' => ['required', 'string', 'max:255'],
             'data.*.value' => ['required', 'string', 'max:255'],
+            'paragraph_id' => ['required', 'integer']
         ]);
-        $contract = Contract::whereHas('employee', function ($q) {
-            $q->company();
+
+
+        $paragraph = Paragraph::where('id', '=', $request->get('paragraph_id'))
+            ->first();
+
+        if (!$paragraph)
+            return $this->errorResponse(trans('response.nothingToUpdate'), 404);
+
+        $contract = Contract::whereHas('employee', function ($q) use ($request) {
+            $q->where('company_id', $request->get('company_id'));
         })->where('id', $id)->first(['id', 'additions']);
 
         if (!$contract->additions) $contract->additions = [];
 
-        $contract->additions = array_merge((array)$request->additions, $request->get('data'));
+        $contract->additions = array_merge((array)$request->get('additions'),
+            [
+                $request->only('data'),
+                'paragraph' => $paragraph
+            ]
+        );
 
         $contract->save();
 
         return $this->successResponse('ok');
-
     }
 
     public function delete(Request $request, $id)
@@ -335,13 +377,28 @@ class ContractController extends Controller
             'company_id' => ['required', 'integer']
         ]);
 
-        $contract = Contract::whereHas('employee', function ($q) {
-            $q->company();
+        $contract = Contract::whereHas('employee', function ($q) use ($request) {
+            $q->where('company_id', $request->get('company_id'));
         })->where('id', $id)->first(['id']);
 
         if (!$contract) return $this->errorResponse(trans('response.contractNotFound'), 404);
 
         $contract->update(['is_active' => false]);
+
+        return $this->successResponse('ok');
+    }
+
+    public function NoDraft(Request $request, $id)
+    {
+        $contract = Contract::whereHas('employee', function ($q) use ($request) {
+            $q->where('company_id', $request->get('company_id'));
+        })->where('id', $id)
+            ->where('draft', 0)
+            ->first(['id']);
+
+        if (!$contract) return $this->errorResponse(trans('response.contractNotFound'), 404);
+
+        $contract->update(['draft' => 1]);
 
         return $this->successResponse('ok');
     }
@@ -363,25 +420,25 @@ class ContractController extends Controller
             })->where('id', $id)->first();
         return $this->successResponse($contract);
     }
-
     public static function getValidationRules()
     {
         return [
-            'draft' => ['nullable', 'boolean'],
             'department_id' => ['sometimes', 'required', 'integer'],
             'section_id' => ['sometimes', 'required', 'integer'],
             'sector_id' => ['sometimes', 'required', 'integer'],
             'position_id' => ['sometimes', 'required', 'integer'],
+            'personal_category_id' => ['nullable', 'integer'],
+            'specialization_degree_id' => ['nullable', 'integer'],//exists
+            'work_environment_id' => ['nullable', 'integer'],//exists
+            'work_place_type' => ['nullable', Rule::in(Contract::WORK_PLACE_TYPES)],
+            'state_value' => ['nullable', 'numeric'],
+            'position_description' => ['nullable', 'string'],
+
 //            'salary' => ['sometimes', 'required', 'numeric'],
 //            'contract' => ['sometimes', 'mimes:pdf,doc,docx'],
             'start_date' => ['sometimes', 'required', 'date'],
             'end_date' => ['sometimes', 'required', 'date'],
-            'personal_category_id' => ['nullable', 'integer'],
-            'specialization_degree_id' => ['nullable', 'integer'],//exists
-            'work_environment_id' => ['nullable', 'integer'],//exists
-            'state_value' => ['nullable', 'numeric'],
             'contract_type_id' => ['nullable', 'integer'],//exists
-            'position_description' => ['nullable', 'string'],
             'currency_id' => ['nullable', 'integer'],//exists
             'position_salary_praise_about' => ['nullable', 'numeric'],
             'addition_package_fee' => ['nullable', 'numeric', "min:0", "max:100"],
@@ -390,6 +447,7 @@ class ContractController extends Controller
             'work_environment_addition' => ['nullable', 'numeric'],
             'overtime_addition' => ['nullable', 'numeric'],
             'labor_protection_addition' => ['nullable', 'string'],
+            'labor_sport_addition' => ['nullable', 'string'],
             'labor_meal_addition' => ['nullable', 'string'],
             'work_start_date' => ['nullable', 'date_format:Y-m-d'],
             'work_end_date' => ['nullable', 'date_format:Y-m-d'],
@@ -415,10 +473,6 @@ class ContractController extends Controller
             'vacation_social_benefits' => ['nullable', 'numeric'],
             'vacation_start_date' => ['nullable', 'date_format:Y-m-d'],
             'vacation_end_date' => ['nullable', 'date_format:Y-m-d'],
-            'work_place_type' => ['nullable', Rule::in(Contract::WORK_PLACE_TYPES)]
         ];
     }
-
 }
-
-

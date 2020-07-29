@@ -7,11 +7,13 @@ use App\Models\Module;
 use App\Models\Permission;
 use App\Models\Role;
 use App\Models\User;
+use App\Models\UserRole;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Modules\Hr\Entities\Employee\Employee;
+use Modules\Plaza\Entities\Office;
 use Modules\Plaza\Entities\OfficeUser;
 
 class ProfileController extends Controller
@@ -26,12 +28,14 @@ class ProfileController extends Controller
         $modules = null;
 
         if($user->getAttribute('is_office_user')){
-            $office = OfficeUser::with(['office:id,name,image,company_id'])->where('user_id', $user->id)->first()->office;
-            $companies = [
-                [
-                    "company_id" => $office->company_id
-                ]
-            ];
+           $userRole = UserRole::where('user_id' , Auth::id())
+               ->where('company_id' , $request->get('company_id'))
+               ->whereNotNull('office_id')
+               ->first(['office_id']);
+           if (!$userRole)
+               return $this->errorResponse(trans('response.logicError') , 400);
+          $office = Office::where('id' , $userRole->office_id)
+               ->first();
         }
 
         if ($request->get('company_id')) {

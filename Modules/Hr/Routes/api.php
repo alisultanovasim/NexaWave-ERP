@@ -31,8 +31,10 @@ Route::group([
         Route::delete('/{id}', 'OrganizationController@destroy');
     });
     Route::group(['prefix' => "paragraphs"], function ($router) {
-        Route::get('/', 'ParagraphContoller@index');
-        Route::get('/{id}', 'ParagraphContoller@store');
+        Route::get('/', 'ParagraphController@index');
+        Route::get('/{id}', 'ParagraphController@show');
+        Route::put('/{id}', 'ParagraphController@update');
+        Route::post('/', 'ParagraphController@store');
     });
 
 
@@ -529,7 +531,7 @@ Route::group([
             Route::get('/{id}', 'WorkEventController@show');
             Route::post('/', 'WorkEventController@create');
             Route::put('/{id}', 'WorkEventController@update');
-            Route::delete('/{id}', 'Work        EventController@destroy');
+            Route::delete('/{id}', 'WorkEventController@destroy');
         });
 
         Route::group(['prefix' => 'vacation/planning'], function (){
