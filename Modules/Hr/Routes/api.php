@@ -542,6 +542,13 @@ Route::group([
             Route::delete('/{id}', 'VacationPlanningController@destroy');
         });
 
+        Route::group(['prefix' => 'past/unused/vacation'], function (){
+            Route::get('/', 'PastUnusedVacationController@index');
+            Route::post('/', 'PastUnusedVacationController@create');
+            Route::put('/{id}', 'PastUnusedVacationController@update');
+            Route::delete('/{id}', 'PastUnusedVacationController@destroy');
+        });
+
         Route::group(['prefix' => 'work/calendar'], function (){
             Route::get('/', 'WorkCalendarController@index');
             Route::post('/', 'WorkCalendarController@create');

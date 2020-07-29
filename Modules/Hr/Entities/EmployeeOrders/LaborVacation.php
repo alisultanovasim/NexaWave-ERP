@@ -42,7 +42,9 @@ class LaborVacation extends Order implements OrderType
             'employees.*.details.vacation_details.*.beginning_of_work_year' => 'required|numeric',
             'employees.*.details.vacation_details.*.end_of_work_year' => 'required|numeric',
             'employees.*.details.vacation_details.*.day' => 'required|numeric',
-            'employees.*.details.vacation_details.*.part_of_vacation' => 'required|max:50',
+            'employees.*.details.vacation_details.*.part_of_vacation' => [
+                'required', Rule::in(['primary', 'additional'])
+            ],
             'employees.*.details.note' => 'nullable|min:3|max:255',
         ];
     }
