@@ -3,12 +3,10 @@
 namespace App\Http\Controllers;
 
 
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 
 class TestController extends Controller
 {
-    public function test(){
-//        dd(Auth::user()->can('edit,test'));
-        return 'a';
+    public function test(Request $request){
     }
 }

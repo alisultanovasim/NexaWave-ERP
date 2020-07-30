@@ -465,11 +465,8 @@ class UserController extends Controller
             'social_insurance_no'
         ]);
         if ($request->hasFile('avatar')) {
-            $name = "{$user->id}.{$request->file('avatar')->getClientOriginalExtension()}";
-            // todo
-            // Zeka :D // change to storage
-            // return $file->store("documents/.../");
-            $request->file('avatar')->move(public_path('users'), $name);
+            $name = "avatar-{$user->id}.{$request->file('avatar')->getClientOriginalExtension()}";
+            $request->file('avatar')->storeAs("documents/users/" . Auth::id(), $name);
             $data['avatar'] = $name;
         }
         $user->details()->create($data);

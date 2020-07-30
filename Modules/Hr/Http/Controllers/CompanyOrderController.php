@@ -126,14 +126,24 @@ class CompanyOrderController extends Controller
     }
 
     public function saveOrder(Request $request, Order $order){
-        DB::transaction(function () use ($request, $order){
+        if ($request->get('is_confirmed')){
+            $confirmedBy = ($this->getEmployeeByUserId(Auth::id(), $request->get('company_id')))->getKey();
+            $confirmedDate = Carbon::now();
+        }
+        else {
+            $confirmedBy = null;
+            $confirmedDate = null;
+        }
+        DB::transaction(function () use ($request, $order, $confirmedBy, $confirmedDate){
             $order->fill([
                 'company_id' => $request->get('company_id'),
                 'type' => $request->get('type'),
                 'number' => $request->get('number'),
                 'labor_code_id' => $request->get('labor_code_id'),
                 'order_sign_date' => $request->get('order_sign_date'),
-                'created_by' => ($this->getEmployeeByUserId(Auth::id(), $request->get('company_id')))->getKey()
+                'created_by' => ($this->getEmployeeByUserId(Auth::id(), $request->get('company_id')))->getKey(),
+                'confirmed_by' => $confirmedBy,
+                'confirmed_date' => $confirmedDate
             ]);
             $order->save();
             $this->saveOrderEmployees($order->getKey(), $request->get('employees'), $this->getOrderModelByType($request->get('type')));
@@ -201,7 +211,8 @@ class CompanyOrderController extends Controller
             'number' => 'required|min:2|max:255',
             'labor_code_id' => 'required|exists:labor_codes,id',
             'order_sign_date' => 'required|date|date_format:Y-m-d',
-            'employees' => 'required|array'
+            'employees' => 'required|array',
+            'is_confirmed' => 'required|boolean'
         ];
         if (\request()->get('type')){
             $rules = array_merge(
