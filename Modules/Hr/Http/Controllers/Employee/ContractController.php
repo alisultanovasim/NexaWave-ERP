@@ -88,11 +88,11 @@ class ContractController extends Controller
             'res_days',
         ]);
 
-        $data['salary'] =
-            +$request->get('position_salary_praise_about') +
+        $data['salary'] = +$request->get('position_salary_praise_about') +
             +$request->header('addition_package_fee') +
             +$request->get('work_environment_addition') +
             +$request->get('overtime_addition');
+
 
         $contract = Contract::create($data);
         Contract::create(
@@ -281,15 +281,22 @@ class ContractController extends Controller
 
         $data = $request->only($keys);
 
+        $salary = $this->countSalary($data);
+        if ($salary)
+            $data['salary'] = $salary;
 
         if (!$data) return $this->successResponse(trans('response.nothingToUpdate'), 400);
 
-//        DB::beginTransaction();
+        DB::beginTransaction();
 
         $contract = Contract::with([
             'position',
             'section:id,name',
             'sector:id,name',
+            'personalCategory:id,name',
+            'specializationDegree:id,name',
+            'contract_type:id,name',
+            'duration_type:id,name',
             'department:id,name',
         ])->where('id', $id)->first(array_merge($keys, ['id', 'versions']));
 
@@ -304,6 +311,10 @@ class ContractController extends Controller
             'position',
             'section:id,name',
             'sector:id,name',
+            'personalCategory:id,name',
+            'specializationDegree:id,name',
+            'contract_type:id,name',
+            'duration_type:id,name',
             'department:id,name',
         ]);
 
@@ -359,13 +370,15 @@ class ContractController extends Controller
 
         if (!$contract->additions) $contract->additions = [];
 
-        $contract->additions = array_merge((array)$request->get('additions'),
+        $temp = $contract->additions;
+        $temp[] = array_merge((array)$request->only('data'),
             [
-                $request->only('data'),
                 'paragraph' => $paragraph
             ]
         );
 
+
+        $contract->additions = $temp;
         $contract->save();
 
         return $this->successResponse('ok');
@@ -420,6 +433,7 @@ class ContractController extends Controller
             })->where('id', $id)->first();
         return $this->successResponse($contract);
     }
+
     public static function getValidationRules()
     {
         return [
@@ -433,7 +447,6 @@ class ContractController extends Controller
             'work_place_type' => ['nullable', Rule::in(Contract::WORK_PLACE_TYPES)],
             'state_value' => ['nullable', 'numeric'],
             'position_description' => ['nullable', 'string'],
-
 //            'salary' => ['sometimes', 'required', 'numeric'],
 //            'contract' => ['sometimes', 'mimes:pdf,doc,docx'],
             'start_date' => ['sometimes', 'required', 'date'],
@@ -474,5 +487,23 @@ class ContractController extends Controller
             'vacation_start_date' => ['nullable', 'date_format:Y-m-d'],
             'vacation_end_date' => ['nullable', 'date_format:Y-m-d'],
         ];
+    }
+
+    public function countSalary(array $data)
+    {
+        if (
+            isset($data['position_salary_praise_about']) &&
+            isset($data['addition_package_fee']) &&
+            isset($data['work_environment_addition']) &&
+            isset($data['overtime_addition'])
+        ) {
+            return
+                +$data['position_salary_praise_about'] +
+                +$data['addition_package_fee'] +
+                +$data['work_environment_addition'] +
+                +$data['overtime_addition'];
+        } else {
+            return false;
+        }
     }
 }
