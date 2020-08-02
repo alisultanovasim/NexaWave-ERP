@@ -30,17 +30,20 @@ class PastUnusedVacationController extends Controller
      */
     public function index(Request $request): JsonResponse {
         $this->validate($request, [
-            'per_page' => 'nullable|integer'
+            'employee_id' => [
+                'required',
+                Rule::exists('employees', 'id')->where('company_id', $request->get('company_id'))
+            ]
         ]);
 
         $vacations = $this->pastUnusedVacation
-        ->belongsToCompany($request->get('company_id'))
+        ->where('employee_id', $request->get('employee_id'))
         ->with([
             'employee:id,user_id',
             'employee.user:id,name,surname'
         ])
         ->orderBy('id', 'desc')
-        ->paginate($request->get('per_page'));
+        ->get();
 
         return $this->successResponse($vacations);
     }
