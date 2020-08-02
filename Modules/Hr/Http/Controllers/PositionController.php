@@ -24,7 +24,11 @@ class PositionController extends Controller
         $positions = Positions::where(function ($q) use ($request){
 //            $q->whereNull('company_id');
                 $q->where('company_id' , $request->get('company_id'));
-        })->paginate($request->get('paginateCount'));
+        });
+        if ($request->get('is_filter'))
+            $positions = $positions->get();
+        else
+            $positions = $positions->paginate($request->get('paginateCount'));
         return $this->dataResponse($positions);
     }
 
