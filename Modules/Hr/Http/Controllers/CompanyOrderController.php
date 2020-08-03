@@ -41,13 +41,11 @@ class CompanyOrderController extends Controller
     }
 
     public function index(Request $request){
-//        dd(trans('hr_orders.type.1.agreements'));
         $sql = "select type, count(type) as count, (case when confirmed_date is not null then 1 else 0 end) as is_confirmed from orders where company_id = ? group by type, is_confirmed";
         $orders = DB::select($sql, [$request->get('company_id')]);
         $response = [];
 
         foreach ($this->order->getTypeIds() as $id){
-//            dd($id);
             $response[$id] = [
                 'type' => $id,
                 'name' => trans('hr_orders.type.'.$id.'.name'),
@@ -69,7 +67,8 @@ class CompanyOrderController extends Controller
         return $this->successResponse(array_values($response));
     }
 
-    public function getOrderEmployees(Request $request, CompanyOrderFilters $orderFilters, OrderEmployeeFilters $employeeFilters){
+    public function getOrderEmployees(Request $request, CompanyOrderFilters $orderFilters, OrderEmployeeFilters $employeeFilters)
+    {
         $employees = $this->orderEmployee
             ->filter($employeeFilters)
             ->whereHas('order', function ($query) use ($request, $orderFilters){
@@ -85,7 +84,8 @@ class CompanyOrderController extends Controller
         return $this->successResponse($employees);
     }
 
-    public function show(Request $request, $id){
+    public function show(Request $request, $id)
+    {
         $order = $this->order->where([
             'id' => $id,
             'company_id' => $request->get('company_id')
@@ -95,13 +95,15 @@ class CompanyOrderController extends Controller
         return $this->successResponse($order);
     }
 
-    public function create(Request $request){
+    public function create(Request $request)
+    {
         $this->validate($request, $this->getRules());
         $this->saveOrder($request, $this->order);
         return $this->successResponse(trans('messages.saved'), 201);
     }
 
-    public function update(Request $request, $id){
+    public function update(Request $request, $id)
+    {
         $order = $this->order->where([
             'id' => $id,
             'company_id' => $request->get('company_id'),
@@ -112,7 +114,8 @@ class CompanyOrderController extends Controller
         return $this->successResponse(trans('messages.saved'));
     }
 
-    public function confirm(Request $request, $id){
+    public function confirm(Request $request, $id)
+    {
         $order = $this->order->where([
             'id' => $id,
             'company_id' => $request->get('company_id'),
@@ -125,7 +128,8 @@ class CompanyOrderController extends Controller
         return $this->successResponse(trans('messages.saved'));
     }
 
-    public function saveOrder(Request $request, Order $order){
+    public function saveOrder(Request $request, Order $order)
+    {
         if ($request->get('is_confirmed')){
             $confirmedBy = ($this->getEmployeeByUserId(Auth::id(), $request->get('company_id')))->getKey();
             $confirmedDate = Carbon::now();
@@ -150,7 +154,8 @@ class CompanyOrderController extends Controller
         });
     }
 
-    private function saveOrderEmployees(int $orderId, array $orderEmployees, OrderType $orderType): void {
+    private function saveOrderEmployees(int $orderId, array $orderEmployees, OrderType $orderType): void
+    {
         $ids = [];
         foreach ($orderEmployees as $orderEmployee){
             $orderEmployee = $this->orderEmployee->updateOrCreate(
@@ -171,7 +176,8 @@ class CompanyOrderController extends Controller
         }
     }
 
-    private function trimOrderEmployeeDetailsJsonFromUnvalidatedFields($details, OrderType $orderType){
+    private function trimOrderEmployeeDetailsJsonFromUnvalidatedFields($details, OrderType $orderType)
+    {
         $rules = $orderType->getEmployeeValidateRules();
         $newRules = [];
         foreach ($rules as $ruleName => $rule){
@@ -180,11 +186,13 @@ class CompanyOrderController extends Controller
 //        dd($rules);
     }
 
-    private function deleteOrderEmployeesWhichIsNotInArray(int $orderId, array $ids): void {
+    private function deleteOrderEmployeesWhichIsNotInArray(int $orderId, array $ids): void
+    {
         $this->orderEmployee->where('order_id', $orderId)->whereNotIn('id', $ids)->delete();
     }
 
-    public function destroy(Request $request, $id){
+    public function destroy(Request $request, $id)
+    {
         $order = $this->order->where([
             'id' => $id,
             'company_id' => $request->get('company_id'),
@@ -195,7 +203,8 @@ class CompanyOrderController extends Controller
             : $this->errorMessage(trans('messages.not_saved'), 400);
     }
 
-    private function getEmployeeByUserId(int $userId, int $companyId): Employee {
+    private function getEmployeeByUserId(int $userId, int $companyId): Employee
+    {
         return Employee::where([
             'user_id' => $userId,
             'company_id' => $companyId

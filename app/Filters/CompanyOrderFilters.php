@@ -52,7 +52,7 @@ class CompanyOrderFilters extends QueryFilters {
     }
 
     public function hasEmployeeId(int $id): Builder {
-        return $this->builder->whereHas('employees', function ($query) use ($id){
+        return $this->builder->whereHas('employees', function ($query) use ($id) {
             $query->where('details->employee_id', $id);
         });
     }

@@ -13,7 +13,8 @@ class OrderEmployee extends Model
     protected $guarded = ['id'];
 
     protected $casts = [
-        'details' => 'json'
+        'details' => 'json',
+        'vacation_details' => 'json'
     ];
 
     public function order(){
