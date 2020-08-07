@@ -33,16 +33,18 @@ class LaborVacation extends Order implements OrderType
                 'required',
                 Rule::in(['f', 'm'])
             ],
-            'employees.*.details.non_working_days' => 'required|array',
+            'employees.*.details.non_working_days' => 'nullable|array',
             'employees.*.details.non_working_days.*' => 'required|max:50',
             'employees.*.details.non_working_days_count' => 'required|numeric|max:100',
-            'employees.*.details.start_date' => 'required|date|date_format:Y-m-d',
-            'employees.*.details.end_date' => 'required|date|date_format:Y-m-d',
+            'employees.*.details.vacation_start_date' => 'required|date|date_format:Y-m-d',
+            'employees.*.details.vacation_end_date' => 'required|date|date_format:Y-m-d',
             'employees.*.details.vacation_details' => 'nullable|array',
             'employees.*.details.vacation_details.*.beginning_of_work_year' => 'required|numeric',
             'employees.*.details.vacation_details.*.end_of_work_year' => 'required|numeric',
             'employees.*.details.vacation_details.*.day' => 'required|numeric',
-            'employees.*.details.vacation_details.*.part_of_vacation' => 'required|max:50',
+            'employees.*.details.vacation_details.*.part_of_vacation' => [
+                'required', Rule::in(['primary', 'additional'])
+            ],
             'employees.*.details.note' => 'nullable|min:3|max:255',
         ];
     }

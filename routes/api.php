@@ -61,7 +61,7 @@ Route::group(['prefix' => 'v1'] , function ($router) {
         Route::get('/module/{id}', 'PermissionController@userGetPermissionsByModuleId');
     }); // permissions
 
-    Route::get('/test', 'TestController@test')->middleware(['auth:api', 'authorize']);
+    Route::post('/test', 'TestController@test')->middleware(['auth:api', 'authorize']);
 
 
 });

@@ -542,10 +542,28 @@ Route::group([
             Route::delete('/{id}', 'VacationPlanningController@destroy');
         });
 
+        Route::group(['prefix' => 'past/unused/vacation'], function (){
+            Route::get('/', 'PastUnusedVacationController@index');
+            Route::post('/', 'PastUnusedVacationController@create');
+            Route::put('/{id}', 'PastUnusedVacationController@update');
+            Route::delete('/{id}', 'PastUnusedVacationController@destroy');
+        });
+
+        Route::group(['prefix' => 'labor/vacation'], function (){
+            Route::get('/', 'LaborVacationTrackingController@index');
+        });
+
         Route::group(['prefix' => 'work/calendar'], function (){
             Route::get('/', 'WorkCalendarController@index');
             Route::post('/', 'WorkCalendarController@create');
             Route::delete('/{id}', 'WorkCalendarController@remove');
+        });
+
+        Route::group(['prefix' => 'event'], function (){
+            Route::get('/', 'CompanyEventController@index');
+            Route::post('/', 'CompanyEventController@create');
+            Route::put('/{id}', 'CompanyEventController@update');
+            Route::delete('/{id}', 'CompanyEventController@remove');
         });
 
         Route::group(['prefix' => 'work/hours'], function (){

@@ -258,20 +258,20 @@ class CompanyStructureController extends Controller
     public function setCompanyStructure(Request $request): JsonResponse {
         $this->validate($request, [
             'structure' => 'required|array',
-            'structure.*.structure_id' => 'required|numeric',
+            'structure.*.structure_id' => 'nullable|numeric',
             'structure.*.structure_type' => [
                 'required',
                 Rule::in(['department', 'section', 'sector'])
             ],
             'structure.*.link' => 'required|array',
-            'structure.*.link.id' => 'required|numeric',
+            'structure.*.link.id' => 'nullable|numeric',
             'structure.*.link.type' => [
                 'required',
                 Rule::in(['company', 'department', 'section', 'sector'])
             ],
         ]);
         $links = [];
-        $linkedStructures = [
+        $structuresToBeUnlinked = [
             'department' => [
                 'model' => $this->getStructureModelByType('department'),
                 'ids' => []
@@ -285,8 +285,42 @@ class CompanyStructureController extends Controller
                 'ids' => []
             ]
         ];
+        $structureIdByTempId = [];
         foreach ($request->get('structure') as $structure){
             $link = $structure['link'];
+            if (!$link['id'] and $link['type'] != 'company'){
+                /*
+                 * When structure already created
+                 */
+                if (isset($structureIdByTempId[$link['temp_id']])){
+                    $link['id'] = $structureIdByTempId[$link['temp_id']];
+                }
+
+                /*
+                 * Else create structure and link temp and real id
+                 */
+                else {
+                    $link['id'] = $this->saveCompanyStructureAndGetId(
+                        ['name' => $link['name'], 'code' => $link['code'] ?? null],
+                        $request->get('company_id'),
+                        $link['type']
+                    );
+                    $structureIdByTempId[$link['temp_id']] = $link['id'];
+                }
+            }
+            if (!$structure['structure_id']){
+                if (isset($structureIdByTempId[$structure['temp_id']])){
+                    $structure['structure_id'] = $structureIdByTempId[$structure['temp_id']];
+                }
+                else {
+                    $structure['structure_id'] = $this->saveCompanyStructureAndGetId(
+                        ['name' => $structure['name'], 'code' => $structure['code'] ?? null],
+                        $request->get('company_id'),
+                        $structure['structure_type']
+                    );
+                    $structureIdByTempId[$structure['temp_id']] = $structure['structure_id'];
+                }
+            }
             $this->ifStructureTriesLinkSmallerStructureThrowException($structure['structure_type'], $link['type']);
             $structableId = $link['type'] == 'company' ? $request->get('company_id') : $link['id'];
             $key = $structableId . '-' . $structure['structure_type'] . '-' . $link['type'];
@@ -307,9 +341,9 @@ class CompanyStructureController extends Controller
             /*
              * Group linked structure ids by structure type (later to remove from company structure which is not in array)
              */
-            $linkedStructures[$structure['structure_type']]['ids'][] = $structure['structure_id'];
+            $structuresToBeUnlinked[$structure['structure_type']]['ids'][] = $structure['structure_id'];
         }
-        DB::transaction(function () use ($request, $links, $linkedStructures){
+        DB::transaction(function () use ($request, $links, $structuresToBeUnlinked){
             foreach ($links as $link){
                 $link['model']->whereIn('id', $link['connectorsIds'])
                 ->where('company_id', $request->get('company_id'))
@@ -318,7 +352,7 @@ class CompanyStructureController extends Controller
                     'structable_type' => $link['structable_type']
                 ]);
             }
-            foreach ($linkedStructures as $link){
+            foreach ($structuresToBeUnlinked as $link){
                 $link['model']->whereNotIn('id', $link['ids'])
                 ->where('company_id', $request->get('company_id'))
                 ->update([
@@ -328,6 +362,17 @@ class CompanyStructureController extends Controller
             }
         });
         return $this->successResponse(trans('messages.saved'), 200);
+    }
+
+    private function saveCompanyStructureAndGetId($structure, $companyId, $structureType): int {
+        $structureModel = $this->getStructureModelNewInstanceByType($structureType);
+        $structureModel->fill([
+            'name' => $structure['name'],
+            'code' => $structure['code'] ?? null,
+            'company_id' => $companyId
+        ]);
+        $structureModel->save();
+        return $structureModel->getKey();
     }
 
     /**
@@ -504,6 +549,17 @@ class CompanyStructureController extends Controller
             $structure = $this->sector;
         if ($type == 'company')
             $structure = $this->company;
+        return $structure;
+    }
+
+    private function getStructureModelNewInstanceByType(string $type): Model {
+        $structure = null;
+        if ($type == 'department')
+            $structure = new Department();
+        if ($type == 'section')
+            $structure = new Section();
+        if ($type == 'sector')
+            $structure = new Sector();
         return $structure;
     }
 
