@@ -11,6 +11,7 @@ use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationData;
 use Modules\Hr\Entities\CompanyAuthorizedEmployee;
 use Modules\Hr\Entities\Employee\Contract;
 use Modules\Hr\Entities\Employee\Employee;
@@ -257,37 +258,63 @@ class ContractController extends Controller
     public function update(Request $request, $id)
     {
         $this->validate($request, [
-            'paragraph_id' => ['required', 'integer']
+            "updates" => ['required', 'array'],
+            "updates.*.paragraph_id" => ['required', 'integer'],
+            "updates.*.data" => ['required', 'array'],
+            "contract_no" => ['required','string' , 'max:255'],
+            "sign_date" => ['required','date_format:Y-m-d'],
+            "start_date" => ['required','date_format:Y-m-d'],
         ]);
 
         $InitialRules = self::getValidationRules();
 
-        $paragraph = Paragraph::with('fields:paragraph_id,field')
-            ->where('id', '=', $request->get('paragraph_id'))
-            ->first();
-
-
-        $keys = $paragraph->fields->pluck('field')->toArray();
-
-        $rules = [];
-        foreach ($InitialRules as $key => $value)
-            if (in_array($key, $keys))
-                $rules[$key] = $value;
-
-        $this->validate($request, $rules);
-
-
-        $keys = array_keys($rules);
-
-        $data = $request->only($keys);
-
-        $salary = $this->countSalary($data);
-        if ($salary)
-            $data['salary'] = $salary;
-
-        if (!$data) return $this->successResponse(trans('response.nothingToUpdate'), 400);
 
         DB::beginTransaction();
+
+
+        $insertedParagraphData = [];
+        $allKeys = [];
+        $allRules = [];
+        foreach ($request->get('updates') as $v) {
+            $paragraph = Paragraph::with('fields:paragraph_id,field')
+                ->where('id', '=', +$v['paragraph_id'])
+                ->first();
+
+            if (!$paragraph) $this->errorResponse('not found', 404);
+
+            $keys = $paragraph->fields->pluck('field')->toArray();
+
+            $rules = [];
+            $data = [];
+
+            foreach ($InitialRules as $key => $value)
+                if (in_array($key, $keys)){
+                    $rules["updates.*.data." . $key] = $value;
+                    $allKeys[] = $key;
+                    if (isset($v['data'][$key])){
+                        $data[$key] = $v['data'][$key];
+                    }
+                }
+
+            $allRules = array_merge($allRules, $rules);
+
+            $salary = $this->countSalary($data);
+
+            if ($salary)
+                $data['salary'] = $salary;
+
+            if (!$data) return $this->successResponse('nothingToUpdate ' + $paragraph->name, 400);
+
+            array_push($insertedParagraphData,
+                [
+                    'data' => $data,
+                    'paragraph' => $paragraph
+                ]
+            );
+        }
+
+        $this->validate($request , $allRules);
+
 
         $contract = Contract::with([
             'position',
@@ -298,32 +325,44 @@ class ContractController extends Controller
             'contract_type:id,name',
             'duration_type:id,name',
             'department:id,name',
-        ])->where('id', $id)->first(array_merge($keys, ['id', 'versions']));
+        ])->where('id', $id)->first(array_merge($allKeys, ['id', 'versions']));
 
 
         if (!$contract) return $this->errorResponse(trans('response.contractNotFound'), 404);
 
         $from = (clone $contract)->toArray();
 
-        $contract->fill($data);
-
-        $contract->load([
-            'position',
-            'section:id,name',
-            'sector:id,name',
-            'personalCategory:id,name',
-            'specializationDegree:id,name',
-            'contract_type:id,name',
-            'duration_type:id,name',
-            'department:id,name',
-        ]);
-
-        $to = (clone $contract)->toArray();
-
-        unset($to['id']);
-        unset($to['version']);
         unset($from['id']);
         unset($from['version']);
+
+        $versionsData = [];
+
+        foreach ($insertedParagraphData as $value) {
+
+            $contract->fill($value['data']);
+
+            $contract->load([
+                'position',
+                'section:id,name',
+                'sector:id,name',
+                'personalCategory:id,name',
+                'specializationDegree:id,name',
+                'contract_type:id,name',
+                'duration_type:id,name',
+                'department:id,name',
+            ]);
+
+            $to = (clone $contract)->toArray();
+            unset($to['id']);
+            unset($to['version']);
+
+            array_push($versionsData, [
+                [
+                    'paragraph' => $value['paragraph'],
+                    'to' => $to,
+                ]
+            ]);
+        }
 
         if (!$contract->versions) $contract->versions = [];
 
@@ -331,10 +370,12 @@ class ContractController extends Controller
 
         $originalProgram[] = [
             'user' => Auth::user(),
-            'paragraph' => $paragraph,
             'updated_at' => Carbon::now()->toDateTimeLocalString(),
             'from' => $from,
-            'to' => $to,
+            'to' => $versionsData,
+            'sign_date'=> $request->get('sign_date'),
+            'start_date'=> $request->get('start_date'),
+            'contract_no' => $request->get('contract_no')
         ];
 
         $contract->versions = $originalProgram;
@@ -348,15 +389,15 @@ class ContractController extends Controller
 
     public function add(Request $request, $id)
     {
-
-
         $this->validate($request, [
             'data' => ['required', 'array'],
-            'data.*.key' => ['required', 'string', 'max:255'],
-            'data.*.value' => ['required', 'string', 'max:255'],
-            'paragraph_id' => ['required', 'integer']
+            'data.*' => ['required', 'string', 'max:255'],
+//            'data.*.value' => ['required', 'string', 'max:255'],
+            'paragraph_id' => ['required', 'integer'],
+            "contract_no" => ['required','string' , 'max:255'],
+            "sign_date" => ['required','date_format:Y-m-d'],
+            "start_date" => ['required','date_format:Y-m-d'],
         ]);
-
 
         $paragraph = Paragraph::where('id', '=', $request->get('paragraph_id'))
             ->first();
@@ -373,10 +414,12 @@ class ContractController extends Controller
         $temp = $contract->additions;
         $temp[] = array_merge((array)$request->only('data'),
             [
-                'paragraph' => $paragraph
+                'paragraph' => $paragraph,
+                'sign_date'=> $request->get('sign_date'),
+                'start_date'=> $request->get('start_date'),
+                'contract_no' => $request->get('contract_no')
             ]
         );
-
 
         $contract->additions = $temp;
         $contract->save();
@@ -502,8 +545,7 @@ class ContractController extends Controller
                 +$data['addition_package_fee'] +
                 +$data['work_environment_addition'] +
                 +$data['overtime_addition'];
-        } else {
-            return false;
         }
+        return false;
     }
 }
