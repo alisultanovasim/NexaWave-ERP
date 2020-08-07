@@ -52,6 +52,7 @@ class Contract extends Model
         return $this->belongsTo('Modules\Hr\Entities\SpecializationDegree');
 
     }
+
     public function section(){
         return $this->belongsTo('Modules\Hr\Entities\Section' );
     }

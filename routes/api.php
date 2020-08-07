@@ -3,6 +3,8 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
+
+Route::get("/test" , "TestController@test");
 Route::group(['prefix' => 'v1'] , function ($router) {
 
     Route::group(['prefix' => 'profile', 'middleware' => ['auth:api', 'authorize'], 'namespace' => 'Auth'] , function ($r) {
