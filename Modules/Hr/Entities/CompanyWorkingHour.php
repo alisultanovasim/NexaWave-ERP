@@ -11,7 +11,7 @@ class CompanyWorkingHour extends Model
 
     protected $guarded = ['id'];
 
-    public function contract(){
-        return $this->belongsTo(Contract::class, 'contract_id');
+    public function contractType(){
+        return $this->belongsTo(ContractType::class, 'contract_id');
     }
 }
