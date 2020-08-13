@@ -228,7 +228,7 @@ class ContractController extends Controller
 
         if ($notExists = $this->companyInfo($request->get('company_id'), $request->only(
             ['department_id', 'section_id', 'position_id', 'sector_id', 'contract_id']
-        ))) return $notExists;
+        ))) return $this->errorResponse($notExists);
 
         $employee = Employee::where('id', $request->get('employee_id'))
             ->where('company_id', $request->get('company_id'))
@@ -270,7 +270,6 @@ class ContractController extends Controller
 
 
         DB::beginTransaction();
-
 
         $insertedParagraphData = [];
         $allKeys = [];
