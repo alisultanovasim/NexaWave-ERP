@@ -34,17 +34,17 @@ class WorkCalendarController extends Controller
 
         $this->validate($request, [
             'year' => 'required|numeric',
-            'month' => 'required|between:1,12',
+            'month' => 'nullable|between:1,12',
         ]);
 
-        $startOfMonth = Carbon::create($request->get('year'), $request->get('month'))->startOfMonth();
-        $endOfMonth = Carbon::create($request->get('year'), $request->get('month'))->endOfMonth();
+        $startOfYear = Carbon::create($request->get('year'), $request->get('month'))->startOfYear();
+        $endOfYear = Carbon::create($request->get('year'), $request->get('month'))->endOfYear();
         $calendar = $this->calendar
         ->companyId($request->get('company_id'))
         ->whereHas('details', function ($query) use ($request){
             $query->where('employee_id', $request->get('employee_id'));
         })
-        ->whereBetween('date', [$startOfMonth, $endOfMonth])
+        ->whereBetween('date', [$startOfYear, $endOfYear])
         ->with([
             'details' => function ($query) use ($request){
                 $query->where('employee_id', $request->get('employee_id'));
