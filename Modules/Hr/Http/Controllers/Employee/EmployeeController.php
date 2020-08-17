@@ -149,7 +149,10 @@ class EmployeeController extends Controller
             ]);
 
             DB::commit();
-            return $this->successResponse(['id' => $employee->getKey()]);
+            return $this->successResponse([
+                'employee_id' => $employee->getKey(),
+                'user_id' => $user->getKey(),
+            ]);
         } catch (QueryException  $exception) {
             if ($exception->errorInfo[1] == 1062){
                 if (strpos($exception->errorInfo[2], 'employees_user_id_company_id_unique') !== false)
