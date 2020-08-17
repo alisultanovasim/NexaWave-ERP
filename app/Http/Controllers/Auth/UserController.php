@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Jobs\SendMailCreatePassword;
+use App\Mail\ResetPassword;
 use App\Models\Company;
 use App\Models\CompanyModule;
 use App\Models\Module;
@@ -20,6 +21,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -194,6 +196,8 @@ class UserController extends Controller
         $resetCountForToday = $userReset->today()->where('email', $request->get('email'))->count();
         if ($resetCountForToday >= $userReset->getDailyResetCount())
             return $this->errorResponse(trans('responses.extend_daily_reset_limit'), 400);
+        $hash = $userReset->getRandomHash();
+        $resetUrl = env('RESET_PASSWORD_URL') . '?hash=' . $hash;
         $userReset->fill([
             'id' => Str::uuid(),
             'email' => $request->get('email'),
@@ -203,7 +207,7 @@ class UserController extends Controller
             'expire_date' => Carbon::now()->addSeconds($userReset->getExpireTime())
         ]);
         $userReset->save();
-        //send email here
+        Mail::to($request->get('email'))->send(new ResetPassword(['reset_url' => $resetUrl]));
         return $userReset
             ? $this->successResponse(['success' => trans('responses.reset_link_sent')])
             : $this->errorResponse(trans('responses.reset_link_not_sent'), 500);
