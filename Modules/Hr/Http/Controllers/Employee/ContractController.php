@@ -352,10 +352,11 @@ class ContractController extends Controller
             ]);
 
             $to = (clone $contract)->toArray();
+
             unset($to['id']);
             unset($to['version']);
 
-            array_push($versionsData, [
+            $versionsData = array_merge($versionsData, [
                 [
                     'paragraph' => $value['paragraph'],
                     'to' => $to,
