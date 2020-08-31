@@ -332,7 +332,7 @@ class ContractController extends Controller
         $from = (clone $contract)->toArray();
 
         unset($from['id']);
-        unset($from['version']);
+        unset($from['versions']);
 
         $versionsData = [];
 
@@ -354,7 +354,7 @@ class ContractController extends Controller
             $to = (clone $contract)->toArray();
 
             unset($to['id']);
-            unset($to['version']);
+            unset($to['versions']);
 
             $versionsData = array_merge($versionsData, [
                 [
@@ -390,20 +390,33 @@ class ContractController extends Controller
     public function add(Request $request, $id)
     {
         $this->validate($request, [
-            'data' => ['required', 'array'],
-            'data.*' => ['required', 'string', 'max:255'],
-//            'data.*.value' => ['required', 'string', 'max:255'],
-            'paragraph_id' => ['required', 'integer'],
+
+
+            "data" => ['required', 'array'],
+            "data.*.paragraph_id" => ['required', 'integer'],
+            "data.*.additions" => ['required', 'array'],
+            "data.*.additions.*.key" => ['required', 'string'],
             "contract_no" => ['required','string' , 'max:255'],
             "sign_date" => ['required','date_format:Y-m-d'],
             "start_date" => ['required','date_format:Y-m-d'],
         ]);
 
-        $paragraph = Paragraph::where('id', '=', $request->get('paragraph_id'))
-            ->first();
 
-        if (!$paragraph)
-            return $this->errorResponse(trans('response.nothingToUpdate'), 404);
+        $insertedData  = [
+            'user' =>  Auth::user(),
+            'contract_no' => $request->get('contract_no'),
+            'sign_date' => $request->get('sign_date'),
+            'start_date' => $request->get('start_date'),
+            'additions' => []
+        ];
+
+        foreach ($request->get('data') as $v) {
+            $paragraph = Paragraph::where('id', '=', +$v['paragraph_id'])
+                ->first();
+            if (!$paragraph) $this->errorResponse('not found', 404);
+
+            $insertedData['additions'] = $v['additions'] ;
+        }
 
         $contract = Contract::whereHas('employee', function ($q) use ($request) {
             $q->where('company_id', $request->get('company_id'));
@@ -412,14 +425,7 @@ class ContractController extends Controller
         if (!$contract->additions) $contract->additions = [];
 
         $temp = $contract->additions;
-        $temp[] = array_merge((array)$request->only('data'),
-            [
-                'paragraph' => $paragraph,
-                'sign_date'=> $request->get('sign_date'),
-                'start_date'=> $request->get('start_date'),
-                'contract_no' => $request->get('contract_no')
-            ]
-        );
+        $temp[] =  $insertedData;
 
         $contract->additions = $temp;
         $contract->save();
