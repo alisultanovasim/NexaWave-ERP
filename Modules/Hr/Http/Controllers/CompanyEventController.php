@@ -83,8 +83,8 @@ class CompanyEventController extends Controller
         $companyEvent->fill([
             'company_id' => $request->get('company_id'),
             'name' => $request->get('name'),
-            'start_time' => $request->get('start_date'),
-            'end_time' => $request->get('end_date'),
+            'start_time' => $request->get('start_time'),
+            'end_time' => $request->get('end_time'),
             'lunch_start_time' => $request->get('lunch_start_time'),
             'lunch_end_time' => $request->get('lunch_end_time'),
         ]);
