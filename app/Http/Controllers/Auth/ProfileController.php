@@ -12,7 +12,9 @@ use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Modules\Hr\Entities\Employee\Employee;
+use Modules\Hr\Entities\Employee\UserDetail;
 use Modules\Plaza\Entities\Office;
 use Modules\Plaza\Entities\OfficeUser;
 
@@ -101,65 +103,45 @@ class ProfileController extends Controller
     public function index(Request $request)
     {
         return Auth::user()->load([
-            'details', 'details.nationality', 'details.citizen', 'details.birthdayCity', 'details.birthdayCountry', 'details.birthdayRegion'
+            'details',
+            'details.nationality',
+            'details.citizen',
+            'details.birthdayCity',
+            'details.birthdayCountry',
+            'details.birthdayRegion'
         ]);
     }
 
     public function history()
     {
         return Auth::user()->load([
-            'employment', 'employment.company', 'employment.contracts', 'employment.contracts.position'
+            'employment',
+            'employment.company',
+            'employment.contracts',
+            'employment.contracts.position'
         ]);
     }
 
     public function update(Request $request)
     {
-        UserController::updateUser($request, Auth::id());
+        $this->validate($request, [
+            'name' => 'required|max:255',
+            'surname' => 'required|max:255',
+            'avatar' => ['nullable', 'mimes:png,jpg,jpeg'],
+        ]);
+        $userUpdateData = $request->only('name', 'surname');
+        $userDetailUpdateData = [];
+        if ($request->hasFile('avatar')) {
+            $id = Auth::id();
+            $name = md5($id . time()) . '.' . $request->file('avatar')->getClientOriginalExtension();
+            Storage::disk('public')->putFileAs('users', $request->file('avatar'), $name);
+            $userDetailUpdateData['avatar'] = $name;
+        }
+        User::where('id', Auth::id())->update($userUpdateData);
+        if (count($userDetailUpdateData)){
+            UserDetail::where('user_id', Auth::id())->update($userDetailUpdateData);
+        }
         return $this->successResponse('ok');
     }
-
 }
 
-/*
- *
-        switch ($user->role_id) {
-
-            case User::OFFICE:
-                $office = OfficeUser::with(['office:id,name,image,company_id'])->where('user_id', $user->id)->first()->office;
-                $companies = [
-                    [
-                        "company_id" => $office->company_id
-                    ]
-                ];
-                break;
-
-            case User::EMPLOYEE:
-                $companies = Employee::with([
-                    'company',
-                    'contract' => function ($q) {
-                        $q->where('is_active', true);
-                    },
-                    'contract.position',
-                    'contract.position.permissions' => function ($q) {
-                        $q->with(['module:id,name'])
-                            ->whereHas('module', function ($q) {
-                                $q->whereNull('parent_id');
-                            })
-                            ->whereHas('permission' , function ($q) {
-                                $q->where('id', Permission::READ);
-                            })
-                            ->select([
-                                'position_id',
-                                'module_id',
-                                'permission_id',
-                            ]);
-                    },
-                ])
-                    ->active()
-                    ->where('user_id', Auth::id())
-                    ->get();
-                break;
-
-        }
-
- */
