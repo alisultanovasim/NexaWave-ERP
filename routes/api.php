@@ -4,7 +4,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 
-Route::get("/test" , "TestController@test");
 Route::group(['prefix' => 'v1'] , function ($router) {
 
     Route::group(['prefix' => 'profile', 'middleware' => ['auth:api', 'authorize'], 'namespace' => 'Auth'] , function ($r) {
@@ -60,9 +59,6 @@ Route::group(['prefix' => 'v1'] , function ($router) {
         Route::get('/roles/{id}', 'PermissionController@getRolePermissions');
         Route::get('/module/{id}', 'PermissionController@userGetPermissionsByModuleId');
     }); // permissions
-
-    Route::post('/test', 'TestController@test')->middleware(['auth:api', 'authorize']);
-
 
 });
 
