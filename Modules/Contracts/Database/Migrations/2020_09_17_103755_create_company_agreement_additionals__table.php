@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateCompanyContractsTable extends Migration
+class CreateCompanyAgreementAdditionalsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,21 +13,20 @@ class CreateCompanyContractsTable extends Migration
      */
     public function up()
     {
-        Schema::create('company_contracts', function (Blueprint $table) {
+        Schema::create('company_agreement_additions', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->unsignedBigInteger('parent_id')->nullable()->default(null);
-            $table->unsignedBigInteger('company_id');
-            $table->string('name', 255);
-            $table->string('number', 255);
+            $table->unsignedBigInteger('company_agreement_id');
+            $table->date('date');
             $table->date('start_date')->nullable()->default(null);
             $table->date('end_date')->nullable()->default(null);
-            $table->date('date')->nullable()->default(null);
+            $table->json('currency');
             $table->string('subject');
+            $table->float('amount');
+            $table->enum('amount_type', ['plus', 'minus']);
             $table->timestamps();
             $table->softDeletes();
 
-            $table->foreign('parent_id')->references('id')->on('company_contracts');
-            $table->foreign('company_id')->references('id')->on('companies');
+            $table->foreign('company_agreement_id')->references('id')->on('company_agreements');
         });
     }
 
@@ -38,6 +37,6 @@ class CreateCompanyContractsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('company_contracts');
+        Schema::dropIfExists('company_agreement_additions');
     }
 }

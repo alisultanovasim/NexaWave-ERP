@@ -4,7 +4,7 @@ namespace Modules\Contracts\Entities;
 
 use Illuminate\Database\Eloquent\Model;
 
-class CompanyContractChange extends Model
+class CompanyAgreementTermination extends Model
 {
-    protected $fillable = [];
+    protected $guarded = [];
 }

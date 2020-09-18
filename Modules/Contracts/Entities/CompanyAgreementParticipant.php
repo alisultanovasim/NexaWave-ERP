@@ -4,7 +4,7 @@ namespace Modules\Contracts\Entities;
 
 use Illuminate\Database\Eloquent\Model;
 
-class CompanyContractDetail extends Model
+class CompanyAgreementParticipant extends Model
 {
-    protected $fillable = [];
+    protected $guarded = ['id'];
 }
