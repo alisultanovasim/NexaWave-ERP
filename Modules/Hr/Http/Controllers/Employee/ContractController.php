@@ -93,9 +93,9 @@ class ContractController extends Controller
             +$request->header('addition_package_fee') +
             +$request->get('work_environment_addition') +
             +$request->get('overtime_addition');
-
-
+        
         $contract = Contract::create($data);
+
         Contract::create(
             array_merge(
                 $data,
@@ -125,7 +125,10 @@ class ContractController extends Controller
             'intern_start_date' => ['nullable', 'date'],
             'intern_end_date' => ['nullable', 'date'],
             'currency_id' => ['required', 'integer'],//exists
-            'contract_type_id' => ['nullable', 'integer'],//exists
+            'contract_type_id' => [
+                'required',
+                Rule::exists('contract_types', 'id')
+            ],//exists
             'work_start_date' => ['nullable', 'date_format:Y-m-d'],
             'work_end_date' => ['nullable', 'date_format:Y-m-d'],
             'break_time_start' => ['nullable', 'date_format:H:i'],
@@ -133,7 +136,10 @@ class ContractController extends Controller
             'work_time_start_at' => ['nullable', 'date_format:H:i'],
             'work_time_end_at' => ['nullable', 'date_format:H:i'],
             'contract_no' => ['required', 'string', 'max:255'],
-            'duration_type_id' => ['required', 'integer', 'min:1'], //exists
+            'duration_type_id' => [
+                'required',
+                Rule::exists('duration_types', 'id')
+            ], //exists
             'labor_protection_addition' => ['nullable', 'string'],
             'labor_meal_addition' => ['nullable', 'string'],
             'labor_sport_addition' => ['nullable', 'string'],
@@ -227,7 +233,7 @@ class ContractController extends Controller
         DB::beginTransaction();
 
         if ($notExists = $this->companyInfo($request->get('company_id'), $request->only(
-            ['department_id', 'section_id', 'position_id', 'sector_id', 'contract_id']
+            ['department_id', 'section_id', 'position_id', 'sector_id']
         ))) return $this->errorResponse($notExists);
 
         $employee = Employee::where('id', $request->get('employee_id'))
@@ -500,7 +506,10 @@ class ContractController extends Controller
 //            'contract' => ['sometimes', 'mimes:pdf,doc,docx'],
             'start_date' => ['sometimes', 'required', 'date'],
             'end_date' => ['sometimes', 'required', 'date'],
-            'contract_type_id' => ['nullable', 'integer'],//exists
+            'contract_type_id' => [
+                'required',
+                Rule::exists('contract_types', 'id')
+            ],//exists
             'currency_id' => ['nullable', 'integer'],//exists
             'position_salary_praise_about' => ['nullable', 'numeric'],
             'addition_package_fee' => ['nullable', 'numeric', "min:0", "max:100"],
