@@ -1,0 +1,27 @@
+{
+    "name": "nwidart/taskmanager",
+    "description": "",
+    "authors": [
+        {
+            "name": "Nicolas Widart",
+            "email": "n.widart@gmail.com"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Modules\\TaskManager\\Providers\\TaskManagerServiceProvider"
+            ],
+            "aliases": {
+
+            }
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\TaskManager\\": ""
+        }
+    },
+    "require-dev": {
+    }
+}

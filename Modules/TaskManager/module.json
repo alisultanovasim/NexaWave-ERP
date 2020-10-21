@@ -1,0 +1,13 @@
+{
+    "name": "TaskManager",
+    "alias": "task-manager",
+    "description": "",
+    "keywords": [],
+    "order": 0,
+    "providers": [
+        "Modules\\TaskManager\\Providers\\TaskManagerServiceProvider"
+    ],
+    "aliases": {},
+    "files": [],
+    "requires": []
+}

@@ -20,12 +20,11 @@
         "laravel/tinker": "^2.0",
         "lorisleiva/laravel-deployer": "^0.3.0",
         "nwidart/laravel-modules": "^6.2",
-        "rennokki/laravel-eloquent-query-cache": "^2.0",
-      "ext-apache": "*",
-      "ext-http": "*"
+        "rennokki/laravel-eloquent-query-cache": "^2.0"
     },
     "require-dev": {
         "facade/ignition": "^2.0",
+        "krlove/eloquent-model-generator": "^1.3",
         "mockery/mockery": "^1.3.1",
         "nunomaduro/collision": "^4.1",
         "phpunit/phpunit": "^8.5"
