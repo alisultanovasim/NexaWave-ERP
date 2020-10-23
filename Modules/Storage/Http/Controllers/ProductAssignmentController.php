@@ -6,7 +6,6 @@ use App\Traits\ApiResponse;
 use App\Traits\Query;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
 use Illuminate\Validation\Rule;
 use Modules\Storage\Entities\Product;
@@ -20,15 +19,15 @@ class ProductAssignmentController extends Controller
     {
         $this->validate($request, [
             'employee_id' => ['nullable', 'integer'],
-            'department_id' => ['nullable'  , 'integer'],
-            'section_id' => ['nullable' , 'integer'],
-            'sector_id' => ['nullable' , 'integer'],
-            'product_id' => ['nullable' , 'integer'],
-            'status' => ['nullable' , Rule::in([
+            'department_id' => ['nullable', 'integer'],
+            'section_id' => ['nullable', 'integer'],
+            'sector_id' => ['nullable', 'integer'],
+            'product_id' => ['nullable', 'integer'],
+            'status' => ['nullable', Rule::in([
                 ProductAssignment::RETURNED,
                 ProductAssignment::ACTIVE,
                 ProductAssignment::ALL
-            ])]
+            ])],
         ]);
 
         $assignments = ProductAssignment::with(['employee:id,user_id' ,'employee.user:id,name,surname' , 'department' , 'section' , 'sector' , 'product' ,'product.kind','product.kind.unit'])
