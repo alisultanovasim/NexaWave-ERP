@@ -83,8 +83,8 @@ class ProductController extends Controller
             }])
             ->company();
 
-        if ($request->has("category_id"))
-            $title = $title->where("id", "=", $request->input("category_id"));
+        if ($request->has("title_id"))
+            $title = $title->where("title_id", "=", $request->input("title_id"));
         $title = $title->paginate($request->get('per_page'));
 
         return $this->dataResponse($title);
