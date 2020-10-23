@@ -192,6 +192,11 @@ class CompanyStructureController extends Controller
         return $this->successResponse(trans('messages.saved'), 200);
     }
 
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     * @throws ValidationException
+     */
     private function companyCreateStructure(Request $request): JsonResponse {
         $structureModel = $this->getStructureModelByType($request->get('structure_type'));
         $this->validate($request, [
@@ -364,6 +369,12 @@ class CompanyStructureController extends Controller
         return $this->successResponse(trans('messages.saved'), 200);
     }
 
+    /**
+     * @param $structure
+     * @param $companyId
+     * @param $structureType
+     * @return int
+     */
     private function saveCompanyStructureAndGetId($structure, $companyId, $structureType): int {
         $structureModel = $this->getStructureModelNewInstanceByType($structureType);
         $structureModel->fill([
@@ -473,6 +484,11 @@ class CompanyStructureController extends Controller
         return $this->successResponse($response);
     }
 
+    /**
+     * @param Request $request
+     * @param $companyId
+     * @return JsonResponse
+     */
     private function getPositionsWhichExistsInAnyStructure(Request $request, $companyId){
         $positions = Positions::where('company_id', $companyId)
             ->existsInStructure()
@@ -552,6 +568,10 @@ class CompanyStructureController extends Controller
         return $structure;
     }
 
+    /**
+     * @param string $type
+     * @return Model
+     */
     private function getStructureModelNewInstanceByType(string $type): Model {
         $structure = null;
         if ($type == 'department')
@@ -586,7 +606,6 @@ class CompanyStructureController extends Controller
         if ($hasSubStructures)
             throw new BadRequestHttpException(trans('messages.remove_sub_structures_before_update_parent_structure'));
     }
-
 
     /**
      * @param Model $model

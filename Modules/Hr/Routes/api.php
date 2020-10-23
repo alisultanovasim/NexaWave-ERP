@@ -596,6 +596,8 @@ Route::group([
         Route::get('/employees', 'CompanyStructureController@getEmployees');
     });
 
+    Route::get('company/staff/schedule', 'CompanyStaffScheduleController@index');
+
     Route::group(['prefix' => 'company/authorized/employees'], function (){
         Route::get('/', 'CompanyAuthorizedUsersController@index');
         Route::post('/', 'CompanyAuthorizedUsersController@addOrUpdateAuthorizedEmployee');
