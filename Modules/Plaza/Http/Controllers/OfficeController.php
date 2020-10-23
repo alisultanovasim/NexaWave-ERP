@@ -11,6 +11,7 @@ use App\Traits\ApiResponse;
 use Exception;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Validation\ValidatesRequests;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
@@ -18,6 +19,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 use Modules\Plaza\Entities\Contact;
 use Modules\Plaza\Entities\Contract;
 use Modules\Plaza\Entities\Document;
@@ -27,10 +29,19 @@ use Modules\Plaza\Entities\Office;
 use Modules\Plaza\Entities\Worker;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
+/**
+ * Class OfficeController
+ * @package Modules\Plaza\Http\Controllers
+ */
 class OfficeController extends Controller
 {
     use ApiResponse, ValidatesRequests;
 
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     * @throws ValidationException
+     */
     public function index(Request $request)
     {
         $this->validate($request, [
@@ -135,7 +146,7 @@ class OfficeController extends Controller
             'documents' => 'sometimes|required|array',
             'documents.*' => 'sometimes|required|mimes::jpeg,png,jpg,gif,svg,pdf,docx,doc,txt,xls,xlsx',
 
-            'username' => ['required', 'string', 'min:6'],
+            'username' => ['required', 'string', 'min:6', "unique:users,username"],
 
             'user_email' => ['required', 'email', 'min:6'],
             'set_password' => ['nullable', 'min:6']
@@ -145,7 +156,9 @@ class OfficeController extends Controller
             DB::beginTransaction();
 
             $office = new Office();
-            $office->fill($request->only('agree_at', 'entity', 'voen', 'per_month', 'company_id', 'name', 'description', 'start_time', 'month_count', 'payed_month_count'));
+            $office->fill($request->only(
+                'agree_at', 'entity', 'voen', 'per_month', 'company_id', 'name',
+                'description', 'start_time', 'month_count', 'payed_month_count'));
 
             if ($request->hasFile('image'))
                 $office->image = $this->uploadImage($request->company_id, $request->image);
@@ -730,7 +743,7 @@ class OfficeController extends Controller
 
             return $this->successResponse('OK');
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return $this->errorResponse(trans('apiResponse.tryLater'), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
