@@ -29,7 +29,8 @@ class ProductKindController extends Controller
             ->company()
             ->where('title_id', $request->get('title_id'));
 
-        if ($request->has("kinds"))
+
+        if ($request->has("keyword"))
             $kinds = $kinds->where("name", "LIKE", "%" . $request->input("keyword") . "%");
 
         $kinds = $kinds->paginate($request->get('per_page'));
