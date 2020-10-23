@@ -93,7 +93,7 @@ class ContractController extends Controller
             +$request->header('addition_package_fee') +
             +$request->get('work_environment_addition') +
             +$request->get('overtime_addition');
-        
+
         $contract = Contract::create($data);
 
         Contract::create(

@@ -122,23 +122,20 @@ class CompanyStructureController extends Controller
      * @throws ValidationException
      */
     public function getEmployees(Request $request): JsonResponse {
+
         $this->validate($request, [
-            'structure_id' => 'nullable|numeric',
-            'structure_type' => [
-                'nullable',
-                Rule::in([
-                    'department', 'section', 'sector'
-                ])
-            ],
             'position_id' => 'nullable|numeric'
         ]);
+
         $employees = Employee::query()
         ->whereHas('contracts', function ($query) use ($request){
-            if ($request->get('structure_id')){
-                $query->where(['structure_id' => $request->get('structure_id')]);
+            if ($request->get('department_id')) {
+                $query->where('department_id', $request->get('department_id'));
             }
-            if ($request->get('structure_type')){
-                $query->where(['structure_type' => $request->get('structure_type')]);
+            if ($request->get('sector_id')) {
+                $query->where('sector_id', $request->get('sector_id'));
+            }if ($request->get('section_id')) {
+                $query->where('section_id', $request->get('section_id'));
             }
             if ($request->get('position_id')){
                 $query->where(['position_id' => $request->get('position_id')]);
