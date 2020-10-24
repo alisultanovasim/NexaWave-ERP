@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Modules\Plaza\Entities\Contact;
 use Modules\Plaza\Entities\Contract;
@@ -146,7 +147,7 @@ class OfficeController extends Controller
             'documents' => 'sometimes|required|array',
             'documents.*' => 'sometimes|required|mimes::jpeg,png,jpg,gif,svg,pdf,docx,doc,txt,xls,xlsx',
 
-            'username' => ['required', 'string', 'min:6', "unique:users,username"],
+            'username' => ['required', 'string', 'min:6', Rule::unique("users", "username")->where("deleted_at", null)],
 
             'user_email' => ['required', 'email', 'min:6'],
             'set_password' => ['nullable', 'min:6']
