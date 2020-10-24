@@ -2,7 +2,7 @@
 pipeline {
   agent {
     docker {
-      image 'ismatbabir/laravel-jenkins:latest'
+      image 'lorisleiva/laravel-docker:latest'
       args '-u root'
     }
   }
