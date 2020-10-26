@@ -19,6 +19,7 @@ use Modules\Hr\Entities\Employee\Employee;
 use Modules\Hr\Entities\Positions;
 use Modules\Hr\Entities\Section;
 use Modules\Hr\Entities\Sector;
+use Modules\Hr\Services\CompanyStructureService;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class CompanyStructureController extends Controller
@@ -29,22 +30,19 @@ class CompanyStructureController extends Controller
     private $department;
     private $section;
     private $sector;
+    private $companyStructureService;
 
-    /**
-     * CompanyStructureController constructor.
-     * @param Company $company
-     * @param Department $department
-     * @param Section $section
-     * @param Sector $sector
-     */
+
     public function __construct(
         Company $company, Department $department,
-        Section $section, Sector $sector
+        Section $section, Sector $sector,
+        CompanyStructureService $companyStructureService
     ){
         $this->company = $company;
         $this->department = $department;
         $this->section = $section;
         $this->sector = $sector;
+        $this->companyStructureService = $companyStructureService;
     }
 
     /**
@@ -52,68 +50,8 @@ class CompanyStructureController extends Controller
      * @return JsonResponse
      */
     public function index(Request $request): JsonResponse {
-        $structure = $this->company->where('id', $request->get('company_id'))
-        ->with([
-            'structuredDepartments:id,name,is_closed,structable_id,structable_type',
-            'structuredSections:id,name,is_closed,structable_id,structable_type',
-            'structuredSectors:id,name,is_closed,structable_id,structable_type',
-        ])
-        ->first([
-            'id',
-            'name'
-        ]);
-        if ($request->get('with_nested_structure')){
-            //when update company structure unset company-structure-comapnyId-* cache keys
-            $cacheKey = 'company-structure-'. $request->get('company_id') . '-' . md5(serialize($structure));
-            if (Cache::has($cacheKey)){
-                $structure->children = Cache::get($cacheKey);
-            }
-            else {
-                $children = $this->getNestedStructure($structure);
-                Cache::put($cacheKey, $children, 24 * 60 * 60);
-                $structure->children = $children;
-            }
-            unset($structure->structuredDepartments);
-            unset($structure->structuredSections);
-            unset($structure->structuredSectors);
-        }
+        $structure = $this->companyStructureService->getStructure($request->get('company_id'), $request->get('with_nested_structure'));
         return  $this->successResponse($structure);
-    }
-
-
-    private function getNestedStructure($structure = []){
-        $formattedStructure = [];
-
-        foreach ($structure['structuredDepartments'] ?? [] as $department){
-            $formattedStructure[] = [
-                'id' => $department['id'],
-                'name' => $department['name'],
-                'is_closed' => $department['is_closed'],
-                'type' => 'department',
-                'children' => $this->getNestedStructure($department)
-            ];
-        }
-
-        foreach ($structure['structuredSections'] ?? [] as $section){
-            $formattedStructure[] = [
-                'id' => $section['id'],
-                'name' => $section['name'],
-                'is_closed' => $section['is_closed'],
-                'type' => 'section',
-                'children' => $this->getNestedStructure($section)
-            ];
-        }
-
-        foreach ($structure['structuredSectors'] ?? [] as $sector){
-            $formattedStructure[] = [
-                'id' => $sector['id'],
-                'name' => $sector['name'],
-                'is_closed' => $sector['is_closed'],
-                'type' => 'sector',
-                'children' => $this->getNestedStructure($sector)
-            ];
-        }
-        return $formattedStructure;
     }
 
     /**

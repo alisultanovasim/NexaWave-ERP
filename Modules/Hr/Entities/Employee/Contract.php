@@ -86,7 +86,8 @@ class Contract extends Model
     public function scopeCurrentlyActive($query){
         return $query->where('is_active', true)
                 ->where('start_date', '<', Carbon::now())
-                ->where('end_date', '>', Carbon::now());
+                ->where('end_date', '>', Carbon::now())
+                ->where('is_terminated', false);
     }
 
     public function scopeNoInitial($q){
