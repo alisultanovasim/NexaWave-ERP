@@ -6,6 +6,7 @@ use App\Traits\ApiResponse;
 use App\Traits\Query;
 use Carbon\Carbon;
 use Illuminate\Foundation\Validation\ValidatesRequests;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
@@ -15,6 +16,7 @@ use Illuminate\Validation\ValidationData;
 use Modules\Hr\Entities\CompanyAuthorizedEmployee;
 use Modules\Hr\Entities\Employee\Contract;
 use Modules\Hr\Entities\Employee\Employee;
+use Modules\Hr\Entities\Employee\EmployeeContractTermination;
 use Modules\Hr\Entities\Paragraph;
 use Modules\Hr\Traits\DocumentUploader;
 
@@ -308,7 +310,7 @@ class ContractController extends Controller
             if ($salary)
                 $data['salary'] = $salary;
 
-            if (!$data) return $this->successResponse('nothingToUpdate ' + $paragraph->name, 400);
+            if (!$data) return $this->successResponse('nothingToUpdate ' . $paragraph->name, 400);
 
             array_push($insertedParagraphData,
                 [
@@ -482,6 +484,7 @@ class ContractController extends Controller
             'employee.user:id,name,surname',
             'contract_type',
             'duration_type',
+            'terminationDetails'
         ])
             ->whereHas('employee', function ($q) use ($request) {
                 $q->where('company_id', $request->get('company_id'));
@@ -562,5 +565,38 @@ class ContractController extends Controller
                 +$data['overtime_addition'];
         }
         return false;
+    }
+
+    public function terminate(Request $request, $id): JsonResponse
+    {
+        $this->validate($request, [
+            'reason' => 'required|min:3|max:255',
+            'order_number' => 'required|numeric',
+            'order_date' => 'required|date|date_format:Y-m-d',
+            'termination_date' => 'required|date|date_format:Y-m-d',
+        ]);
+
+
+        $contract = Contract::where([
+            'id' => $id,
+            'is_terminated' => 0
+        ])
+        ->whereHas('employee', function ($query) use ($request) {
+            $query->where('company_id', $request->get('company_id'));
+        })
+        ->firstOrFail(['id', 'employee_id']);
+
+        DB::transaction(function () use ($request, $contract) {
+            EmployeeContractTermination::create([
+                'employee_contract_id' => $contract->getKey(),
+                'reason' => $request->get('reason'),
+                'order_number' => $request->get('order_number'),
+                'order_date' => $request->get('order_date'),
+                'termination_date' => $request->get('termination_date'),
+            ]);
+            $contract->update(['is_terminated' => 1]);
+        });
+
+        return $this->successResponse(trans('messages.saved'));
     }
 }
