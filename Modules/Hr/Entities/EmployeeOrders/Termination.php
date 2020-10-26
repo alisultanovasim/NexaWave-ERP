@@ -14,14 +14,14 @@ class Termination extends Order implements OrderType
     {
         return [
             'employees.*.id' => 'nullable|integer',
-            'employees.*.details' => 'required',
-            'employees.*.details.employee_id' => 'required|integer',
-            'employees.*.details.employee_tabel_no' => 'required|min:3|max:255',
-            'employees.*.details.employee_name' => 'required|min:3|max:255',
-            'employees.*.details.employee_surname' => 'required|min:3|max:255',
-            'employees.*.details.employee_father_name' => 'required|min:3|max:255',
+            'employees.*.details' => 'exclude_if:is_confirmed,0',
+            'employees.*.details.employee_id' => 'exclude_if:is_confirmed,0|integer',
+            'employees.*.details.employee_tabel_no' => 'exclude_if:is_confirmed,0|max:255',
+            'employees.*.details.employee_name' => 'exclude_if:is_confirmed,0|max:255',
+            'employees.*.details.employee_surname' => 'exclude_if:is_confirmed,0|max:255',
+            'employees.*.details.employee_father_name' => 'exclude_if:is_confirmed,0|max:255',
             'employees.*.details.employee_gender' => [
-                'required',
+                'exclude_if:is_confirmed,0',
                 Rule::in(['f', 'm'])
             ],
             'employees.*.details.department_id' => 'nullable|integer',
@@ -35,10 +35,10 @@ class Termination extends Order implements OrderType
             'employees.*.details.qualification_degree' => 'nullable|min:3|max:255',
             'employees.*.details.personal_category_id' => 'nullable|integer',
             'employees.*.details.personal_category_name' => 'nullable|min:3|max:255',
-            'employees.*.details.recruitment_date' => 'required|date|date_format:Y-m-d',
-            'employees.*.details.contract_date' => 'required|date|date_format:Y-m-d',
-            'employees.*.details.contract_number' => 'required|min:3|max:255',
-            'employees.*.details.termination_date' => 'required|date|date_format:Y-m-d',
+            'employees.*.details.recruitment_date' => 'exclude_if:is_confirmed,0|date|date_format:Y-m-d',
+            'employees.*.details.contract_date' => 'exclude_if:is_confirmed,0|date|date_format:Y-m-d',
+            'employees.*.details.contract_number' => 'exclude_if:is_confirmed,0|max:255',
+            'employees.*.details.termination_date' => 'exclude_if:is_confirmed,0|date|date_format:Y-m-d',
             'employees.*.details.note' => 'nullable|min:3|max:255',
         ];
     }

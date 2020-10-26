@@ -409,6 +409,7 @@ Route::group([
             'prefix' => 'contracts'
         ], function ($route) {
             Route::get("/", 'ContractController@index');
+            Route::put("/terminate/{id}", 'ContractController@terminate');
             Route::get("/{id}", 'ContractController@show');
             Route::post("/", 'ContractController@store');
             Route::post("/update/{id}", 'ContractController@update');
