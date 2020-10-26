@@ -134,7 +134,8 @@ class CompanyStructureController extends Controller
             }
             if ($request->get('sector_id')) {
                 $query->where('sector_id', $request->get('sector_id'));
-            }if ($request->get('section_id')) {
+            }
+            if ($request->get('section_id')) {
                 $query->where('section_id', $request->get('section_id'));
             }
             if ($request->get('position_id')){
