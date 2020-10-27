@@ -155,21 +155,21 @@ class OfficeController extends Controller
             'user_email' => ['required', 'email', 'min:6'],
             'set_password' => ['nullable', 'min:6'],
 
-            "price_without_adv" => ["sometimes", "required", "numeric"],
-            "is_adv_payer" => ["sometimes", "required", "boolean"],
-            "is_buy_attendance" => ["sometimes", "required", "boolean"],
-            "parking_count" => ["sometimes", "required", "integer"],
-            "parking_type" => ['sometimes', "required", Rule::in([
-                Office::PARKING_ABOVE_GROUND,
-                Office::PARKING_UNDERGROUND
-            ])],
-            "internet_monthly_price" => ["sometimes", "required", "numeric"],
-            "electric_monthly_price" => ["sometimes", "required", "numeric"],
-            "is_pay_for_repair" => ['sometimes', 'required', "numeric"],
-            "free_entrance_card" => ['sometimes', "required", "integer"],
-            "paid_entrance_card" => ['sometimes', "required", "integer"],
-            "price_per_card" => ['sometimes', "required", "numeric"],
-            "requests" => ['sometimes', "required", "string", "min:1"]
+//            "price_without_adv" => ["sometimes", "required", "numeric"],
+//            "is_adv_payer" => ["sometimes", "required", "boolean"],
+//            "is_buy_attendance" => ["sometimes", "required", "boolean"],
+//            "parking_count" => ["sometimes", "required", "integer"],
+//            "parking_type" => ['sometimes', "required", Rule::in([
+//                Office::PARKING_ABOVE_GROUND,
+//                Office::PARKING_UNDERGROUND
+//            ])],
+//            "internet_monthly_price" => ["sometimes", "required", "numeric"],
+//            "electric_monthly_price" => ["sometimes", "required", "numeric"],
+//            "is_pay_for_repair" => ['sometimes', 'required', "numeric"],
+//            "free_entrance_card" => ['sometimes', "required", "integer"],
+//            "paid_entrance_card" => ['sometimes', "required", "integer"],
+//            "price_per_card" => ['sometimes', "required", "numeric"],
+//            "requests" => ['sometimes', "required", "string", "min:1"]
 
         ]);
         try {
