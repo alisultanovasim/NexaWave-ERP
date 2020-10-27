@@ -16,7 +16,7 @@ class Contract  extends Model
 
     public function getContractAttribute($value){
         if ($value)
-            return env('APP_URL') . '/' . $value;
+            return env('APP_URL') . '/storage/' . $value;
         return $value;
     }
 }
