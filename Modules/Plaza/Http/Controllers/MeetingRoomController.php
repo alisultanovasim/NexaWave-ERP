@@ -4,26 +4,37 @@
 namespace Modules\Plaza\Http\Controllers;
 
 
+use App\Traits\ApiResponse;
+use Carbon\Carbon;
+use DemeterChain\C;
+use Exception;
 use Illuminate\Foundation\Validation\ValidatesRequests;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 use Modules\Plaza\Entities\Meeting;
 use Modules\Plaza\Entities\MeetingRoomImage;
 use Modules\Plaza\Entities\MeetingRooms;
 use Modules\Plaza\Entities\Office;
 use Modules\Plaza\Entities\RoomType;
-use App\Traits\ApiResponse;
-use Carbon\Carbon;
-use DemeterChain\C;
-use Doctrine\DBAL\Query\QueryException;
-use Illuminate\Http\Request;
-use Illuminate\Http\Response;
-use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Routing\Controller;
 
+/**
+ * Class MeetingRoomController
+ * @package Modules\Plaza\Http\Controllers
+ */
 class MeetingRoomController extends Controller
 {
-    use ApiResponse  , ValidatesRequests;
+    use ApiResponse, ValidatesRequests;
 
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     * @throws ValidationException
+     */
     public function getAllRooms(Request $request)
     {
         $this->validate($request, [
@@ -37,16 +48,21 @@ class MeetingRoomController extends Controller
 
             if ($request->with_images) $rooms->with(['images']);
             else  $rooms->with(['images' => function ($q) {
-                    $q->take(1);
-                }]);
+                $q->take(1);
+            }]);
 
             $rooms = $rooms->get();
             return $this->successResponse($rooms);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return $this->errorResponse('apiResponse.tryLater', Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     * @throws ValidationException
+     */
     public function storeRooms(Request $request)
     {
         $this->validate($request, [
@@ -97,11 +113,17 @@ class MeetingRoomController extends Controller
 
             DB::commit();
             return $this->successResponse('OK');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return $this->errorResponse('apiResponse.tryLater', Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
+    /**
+     * @param $company_id
+     * @param $file
+     * @param string $str
+     * @return false|string|null
+     */
     public function uploadImage($company_id, $file, $str = 'rooms')
     {
         if ($file instanceof UploadedFile) {
@@ -111,6 +133,12 @@ class MeetingRoomController extends Controller
         return null;
     }
 
+    /**
+     * @param Request $request
+     * @param $id
+     * @return JsonResponse
+     * @throws ValidationException
+     */
     public function showRooms(Request $request, $id)
     {
         $this->validate($request, [
@@ -139,11 +167,17 @@ class MeetingRoomController extends Controller
             if ($request->with_images) $room = $room->with(['images']);
             $room = $room->first();
             return $this->successResponse($room);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return $this->errorResponse('apiResponse.tryLater', Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
+    /**
+     * @param Request $request
+     * @param $id
+     * @return JsonResponse
+     * @throws ValidationException
+     */
     public function updateRoom(Request $request, $id)
     {
         $this->validate($request, [
@@ -189,11 +223,17 @@ class MeetingRoomController extends Controller
                 RoomType::insert($types);
             }
             return $this->successResponse('OK');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return $this->errorResponse('apiResponse.tryLater', Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
+    /**
+     * @param Request $request
+     * @param $id
+     * @return JsonResponse
+     * @throws ValidationException
+     */
     public function deleteRoom(Request $request, $id)
     {
         $this->validate($request, [
@@ -208,11 +248,16 @@ class MeetingRoomController extends Controller
             return $this->successResponse('ok');
         } catch (\Illuminate\Database\QueryException $e) {
             return $this->errorResponse('apiResponse.afterDomeTimesYoCantDelete', Response::HTTP_INTERNAL_SERVER_ERROR);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return $this->errorResponse('apiResponse.tryLater', Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     * @throws ValidationException
+     */
     public function index(Request $request)
     {
         $this->validate($request, [
@@ -263,13 +308,19 @@ class MeetingRoomController extends Controller
 
             return $this->successResponse($meeting);
 
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             return $this->errorResponse(trans('apiResponse.tryLater'), Response::HTTP_INTERNAL_SERVER_ERROR);
 
         }
 
     }
 
+    /**
+     * @param Request $request
+     * @param $id
+     * @return JsonResponse
+     * @throws ValidationException
+     */
     public function show(Request $request, $id)
     {
         $this->validate($request, [
@@ -282,13 +333,18 @@ class MeetingRoomController extends Controller
                 ->where('company_id', $request->company_id)
                 ->where('id', $id)->first();
             return $this->successResponse($meeting);
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             return $this->errorResponse(trans('apiResponse.tryLater'), Response::HTTP_INTERNAL_SERVER_ERROR);
 
         }
 
     }
 
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     * @throws ValidationException
+     */
     public function store(Request $request)
     {
         $this->validate($request, [
@@ -344,11 +400,17 @@ class MeetingRoomController extends Controller
             if ($check) return $this->errorResponse(trans('apiResponse.reservationTimeError'));
             Meeting::create($request->only('company_id', 'start_at', 'finish_at', 'office_id', 'finish_at', 'event_name', 'description', 'meeting_room'));
             return $this->successResponse('OK');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return $this->errorResponse(trans('apiResponse.tryLater'), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
+    /**
+     * @param Request $request
+     * @param $id
+     * @return JsonResponse
+     * @throws ValidationException
+     */
     public function updateForPlaza(Request $request, $id)
     {
         $this->validate($request, [
@@ -365,11 +427,17 @@ class MeetingRoomController extends Controller
             if (!$meeting) return $this->errorResponse(trans('apiResponse.MeetingNotFound'));
             Meeting::where('id', $id)->update($request->only('plaza_note', 'status', 'price'));
             return $this->successResponse('OK');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return $this->errorResponse(trans('apiResponse.tryLater'), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
+    /**
+     * @param Request $request
+     * @param $id
+     * @return JsonResponse
+     * @throws ValidationException
+     */
     public function update(Request $request, $id)
     {
         $this->validate($request, [
@@ -454,12 +522,18 @@ class MeetingRoomController extends Controller
             Meeting::where('id', $id)->update($arr);
             return $this->successResponse('OK');
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return $this->errorResponse(trans('apiResponse.tryLater'), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
     }
 
+    /**
+     * @param Request $request
+     * @param $id
+     * @return JsonResponse
+     * @throws ValidationException
+     */
     public function delete(Request $request, $id)
     {
         $this->validate($request, [
@@ -477,7 +551,7 @@ class MeetingRoomController extends Controller
 
             return $this->successResponse('OK');
 
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             return $this->errorResponse(trans('apiResponse.tryLater'), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 

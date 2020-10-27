@@ -132,7 +132,7 @@ Route::group([
 
         Route::get('/', 'MeetingRoomController@index');
         Route::get('/{id}', 'MeetingRoomController@show');
-        Route::post('/{id}/update/for/plaza', 'MeetingRoomController@updateForPlaza');
+        Route::post('/update/for/plaza/{id}', 'MeetingRoomController@updateForPlaza');
         Route::post('/', 'MeetingRoomController@store');
         Route::post('/update/{id}', 'MeetingRoomController@update');
         Route::post('/delete/{id}', 'MeetingRoomController@delete');
