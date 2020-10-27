@@ -150,7 +150,7 @@ class OfficeController extends Controller
             'documents' => 'sometimes|required|array',
             'documents.*' => 'sometimes|required|mimes::jpeg,png,jpg,gif,svg,pdf,docx,doc,txt,xls,xlsx',
 
-            'username' => ['required', 'string', 'min:6', Rule::unique("users", "username")->where("deleted_at", null)],
+            'username' => ['required', 'string', 'min:6', Rule::unique("users", "username")],
 
             'user_email' => ['required', 'email', 'min:6'],
             'set_password' => ['nullable', 'min:6'],
