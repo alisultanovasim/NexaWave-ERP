@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Query\Builder;
 
 /**
  * @property integer $id
@@ -22,12 +23,16 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string $deleted_at
  * @property Company $company
  * @property User[] $users
+ * @method Builder isActive()
  */
 class Project extends Model
 {
 
     use SoftDeletes;
 
+    /**
+     * @var string
+     */
     protected $table = "tm_projects";
     /**
      * The "type" of the auto-incrementing ID.
@@ -50,6 +55,9 @@ class Project extends Model
         'updated_at',
         'deleted_at'
     ];
+    /**
+     * @var string[]
+     */
     protected $hidden = [
         'created_at',
         'updated_at',
@@ -69,6 +77,16 @@ class Project extends Model
      */
     public function users()
     {
-        return $this->belongsToMany(User::class, 'project_users');
+        return $this->belongsToMany(User::class, 'tm_project_users');
+    }
+
+
+    /**
+     * @param $q
+     * @return mixed
+     */
+    public function scopeIsActive($q)
+    {
+        return $q->where("is_active", "=", true);
     }
 }

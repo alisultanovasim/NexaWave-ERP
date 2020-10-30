@@ -18,7 +18,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class TaskComment extends Model
 {
-    protected $table="tm_comments";
+    protected $table = "tm_task_comments";
 
     /**
      * The "type" of the auto-incrementing ID.

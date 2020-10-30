@@ -3,7 +3,9 @@
 namespace Modules\TaskManager\Entities;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Query\Builder;
 
 /**
  * @property integer $id
@@ -13,6 +15,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string $created_at
  * @property string $updated_at
  * @property Task[] $tasks
+ * @property Project $project
+ * @method Builder isNotArchive()
  */
 class TaskList extends Model
 {
@@ -33,7 +37,14 @@ class TaskList extends Model
     /**
      * @var array
      */
-    protected $fillable = ['project_id', 'name', 'is_archive', 'created_at', 'updated_at'];
+    protected $fillable = ['project_id', 'name', 'is_archive'];
+
+    /**
+     * @var string[]
+     */
+    protected $hidden = [
+        'created_at', 'updated_at'
+    ];
 
     /**
      * @return HasMany
@@ -41,5 +52,22 @@ class TaskList extends Model
     public function tasks()
     {
         return $this->hasMany(Task::class);
+    }
+
+    /**
+     * @return BelongsTo
+     */
+    public function project()
+    {
+        return $this->belongsTo(Project::class, "project_id");
+    }
+
+    /**
+     * @param $q
+     * @return mixed
+     */
+    public function scopeIsNotArchive($q)
+    {
+        return $q->where("is_archive", false);
     }
 }

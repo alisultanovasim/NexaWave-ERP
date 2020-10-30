@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 /**
  * @property integer $user_id
  * @property integer $project_id
+ * @property integer $role_id
  * @property Project $project
  * @property User $user
  */
@@ -20,7 +21,7 @@ class ProjectUser extends Model
     /**
      * @var array
      */
-    protected $fillable = ['user_id', 'project_id'];
+    protected $fillable = ['user_id', 'project_id', "role_id"];
 
     /**
      * @return BelongsTo

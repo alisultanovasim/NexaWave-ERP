@@ -16,8 +16,8 @@ class CreateTasksTable extends Migration
         Schema::create('tm_tasks', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->foreignId("list_id")->constrained("tm_lists");
-            $table->foreignId("parent_id")->constrained("tm_tasks");
-            $table->foreignId("assigned_id")->constrained("users");
+            $table->foreignId("parent_id")->nullable()->constrained("tm_tasks");
+            $table->foreignId("assigned_id")->nullable()->constrained("users");
             $table->foreignId("created_id")->constrained("users");
             $table->string("name", 300);
             $table->dateTime("deadline")->nullable();

@@ -14,7 +14,24 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::group([
-    'prefix' => "v1/task-manager/project",
-], function ($project) {
-    $project->post("/", "ProjectController@store");
+    'prefix' => "v1/task-manager",
+    "middleware" => "auth:api"
+], function ($tm) {
+
+    $tm->group(['prefix' => "project"], function ($project) {
+        $project->post("/", "ProjectController@store");
+        $project->get("/", "ProjectController@index");
+    });
+
+    $tm->group(['prefix' => "list", "middleware" => "projectId"], function ($list) {
+        $list->post("/", "ListController@store");
+        $list->get("/", "ListController@index");
+    });
+
+    $tm->group(['prefix' => "task", "middleware" => "projectId"], function ($task) {
+        $task->post("/", "TaskController@store");
+        $task->get("/{id}", "TaskController@show");
+        $task->get("/", "TaskController@index");
+    });
+
 });

@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property integer $parent_id
  * @property integer $assigned_id
  * @property integer $created_id
+ * @property integer $status
  * @property string $name
  * @property string $deadline
  * @property string $description
@@ -21,17 +22,27 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string $created_at
  * @property string $updated_at
  * @property User $assigned
- * @property User $created
+ * @property User $createdBy
  * @property TaskList $list
- * @property Task $task
+ * @property Task $parent
+ * @property Task[] $subTasks
  * @property TaskComment[] $comments
  * @property TaskFile[] $files
- * @property User[] $users
+ * @property User[] $watchers
+ * @property ActivityLog[] $activity
  */
 class Task extends Model
 {
 
-    protected $table="tm_tasks";
+    /**
+     * Task is new created
+     */
+    const PENDING = 1;
+
+    /**
+     * @var string
+     */
+    protected $table = "tm_tasks";
 
     /**
      * The "type" of the auto-incrementing ID.
@@ -43,7 +54,26 @@ class Task extends Model
     /**
      * @var array
      */
-    protected $fillable = ['list_id', 'parent_id', 'assigned_id', 'created_id', 'name', 'deadline', 'description', 'budget', 'created_at', 'updated_at'];
+    protected $fillable = [
+        'list_id',
+        'parent_id',
+        'assigned_id',
+        'created_id',
+        'name',
+        'deadline',
+        'description',
+        'budget',
+        'status',
+        'created_at',
+    ];
+
+    /**
+     * @var string[]
+     */
+    protected $hidden = [
+        'updated_at'
+
+    ];
 
     /**
      * @return BelongsTo
@@ -56,7 +86,7 @@ class Task extends Model
     /**
      * @return BelongsTo
      */
-    public function created()
+    public function createdBy()
     {
         return $this->belongsTo(User::class, 'created_id');
     }
@@ -72,9 +102,17 @@ class Task extends Model
     /**
      * @return BelongsTo
      */
-    public function task()
+    public function parent()
     {
         return $this->belongsTo(Task::class, 'parent_id');
+    }
+
+    /**
+     * @return HasMany
+     */
+    public function subTasks()
+    {
+        return $this->hasMany(Task::class, "id", "parent_id");
     }
 
     /**
@@ -96,8 +134,16 @@ class Task extends Model
     /**
      * @return BelongsToMany
      */
-    public function users()
+    public function watchers()
     {
-        return $this->belongsToMany(User::class, 'task_watchers');
+        return $this->belongsToMany(User::class, 'tm_task_watchers');
+    }
+
+    /**
+     * @return HasMany
+     */
+    public function activity()
+    {
+        return $this->hasMany(ActivityLog::class);
     }
 }
