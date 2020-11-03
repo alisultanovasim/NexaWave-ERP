@@ -4,6 +4,7 @@
 namespace Modules\Hr\Entities\Employee;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 
 class Contract extends Model
@@ -77,6 +78,11 @@ class Contract extends Model
             ->whereNull('initial_contract_id');
     }
 
+    public function terminationDetails(): HasOne
+    {
+        return $this->hasOne(EmployeeContractTermination::class, 'employee_contract_id', 'id');
+    }
+
     public function scopeDraft($q){
         return $q -> where('is_active' , true)
             ->where('draft' , 1)
@@ -86,7 +92,8 @@ class Contract extends Model
     public function scopeCurrentlyActive($query){
         return $query->where('is_active', true)
                 ->where('start_date', '<', Carbon::now())
-                ->where('end_date', '>', Carbon::now());
+                ->where('end_date', '>', Carbon::now())
+                ->where('is_terminated', false);
     }
 
     public function scopeNoInitial($q){

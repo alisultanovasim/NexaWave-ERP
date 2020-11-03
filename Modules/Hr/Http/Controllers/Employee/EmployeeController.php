@@ -5,17 +5,17 @@ namespace Modules\Hr\Http\Controllers\Employee;
 use App\Http\Controllers\Auth\UserController;
 use App\Models\User;
 use App\Models\UserRole;
-use Carbon\Carbon;
-use Illuminate\Foundation\Validation\ValidatesRequests;
-use Illuminate\Validation\Rule;
-use Modules\Hr\Entities\Employee\Employee;
 use App\Traits\ApiResponse;
 use App\Traits\Query;
+use Carbon\Carbon;
 use Illuminate\Database\QueryException;
+use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
+use Modules\Hr\Entities\Employee\Employee;
 use Modules\Hr\Traits\DocumentUploader;
 
 class EmployeeController extends Controller
@@ -47,8 +47,11 @@ class EmployeeController extends Controller
             return $this->errorResponse($notExists);
 
         $employees = Employee::where('company_id', $request->get('company_id'))
-        ->join('employee_contracts', 'employees.id', 'employee_contracts.employee_id');
+            ->with("contracts");
+        //TODO change it
+//        ->join('employee_contracts', 'employees.id', 'employee_contracts.employee_id');
 
+//        dd($employees->get()->toArray());
 
         if ($request->has('state') and $request->get('state') != '2')
             $employees->where('employees.is_active', $request->get('state'));
@@ -56,7 +59,7 @@ class EmployeeController extends Controller
             $employees->where('employees.is_active', true);
 
         if ($request->get('department_id'))
-            $employees->whereHas('contract' , function ($q) use ($request){
+            $employees->whereHas('contract', function ($q) use ($request) {
                 $q->where('department_id', $request->get('department_id'));
             });
 

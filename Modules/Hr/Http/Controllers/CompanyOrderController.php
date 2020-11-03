@@ -217,10 +217,10 @@ class CompanyOrderController extends Controller
                 'required',
                 Rule::in($this->order->getTypeIds())
             ],
-            'number' => 'required|min:2|max:255',
-            'labor_code_id' => 'required|exists:labor_codes,id',
-            'order_sign_date' => 'required|date|date_format:Y-m-d',
-            'employees' => 'required|array',
+            'number' => 'required_if:is_confirmed,1|max:255',
+            'labor_code_id' => 'exclude_if:is_confirmed,0|exists:labor_codes,id',
+            'order_sign_date' => 'exclude_if:is_confirmed,0|date|date_format:Y-m-d',
+            'employees' => 'required_if:is_confirmed,1|array',
             'is_confirmed' => 'required|boolean'
         ];
         if (\request()->get('type')){
