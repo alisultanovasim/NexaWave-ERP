@@ -11,6 +11,7 @@ Route::group([
     Route::get('/contract/type', 'AgreementsController@getContractTypes');
     Route::post('/', 'AgreementsController@createAgreement');
     Route::post('/addition', 'AgreementsController@addAdditionToAgreement');
+
 });
 
 

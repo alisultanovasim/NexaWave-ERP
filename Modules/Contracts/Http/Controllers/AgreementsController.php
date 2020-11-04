@@ -229,7 +229,6 @@ class AgreementsController extends Controller
                 $rules['participants.' . $i . '.correspondent_account'] = 'required|max:255';
                 $rules['participants.' . $i . '.signed_person_name'] = 'required|max:255';
                 $rules['participants.' . $i . '.signed_person_position'] = 'required|max:255';
-                $rules['participants.' . $i . '.signed_person_position'] = 'required|max:255';
             }
             if ($request->get('participants')[$i]['type'] == 'executor' and $request->get('agreement_type') == 'external') {
                 $rules['participants.' . $i . '.intermediary_bank_name'] = 'required|min:2|max:255';
