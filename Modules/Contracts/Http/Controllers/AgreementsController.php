@@ -19,26 +19,118 @@ use Modules\Contracts\Entities\CompanyAgreementContractType;
 use Modules\Contracts\Entities\CompanyAgreementFile;
 use Modules\Contracts\Entities\CompanyAgreementParticipant;
 use Modules\Contracts\Entities\CompanyAgreementTermination;
+use Modules\Contracts\Filters\AgreementFilters;
 
 class AgreementsController extends Controller
 {
     use ApiResponse, ValidatesRequests;
 
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function getContractTypes(Request $request): JsonResponse
     {
         $types = CompanyAgreementContractType::active()->get(['id', 'name']);
         return $this->successResponse($types);
     }
 
-    public function getContractsCount(Request $request): JsonResponse
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function getAllAgreementsCount(Request $request): JsonResponse
     {
+        $agreementsCount = CompanyAgreement::where('company_id', $request->get('company_id'))->count();
+        return $this->successResponse($agreementsCount);
     }
 
-    public function getContracts(Request $request): JsonResponse
+    /**
+     * @param Request $request
+     * @param $id
+     * @return JsonResponse
+     */
+    public function getAdditionById(Request $request, $id): JsonResponse
     {
+        $addition = CompanyAgreementAddition::belongsToCompanyId($request->get('company_id'))
+        ->with('files')
+        ->where('id', $id)
+        ->firstOrFail();
 
+        return $this->successResponse($addition);
     }
 
+    /**
+     * @param Request $request
+     * @param $id
+     * @return JsonResponse
+     */
+    public function getAdditionsByAgreementId(Request $request, $id): JsonResponse
+    {
+        $additions = CompanyAgreementAddition::whereHas('agreement',
+        function ($query) use ($request, $id) {
+            $query->where([
+                'id' => $id,
+                'company_id' => $request->get('company_id')
+            ]);
+        })
+        ->get([
+            'id',
+            'date',
+            'start_date',
+            'end_date'
+        ]);
+
+        return $this->successResponse($additions);
+    }
+
+    /**
+     * @param Request $request
+     * @param AgreementFilters $filters
+     * @return JsonResponse
+     */
+    public function getAgreements(Request $request, AgreementFilters $filters): JsonResponse
+    {
+        $agreements = CompanyAgreement::query()
+        ->filter($filters)
+        ->where('company_id', $request->get('company_id'))
+        ->select([
+            'id',
+            'parent_id',
+            'name',
+            'start_date',
+            'end_date'
+        ])
+        ->paginate($request->get('per_page'));
+
+        return $this->successResponse($agreements);
+    }
+
+    /**
+     * @param Request $request
+     * @param $id
+     * @return JsonResponse
+     */
+    public function getAgreementById(Request $request, $id): JsonResponse
+    {
+        $agreement = CompanyAgreement::where([
+            'id' => $id,
+            'company_id' => $request->get('company_id')
+        ])
+        ->with([
+            'files',
+            'participants'
+        ])
+        ->firstOrFail();
+
+        return $this->successResponse($agreement);
+    }
+
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     * @throws ValidationException
+     */
     public function createAgreement(Request $request): JsonResponse
     {
         $this->validate($request, $this->getAgreementRules($request));
@@ -228,7 +320,6 @@ class AgreementsController extends Controller
                 $rules['participants.' . $i . '.bank_name'] = 'required|max:255';
                 $rules['participants.' . $i . '.correspondent_account'] = 'required|max:255';
                 $rules['participants.' . $i . '.signed_person_name'] = 'required|max:255';
-                $rules['participants.' . $i . '.signed_person_position'] = 'required|max:255';
                 $rules['participants.' . $i . '.signed_person_position'] = 'required|max:255';
             }
             if ($request->get('participants')[$i]['type'] == 'executor' and $request->get('agreement_type') == 'external') {
