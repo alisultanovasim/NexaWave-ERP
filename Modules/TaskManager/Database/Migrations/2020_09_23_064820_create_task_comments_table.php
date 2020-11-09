@@ -14,7 +14,7 @@ class CreateTaskCommentsTable extends Migration
     public function up()
     {
         Schema::create('tm_task_comments', function (Blueprint $table) {
-            $table->bigIncrements('id');
+            $table->uuid('id')->primary();
             $table->foreignId("task_id")->constrained("tm_tasks");
             $table->foreignId("user_id")->constrained("users");
             $table->text("comment");

@@ -28,8 +28,14 @@ class ActivityLog extends Model
      * @var string
      */
     protected $table = 'tm_activity_log';
+
     /**
      * @var array
+     */
+    public $incrementing = false;
+
+    /**
+     * @var string[]
      */
     protected $fillable = [
         'user_id',
@@ -43,6 +49,9 @@ class ActivityLog extends Model
         'updated_at'
     ];
 
+    /**
+     *
+     */
     protected static function boot()
     {
         parent::boot();

@@ -8,6 +8,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Modules\TaskManager\Entities\Task;
+use Modules\TaskManager\Entities\TaskWatcher;
 use Throwable;
 
 /**
@@ -59,7 +60,6 @@ class TaskController extends Controller
             $task->created_id = auth()->id();
             $task->save();
             $this->addWatchers($task->id, $request->input("watchers"));
-
         });
 
         return $this->successResponse(trans("responses.success_add"), 201);
@@ -71,9 +71,21 @@ class TaskController extends Controller
      */
     private function addWatchers($task_id, $watchers)
     {
-        //TODO write body of this method
+        $watcherUsers = [];
+        foreach ($watchers as $user_id) {
+            $watcherUsers[] = [
+                'user_id' => $user_id,
+                'task_id' => $task_id
+            ];
+        }
+
+        (new TaskWatcher)->insert($watcherUsers);
     }
 
+    /**
+     * @param $id
+     * @return JsonResponse
+     */
     public function show($id)
     {
         $task = Task::with([
@@ -87,5 +99,29 @@ class TaskController extends Controller
         ])->findOrFail($id);
 
         return $this->dataResponse($task);
+    }
+
+
+    /**
+     * @param $id
+     * @param $status
+     * @return JsonResponse
+     */
+    public function changeTaskStatus($id, $status)
+    {
+        if (!in_array($status, Task::statuses()))
+            return $this->errorResponse(trans('responses.status_not_found'));
+
+        DB::transaction(function () use ($id, $status) {
+            $task = Task::findOrFail($id);
+            $task->fill(
+                [
+                    "status" => $status
+                ]
+            );
+            $task->save();
+        });
+        return $this->successResponse(trans('responses.success_update'));
+
     }
 }

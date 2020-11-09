@@ -5,6 +5,7 @@ namespace Modules\TaskManager\Entities;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Str;
 
 /**
  * @property integer $id
@@ -27,10 +28,25 @@ class TaskComment extends Model
      */
     protected $keyType = 'integer';
 
+    public $incrementing = false;
+
+    protected static function boot()
+    {
+        parent::boot();
+        self::creating(function ($model) {
+            $model->{$model->getKeyName()} = Str::uuid();
+        });
+    }
+
+    protected $primaryKey = "id";
     /**
      * @var array
      */
-    protected $fillable = ['task_id', 'user_id', 'comment', 'created_at', 'updated_at'];
+    protected $fillable = ['task_id', 'user_id', 'comment', 'created_at'];
+
+    protected $hidden = [
+        'updated_at'
+    ];
 
     /**
      * @return BelongsTo

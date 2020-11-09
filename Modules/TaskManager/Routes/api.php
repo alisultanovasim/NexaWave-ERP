@@ -32,6 +32,13 @@ Route::group([
         $task->post("/", "TaskController@store");
         $task->get("/{id}", "TaskController@show");
         $task->get("/", "TaskController@index");
+        $task->put("/{id}/status/{status}", "TaskController@changeTaskStatus");
+
+
+        $task->group(['prefix' => "comment", "middleware" => "projectId"], function ($comment) {
+            $comment->post("/", "CommentController@store");
+            $comment->put("/{uuid}", "CommentController@update");
+        });
     });
 
 });

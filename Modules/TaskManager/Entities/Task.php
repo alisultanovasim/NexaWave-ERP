@@ -35,9 +35,18 @@ class Task extends Model
 {
 
     /**
-     * Task is new created
+     * Task statutes
      */
     const PENDING = 1;
+
+    const IN_PROGRESS = 2;
+
+    const COMPLETED = 3;
+
+    public static function statuses()
+    {
+        return [self::PENDING, self::IN_PROGRESS, self::COMPLETED];
+    }
 
     /**
      * @var string
