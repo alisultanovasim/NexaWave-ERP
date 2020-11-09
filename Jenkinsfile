@@ -34,8 +34,8 @@ pipeline {
         branch 'master'
       }
       steps {
-        sh 'ssh-keyscan 213.136.78.83 >> ~/.ssh/known_hosts'
-        sh 'php artisan deploy 213.136.78.83 -s upload'
+        sh 'ssh-keyscan 185.32.45.80 >> ~/.ssh/known_hosts'
+        sh 'php artisan deploy 185.32.45.80 -s upload'
       }
     }
 
