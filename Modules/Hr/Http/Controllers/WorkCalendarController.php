@@ -34,21 +34,22 @@ class WorkCalendarController extends Controller
 
         $this->validate($request, [
             'year' => 'required|numeric',
-            'month' => 'required|between:1,12',
+            'month' => 'nullable|between:1,12',
         ]);
 
-        $startOfMonth = Carbon::create($request->get('year'), $request->get('month'))->startOfMonth();
-        $endOfMonth = Carbon::create($request->get('year'), $request->get('month'))->endOfMonth();
+        $startOfYear = Carbon::create($request->get('year'), $request->get('month'))->startOfYear();
+        $endOfYear = Carbon::create($request->get('year'), $request->get('month'))->endOfYear();
         $calendar = $this->calendar
         ->companyId($request->get('company_id'))
         ->whereHas('details', function ($query) use ($request){
             $query->where('employee_id', $request->get('employee_id'));
         })
-        ->whereBetween('date', [$startOfMonth, $endOfMonth])
+        ->whereBetween('date', [$startOfYear, $endOfYear])
         ->with([
             'details' => function ($query) use ($request){
                 $query->where('employee_id', $request->get('employee_id'));
-                $query->select(['id', 'work_calendar_id', 'employee_id', 'event']);
+                $query->select(['id', 'work_calendar_id', 'employee_id', 'event', 'event_id']);
+                $query->with('eventDetails');
             }
         ])
         ->orderBy('date')
@@ -68,7 +69,11 @@ class WorkCalendarController extends Controller
 
         $this->validate($request, [
             'date' => 'required|date',
-            'event' => 'required|max:255',
+            'event' => 'nullable|max:255',
+            'event_id' => [
+                'nullable',
+                Rule::exists('company_events', 'id')->where('company_id', $request->get('company_id'))
+            ],
             'employee_id' => [
                 'nullable',
                 Rule::exists('employees', 'id')->where('company_id', $request->get('company_id'))
@@ -80,9 +85,9 @@ class WorkCalendarController extends Controller
             WorkCalendarDetail::create([
                 'work_calendar_id' => $dayOnCalendar->getKey(),
                 'employee_id' => $request->get('employee_id'),
-                'event' => $request->get('event')
+                'event' => $request->get('event'),
+                'event_id' => $request->get('event_id'),
             ]);
-
             return $this->successResponse(trans('messages.saved'), 201);
         });
 

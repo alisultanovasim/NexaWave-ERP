@@ -4,7 +4,6 @@
 namespace App\Traits;
 
 
-use Illuminate\Http\Response;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
@@ -33,7 +32,7 @@ trait DocumentUploader
 
                 ];
             } else
-                throw \Illuminate\Validation\ValidationException::withMessages([
+                throw ValidationException::withMessages([
                     "$str" => ['Not valid extention'],
                 ]);
         } else {
@@ -66,7 +65,7 @@ trait DocumentUploader
                     'assignment_item_id'=>$assignmentItem->id
                 ];
             } else
-                throw \Illuminate\Validation\ValidationException::withMessages([
+                throw ValidationException::withMessages([
                     "$str" => ['Not valid extention'],
                 ]);
         } else {
@@ -94,7 +93,7 @@ trait DocumentUploader
 
                 ];
             } else
-                throw \Illuminate\Validation\ValidationException::withMessages([
+                throw ValidationException::withMessages([
                     "$str" => ['Not valid extention'],
                 ]);
         } else {
@@ -112,9 +111,8 @@ trait DocumentUploader
 
     public function uploadFile(UploadedFile $file, $company_id, $str = "documents"): string
     {
-        $filename = rand(1, 10000) . time() . "." . $file->extension();
-        $file->move(base_path("public/documents/$company_id/$str"), $filename);
-        return "$company_id/$str/$filename";
+        return $file->store("documents/$company_id/$str");
+//        $file->move(base_path("storage/app/documents/$company_id/$str"), $filename);
     }
 
     private function SubDocumentsBuilder($document, $documents, $baseDoc, $request, $str = 'documents')
@@ -132,7 +130,7 @@ trait DocumentUploader
                         'size' => $filesize
                     ];
                 } else
-                    throw \Illuminate\Validation\ValidationException::withMessages([
+                    throw ValidationException::withMessages([
                         "$str" => ['Not valid extention'],
                     ]);
             } else {

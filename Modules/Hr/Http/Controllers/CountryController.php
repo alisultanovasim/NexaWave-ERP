@@ -69,7 +69,7 @@ class CountryController extends Controller
     {
         return [
             'name' => "required|string|min:2|max:255",
-            "short_name" => "required|string|min:1|max:20",
+//            "short_name" => "nullable|string|min:1|max:20",
             "code" => "nullable|string|min:1|max:10",
             "iso" => "nullable|string|size:2",
             "iso3" => "nullable|string|size:3",

@@ -27,18 +27,15 @@ class DataController extends Controller
                 Rule::in(array_keys($conf))
             ]
         ]);
-        try {
-            $data = [];
-            foreach ($request->data as $table) {
-                if ($conf[$table])
-                    $data[$table] = DB::table($table)->where('company_id', $request->company_id)->get();
-                else
-                    $data[$table] = DB::table($table)->get();
-            }
-            return $this->successResponse($data);
-        } catch (\Exception $exception) {
-            return $this->errorResponse(trans('apiResponse.tryLater') , Response::HTTP_INTERNAL_SERVER_ERROR);
+        $data = [];
+        foreach ($request->data as $table) {
+            if ($conf[$table])
+                $data[$table] = DB::table($table)->where('company_id', $request->company_id)->get();
+            else
+                $data[$table] = DB::table($table)->get();
         }
+        return $this->successResponse($data);
+
     }
 
 }

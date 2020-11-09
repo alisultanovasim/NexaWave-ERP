@@ -16,16 +16,31 @@ class RolePositionSeeder extends Seeder
             'short_name' => 'Director'
         ]);
         $roles = [
-            'super_admin',
-            'employee',
-            'office',
-            'dev',
-            'company_admin'
+            [
+                'id' => 1,
+                'name' => 'super_admin',
+            ],
+            [
+                'id' => 2,
+                'name' => 'employee'
+            ],
+            [
+                'id' => 3,
+                'name' => 'office_admin'
+            ],
+            [
+                'id' => 4,
+                'name' => 'dev'
+            ],
+            [
+                'id' => 5,
+                'name' => 'company_admin'
+            ]
         ];
         foreach ($roles as $role)
             \App\Models\Role::create([
-                'name' => $role
+                'id' => $role['id'],
+                'name' => $role['name']
             ]);
-
     }
 }

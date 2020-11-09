@@ -116,6 +116,10 @@ return [
             'deploy_path' => '/var/www/oneoffice',
             'user' => 'root',
         ],
+        "185.32.45.80" => [
+            'deploy_path' => '/DATA/sites/api.oneof.az',
+            'user' => 'deployer',
+        ],
     ],
 
     /*

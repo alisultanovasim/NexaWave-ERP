@@ -8,6 +8,6 @@
     <title>Document</title>
 </head>
 <body>
-<h1>reset your password</h1>
+<h1><a href="{{$data['reset_url']}}">Click here to reset password</a></h1>
 </body>
 </html>

@@ -40,8 +40,9 @@ Route::group([
 
         Route::post("/users/add/{id}", 'OfficeController@addUser');
         Route::post("/users/update/{id}", 'OfficeController@updateUser');
-        Route::post("/users/remove/{id}", 'OfficeController@removeUser');
-        Route::get("/users", 'OfficeController@getOfficeAssignedToUser');
+        Route::delete("/users/remove/{id}", 'OfficeController@removeUser');
+        Route::get("/users/{id}", 'OfficeController@getOfficeAssignedToUser');
+        Route::get("/users/show/{id}", 'OfficeController@getOfficeUser');
 
 
         Route::group([
@@ -131,7 +132,7 @@ Route::group([
 
         Route::get('/', 'MeetingRoomController@index');
         Route::get('/{id}', 'MeetingRoomController@show');
-        Route::post('/{id}/update/for/plaza', 'MeetingRoomController@updateForPlaza');
+        Route::post('/update/for/plaza/{id}', 'MeetingRoomController@updateForPlaza');
         Route::post('/', 'MeetingRoomController@store');
         Route::post('/update/{id}', 'MeetingRoomController@update');
         Route::post('/delete/{id}', 'MeetingRoomController@delete');

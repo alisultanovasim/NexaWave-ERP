@@ -11,6 +11,3 @@
 |
 */
 
-Route::prefix('storage')->group(function() {
-    Route::get('/', 'StorageController@index');
-});
