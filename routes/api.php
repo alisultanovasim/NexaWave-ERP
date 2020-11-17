@@ -6,8 +6,13 @@ use Illuminate\Support\Facades\Route;
 
 Route::group(['prefix' => 'v1'] , function ($router) {
 
-    Route::group(['prefix' => 'file'], function () {
-        Route::post('upload', 'FileUploadController@uploadFile');
+    Route::group(['prefix' => 'files'], function () {
+
+        Route::group(['prefix' => 'company', 'middleware' => ['auth:api', 'authorize'] ], function () {
+            Route::post('single/upload', 'FileUploadController@companyUploadFile');
+            Route::post('multiple/upload', 'FileUploadController@companyUploadMultipleFiles');
+        });
+
     });
 
     Route::group(['prefix' => 'profile', 'middleware' => ['auth:api', 'authorize'], 'namespace' => 'Auth'] , function ($r) {
