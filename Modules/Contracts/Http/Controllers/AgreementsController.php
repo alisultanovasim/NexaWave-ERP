@@ -2,8 +2,11 @@
 
 namespace Modules\Contracts\Http\Controllers;
 
+use App\Models\TemporaryFile;
+use App\Services\File\TemporaryFileService;
 use App\Traits\ApiResponse;
 use Carbon\Carbon;
+use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -19,37 +22,167 @@ use Modules\Contracts\Entities\CompanyAgreementContractType;
 use Modules\Contracts\Entities\CompanyAgreementFile;
 use Modules\Contracts\Entities\CompanyAgreementParticipant;
 use Modules\Contracts\Entities\CompanyAgreementTermination;
+use Modules\Contracts\Filters\AgreementFilters;
 
 class AgreementsController extends Controller
 {
     use ApiResponse, ValidatesRequests;
 
+    private $tempFileService;
+
+    /**
+     * AgreementsController constructor.
+     * @param TemporaryFileService $tempFileService
+     */
+    public function __construct(TemporaryFileService $tempFileService)
+    {
+        $this->tempFileService = $tempFileService;
+    }
+
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function getContractTypes(Request $request): JsonResponse
     {
         $types = CompanyAgreementContractType::active()->get(['id', 'name']);
         return $this->successResponse($types);
     }
 
-    public function getContractsCount(Request $request): JsonResponse
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function getAllAgreementsCount(Request $request): JsonResponse
     {
+        $agreementsCount = CompanyAgreement::where('company_id', $request->get('company_id'))->count();
+        return $this->successResponse($agreementsCount);
     }
 
-    public function getContracts(Request $request): JsonResponse
+    /**
+     * @param Request $request
+     * @param $id
+     * @return JsonResponse
+     */
+    public function getAdditionById(Request $request, $id): JsonResponse
     {
+        $addition = CompanyAgreementAddition::belongsToCompanyId($request->get('company_id'))
+        ->with('files')
+        ->where('id', $id)
+        ->firstOrFail();
 
+        return $this->successResponse($addition);
     }
 
+    /**
+     * @param Request $request
+     * @param $id
+     * @return JsonResponse
+     */
+    public function getAdditionsByAgreementId(Request $request, $id): JsonResponse
+    {
+        $additions = CompanyAgreementAddition::whereHas('agreement',
+        function ($query) use ($request, $id) {
+            $query->where([
+                'id' => $id,
+                'company_id' => $request->get('company_id')
+            ]);
+        })
+        ->get([
+            'id',
+            'date',
+            'start_date',
+            'end_date'
+        ]);
+
+        return $this->successResponse($additions);
+    }
+
+    /**
+     * @param Request $request
+     * @param AgreementFilters $filters
+     * @return JsonResponse
+     */
+    public function getAgreements(Request $request, AgreementFilters $filters): JsonResponse
+    {
+        $agreements = CompanyAgreement::query()
+        ->filter($filters)
+        ->where('company_id', $request->get('company_id'))
+        ->select([
+            'id',
+            'parent_id',
+            'name',
+            'start_date',
+            'end_date'
+        ])
+        ->paginate($request->get('per_page'));
+
+        return $this->successResponse($agreements);
+    }
+
+    /**
+     * @param Request $request
+     * @param $id
+     * @return JsonResponse
+     */
+    public function getAgreementById(Request $request, $id): JsonResponse
+    {
+        $agreement = CompanyAgreement::where([
+            'id' => $id,
+            'company_id' => $request->get('company_id')
+        ])
+        ->with([
+            'files',
+            'participants'
+        ])
+        ->firstOrFail();
+
+        return $this->successResponse($agreement);
+    }
+
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     * @throws ValidationException
+     */
     public function createAgreement(Request $request): JsonResponse
     {
         $this->validate($request, $this->getAgreementRules($request));
         DB::transaction(function () use($request) {
             $contract = $this->saveAgreement($request, new CompanyAgreement());
             $this->saveAgreementParticipants($contract, $request->get('participants'));
-            if ($request->get('files'))
+            if ($request->get('files')) {
                 $this->saveAgreementFiles($contract, $request->get('files'));
+            }
         });
 
         return $this->successResponse(trans('messages.saved'), 201);
+    }
+
+    /**
+     * @param CompanyAgreement $agreement
+     * @param array $files
+     * @param CompanyAgreementAddition|null $addition
+     * @throws FileNotFoundException
+     */
+    public function saveAgreementFiles(CompanyAgreement $agreement, array $files, CompanyAgreementAddition $addition = null): void
+    {
+        $tempFiles = TemporaryFile::whereIn('uuid', $files)->get();
+        $insertData = [];
+        foreach ($tempFiles as $file) {
+            $filePath = $this->tempFileService->moveFileToCompanyStorage($file, $agreement->getAttribute('company_id'));
+            $insertData[] = [
+                'id' => $file->getKey(),
+                'file' => $filePath,
+                'company_agreement_id' => $agreement->getKey(),
+                'company_agreement_additional_id' => $addition->getKey(),
+                'name' => $file->getAttribute('name'),
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now()
+            ];
+        }
+        TemporaryFile::whereIn('uuid', $files)->delete();
+        CompanyAgreementFile::insert($insertData);
     }
 
     /**
@@ -141,31 +274,11 @@ class AgreementsController extends Controller
                 'amount' => $request->get('amount'),
                 'amount_type' => $request->get('amount_type'),
             ]);
-            if ($request->get('files'))
-                $this->saveAgreementFiles($agreement, $request->get('files'), $addition->getKey());
+            if ($request->get('files')) {
+                $this->saveAgreementFiles($agreement, $request->get('files'), $addition);
+            }
         });
         return $this->successResponse(trans('messages.saved'), 201);
-    }
-
-    public function saveAgreementFiles(CompanyAgreement $companyAgreement, array $files, $additionalAgreementId = null): void
-    {
-        $data = [];
-        foreach ($files as $index => $file) {
-            $path = 'agreement_files/' . $companyAgreement->getKey();
-            $originalName = \request()->files->get('files')[$index]['file']->getClientOriginalName();
-            $extension = \request()->files->get('files')[$index]['file']->getClientOriginalExtension();
-            $originalName = rtrim($originalName, '.' . $extension);
-            $name = Str::slug($originalName);
-            $name .= ".{$extension}";
-            Storage::disk('public')->put($path . '/' . $name, \request()->files->get('files')[$index]['file']);
-            $data[] = [
-                'id' => Str::uuid(),
-                'company_agreement_id' => $companyAgreement->getKey(),
-                'name' => $file['name'],
-                'file' => $path . '/' . $name
-            ];
-        }
-        CompanyAgreementFile::insert($data);
     }
 
     /**
@@ -212,8 +325,7 @@ class AgreementsController extends Controller
             'participants.*.account_number' => 'required|max:255',
             'participants.*.swift' => 'required|max:255',
             'files' => 'nullable|array|min:1',
-            'files.*.name' => 'required|max:255',
-            'files.*.file' => 'required'
+            'files.*' => 'exists:temporary_files,uuid'
         ];
         for ($i = 0; $i < count($request->get('participants')); $i++) {
             if (
@@ -229,7 +341,6 @@ class AgreementsController extends Controller
                 $rules['participants.' . $i . '.correspondent_account'] = 'required|max:255';
                 $rules['participants.' . $i . '.signed_person_name'] = 'required|max:255';
                 $rules['participants.' . $i . '.signed_person_position'] = 'required|max:255';
-                $rules['participants.' . $i . '.signed_person_position'] = 'required|max:255';
             }
             if ($request->get('participants')[$i]['type'] == 'executor' and $request->get('agreement_type') == 'external') {
                 $rules['participants.' . $i . '.intermediary_bank_name'] = 'required|min:2|max:255';
@@ -239,6 +350,12 @@ class AgreementsController extends Controller
         return $rules;
     }
 
+    /**
+     * @param Request $request
+     * @param $id
+     * @return JsonResponse
+     * @throws ValidationException
+     */
     public function terminate(Request $request, $id): JsonResponse
     {
         $this->validate($request, $this->getContractTerminationRules($request));
@@ -262,7 +379,10 @@ class AgreementsController extends Controller
         return  $this->successResponse(trans('messages.saved'));
     }
 
-
+    /**
+     * @param Request $request
+     * @return string[]
+     */
     private function getContractTerminationRules(Request $request): array
     {
         return [

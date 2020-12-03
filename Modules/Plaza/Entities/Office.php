@@ -10,7 +10,12 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Office extends Model
 {
     use SoftDeletes;
+
     public $timestamps = false;
+
+    const PARKING_UNDERGROUND = 1;
+    const PARKING_ABOVE_GROUND = 2;
+
 
     protected $guarded = ['id'];
 

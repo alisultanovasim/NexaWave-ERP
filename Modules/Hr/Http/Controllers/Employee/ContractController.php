@@ -6,6 +6,7 @@ use App\Traits\ApiResponse;
 use App\Traits\Query;
 use Carbon\Carbon;
 use Illuminate\Foundation\Validation\ValidatesRequests;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
@@ -15,6 +16,7 @@ use Illuminate\Validation\ValidationData;
 use Modules\Hr\Entities\CompanyAuthorizedEmployee;
 use Modules\Hr\Entities\Employee\Contract;
 use Modules\Hr\Entities\Employee\Employee;
+use Modules\Hr\Entities\Employee\EmployeeContractTermination;
 use Modules\Hr\Entities\Paragraph;
 use Modules\Hr\Traits\DocumentUploader;
 
@@ -94,8 +96,8 @@ class ContractController extends Controller
             +$request->get('work_environment_addition') +
             +$request->get('overtime_addition');
 
-
         $contract = Contract::create($data);
+
         Contract::create(
             array_merge(
                 $data,
@@ -125,7 +127,10 @@ class ContractController extends Controller
             'intern_start_date' => ['nullable', 'date'],
             'intern_end_date' => ['nullable', 'date'],
             'currency_id' => ['required', 'integer'],//exists
-            'contract_type_id' => ['nullable', 'integer'],//exists
+            'contract_type_id' => [
+                'required',
+                Rule::exists('contract_types', 'id')
+            ],//exists
             'work_start_date' => ['nullable', 'date_format:Y-m-d'],
             'work_end_date' => ['nullable', 'date_format:Y-m-d'],
             'break_time_start' => ['nullable', 'date_format:H:i'],
@@ -133,7 +138,10 @@ class ContractController extends Controller
             'work_time_start_at' => ['nullable', 'date_format:H:i'],
             'work_time_end_at' => ['nullable', 'date_format:H:i'],
             'contract_no' => ['required', 'string', 'max:255'],
-            'duration_type_id' => ['required', 'integer', 'min:1'], //exists
+            'duration_type_id' => [
+                'required',
+                Rule::exists('duration_types', 'id')
+            ], //exists
             'labor_protection_addition' => ['nullable', 'string'],
             'labor_meal_addition' => ['nullable', 'string'],
             'labor_sport_addition' => ['nullable', 'string'],
@@ -227,7 +235,7 @@ class ContractController extends Controller
         DB::beginTransaction();
 
         if ($notExists = $this->companyInfo($request->get('company_id'), $request->only(
-            ['department_id', 'section_id', 'position_id', 'sector_id', 'contract_id']
+            ['department_id', 'section_id', 'position_id', 'sector_id']
         ))) return $this->errorResponse($notExists);
 
         $employee = Employee::where('id', $request->get('employee_id'))
@@ -302,7 +310,7 @@ class ContractController extends Controller
             if ($salary)
                 $data['salary'] = $salary;
 
-            if (!$data) return $this->successResponse('nothingToUpdate ' + $paragraph->name, 400);
+            if (!$data) return $this->successResponse('nothingToUpdate ' . $paragraph->name, 400);
 
             array_push($insertedParagraphData,
                 [
@@ -476,6 +484,7 @@ class ContractController extends Controller
             'employee.user:id,name,surname',
             'contract_type',
             'duration_type',
+            'terminationDetails'
         ])
             ->whereHas('employee', function ($q) use ($request) {
                 $q->where('company_id', $request->get('company_id'));
@@ -500,7 +509,10 @@ class ContractController extends Controller
 //            'contract' => ['sometimes', 'mimes:pdf,doc,docx'],
             'start_date' => ['sometimes', 'required', 'date'],
             'end_date' => ['sometimes', 'required', 'date'],
-            'contract_type_id' => ['nullable', 'integer'],//exists
+            'contract_type_id' => [
+                'required',
+                Rule::exists('contract_types', 'id')
+            ],//exists
             'currency_id' => ['nullable', 'integer'],//exists
             'position_salary_praise_about' => ['nullable', 'numeric'],
             'addition_package_fee' => ['nullable', 'numeric', "min:0", "max:100"],
@@ -553,5 +565,38 @@ class ContractController extends Controller
                 +$data['overtime_addition'];
         }
         return false;
+    }
+
+    public function terminate(Request $request, $id): JsonResponse
+    {
+        $this->validate($request, [
+            'reason' => 'required|min:3|max:255',
+            'order_number' => 'required|numeric',
+            'order_date' => 'required|date|date_format:Y-m-d',
+            'termination_date' => 'required|date|date_format:Y-m-d',
+        ]);
+
+
+        $contract = Contract::where([
+            'id' => $id,
+            'is_terminated' => 0
+        ])
+        ->whereHas('employee', function ($query) use ($request) {
+            $query->where('company_id', $request->get('company_id'));
+        })
+        ->firstOrFail(['id', 'employee_id']);
+
+        DB::transaction(function () use ($request, $contract) {
+            EmployeeContractTermination::create([
+                'employee_contract_id' => $contract->getKey(),
+                'reason' => $request->get('reason'),
+                'order_number' => $request->get('order_number'),
+                'order_date' => $request->get('order_date'),
+                'termination_date' => $request->get('termination_date'),
+            ]);
+            $contract->update(['is_terminated' => 1]);
+        });
+
+        return $this->successResponse(trans('messages.saved'));
     }
 }

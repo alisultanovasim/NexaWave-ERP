@@ -11,6 +11,7 @@ use App\Traits\ApiResponse;
 use Exception;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Validation\ValidatesRequests;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
@@ -18,6 +19,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 use Modules\Plaza\Entities\Contact;
 use Modules\Plaza\Entities\Contract;
 use Modules\Plaza\Entities\Document;
@@ -27,10 +30,19 @@ use Modules\Plaza\Entities\Office;
 use Modules\Plaza\Entities\Worker;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
+/**
+ * Class OfficeController
+ * @package Modules\Plaza\Http\Controllers
+ */
 class OfficeController extends Controller
 {
     use ApiResponse, ValidatesRequests;
 
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     * @throws ValidationException
+     */
     public function index(Request $request)
     {
         $this->validate($request, [
@@ -96,13 +108,16 @@ class OfficeController extends Controller
         }
     }
 
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     * @throws ValidationException
+     */
     public function store(Request $request)
     {
         $this->validate($request, [
             'company_id' => 'required|integer',
             'name' => 'required|min:3|max:255',
-//            'description' => 'sometimes|required',
-
             'email' => 'sometimes|required|array',
             'email.*.contact' => 'required_with:email|email',
             'email.*.name' => 'sometimes|required|min:2|max:255',
@@ -135,17 +150,56 @@ class OfficeController extends Controller
             'documents' => 'sometimes|required|array',
             'documents.*' => 'sometimes|required|mimes::jpeg,png,jpg,gif,svg,pdf,docx,doc,txt,xls,xlsx',
 
-            'username' => ['required', 'string', 'min:6'],
+            'username' => ['required', 'string', 'min:6', Rule::unique("users", "username")],
 
             'user_email' => ['required', 'email', 'min:6'],
-            'set_password' => ['nullable', 'min:6']
-//            'password' => ['required', 'min:6'],
+            'set_password' => ['nullable', 'min:6'],
+
+//            "price_without_adv" => ["sometimes", "required", "numeric"],
+//            "is_adv_payer" => ["sometimes", "required", "boolean"],
+//            "is_buy_attendance" => ["sometimes", "required", "boolean"],
+//            "parking_count" => ["sometimes", "required", "integer"],
+//            "parking_type" => ['sometimes', "required", Rule::in([
+//                Office::PARKING_ABOVE_GROUND,
+//                Office::PARKING_UNDERGROUND
+//            ])],
+//            "internet_monthly_price" => ["sometimes", "required", "numeric"],
+//            "electric_monthly_price" => ["sometimes", "required", "numeric"],
+//            "is_pay_for_repair" => ['sometimes', 'required', "numeric"],
+//            "free_entrance_card" => ['sometimes', "required", "integer"],
+//            "paid_entrance_card" => ['sometimes', "required", "integer"],
+//            "price_per_card" => ['sometimes', "required", "numeric"],
+//            "requests" => ['sometimes', "required", "string", "min:1"]
+
         ]);
         try {
             DB::beginTransaction();
 
             $office = new Office();
-            $office->fill($request->only('agree_at', 'entity', 'voen', 'per_month', 'company_id', 'name', 'description', 'start_time', 'month_count', 'payed_month_count'));
+            $office->fill($request->only([
+                'agree_at',
+                'entity',
+                'voen',
+                'per_month',
+                'company_id',
+                'name',
+                'description',
+                'start_time',
+                'month_count',
+                'payed_month_count',
+                "price_without_adv",
+                "is_adv_payer",
+                "is_buy_attendance",
+                "parking_count",
+                "parking_type",
+                "internet_monthly_price",
+                "electric_monthly_price",
+                "is_pay_for_repair",
+                "free_entrance_card",
+                "paid_entrance_card",
+                "price_per_card",
+                "requests",
+            ]));
 
             if ($request->hasFile('image'))
                 $office->image = $this->uploadImage($request->company_id, $request->image);
@@ -267,6 +321,12 @@ class OfficeController extends Controller
         }
     }
 
+    /**
+     * @param $company_id
+     * @param $file
+     * @param string $str
+     * @return null|string
+     */
     public function uploadImage($company_id, $file, $str = 'offices')
     {
         if ($file instanceof UploadedFile) {
@@ -276,6 +336,12 @@ class OfficeController extends Controller
         return null;
     }
 
+    /**
+     * @param Request $request
+     * @param $id
+     * @return JsonResponse
+     * @throws ValidationException
+     */
     public function show(Request $request, $id)
     {
         $this->validate($request, [
@@ -294,6 +360,12 @@ class OfficeController extends Controller
         return $this->successResponse($office);
     }
 
+    /**
+     * @param Request $request
+     * @param $id
+     * @return JsonResponse
+     * @throws ValidationException
+     */
     public function update(Request $request, $id)
     {
         $this->validate($request, [
@@ -321,7 +393,23 @@ class OfficeController extends Controller
 
 
             'documents' => 'sometimes|required|array',
-            'documents.*' => 'sometimes|required|mimes::jpeg,png,jpg,gif,svg,pdf,docx,doc,txt,xls,xlsx'
+            'documents.*' => 'sometimes|required|mimes::jpeg,png,jpg,gif,svg,pdf,docx,doc,txt,xls,xlsx',
+
+            "price_without_adv" => ["sometimes", "required", "numeric"],
+            "is_adv_payer" => ["sometimes", "required", "boolean"],
+            "is_buy_attendance" => ["sometimes", "required", "boolean"],
+            "parking_count" => ["sometimes", "required", "integer"],
+            "parking_type" => ['sometimes', "required", Rule::in([
+                Office::PARKING_ABOVE_GROUND,
+                Office::PARKING_UNDERGROUND
+            ])],
+            "internet_monthly_price" => ["sometimes", "required", "numeric"],
+            "electric_monthly_price" => ["sometimes", "required", "numeric"],
+            "is_pay_for_repair" => ['sometimes', 'required', "numeric"],
+            "free_entrance_card" => ['sometimes', "required", "integer"],
+            "paid_entrance_card" => ['sometimes', "required", "integer"],
+            "price_per_card" => ['sometimes', "required", "numeric"],
+            "requests" => ['sometimes', "required", "string", "min:1"]
         ]);
 
         $company_id = $request->company_id;
@@ -341,7 +429,27 @@ class OfficeController extends Controller
             }
 
 
-            $office->fill($request->only('name', 'description', 'start_time', 'end_time', 'voen', 'payed_month_count', 'agree_at'));
+            $office->fill($request->only([
+                'name',
+                'description',
+                'start_time',
+                'end_time',
+                'voen',
+                'payed_month_count',
+                'agree_at',
+                "price_without_adv",
+                "is_adv_payer",
+                "is_buy_attendance",
+                "parking_count",
+                "parking_type",
+                "internet_monthly_price",
+                "electric_monthly_price",
+                "is_pay_for_repair",
+                "free_entrance_card",
+                "paid_entrance_card",
+                "price_per_card",
+                "requests",
+            ]));
 
             if ($request->hasFile('image')) {
                 $filename = $this->uploadImage($company_id, $request->image);
@@ -422,6 +530,12 @@ class OfficeController extends Controller
         }
     }
 
+    /**
+     * @param Request $request
+     * @param $id
+     * @return JsonResponse
+     * @throws ValidationException
+     */
     public function delete(Request $request, $id)
     {
         $this->validate($request, [
@@ -525,6 +639,12 @@ class OfficeController extends Controller
         }
     }
 
+    /**
+     * @param Request $request
+     * @param $id
+     * @return JsonResponse
+     * @throws ValidationException
+     */
     public function locationUpdate(Request $request, $id)
     {
         $this->validate($request, [
@@ -623,6 +743,12 @@ class OfficeController extends Controller
         }
     }
 
+    /**
+     * @param Request $request
+     * @param $id
+     * @return JsonResponse
+     * @throws ValidationException
+     */
     public function locationDestroy(Request $request, $id)
     {
         $this->validate($request, [
@@ -692,6 +818,12 @@ class OfficeController extends Controller
         return $this->successResponse('OK');
     }
 
+    /**
+     * @param Request $request
+     * @param $id
+     * @return JsonResponse
+     * @throws ValidationException
+     */
     public function documentUpdate(Request $request, $id)
     {
         $this->validate($request, [
@@ -713,6 +845,12 @@ class OfficeController extends Controller
 
     }
 
+    /**
+     * @param Request $request
+     * @param $id
+     * @return JsonResponse
+     * @throws ValidationException
+     */
     public function documentDestroy(Request $request, $id)
     {
         $this->validate($request, [
@@ -730,7 +868,7 @@ class OfficeController extends Controller
 
             return $this->successResponse('OK');
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return $this->errorResponse(trans('apiResponse.tryLater'), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
@@ -766,6 +904,12 @@ class OfficeController extends Controller
         return $this->successResponse('ok');
     }
 
+    /**
+     * @param Request $request
+     * @param $id
+     * @return JsonResponse
+     * @throws ValidationException
+     */
     public function contactUpdate(Request $request, $id)
     {
         $this->validate($request, [
@@ -812,6 +956,12 @@ class OfficeController extends Controller
         return $this->successResponse('ok');
     }
 
+    /**
+     * @param Request $request
+     * @param $id
+     * @return JsonResponse
+     * @throws ValidationException
+     */
     public function contactDelete(Request $request, $id)
     {
         $this->validate($request, [
@@ -840,6 +990,12 @@ class OfficeController extends Controller
         }
     }
 
+    /**
+     * @param Request $request
+     * @param $id
+     * @return JsonResponse
+     * @throws ValidationException
+     */
     public function getOfficeAssignedToUser(Request $request, $id)
     {
         $this->validate($request, [
@@ -863,6 +1019,12 @@ class OfficeController extends Controller
         return $this->successResponse($data);
     }
 
+    /**
+     * @param Request $request
+     * @param $id
+     * @return JsonResponse
+     * @throws ValidationException
+     */
     public function getOfficeUser(Request $request, $id)
     {
         $this->validate($request, [
@@ -887,6 +1049,12 @@ class OfficeController extends Controller
         return $this->successResponse($data);
     }
 
+    /**
+     * @param Request $request
+     * @param $id
+     * @return JsonResponse
+     * @throws ValidationException
+     */
     public function addUser(Request $request, $id)
     {
         $this->validate($request, [
@@ -931,6 +1099,12 @@ class OfficeController extends Controller
 
     }
 
+    /**
+     * @param Request $request
+     * @param $id
+     * @return JsonResponse
+     * @throws ValidationException
+     */
     public function updateUser(Request $request, $id)
     {
         $this->validate($request, [
@@ -973,6 +1147,12 @@ class OfficeController extends Controller
         return $this->successResponse('OK');
     }
 
+    /**
+     * @param Request $request
+     * @param $id
+     * @return JsonResponse
+     * @throws ValidationException
+     */
     public function removeUser(Request $request, $id)
     {
         $this->validate($request, [
@@ -1000,6 +1180,11 @@ class OfficeController extends Controller
         return $this->successResponse('OK');
     }
 
+    /**
+     * @param $id
+     * @param $company_id
+     * @return false
+     */
     protected function officeExists($id, $company_id)
     {
         $office = Office::where([
@@ -1011,6 +1196,12 @@ class OfficeController extends Controller
         return $office;
     }
 
+    /**
+     * @param $id
+     * @param $company_id
+     * @param string[] $columns
+     * @return false
+     */
     protected function officeGet($id, $company_id, $columns = ['*'])
     {
         $office = Office::where([

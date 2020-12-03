@@ -41,6 +41,11 @@ class UserController extends Controller
 {
     use ApiResponse;
 
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     * @throws ValidationException
+     */
     public function login(Request $request)
     {
         $this->validate($request, [
@@ -49,9 +54,9 @@ class UserController extends Controller
         ]);
 
         //todo make auth not only with username but with email too bro :D
-        if (!Auth::attempt($request->only('username', 'password'))) {
+        if (!Auth::attempt($request->only('username', 'password')))
             return $this->errorResponse(trans('response.invalidLoginOrPassword'));
-        }
+
         $token = Auth::user()->createToken('authToken')->accessToken;
         return $this->dataResponse([
             'token_type' => 'Bearer',
@@ -131,6 +136,10 @@ class UserController extends Controller
         });
     }
 
+    /**
+     * @param $companyId
+     * @return mixed
+     */
     private function createDirectorPositionAndGetId($companyId)
     {
         $position = Positions::create([
@@ -141,6 +150,9 @@ class UserController extends Controller
         return $position->getKey();
     }
 
+    /**
+     * @param $companyId
+     */
     private function saveCompanyModules($companyId)
     {
         $insert = [];
@@ -155,6 +167,9 @@ class UserController extends Controller
         CompanyModule::insert($insert);
     }
 
+    /**
+     * @param $id
+     */
     public function destroy($id)
     {
         //
@@ -251,6 +266,11 @@ class UserController extends Controller
         });
     }
 
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     * @throws ValidationException
+     */
     public function index(Request $request)
     {
         $this->validate($request, [
@@ -268,6 +288,10 @@ class UserController extends Controller
         return $this->successResponse($user);
     }
 
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function store(Request $request)
     {
         $user = self::createUser($request);
@@ -277,6 +301,11 @@ class UserController extends Controller
         return $this->successResponse('ok');
     }
 
+    /**
+     * @param Request $request
+     * @param $id
+     * @return JsonResponse
+     */
     public function update(Request $request, $id)
     {
         self::updateUser($request, $id);
@@ -284,6 +313,11 @@ class UserController extends Controller
         return $this->successResponse('ok');
     }
 
+    /**
+     * @param Request $request
+     * @param $id
+     * @return JsonResponse
+     */
     public function show(Request $request, $id)
     {
         $user = User::findOrFail($id);
@@ -312,6 +346,11 @@ class UserController extends Controller
         return $this->successResponse($user);
     }
 
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     * @throws ValidationException
+     */
     public function searchByFin(Request $request)
     {
         $this->validate($request, [
@@ -323,6 +362,9 @@ class UserController extends Controller
         return $this->successResponse($user);
     }
 
+    /**
+     * @return string[]
+     */
     public static function rules()
     {
         return [
@@ -369,6 +411,9 @@ class UserController extends Controller
         ];
     }
 
+    /**
+     * @return string[]
+     */
     public static function updateRules()
     {
         return [
@@ -415,6 +460,10 @@ class UserController extends Controller
         ];
     }
 
+    /**
+     * @param Request $request
+     * @return mixed
+     */
     public static function createUser(Request $request)
     {
         Validator::make($request->all(), self::rules())->validate();
@@ -479,6 +528,11 @@ class UserController extends Controller
         return $user;
     }
 
+    /**
+     * @param Request $request
+     * @param $id
+     * @return bool
+     */
     public static function updateUser(Request $request, $id)
     {
         Validator::make($request->all(), self::updateRules())->validate();

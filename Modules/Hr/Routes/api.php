@@ -409,6 +409,7 @@ Route::group([
             'prefix' => 'contracts'
         ], function ($route) {
             Route::get("/", 'ContractController@index');
+            Route::put("/terminate/{id}", 'ContractController@terminate');
             Route::get("/{id}", 'ContractController@show');
             Route::post("/", 'ContractController@store');
             Route::post("/update/{id}", 'ContractController@update');
@@ -595,6 +596,8 @@ Route::group([
         Route::get('/positions', 'CompanyStructureController@getStructurePositions');
         Route::get('/employees', 'CompanyStructureController@getEmployees');
     });
+
+    Route::get('company/staff/schedule', 'CompanyStaffScheduleController@index');
 
     Route::group(['prefix' => 'company/authorized/employees'], function (){
         Route::get('/', 'CompanyAuthorizedUsersController@index');

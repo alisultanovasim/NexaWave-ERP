@@ -18,7 +18,7 @@ class Location extends Model
 
     public function getSchemaAttribute($value){
         if ($value)
-            return env('APP_URL') . '/documents/'  . $value;
+            return config('app.url') . '/storage/' . $value;
         return $value;
     }
 }
