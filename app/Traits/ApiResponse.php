@@ -1,5 +1,6 @@
 <?php
 namespace App\Traits;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 trait ApiResponse
 {
@@ -7,7 +8,7 @@ trait ApiResponse
      * Building success response
      * @param $data
      * @param int $code
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function successResponse($data, $code = Response::HTTP_OK)
     {
