@@ -114,7 +114,7 @@ return [
     'hosts' => [
         'time-vps1.serverxx.com' => [
             'deploy_path' => '/var/www/oneoffice',
-            'user' => 'root',
+            'user' => 'deployer',
         ],
         "185.32.45.80" => [
             'deploy_path' => '/DATA/sites/api.oneof.az',
