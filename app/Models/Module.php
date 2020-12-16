@@ -37,7 +37,7 @@ class   Module extends Model
     /**
      * @var array
      */
-    protected $fillable = ['name', 'parent_id', 'is_active', 'created_at', 'updated_at'];
+    protected $fillable = ['name', "position",'parent_id', 'is_active', 'created_at', 'updated_at'];
 
     /**
      * @return HasMany

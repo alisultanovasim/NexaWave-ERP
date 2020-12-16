@@ -72,7 +72,7 @@ class ProfileController extends Controller
                 $modules = $modules->where('is_office_module', 1);
         }
 
-        $modules = $modules->get([
+        $modules = $modules->orderBy("position")->get([
             'id',
             'name',
             'icon',
