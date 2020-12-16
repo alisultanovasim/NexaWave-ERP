@@ -10,13 +10,16 @@ use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Modules\Hr\Entities\Department;
 use Modules\Hr\Entities\Employee\Employee;
+use Modules\Hr\Entities\Positions;
 use Modules\Hr\Entities\Section;
 use Modules\Hr\Entities\Sector;
+use Modules\Hr\Services\CompanyStructureService;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class CompanyStructureController extends Controller
@@ -27,23 +30,19 @@ class CompanyStructureController extends Controller
     private $department;
     private $section;
     private $sector;
+    private $companyStructureService;
 
-    /**
-     * CompanyStructureController constructor.
-     * @param Request $request
-     * @param Company $company
-     * @param Department $department
-     * @param Section $section
-     * @param Sector $sector
-     */
+
     public function __construct(
-        Request $request, Company $company, Department $department,
-        Section $section, Sector $sector
+        Company $company, Department $department,
+        Section $section, Sector $sector,
+        CompanyStructureService $companyStructureService
     ){
         $this->company = $company;
         $this->department = $department;
         $this->section = $section;
         $this->sector = $sector;
+        $this->companyStructureService = $companyStructureService;
     }
 
     /**
@@ -51,36 +50,35 @@ class CompanyStructureController extends Controller
      * @return JsonResponse
      */
     public function index(Request $request): JsonResponse {
-        $structure = $this->company->where('id', $request->get('company_id'))
-        ->with([
-            'structuredDepartments:id,name,structable_id,structable_type',
-            'structuredSections:id,name,structable_id,structable_type',
-            'structuredSectors:id,name,structable_id,structable_type',
-        ])
-        ->first([
-            'id',
-            'name'
-        ]);
+        $structure = $this->companyStructureService->getStructure($request->get('company_id'), $request->get('with_nested_structure'));
         return  $this->successResponse($structure);
     }
 
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     * @throws ValidationException
+     */
     public function getEmployees(Request $request): JsonResponse {
+
         $this->validate($request, [
-            'structure_id' => 'nullable|numeric',
-            'structure_type' => [
-                'nullable',
-                Rule::in([
-                    'department', 'section', 'sector'
-                ])
-            ],
-            'position_id' => 'required|numeric'
+            'position_id' => 'nullable|numeric'
         ]);
+
         $employees = Employee::query()
         ->whereHas('contracts', function ($query) use ($request){
-            $query->where([
-                'structure_id' => $request->get('structure_id'),
-                'structure_type' => $request->get('structure_type')
-            ]);
+            if ($request->get('department_id')) {
+                $query->where('department_id', $request->get('department_id'));
+            }
+            if ($request->get('sector_id')) {
+                $query->where('sector_id', $request->get('sector_id'));
+            }
+            if ($request->get('section_id')) {
+                $query->where('section_id', $request->get('section_id'));
+            }
+            if ($request->get('position_id')){
+                $query->where(['position_id' => $request->get('position_id')]);
+            }
             $query->where(function ($query){
                 $query->where('end_date', '>', Carbon::now());
                 $query->orWhere('end_date', null);
@@ -92,23 +90,129 @@ class CompanyStructureController extends Controller
         return $this->successResponse($employees);
     }
 
-    public function createCompanyStructure(Request $request): JsonResponse {
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     * @throws ValidationException
+     */
+    public function companyCreateStructures(Request $request): JsonResponse {
+        if (!$request->get('is_batch_create')){
+            return $this->companyCreateStructure($request);
+        }
+        $structureModel = $this->getStructureModelByType($request->get('structure_type'));
+        $this->validate($request, [
+            'structure_type' => [
+                'required',
+                Rule::in(['department', 'section', 'sector'])
+            ],
+            'structures' => 'required|array',
+            'structures.*.name' => 'required|min:2|max:255',
+            'structures.*.code' => [
+                'required',
+                'min:3',
+                'max:3',
+                Rule::unique($structureModel->getTable(), 'code')->where('company_id', $request->get('company_id'))
+            ]
+        ]);
+        $insertData = [];
+        foreach ($request->get('structures') as $structure){
+            $insertData[] = [
+                'name' => $structure['name'],
+                'code' => $structure['code'],
+                'company_id' => $request->get('company_id'),
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now()
+            ];
+        }
+        $structureModel->insert($insertData);
+        return $this->successResponse(trans('messages.saved'), 200);
+    }
+
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     * @throws ValidationException
+     */
+    private function companyCreateStructure(Request $request): JsonResponse {
+        $structureModel = $this->getStructureModelByType($request->get('structure_type'));
+        $this->validate($request, [
+            'structure_type' => [
+                'required',
+                Rule::in(['department', 'section', 'sector'])
+            ],
+            'name' => 'required|min:2|max:255',
+            'code' => [
+                'required',
+                'min:3',
+                'max:3',
+                Rule::unique($structureModel->getTable(), 'code')->where('company_id', $request->get('company_id'))
+            ]
+        ]);
+        $structureModel->fill([
+            'name' => $request->get('name'),
+            'code' => $request->get('code'),
+            'company_id' => $request->get('company_id'),
+            'created_at' => Carbon::now(),
+            'updated_at' => Carbon::now()
+        ]);
+        $structureModel->save();
+        return $this->successResponse(['id' => $structureModel->getKey()], 200);
+    }
+
+    /**
+     * @param Request $request
+     * @param $id
+     * @return JsonResponse
+     * @throws ValidationException
+     */
+    public function companyUpdateStructure(Request $request, $id): JsonResponse {
+        $structureModel = $this->getStructureModelByType($request->get('structure_type'));
+        $this->validate($request, [
+            'structure_type' => [
+                'required',
+                Rule::in(['department', 'section', 'sector'])
+            ],
+            'name' => 'required|min:2|max:255',
+            'code' => [
+                'required',
+                'min:3',
+                'max:3',
+                Rule::unique($structureModel->getTable(), 'code')->where(function ($query) use ($request, $id){
+                    $query->where('company_id', $request->get('company_id'));
+                    $query->where('id', '!=', $id);
+                })
+            ]
+        ]);
+        $structureModel = $structureModel->where([
+            'id' => $id,
+            'company_id' => $request->get('company_id')
+        ])->firstOrFail(['id']);
+        $structureModel->update($request->only(['name', 'code', 'is_closed', 'closed_date']));
+        return $this->successResponse(trans('messages.saved'), 200);
+    }
+
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     * @throws ValidationException
+     */
+    public function setCompanyStructure(Request $request): JsonResponse {
         $this->validate($request, [
             'structure' => 'required|array',
-            'structure.*.structure_id' => 'required|numeric',
+            'structure.*.structure_id' => 'nullable|numeric',
             'structure.*.structure_type' => [
                 'required',
                 Rule::in(['department', 'section', 'sector'])
             ],
             'structure.*.link' => 'required|array',
-            'structure.*.link.id' => 'required|numeric',
+            'structure.*.link.id' => 'nullable|numeric',
             'structure.*.link.type' => [
                 'required',
                 Rule::in(['company', 'department', 'section', 'sector'])
             ],
         ]);
         $links = [];
-        $linkedStructures = [
+        $structuresToBeUnlinked = [
             'department' => [
                 'model' => $this->getStructureModelByType('department'),
                 'ids' => []
@@ -122,8 +226,42 @@ class CompanyStructureController extends Controller
                 'ids' => []
             ]
         ];
+        $structureIdByTempId = [];
         foreach ($request->get('structure') as $structure){
             $link = $structure['link'];
+            if (!$link['id'] and $link['type'] != 'company'){
+                /*
+                 * When structure already created
+                 */
+                if (isset($structureIdByTempId[$link['temp_id']])){
+                    $link['id'] = $structureIdByTempId[$link['temp_id']];
+                }
+
+                /*
+                 * Else create structure and link temp and real id
+                 */
+                else {
+                    $link['id'] = $this->saveCompanyStructureAndGetId(
+                        ['name' => $link['name'], 'code' => $link['code'] ?? null],
+                        $request->get('company_id'),
+                        $link['type']
+                    );
+                    $structureIdByTempId[$link['temp_id']] = $link['id'];
+                }
+            }
+            if (!$structure['structure_id']){
+                if (isset($structureIdByTempId[$structure['temp_id']])){
+                    $structure['structure_id'] = $structureIdByTempId[$structure['temp_id']];
+                }
+                else {
+                    $structure['structure_id'] = $this->saveCompanyStructureAndGetId(
+                        ['name' => $structure['name'], 'code' => $structure['code'] ?? null],
+                        $request->get('company_id'),
+                        $structure['structure_type']
+                    );
+                    $structureIdByTempId[$structure['temp_id']] = $structure['structure_id'];
+                }
+            }
             $this->ifStructureTriesLinkSmallerStructureThrowException($structure['structure_type'], $link['type']);
             $structableId = $link['type'] == 'company' ? $request->get('company_id') : $link['id'];
             $key = $structableId . '-' . $structure['structure_type'] . '-' . $link['type'];
@@ -144,9 +282,9 @@ class CompanyStructureController extends Controller
             /*
              * Group linked structure ids by structure type (later to remove from company structure which is not in array)
              */
-            $linkedStructures[$structure['structure_type']]['ids'][] = $structure['structure_id'];
+            $structuresToBeUnlinked[$structure['structure_type']]['ids'][] = $structure['structure_id'];
         }
-        DB::transaction(function () use ($request, $links, $linkedStructures){
+        DB::transaction(function () use ($request, $links, $structuresToBeUnlinked){
             foreach ($links as $link){
                 $link['model']->whereIn('id', $link['connectorsIds'])
                 ->where('company_id', $request->get('company_id'))
@@ -155,7 +293,7 @@ class CompanyStructureController extends Controller
                     'structable_type' => $link['structable_type']
                 ]);
             }
-            foreach ($linkedStructures as $link){
+            foreach ($structuresToBeUnlinked as $link){
                 $link['model']->whereNotIn('id', $link['ids'])
                 ->where('company_id', $request->get('company_id'))
                 ->update([
@@ -167,6 +305,27 @@ class CompanyStructureController extends Controller
         return $this->successResponse(trans('messages.saved'), 200);
     }
 
+    /**
+     * @param $structure
+     * @param $companyId
+     * @param $structureType
+     * @return int
+     */
+    private function saveCompanyStructureAndGetId($structure, $companyId, $structureType): int {
+        $structureModel = $this->getStructureModelNewInstanceByType($structureType);
+        $structureModel->fill([
+            'name' => $structure['name'],
+            'code' => $structure['code'] ?? null,
+            'company_id' => $companyId
+        ]);
+        $structureModel->save();
+        return $structureModel->getKey();
+    }
+
+    /**
+     * @param $structureType
+     * @param $linkStructureType
+     */
     private function ifStructureTriesLinkSmallerStructureThrowException($structureType, $linkStructureType){
         $throw = false;
         if ($structureType == 'department' and $linkStructureType != 'company')
@@ -178,7 +337,6 @@ class CompanyStructureController extends Controller
         if ($throw)
             throw new BadRequestHttpException(trans('messages.remove_sub_structures_before_update_parent_structure'));
     }
-
 
     /**
      * @param Request $request
@@ -223,13 +381,22 @@ class CompanyStructureController extends Controller
         return $this->successResponse(trans('messages.saved'), 200);
     }
 
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     * @throws ValidationException
+     */
     public function getStructurePositions(Request $request): JsonResponse {
         $this->validate($request, [
             'structure_id' => 'nullable|numeric',
             'structure_type' => [
+                'nullable',
                 Rule::in(['company', 'department', 'section', 'sector'])
             ],
         ]);
+        if (!$request->get('structure_id') and !$request->get('structure_type')){
+            return $this->getPositionsWhichExistsInAnyStructure($request, $request->get('company_id'));
+        }
         if ($request->get('structure_type')){
             $structure = $this->getStructureModelByType($request->get('structure_type'));
             $structure = $structure->where('id', $request->get('structure_id'));
@@ -251,6 +418,18 @@ class CompanyStructureController extends Controller
             ];
         }
         return $this->successResponse($response);
+    }
+
+    /**
+     * @param Request $request
+     * @param $companyId
+     * @return JsonResponse
+     */
+    private function getPositionsWhichExistsInAnyStructure(Request $request, $companyId){
+        $positions = Positions::where('company_id', $companyId)
+            ->existsInStructure()
+        ->get(['id', 'name']);
+        return $this->successResponse($positions);
     }
 
     /**
@@ -303,10 +482,15 @@ class CompanyStructureController extends Controller
                 'structure_type' => $request->get('structure_type'),
             ])->delete();
             DB::table('structure_positions')->insert($positions);
+            Cache::forget('company-structure-'. $request->get('company_id') . '-' . '*');
            return $this->successResponse(trans('messages.saved'), 200);
         });
     }
 
+    /**
+     * @param string $type
+     * @return Model
+     */
     private function getStructureModelByType(string $type): Model {
         $structure = null;
         if ($type == 'department')
@@ -317,6 +501,21 @@ class CompanyStructureController extends Controller
             $structure = $this->sector;
         if ($type == 'company')
             $structure = $this->company;
+        return $structure;
+    }
+
+    /**
+     * @param string $type
+     * @return Model
+     */
+    private function getStructureModelNewInstanceByType(string $type): Model {
+        $structure = null;
+        if ($type == 'department')
+            $structure = new Department();
+        if ($type == 'section')
+            $structure = new Section();
+        if ($type == 'sector')
+            $structure = new Sector();
         return $structure;
     }
 
@@ -343,7 +542,6 @@ class CompanyStructureController extends Controller
         if ($hasSubStructures)
             throw new BadRequestHttpException(trans('messages.remove_sub_structures_before_update_parent_structure'));
     }
-
 
     /**
      * @param Model $model

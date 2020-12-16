@@ -5,17 +5,17 @@ namespace Modules\Hr\Http\Controllers\Employee;
 use App\Http\Controllers\Auth\UserController;
 use App\Models\User;
 use App\Models\UserRole;
-use Carbon\Carbon;
-use Illuminate\Foundation\Validation\ValidatesRequests;
-use Illuminate\Validation\Rule;
-use Modules\Hr\Entities\Employee\Employee;
 use App\Traits\ApiResponse;
 use App\Traits\Query;
+use Carbon\Carbon;
 use Illuminate\Database\QueryException;
+use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
+use Modules\Hr\Entities\Employee\Employee;
 use Modules\Hr\Traits\DocumentUploader;
 
 class EmployeeController extends Controller
@@ -26,7 +26,7 @@ class EmployeeController extends Controller
     {
         $this->validate($request, [
             'company_id' => ['required', 'integer'],
-            'paginateCount' => ['sometimes', 'required', 'integer'],
+            'per_page' => ['sometimes', 'required', 'integer'],
             'state' => ['nullable', 'integer', 'in:0,1,2'],
             'name' => ['nullable', 'string', 'max:255'],
             'department_id' => ['nullable', 'integer'],
@@ -34,19 +34,32 @@ class EmployeeController extends Controller
             'section_id' => ['nullable', 'integer'],
             'sector_id' => ['nullable', 'integer'],
             'is_filter' => ['nullable' , 'boolean'],
-            "tabel_no" => ['nullable' , 'string' , 'max:255']
+            "tabel_no" => ['nullable' , 'string' , 'max:255'],
+            'order_by' => [
+                'nullable', Rule::in(['employee_contracts.start_date'])
+            ],
         ]);
 
-        if ($notExists = $this->companyInfo($request->get('company_id'), $request->only(['profession_id']))) return $this->errorResponse($notExists);
+        $orderBy = $request->get('order_by') ?? 'employees.id';
+        $sortBy = $request->get('sort_by') == 'asc' ? 'asc' : 'desc';
 
-        $employees = Employee::where('company_id', $request->get('company_id'));
+        if ($notExists = $this->companyInfo($request->get('company_id'), $request->only(['profession_id'])))
+            return $this->errorResponse($notExists);
+
+        $employees = Employee::where('company_id', $request->get('company_id'))
+            ->with("contracts");
+        //TODO change it
+//        ->join('employee_contracts', 'employees.id', 'employee_contracts.employee_id');
+
+//        dd($employees->get()->toArray());
 
         if ($request->has('state') and $request->get('state') != '2')
-            $employees->where('is_active', $request->get('state'));
-        else $employees->where('is_active', true);
+            $employees->where('employees.is_active', $request->get('state'));
+        else
+            $employees->where('employees.is_active', true);
 
         if ($request->get('department_id'))
-            $employees->whereHas('contract' , function ($q) use ($request){
+            $employees->whereHas('contract', function ($q) use ($request) {
                 $q->where('department_id', $request->get('department_id'));
             });
 
@@ -67,9 +80,10 @@ class EmployeeController extends Controller
                 'user:id,name,surname',
                 'contract:id,employee_id,position_id',
                 'contract.position:id,name'
-            ])->orderBy('id', 'desc')->take(50)->get(
-                ['id', 'user_id', 'company_id']
-            );
+            ])
+            ->orderBy($orderBy, $sortBy)
+            ->take(50)
+            ->get(['employees.id', 'employees.user_id', 'employees.company_id']);
             return $this->successResponse(['data' => $employees]);
         }
 
@@ -80,7 +94,8 @@ class EmployeeController extends Controller
                 'contracts.position',
                 'contracts.currency'
             ])
-            ->paginate($request->get('paginateCount'));
+        ->orderBy($orderBy, $sortBy)
+        ->paginate($request->get('per_page'), ['employees.*']);
 
         return $this->successResponse($employees);
 
@@ -93,6 +108,13 @@ class EmployeeController extends Controller
         ]);
         $employees = Employee::with([
             'user',
+            'contracts',
+            'contracts.position',
+            'contracts.department:id,name',
+            'contracts.section:id,name',
+            'contracts.sector:id,name',
+            'contracts.specializationDegree',
+            'contracts.personalCategory',
             'user.roles:user_roles.user_id,user_roles.role_id',
             'user.details',
             'user.details.nationality',
@@ -142,7 +164,10 @@ class EmployeeController extends Controller
             ]);
 
             DB::commit();
-            return $this->successResponse('ok');
+            return $this->successResponse([
+                'employee_id' => $employee->getKey(),
+                'user_id' => $user->getKey(),
+            ]);
         } catch (QueryException  $exception) {
             if ($exception->errorInfo[1] == 1062){
                 if (strpos($exception->errorInfo[2], 'employees_user_id_company_id_unique') !== false)
@@ -228,5 +253,43 @@ class EmployeeController extends Controller
         return $this->successResponse('ok');
     }
 
+
+    public function getEmployeeWithStructureData(Request $request, $id){
+        $employee = Employee::where([
+            'id' => $id,
+            'company_id' => $request->get('company_id'),
+            'is_active' => 1
+        ])
+        ->select([
+            'id',
+            'user_id',
+            'tabel_no'
+        ])
+        ->with([
+            'user:id,name,surname',
+            'user.details:user_id,father_name'
+        ])
+        ->firstOrFail();
+        return $this->successResponse($employee);
+    }
+
+    public function setAuthorizedEmployees(Request $request){
+        $this->validate($request, [
+            'employee_ids' => 'required|array'
+        ]);
+
+        DB::transaction(function () use ($request){
+            Employee::where('company_id', $request->get('company_id'))
+                ->whereIn('id', $request->get('employee_ids'))->update([
+                    'is_authorized_employee' => 1
+                ]);
+            Employee::where('company_id', $request->get('company_id'))
+                ->whereNotIn('id', $request->get('employee_ids'))->update([
+                    'is_authorized_employee' => 0
+                ]);
+        });
+
+        return $this->successResponse(trans('messages.saved'), 200);
+    }
 
 }

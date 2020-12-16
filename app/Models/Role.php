@@ -10,6 +10,7 @@ class Role extends Model
 
     private $superAdminRoleId = 1;
     private $companyAdminRoleId = 5;
+    private $officeAdminRoleId = 3;
 
     protected $hidden = ['pivot'];
 
@@ -38,6 +39,7 @@ class Role extends Model
         ->join('permissions','permission_id','=','permissions.id')
         ->select([
             'permissions.name as pivot_permission_name',
+            'permissions.slug as pivot_permission_slug',
             'permissions.id as pivot_permission_id',
             'modules.id as id',
             'modules.name as module_name',

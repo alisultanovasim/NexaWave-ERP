@@ -44,8 +44,7 @@ class ContractTypeController extends Controller
         if (!ContractType::where('id', $id)->first(['id']))
             return $this->errorResponse(['response.durationTypeNotFound']);
         ContractType::where('id', $id)->update($request->only('name'));
-        $this->successResponse('ok');
-
+        return $this->successResponse('ok');
     }
 
     public function destroy($id)

@@ -22,9 +22,13 @@ class PositionController extends Controller
             'paginateCount' => ['sometimes' , 'required' , 'integer'],
         ]);
         $positions = Positions::where(function ($q) use ($request){
-            $q->whereNull('company_id')
-                ->orWhere('company_id' , $request->get('company_id'));
-        })->paginate($request->get('paginateCount'));
+//            $q->whereNull('company_id');
+                $q->where('company_id' , $request->get('company_id'));
+        });
+        if ($request->get('is_filter'))
+            $positions = $positions->get();
+        else
+            $positions = $positions->paginate($request->get('paginateCount'));
         return $this->dataResponse($positions);
     }
 
@@ -75,8 +79,8 @@ class PositionController extends Controller
             DB::beginTransaction();
             $saved = true;
             $position = Positions::where('id', $id)->where(function ($query) use ($request){
-                $query->whereNull('company_id')
-                ->orWhere('company_id' , $request->get('company_id'));
+//                $query->whereNull('company_id')
+                $query->where('company_id' , $request->get('company_id'));
             })->exists();
             if (!$position)
                 return $this->errorResponse(trans('messages.not_found'), 404);

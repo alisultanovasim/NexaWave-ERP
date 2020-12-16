@@ -77,7 +77,7 @@ class UserDetail extends Model
 
     public function getAvatarAttribute($value){
         if ($value)
-            return env("APP_URL") . "/users/" . $value;
+            return env("APP_URL") . "/storage/public/users/" . $value;
         return null;
     }
 }

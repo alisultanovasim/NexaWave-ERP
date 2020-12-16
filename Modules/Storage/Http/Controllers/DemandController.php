@@ -84,12 +84,14 @@ class DemandController extends Controller
             ['user_id' , Auth::id()],
             ['company_id' , $request->get('company_id')]
         ])->first(['id']);
+
         Demand::create([
             'description' => $request->get('demand_description'),
             'want_till' => $request->get('want_till'),
             'product_id' => $product->id,
             'employee_id' => $employee_id->id,
-            'company_id' => $request->get('company_id')
+            'company_id' => $request->get('company_id'),
+            'status' => Demand::STATUS_WAIT
         ]);
         return $this->successResponse('ok');
     }

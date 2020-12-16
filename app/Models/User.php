@@ -2,11 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 use Laravel\Passport\HasApiTokens;
 use Modules\Hr\Entities\Employee\Employee;
 use Modules\Hr\Entities\Employee\UserDetail;
@@ -23,6 +21,7 @@ class User extends Authenticatable
     const DEV = 4;
 
     private $userRolesForRequest = [];
+    private $userWorkingOfficeId;
 
     /**
      * The attributes that are mass assignable.
@@ -56,12 +55,14 @@ class User extends Authenticatable
         return $this->hasOne(UserDetail::class);
     }
     public function role(){
-        return $this->belongsTo('App\Models\Role');
+        return $this->belongsToMany(Role::class,'user_roles')->first();
     }
 
     public function roles(){
         return $this->belongsToMany(Role::class, 'user_roles');
     }
+
+
 
     public function employment(){
         return $this->hasMany(Employee::class);
@@ -107,6 +108,22 @@ class User extends Authenticatable
             ['user_id' , '='  , Auth::id()],
             ['company_id' , '='  , $company],
         ])->first(['id'])->id;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getUserWorkingOfficeId()
+    {
+        return $this->userWorkingOfficeId;
+    }
+
+    /**
+     * @param mixed $userWorkingOfficeId
+     */
+    public function setUserWorkingOfficeId($userWorkingOfficeId): void
+    {
+        $this->userWorkingOfficeId = $userWorkingOfficeId;
     }
 
 }

@@ -14,20 +14,22 @@ class Doc extends Model
 
     public $timestamps = false;
 
-    public function subDocs(){
-        return $this->hasMany("Modules\Esd\Entities\Doc" , "parent_id");
+    public function subDocs()
+    {
+        return $this->hasMany("Modules\Esd\Entities\Doc", "parent_id");
     }
 
-    public  function  uploader(){
-        return $this->belongsTo("Modules\Esd\Entities\User" , "uploader" , "id")->select(["id" , "name"]);
+    public function uploader()
+    {
+        return $this->belongsTo("Modules\Esd\Entities\User", "uploader", "id")->select(["id", "name"]);
     }
 
-    public function getResourceAttribute($value){
+    public function getResourceAttribute($value)
+    {
         if ($this->type == self::FILE and $value)
-        return env('APP_URL','http://office-backend.vac.az') . '/documents/'  .  $value;
+            return config('app.url') . '/storage/' . $value;
         return $value;
     }
-
 
 
 }

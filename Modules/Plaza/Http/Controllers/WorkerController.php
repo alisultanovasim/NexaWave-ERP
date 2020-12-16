@@ -23,7 +23,6 @@ class WorkerController extends Controller
             'name'=> 'sometimes|nullable|string|max:255',
             'has_card'=>'sometimes|required|in:1,0'
         ]);
-        try{
             $workers = Worker::with(['card:id,alias','role:id,name', 'office:id,name'])->whereHas('office' , function ($q) use ($request) {
                 $q->where('company_id' ,$request->company_id);
             });
@@ -42,9 +41,7 @@ class WorkerController extends Controller
 
             return $this->successResponse($workers);
 
-        }catch (\Exception $exception){
-            return $this->errorResponse(trans('apiResponse.tryLater'), Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
+
     }
 
     public function index(Request $request)
@@ -55,7 +52,6 @@ class WorkerController extends Controller
             'has_card'=> 'sometimes|required|in:0,1'
         ]);
 
-        try {
 
             $workers = Worker::with(['card:id,alias','role:id,name' , 'office:id,name']);
             if ($request->has('office_id') and $request->get('office_id') != "null"){
@@ -85,9 +81,7 @@ class WorkerController extends Controller
 
 
             return $this->successResponse($workers);
-        } catch (\Exception $e) {
-            return $this->errorResponse(trans('apiResponse.tryLater'), Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
+
     }
 
     public function show(Request $request, $id)
@@ -96,16 +90,13 @@ class WorkerController extends Controller
             'company_id' => 'required|integer',
             'office_id' => 'required|integer'
         ]);
-        try {
             $check = Office::where('company_id', $request->company_id)->where('id', $request->office_id)->exists();
             if (!$check) return $this->errorResponse(trans('apiResponse.unProcess'));
 
             $workers = Worker::with(['card:id,alias','role:id,name' , 'office:id,name'])->where('id', $id)->where("office_id", $request->office_id)->get();
 
             return $this->successResponse($workers);
-        } catch (\Exception $e) {
-            return $this->errorResponse(trans('apiResponse.tryLater'), Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
+
     }
 
     public function store(Request $request)
@@ -146,10 +137,6 @@ class WorkerController extends Controller
                     return $this->errorResponse([$find[1] => trans('apiResponse.alreadyExists')], Response::HTTP_UNPROCESSABLE_ENTITY);
                 }
             }
-            return $this->errorResponse(trans('apiResponse.tryLater'), Response::HTTP_INTERNAL_SERVER_ERROR);
-
-        } catch (\Exception $e) {
-            return $this->errorResponse(trans('apiResponse.tryLater'), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 

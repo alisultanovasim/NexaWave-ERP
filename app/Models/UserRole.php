@@ -10,4 +10,5 @@ class UserRole extends Model
     use SoftDeletes;
 
     protected $guarded = ['id'];
+
 }

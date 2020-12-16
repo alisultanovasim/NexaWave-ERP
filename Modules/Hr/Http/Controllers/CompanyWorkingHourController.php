@@ -37,7 +37,7 @@ class CompanyWorkingHourController extends Controller
         $workHours = $this->workingHour
         ->where('company_id', $request->get('company_id'))
         ->with([
-            'contract:id,name'
+            'contractType:id,name'
         ])
         ->orderBy('id', 'desc')
         ->paginate($request->get('per_page'));
@@ -55,7 +55,7 @@ class CompanyWorkingHourController extends Controller
         $workHour = $this->workingHour
             ->where('company_id', $request->get('company_id'))
             ->with([
-                'contract:id,name'
+                'contractType:id,name'
             ])
             ->orderBy('id', 'desc')
             ->firstOrFail();
@@ -69,13 +69,8 @@ class CompanyWorkingHourController extends Controller
      * @throws ValidationException
      */
     public function create(Request $request): JsonResponse {
-        try {
-            $this->validate($request, $this->getWorkingHourRules());
-            $this->saveWorkingHour($request, $this->workingHour);
-        }catch (\Exception $exception){
-            dd($exception->getMessage());
-        }
-
+        $this->validate($request, $this->getWorkingHourRules());
+        $this->saveWorkingHour($request, $this->workingHour);
         return $this->successResponse(trans('messages.saved'), 201);
     }
 
@@ -127,7 +122,7 @@ class CompanyWorkingHourController extends Controller
         return [
             'contract_id' => [
                 'required',
-                Rule::exists('contracts', 'id')->where('company_id', \request()->get('company_id'))
+                Rule::exists('contract_types', 'id')
             ],
             'count_of_work_days' => 'required|numeric',
             'count_of_day_offs' => 'required|numeric',

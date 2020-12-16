@@ -6,7 +6,6 @@ use App\Traits\ApiResponse;
 use App\Traits\Query;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
 use Illuminate\Validation\Rule;
 use Modules\Storage\Entities\Product;
@@ -20,20 +19,41 @@ class ProductAssignmentController extends Controller
     {
         $this->validate($request, [
             'employee_id' => ['nullable', 'integer'],
-            'department_id' => ['nullable'  , 'integer'],
-            'section_id' => ['nullable' , 'integer'],
-            'sector_id' => ['nullable' , 'integer'],
+            'department_id' => ['nullable', 'integer'],
+            'section_id' => ['nullable', 'integer'],
+            'sector_id' => ['nullable', 'integer'],
+            'product_id' => ['nullable', 'integer'],
+            'status' => ['nullable', Rule::in([
+                ProductAssignment::RETURNED,
+                ProductAssignment::ACTIVE,
+                ProductAssignment::ALL
+            ])],
         ]);
 
-        $assignments = ProductAssignment::with(['employee' , 'department' , 'section' , 'sector' , 'product' ,'product.kind'])
+        $assignments = ProductAssignment::with(['employee:id,user_id' ,'employee.user:id,name,surname' , 'department' , 'section' , 'sector' , 'product' ,'product.kind','product.kind.unit'])
             ->company()
             ->orderBy('id' , 'desc');
 
         if ($request->get('employee_id'))
             $assignments->where('employee_id' , $request->get('employee_id'));
 
+
+        if ($request->get('status')){
+            if ($request->get('status') != ProductAssignment::ALL)
+                $assignments->where('status' , $request->get('status'));
+        }else{
+            $assignments->where('status' , ProductAssignment::ACTIVE);
+        }
+
         if ($request->get('department_id'))
             $assignments->where('department_id' , $request->get('department_id'));
+
+        if ($request->get('product_id'))
+            $assignments->where('product_id' , $request->get('product_id'));
+
+        if ($request->get('assignment_type'))
+            $assignments->where('assignment_type' , $request->get('assignment_type'));
+
 
         if ($request->get('section_id'))
             $assignments->where('section_id' , $request->get('section_id'));
@@ -49,23 +69,23 @@ class ProductAssignmentController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
-            'product_id' => ['required', 'integer'],
-            'amount' => ['required', 'float'],
-            'assignment_type' => ['required', 'integer',
-                Rule::in([ProductAssignment::ASSIGN_TO_PLACE, ProductAssignment::ASSIGN_TO_USER])
-            ],
-            'employee_id' => ['nullable', 'integer'],
-            'section_id' => ['nullable', 'integer'],
-            'sector_id' => ['nullable', 'integer'],
-            'department_id' => ['nullable', 'integer'],
+                'product_id' => ['required', 'integer'],
+                'amount' => ['required', 'numeric'],
+                'assignment_type' => ['required', 'integer',
+                    Rule::in([ProductAssignment::ASSIGN_TO_PLACE, ProductAssignment::ASSIGN_TO_USER])
+                ],
+                'employee_id' => ['required_if:assignment_type,' . ProductAssignment::ASSIGN_TO_USER, 'integer'],
+                'section_id' => ['nullable', 'integer'],
+                'sector_id' => ['nullable', 'integer'],
+                'department_id' => ['nullable', 'integer'],
         ]);
 
         $product = Product::company()
-            ->where('product_id', $request->get('product_id'))
+            ->where('id', $request->get('product_id'))
             ->first(['amount', 'status' , 'id']);
 
         if (!$product)
-            return $this->errorResponse(trans('response.productNotFound'), 404);
+            return $this->errorResponse(trans('response.productNotFound'), 422);
 
         if ($product->amount < $request->get('amount'))
             return $this->errorResponse(trans('response.productAmountLessThanAssign'), 422);
@@ -90,7 +110,7 @@ class ProductAssignmentController extends Controller
             'department_id',
             'sector_id'
         ]), [
-            'initial_state' => $product->state,
+            'reasons' => [] ,
             'company_id' => $request->get('company_id')
         ]);
 
@@ -107,7 +127,7 @@ class ProductAssignmentController extends Controller
         if (!$assignment)
             return $this->errorResponse(trans('response.assignmentNotFound'), 404);
 
-        return $this->successResponse($request);
+        return $this->successResponse($assignment);
     }
 
     public function update(Request $request, $id)
@@ -134,12 +154,15 @@ class ProductAssignmentController extends Controller
             'department_id',
             'initial_state',
         ]);
-
         $assignment = ProductAssignment::where('id', $id)
             ->company()
-            ->first(['id' , 'product_id' , 'amount']);
+            ->first(['id' , 'product_id' , 'amount' , 'status']);
         if (!$assignment)
             return $this->errorResponse(trans('response.assignmentNotFound'), 404);
+
+
+        if($assignment->status  == ProductAssignment::RETURNED)
+            return $this->errorResponse(trans('response.assignmentStatusNotValid'), 404);
 
         if ($assignment->product_id == $request->get('product_id')){
             if ($request->get('amount') > $assignment->amount){
@@ -176,14 +199,23 @@ class ProductAssignmentController extends Controller
 
     public function delete(Request $request, $id)
     {
+        $this->validate($request , [
+            'reasons' => ['required' , 'array' , 'min:1'],
+            'reasons.*' => ['required' , 'string'],
+        ]);
         $assignment = ProductAssignment::where('id', $id)
             ->company()
-            ->first(['id' , 'product_id' , 'amount']);
+            ->first(['id' , 'product_id' , 'amount' , 'status']);
         if (!$assignment)
             return $this->errorResponse(trans('response.assignmentNotFound'), 404);
 
-        $assignment->delete();
+        if($assignment->status  == ProductAssignment::RETURNED)
+            return $this->errorResponse(trans('response.assignmentStatusNotValid'), 422);
 
+        $assignment->update([
+            'status' => ProductAssignment::RETURNED,
+            'reasons' => $request->get('reasons')
+        ]);
 
         Product::where('id' , $id)
             ->increment('amount' , $assignment->amount);

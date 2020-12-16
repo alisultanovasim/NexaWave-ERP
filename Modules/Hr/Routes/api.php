@@ -30,7 +30,12 @@ Route::group([
         Route::put('/{id}', 'OrganizationController@update');
         Route::delete('/{id}', 'OrganizationController@destroy');
     });
-
+    Route::group(['prefix' => "paragraphs"], function ($router) {
+        Route::get('/', 'ParagraphController@index');
+        Route::get('/{id}', 'ParagraphController@show');
+        Route::put('/{id}', 'ParagraphController@update');
+        Route::post('/', 'ParagraphController@store');
+    });
 
 
     Route::group(['prefix' => "countries"], function ($router) {
@@ -45,6 +50,13 @@ Route::group([
         Route::post('/', 'NotificationCaseController@create');
         Route::put('/{id}', 'NotificationCaseController@update');
         Route::delete('/{id}', 'NotificationCaseController@destroy');
+    });
+
+    Route::group(['prefix' => 'notification/types'], function ($router) {
+        Route::get('/', 'NotificationTypeController@index');
+        Route::post('/', 'NotificationTypeController@create');
+        Route::put('/{id}', 'NotificationTypeController@update');
+        Route::delete('/{id}', 'NotificationTypeController@destroy');
     });
 
     Route::group(['prefix' => 'address/types'], function ($router) {
@@ -397,9 +409,11 @@ Route::group([
             'prefix' => 'contracts'
         ], function ($route) {
             Route::get("/", 'ContractController@index');
+            Route::put("/terminate/{id}", 'ContractController@terminate');
             Route::get("/{id}", 'ContractController@show');
             Route::post("/", 'ContractController@store');
             Route::post("/update/{id}", 'ContractController@update');
+            Route::post("/add/{id}", 'ContractController@add');
             Route::delete("/{id}", 'ContractController@delete');
         });
     });
@@ -514,11 +528,11 @@ Route::group([
     Route::group(['prefix' => 'time/tracking'], function (){
 
         Route::group(['prefix' => 'work/events'], function ($router) {
-            Route::get('/', 'WokEventController@index');
-            Route::get('/{id}', 'WokEventController@show');
-            Route::post('/', 'WokEventController@create');
-            Route::put('/{id}', 'WokEventController@update');
-            Route::delete('/{id}', 'WokEventController@destroy');
+            Route::get('/', 'WorkEventController@index');
+            Route::get('/{id}', 'WorkEventController@show');
+            Route::post('/', 'WorkEventController@create');
+            Route::put('/{id}', 'WorkEventController@update');
+            Route::delete('/{id}', 'WorkEventController@destroy');
         });
 
         Route::group(['prefix' => 'vacation/planning'], function (){
@@ -529,10 +543,28 @@ Route::group([
             Route::delete('/{id}', 'VacationPlanningController@destroy');
         });
 
+        Route::group(['prefix' => 'past/unused/vacation'], function (){
+            Route::get('/', 'PastUnusedVacationController@index');
+            Route::post('/', 'PastUnusedVacationController@create');
+            Route::put('/{id}', 'PastUnusedVacationController@update');
+            Route::delete('/{id}', 'PastUnusedVacationController@destroy');
+        });
+
+        Route::group(['prefix' => 'labor/vacation'], function (){
+            Route::get('/', 'LaborVacationTrackingController@index');
+        });
+
         Route::group(['prefix' => 'work/calendar'], function (){
             Route::get('/', 'WorkCalendarController@index');
             Route::post('/', 'WorkCalendarController@create');
             Route::delete('/{id}', 'WorkCalendarController@remove');
+        });
+
+        Route::group(['prefix' => 'event'], function (){
+            Route::get('/', 'CompanyEventController@index');
+            Route::post('/', 'CompanyEventController@create');
+            Route::put('/{id}', 'CompanyEventController@update');
+            Route::delete('/{id}', 'CompanyEventController@remove');
         });
 
         Route::group(['prefix' => 'work/hours'], function (){
@@ -544,6 +576,7 @@ Route::group([
         });
 
         Route::group(['prefix' => 'work/skips'], function (){
+            Route::get('/main', 'WorkSkipsController@getMainWorkSkips');
             Route::get('/', 'WorkSkipsController@index');
             Route::get('/{id}', 'WorkSkipsController@show');
             Route::post('/', 'WorkSkipsController@create');
@@ -554,12 +587,32 @@ Route::group([
     });
 
     Route::group(['prefix' => 'company/structure'], function (){
+        Route::post('/add', 'CompanyStructureController@companyCreateStructures');
+        Route::put('/{id}', 'CompanyStructureController@companyUpdateStructure');
         Route::get('/', 'CompanyStructureController@index');
         Route::post('/', 'CompanyStructureController@addStructureLink');
-        Route::post('/set', 'CompanyStructureController@createCompanyStructure');
+        Route::post('/set', 'CompanyStructureController@setCompanyStructure');
         Route::post('/positions', 'CompanyStructureController@setStructurePositions');
         Route::get('/positions', 'CompanyStructureController@getStructurePositions');
         Route::get('/employees', 'CompanyStructureController@getEmployees');
+    });
+
+    Route::get('company/staff/schedule', 'CompanyStaffScheduleController@index');
+
+    Route::group(['prefix' => 'company/authorized/employees'], function (){
+        Route::get('/', 'CompanyAuthorizedUsersController@index');
+        Route::post('/', 'CompanyAuthorizedUsersController@addOrUpdateAuthorizedEmployee');
+        Route::delete('/', 'CompanyAuthorizedUsersController@removeEmployeeFromAuthorizedUsers');
+    });
+
+    Route::group(['prefix' => 'company/orders'], function (){
+        Route::get('/', 'CompanyOrderController@index');
+        Route::get('/employees', 'CompanyOrderController@getOrderEmployees');
+        Route::post('/', 'CompanyOrderController@create');
+        Route::put('/{id}', 'CompanyOrderController@update');
+        Route::get('/{id}', 'CompanyOrderController@show');
+        Route::put('/confirm/{id}', 'CompanyOrderController@confirm');
+        Route::delete('/{id}', 'CompanyOrderController@destroy');
     });
 
 });

@@ -174,13 +174,8 @@ class DraftController extends Controller
                     return $this->errorResponse([$find[0] => "incorrect format"], Response::HTTP_UNPROCESSABLE_ENTITY);
                 }
             }
-            dd($e);
 
              return $this->errorResponse(trans('apiResponse.tryLater'), Response::HTTP_INTERNAL_SERVER_ERROR);
-        } catch (\Exception $exception) {
-            DB::rollBack();
-            dd($exception);
-            return $this->errorResponse(trans("apiResponse.tryLater"), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 //    public function uploadFile(UploadedFile $file, $company_id): string
@@ -195,7 +190,6 @@ class DraftController extends Controller
 
             'company_id' => 'required|integer',
         ]);
-        try {
             $draft = Document::where("id", $id)
                 ->where("status", config("esd.document.status.draft"))
                 ->where("company_id", $request->company_id)
@@ -219,10 +213,7 @@ class DraftController extends Controller
             $draft = $draft->first($data);
 
             return $this->successResponse($draft);
-        } catch (\Exception $e) {
-            return $this->errorResponse(trans("apiResponse.tryLater"), Response::HTTP_INTERNAL_SERVER_ERROR);
 
-        }
     }
 
     public function update(Request $request, $id)
@@ -261,7 +252,6 @@ class DraftController extends Controller
             'send_type', 'send_form',
             'parent_id', 'theme',
             'description', 'document_time', 'register_time', 'send_to_user');
-        try {
 
             $document = Document::where("id", $id)
                 ->where("company_id", $company_id)
@@ -288,11 +278,6 @@ class DraftController extends Controller
                 DB::table($table)->where('document_id' , $document->id)->update((array)$data);
 
             return $this->successResponse("OK");
-
-        } catch (\Exception $e) {
-            dd($e);
-            return $this->errorResponse(trans("apiResponse.tryLater"), Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
     }
 
     public function destroy(Request $request, $id)
@@ -301,7 +286,6 @@ class DraftController extends Controller
 
             'company_id' => 'required|integer',
         ]);
-        try {
             $check = Document::where([
                 "id" => $id,
                 "status" => config("esd.document.status.draft"),
@@ -311,9 +295,7 @@ class DraftController extends Controller
             if (!$check)
                 return $this->errorResponse(trans("apiResponse.unProcess"));
             return $this->successResponse("OK");
-        } catch (\Exception $e) {
-            return $this->errorResponse(trans("apiResponse.tryLater"), Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
+
     }
     /**
      * crud end
@@ -327,7 +309,6 @@ class DraftController extends Controller
             'company_id' => 'required|integer',
         ]);
         $company_id = $request->company_id;
-        try {
             $document = Document::where("id", $id)
                 ->where("company_id", $company_id)
                 ->where("from",  Auth::id())
@@ -347,10 +328,6 @@ class DraftController extends Controller
 
             return $this->successResponse("OK");
 
-
-        } catch (\Exception $e) {
-            return $this->errorResponse(trans("apiResponse.tryLater"), Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
     }
 
     public function removeDocument(Request $request, $id)
@@ -363,7 +340,6 @@ class DraftController extends Controller
 
         $company_id = $request->company_id;
 
-        try {
             $document = Document::where("id", $id)
                 ->where("company_id", $company_id)
                 ->where("from", Auth::id())
@@ -387,10 +363,6 @@ class DraftController extends Controller
 
             return $this->successResponse("OK");
 
-        } catch (\Exception $e) {
-            return $this->errorResponse(trans("apiResponse.tryLater"), Response::HTTP_INTERNAL_SERVER_ERROR);
-
-        }
     }
 
     public function updateDocument(Request $request, $id)
