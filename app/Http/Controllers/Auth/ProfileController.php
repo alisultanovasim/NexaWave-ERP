@@ -62,7 +62,7 @@ class ProfileController extends Controller
         if ($request->get('company_id'))
             $modules = $modules->hasCompany($request->get('company_id'));
 
-        $modules = $modules->get([
+        $modules = $modules->orderBy("position")->get([
             'id',
             'name',
             'icon',
