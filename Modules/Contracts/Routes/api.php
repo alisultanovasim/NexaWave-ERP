@@ -16,6 +16,13 @@ Route::group([
     Route::get('/{agreementId}/additions', 'AgreementsController@getAdditionsByAgreementId');
     Route::get('/additions/{additionId}', 'AgreementsController@getAdditionById');
 
+    Route::group(['prefix' => 'bank/infos'], function () {
+        Route::get('/', 'CompanyAgreementPartnerBankInfoController@index');
+        Route::post('/', 'CompanyAgreementPartnerBankInfoController@create');
+        Route::put('/{id}', 'CompanyAgreementPartnerBankInfoController@update');
+        Route::delete('/{id}', 'CompanyAgreementPartnerBankInfoController@destroy');
+    });
+
 });
 
 
