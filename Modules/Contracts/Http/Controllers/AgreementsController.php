@@ -12,8 +12,6 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Modules\Contracts\Entities\CompanyAgreement;
@@ -37,6 +35,25 @@ class AgreementsController extends Controller
     public function __construct(TemporaryFileService $tempFileService)
     {
         $this->tempFileService = $tempFileService;
+    }
+
+    /**
+     * @param Request $request
+     * @param $id
+     * @return JsonResponse
+     */
+    public function approve(Request $request, $id): JsonResponse
+    {
+        $agreement = CompanyAgreement::where([
+            'id' => $id,
+            'company_id' => $request->get('company_id'),
+            'status' => CompanyAgreement::draftStatus
+        ])->firstOrFail(['id']);
+        $agreement->update([
+            'status' => CompanyAgreement::approvedStatus
+        ]);
+
+        return $this->successResponse(trans('messages.saved'));
     }
 
     /**
@@ -160,6 +177,50 @@ class AgreementsController extends Controller
     }
 
     /**
+     * @param Request $request
+     * @param $id
+     * @return JsonResponse
+     * @throws ValidationException
+     */
+    public function update(Request $request, $id): JsonResponse
+    {
+        $this->validate($request, $this->getAgreementRules($request));
+
+        $agreement = CompanyAgreement::where([
+            'id' => $id,
+            'company_id' => $request->get('company_id'),
+            'status' => CompanyAgreement::draftStatus
+        ])->firstOrFail(['id']);
+
+        DB::transaction(function () use($request, $agreement) {
+            $contract = $this->saveAgreement($request, $agreement);
+            $this->saveAgreementParticipants($contract, $request->get('participants'));
+            if ($request->get('files')) {
+                $this->saveAgreementFiles($contract, $request->get('files'));
+            }
+        });
+
+        return $this->successResponse(trans('messages.saved'), 201);
+    }
+
+    /**
+     * @param Request $request
+     * @param $id
+     * @return JsonResponse
+     */
+    public function destroy(Request $request, $id): JsonResponse
+    {
+        $agreement = CompanyAgreement::where([
+            'id' => $id,
+            'company_id' => $request->get('company_id'),
+            'status' => CompanyAgreement::draftStatus
+        ])->firstOrFail(['id']);
+        $agreement->delete();
+
+        return $this->successResponse(trans('messages.saved'));
+    }
+
+    /**
      * @param CompanyAgreement $agreement
      * @param array $files
      * @param CompanyAgreementAddition|null $addition
@@ -211,7 +272,7 @@ class AgreementsController extends Controller
             ],
             'vat' => $request->get('vat'),
             'subject' => $request->get('subject'),
-            'status' => $companyContract::activeStatus
+            'status' => $companyContract::draftStatus
         ])->save();
         return $companyContract;
     }
@@ -292,7 +353,7 @@ class AgreementsController extends Controller
                 'nullable',
                 Rule::exists('company_agreements', 'id')->where(function ($query) use ($request){
                     $query->where('company_id', $request->get('company_id'));
-                    $query->where('status', CompanyAgreement::activeStatus);
+                    $query->where('status', CompanyAgreement::approvedStatus);
                 })
             ],
             'agreement_type' => [
@@ -362,7 +423,8 @@ class AgreementsController extends Controller
 
         $contract = CompanyAgreement::where([
             'company_id' => $request->get('company_id'),
-            'id' => $id
+            'id' => $id,
+            'status' => CompanyAgreement::approvedStatus
         ])->firstOrFail(['id']);
 
         DB::transaction(function () use ($request, $contract) {
