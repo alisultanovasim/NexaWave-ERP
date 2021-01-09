@@ -31,7 +31,7 @@ class AgreementFilters extends QueryFilters
 
     public function isTerminated(bool $isTerminated)
     {
-        return $this->builder->where('status', $isTerminated ? CompanyAgreement::terminatedStatus : CompanyAgreement::activeStatus);
+        return $this->builder->where('status', $isTerminated ? CompanyAgreement::terminatedStatus : CompanyAgreement::approvedStatus);
     }
 
     public function parentId(int $parentId)
