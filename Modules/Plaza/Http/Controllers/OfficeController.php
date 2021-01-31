@@ -296,7 +296,7 @@ class OfficeController extends Controller
                 'company_id' => $request->get('company_id'),
             ]);
 
-            SendMailCreatePassword::dispatch($user, $ps);
+            SendMailCreatePassword::dispatchNow($user, $ps);
 
             DB::commit();
             return $this->successResponse("OK");

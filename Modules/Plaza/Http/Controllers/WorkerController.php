@@ -108,7 +108,7 @@ class WorkerController extends Controller
             'office_id' => 'required|integer',
             'role_id' => 'required|integer',
 
-            'description' => 'sometimes|required',
+            'description' => 'nullable|max:255',
             'card' => 'sometimes|required|integer'
         ]);
         try {
@@ -148,7 +148,7 @@ class WorkerController extends Controller
             'gender'=> 'sometimes|required|in:1,2',
 
             'office_id' => 'required|integer',
-            'description' => 'sometimes|required|string',
+            'description' => 'nullable|max:255',
             'role_id' => 'sometimes|required|integer',
             'card' => 'sometimes|required|integer'
         ]);
