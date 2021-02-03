@@ -73,16 +73,19 @@ class Company extends Model
 
     }
 
-    public function structuredDepartments(){
+    public function structuredDepartments(): HasMany
+    {
         return $this->hasMany(Department::class, 'structable_id', 'id')
             ->where('structable_type', 'company')
             ->with([
                 'structuredSections:id,name,structable_id,structable_type',
-                'structuredSectors:id,name,structable_id,structable_type'
+                'structuredSectors:id,name,structable_id,structable_type',
+                'curator'
             ]);
     }
 
-    public function structuredSections(){
+    public function structuredSections(): HasMany
+    {
         return $this->hasMany(Section::class, 'structable_id', 'id')
             ->where('structable_type', 'company')
             ->with([
@@ -90,7 +93,8 @@ class Company extends Model
             ]);
     }
 
-    public function structuredSectors(){
+    public function structuredSectors(): HasMany
+    {
         return $this->hasMany(Sector::class, 'structable_id', 'id')
             ->where('structable_type', 'company');
     }

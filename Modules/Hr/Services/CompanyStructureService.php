@@ -13,25 +13,26 @@ class CompanyStructureService
     {
         $structure = Company::where('id', $companyId)
         ->with([
-            'structuredDepartments:id,name,is_closed,structable_id,structable_type',
-            'structuredSections:id,name,is_closed,structable_id,structable_type',
-            'structuredSectors:id,name,is_closed,structable_id,structable_type',
+            'structuredDepartments:id,name,curator_id,is_closed,structable_id,structable_type',
+            'structuredSections:id,name,curator_id,is_closed,structable_id,structable_type',
+            'structuredSectors:id,name,curator_id,is_closed,structable_id,structable_type',
         ])
         ->first([
             'id',
             'name'
         ]);
+
         if ($getNestedFormat){
             //when update company structure unset company-structure-comapnyId-* cache keys
-            $cacheKey = 'company-structure-'. $companyId . '-' . md5(serialize($structure));
-            if (Cache::has($cacheKey)){
-                $structure->children = Cache::get($cacheKey);
-            }
-            else {
+//            $cacheKey = 'company-structure-'. $companyId . '-' . md5(serialize($structure));
+//            if (Cache::has($cacheKey)){
+//                $structure->children = Cache::get($cacheKey);
+//            }
+//            else {
                 $children = $this->getNestedStructure($structure);
-                Cache::put($cacheKey, $children, 24 * 60 * 60);
+//                Cache::put($cacheKey, $children, 24 * 60 * 60);
                 $structure->children = $children;
-            }
+//            }
             unset($structure->structuredDepartments);
             unset($structure->structuredSections);
             unset($structure->structuredSectors);
@@ -40,7 +41,8 @@ class CompanyStructureService
         return $structure;
     }
 
-    private function getNestedStructure($structure = []){
+    private function getNestedStructure($structure = []): array
+    {
         $formattedStructure = [];
 
         foreach ($structure['structuredDepartments'] ?? [] as $department){
@@ -49,6 +51,7 @@ class CompanyStructureService
                 'name' => $department['name'],
                 'is_closed' => $department['is_closed'],
                 'type' => 'department',
+                'curator' => $department['curator'] ?? null,
                 'children' => $this->getNestedStructure($department)
             ];
         }
@@ -59,6 +62,7 @@ class CompanyStructureService
                 'name' => $section['name'],
                 'is_closed' => $section['is_closed'],
                 'type' => 'section',
+                'curator' => $department['curator'] ?? null,
                 'children' => $this->getNestedStructure($section)
             ];
         }
@@ -69,6 +73,7 @@ class CompanyStructureService
                 'name' => $sector['name'],
                 'is_closed' => $sector['is_closed'],
                 'type' => 'sector',
+                'curator' => $department['curator'] ?? null,
                 'children' => $this->getNestedStructure($sector)
             ];
         }
