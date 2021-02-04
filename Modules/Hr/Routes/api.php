@@ -587,6 +587,7 @@ Route::group([
     });
 
     Route::group(['prefix' => 'company/structure'], function (){
+        Route::post('/set/curator', 'CompanyStructureController@setCuratorToStructure');
         Route::post('/add', 'CompanyStructureController@companyCreateStructures');
         Route::put('/{id}', 'CompanyStructureController@companyUpdateStructure');
         Route::get('/', 'CompanyStructureController@index');

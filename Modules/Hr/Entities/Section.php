@@ -3,11 +3,15 @@
 namespace Modules\Hr\Entities;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Modules\Hr\Traits\HasCuratorRelation;
 
 class Section extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes, HasCuratorRelation;
 
     protected $guarded = [];
 
@@ -18,22 +22,27 @@ class Section extends Model
 
     protected $appends = ['structure_type'];
 
-    public function department()
+    public function department(): BelongsTo
     {
         return $this->belongsTo(Department::class);
     }
 
-    public function sectors()
+    public function sectors(): HasMany
     {
         return $this->hasMany(Sector::class);
     }
 
-    public function structuredSectors(){
+    public function structuredSectors(): HasMany
+    {
         return $this->hasMany(Sector::class, 'structable_id', 'id')
+            ->with([
+                'curator',
+            ])
             ->where('structable_type', 'section');
     }
 
-    public function positions(){
+    public function positions(): BelongsToMany
+    {
         return $this->belongsToMany(
             Positions::class,
             'structure_positions',
@@ -44,7 +53,8 @@ class Section extends Model
         ->where('structure_type', 'section');
     }
 
-    public function scopeWithAllRelations($query){
+    public function scopeWithAllRelations($query)
+    {
         return $query->with([
             'department' => function ($query){
                 $query->select(['id', 'name']);
@@ -55,11 +65,13 @@ class Section extends Model
         ]);
     }
 
-    public function getStructureTypeAttribute(){
+    public function getStructureTypeAttribute(): string
+    {
         return 'section';
     }
 
-    public function children(){
+    public function children(): HasMany
+    {
         return $this->sectors();
     }
 }
