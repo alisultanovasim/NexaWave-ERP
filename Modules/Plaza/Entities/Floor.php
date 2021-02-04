@@ -12,6 +12,7 @@ class Floor extends Model
 
     protected $guarded = ['id'];
 
+    protected $fillable=['company_id','number','common_size','sold_size'];
 
     public function offices(){
         return $this->belongsToMany('Modules\Plaza\Entities\Office' , 'offices_locations' , 'office_id' , 'floor_id');
