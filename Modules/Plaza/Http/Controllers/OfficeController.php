@@ -132,7 +132,7 @@ class OfficeController extends Controller
             'phone.*.name' => 'sometimes|required|min:2|max:255',
             'phone.*.contact' => 'required_with:phone|regex:/^\+?[0-9]{12}$/',
 
-            'image' => 'sometimes|required|image|mimes:jpeg,png,jpg,gif,svg',
+            'image' => 'sometimes|required|file|mimes:jpeg,png,pdf,jpg,gif,svg',
             'start_time' => 'required|date|date_format:Y-m-d',
             'month_count' => 'required|integer',
             'payed_month_count' => 'sometimes|required|integer|lte:month_count',
