@@ -6,13 +6,15 @@ use App\Traits\Filterable;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class CompanyAgreement extends Model
 {
-    use Filterable;
+    use Filterable, SoftDeletes;
 
-    const activeStatus = 1;
-    const terminatedStatus = 2;
+    const draftStatus = 1;
+    const approvedStatus = 2;
+    const terminatedStatus = 3;
 
     protected $guarded = ['id'];
     protected $appends = ['remain_days'];
