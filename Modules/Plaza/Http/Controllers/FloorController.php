@@ -98,9 +98,9 @@ class FloorController extends Controller
     {
         $this->validate($request, [
             'company_id' => 'required|integer',
-            'image' => 'sometimes|required|image|mimes:jpeg,png,jpg,gif,svg',
+            'image' => 'sometimes|required|file|mimes:jpeg,pdf,png,jpg,gif,svg',
             'common_size' => 'sometimes|required|numeric',
-            'number' => 'sometimes|required|integer'
+            'number' => 'sometimes|required|number'
         ]);
         $arr = $request->only('common_size', 'image', 'number');
         if (!$arr)
