@@ -2,7 +2,7 @@
 pipeline {
   agent {
     docker {
-      image 'lorisleiva/laravel-docker'
+      image 'lorisleiva/laravel-docker:7.4'
       args '-u root'
     }
   }
@@ -34,8 +34,8 @@ pipeline {
         branch 'master'
       }
       steps {
-        sh 'ssh-keyscan 185.32.45.93 >> ~/.ssh/known_hosts'
-        sh 'php artisan deploy 185.32.45.93 -s upload'
+        sh 'ssh-keyscan api.oneof.az >> ~/.ssh/known_hosts'
+        sh 'php artisan deploy api.oneof.az -s upload'
       }
     }
 

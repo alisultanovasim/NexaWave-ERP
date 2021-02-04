@@ -23,7 +23,7 @@ class CountryController extends Controller
     public function index(Request $request)
     {
         $this->validate($request, [
-            'paginateCount' => ['sometimes', 'required', 'integer'],
+            'per_page' => ['sometimes', 'required', 'integer'],
 //            'company_id' => ['required', 'integer'],
             'name' => ['sometimes' ,'required', 'string', 'max:255']
         ]);
@@ -34,7 +34,7 @@ class CountryController extends Controller
         if ($request->get('is_filter'))
             $countries = ['data' => $countries->get(['id' ,'name','short_name'])];
         else
-            $countries = $countries->paginate($request->get('paginateCount'));
+            $countries = $countries->paginate($request->get('per_page'));
         return $this->dataResponse($countries);
     }
 

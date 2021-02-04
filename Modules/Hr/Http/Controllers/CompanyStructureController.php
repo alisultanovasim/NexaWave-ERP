@@ -51,7 +51,41 @@ class CompanyStructureController extends Controller
      */
     public function index(Request $request): JsonResponse {
         $structure = $this->companyStructureService->getStructure($request->get('company_id'), $request->get('with_nested_structure'));
+
         return  $this->successResponse($structure);
+    }
+
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     * @throws ValidationException
+     */
+    public function setCuratorToStructure(Request $request): JsonResponse
+    {
+        $this->validate($request, [
+            'structure_id' => 'required|integer',
+            'structure_type' => [
+                'required',
+                Rule::in(['department', 'section', 'sector'])
+            ],
+            'curator_id' => [
+                'required',
+                Rule::exists('employees', 'id')->where(function ($query) use ($request) {
+                    $query->where('company_id', $request->get('company_id'));
+                })
+            ]
+        ]);
+
+        $structure = $this->getStructureModelByType($request->get('structure_type'));
+        $structure->where([
+            'company_id' => $request->get('company_id'),
+            'id' => $request->get('structure_id')
+        ])->firstOrFail(['id']);
+        $structure->update([
+            'curator_id' => $request->get('curator_id')
+        ]);
+
+        return  $this->successResponse(trans('messages.saved'));
     }
 
     /**
@@ -87,6 +121,7 @@ class CompanyStructureController extends Controller
         ->with('user:id,name,surname')
 //        ->where('company_id', $request->get('company_id'))
         ->get(['id', 'user_id']);
+
         return $this->successResponse($employees);
     }
 
@@ -96,6 +131,7 @@ class CompanyStructureController extends Controller
      * @throws ValidationException
      */
     public function companyCreateStructures(Request $request): JsonResponse {
+
         if (!$request->get('is_batch_create')){
             return $this->companyCreateStructure($request);
         }
@@ -115,7 +151,8 @@ class CompanyStructureController extends Controller
             ]
         ]);
         $insertData = [];
-        foreach ($request->get('structures') as $structure){
+
+        foreach ($request->get('structures') as $structure) {
             $insertData[] = [
                 'name' => $structure['name'],
                 'code' => $structure['code'],
@@ -125,6 +162,7 @@ class CompanyStructureController extends Controller
             ];
         }
         $structureModel->insert($insertData);
+
         return $this->successResponse(trans('messages.saved'), 200);
     }
 
@@ -188,6 +226,7 @@ class CompanyStructureController extends Controller
             'company_id' => $request->get('company_id')
         ])->firstOrFail(['id']);
         $structureModel->update($request->only(['name', 'code', 'is_closed', 'closed_date']));
+
         return $this->successResponse(trans('messages.saved'), 200);
     }
 
