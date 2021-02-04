@@ -40,10 +40,10 @@ class FloorController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
-            'number' => 'required|integer',
+            'number' => 'required|numeric',
             'company_id' => 'required|integer',
             'common_size' => 'required|numeric',
-            'image' => 'sometimes|required|image|mimes:jpeg,png,jpg,gif,svg',
+            'image' => 'sometimes|required|file|mimes:jpeg,pdf,png,jpg,gif,svg',
         ]);
 
         try {
