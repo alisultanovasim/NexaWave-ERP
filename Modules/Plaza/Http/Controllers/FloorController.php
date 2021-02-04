@@ -15,9 +15,10 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Routing\Controller;
+
 class FloorController extends Controller
 {
-    use ApiResponse  , ValidatesRequests;
+    use ApiResponse, ValidatesRequests;
 
     public function index(Request $request)
     {
@@ -43,7 +44,8 @@ class FloorController extends Controller
             'number' => 'required|integer',
             'company_id' => 'required|integer',
             'common_size' => 'required|numeric',
-            'image' => 'sometimes|required|image|mimes:jpeg,png,jpg,gif,svg',
+            'solid_size' => 'numeric',
+            'image' => 'sometimes|required|file|mimes:jpeg,pdf,png,jpg,gif,svg',
         ]);
 
         try {
@@ -54,7 +56,7 @@ class FloorController extends Controller
             if ($request->hasFile('image')) {
                 $floor->image = $this->uploadImage($request->image, $request->company_id);
             }
-            $floor->sold_size = 0;
+            $floor->sold_size = $request->input("solid_size", 0);
             $floor->save();
             return $this->successResponse('OK');
 
@@ -76,7 +78,7 @@ class FloorController extends Controller
     {
         $this->validate($request, [
             'company_id' => 'required|integer',
-            'with_offices' => ['sometimes' , 'required' ]
+            'with_offices' => ['sometimes', 'required']
         ]);
         try {
             $floor = Floor::where([
@@ -98,8 +100,9 @@ class FloorController extends Controller
     {
         $this->validate($request, [
             'company_id' => 'required|integer',
-            'image' => 'sometimes|required|image|mimes:jpeg,png,jpg,gif,svg',
+            'image' => 'sometimes|required|file|mimes:jpeg,pdf,png,jpg,gif,svg',
             'common_size' => 'sometimes|required|numeric',
+            'solid_size' => 'sometimes|required|numeric',
             'number' => 'sometimes|required|integer'
         ]);
         $arr = $request->only('common_size', 'image', 'number');
@@ -123,8 +126,7 @@ class FloorController extends Controller
                 $floor->image = $filename;
             }
 
-            $floor->fill($request->only('common_size', 'number'));
-
+            $floor->fill($request->only('common_size', 'number','solid_size'));
             $check = $floor->save();
             if (!$check)
                 return $this->errorResponse(trans('apiResponse.tryLater'));
