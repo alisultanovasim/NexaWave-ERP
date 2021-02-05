@@ -154,7 +154,6 @@ class OfficeController extends Controller
 
             'user_email' => ['required', 'email', 'min:6'],
             'set_password' => ['nullable', 'min:6'],
-
 //            "price_without_adv" => ["sometimes", "required", "numeric"],
 //            "is_adv_payer" => ["sometimes", "required", "boolean"],
 //            "is_buy_attendance" => ["sometimes", "required", "boolean"],
