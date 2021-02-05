@@ -54,9 +54,8 @@ class UserController extends Controller
         ]);
 
         //todo make auth not only with username but with email too bro :D
-        if (!Auth::attempt($request->only('username', 'password')))
+        if (!$token = Auth::attempt($request->only('username', 'password')))
             return $this->errorResponse(trans('response.invalidLoginOrPassword'));
-
         $token = Auth::user()->createToken('authToken')->accessToken;
         return $this->dataResponse([
             'token_type' => 'Bearer',
