@@ -142,7 +142,7 @@ class OfficeController extends Controller
             'location.*.size' => 'required|numeric',
             'location.*.floor_id' => 'required|integer',
             'location.*.number' => 'sometimes|required|integer',
-            'location.*.schema' => 'sometimes|required|image|mimes:jpeg,png,jpg,gif,svg,pdf,docx,doc',
+            'location.*.schema' => 'sometimes|required|file|mimes:jpeg,png,jpg,gif,svg,pdf,docx,doc',
             'per_month' => 'required|numeric',
 
             'agree_at' => 'sometimes|required|date|date_format:Y-m-d',
