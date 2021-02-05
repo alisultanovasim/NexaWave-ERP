@@ -105,7 +105,7 @@ class FloorController extends Controller
             'solid_size' => 'sometimes|required|numeric',
             'number' => 'sometimes|required|integer'
         ]);
-        $arr = $request->only('common_size', 'sold_size','image', 'number');
+        $arr = $request->only('common_size', 'sold_size', 'image', 'number');
         if (!$arr)
             return $this->errorResponse(trans('apiResponse.nothing'));
         try {
@@ -126,7 +126,7 @@ class FloorController extends Controller
                 $floor->image = $filename;
             }
 
-            $floor->fill($request->only('common_size', 'number','sold_size'));
+            $floor->fill($request->only('common_size', 'number', 'sold_size'));
             $check = $floor->save();
             if (!$check)
                 return $this->errorResponse(trans('apiResponse.tryLater'));
