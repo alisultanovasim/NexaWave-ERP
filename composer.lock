@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "6194a2229726f4d56062d79e7a217c25",
+    "content-hash": "e07cc2fd5c94215e41763e0faad7d77d",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -6774,6 +6774,81 @@
                 "source": "https://github.com/hamcrest/hamcrest-php/tree/v2.0.1"
             },
             "time": "2020-07-09T08:09:16+00:00"
+        },
+        {
+            "name": "krlove/code-generator",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/krlove/code-generator.git",
+                "reference": "c1f0cb6898c5e378528c095d54623171e62ee1c3"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/krlove/code-generator/zipball/c1f0cb6898c5e378528c095d54623171e62ee1c3",
+                "reference": "c1f0cb6898c5e378528c095d54623171e62ee1c3",
+                "shasum": ""
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Krlove\\CodeGenerator\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "Code Generator",
+            "support": {
+                "issues": "https://github.com/krlove/code-generator/issues",
+                "source": "https://github.com/krlove/code-generator/tree/master"
+            },
+            "time": "2016-04-03T14:09:31+00:00"
+        },
+        {
+            "name": "krlove/eloquent-model-generator",
+            "version": "1.3.6",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/krlove/eloquent-model-generator.git",
+                "reference": "24dbab8ced34c71b8a8d72dc98bd343041c785b2"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/krlove/eloquent-model-generator/zipball/24dbab8ced34c71b8a8d72dc98bd343041c785b2",
+                "reference": "24dbab8ced34c71b8a8d72dc98bd343041c785b2",
+                "shasum": ""
+            },
+            "require": {
+                "doctrine/dbal": "^2.5",
+                "illuminate/database": "^5.0 || ^6.0 || ^7.0 || ^8.0",
+                "illuminate/support": "^5.0 || ^6.0|| ^7.0 || ^8.0",
+                "krlove/code-generator": "^1.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Krlove\\EloquentModelGenerator\\Provider\\GeneratorServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Krlove\\EloquentModelGenerator\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "Eloquent Model Generator",
+            "support": {
+                "issues": "https://github.com/krlove/eloquent-model-generator/issues",
+                "source": "https://github.com/krlove/eloquent-model-generator/tree/1.3.6"
+            },
+            "time": "2020-10-03T08:18:38+00:00"
         },
         {
             "name": "mockery/mockery",
