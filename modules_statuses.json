@@ -3,5 +3,6 @@
     "Hr": true,
     "Plaza": true,
     "Storage": true,
-    "Contracts": true
+    "Contracts": true,
+    "TaskManager": true
 }
