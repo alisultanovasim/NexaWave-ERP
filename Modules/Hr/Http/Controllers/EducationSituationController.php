@@ -21,7 +21,7 @@ class EducationSituationController extends Controller
             'company_id' => ['required' , 'integer'],
             'paginateCount' => ['sometimes','required' , 'integer'],
         ]);
-        $result = EducationSituation::where('company_id' , $request->get('company_id'))->paginate($request->get('paginateCount'));
+        $result = EducationSituation::where('company_id' , $request->get('company_id'))->paginate($request->input('per_page',200));
         return $this->dataResponse($result);
     }
 

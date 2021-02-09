@@ -20,7 +20,7 @@ class EducationSpecialtyController extends Controller
         $this->validate($request , [
             'paginateCount' => ['sometimes','required' , 'integer'],
         ]);
-        $result = EducationSpecialty::paginate($request->get('paginateCount'));
+        $result = EducationSpecialty::paginate($request->get('per_page',200));
         return $this->dataResponse($result);
     }
 

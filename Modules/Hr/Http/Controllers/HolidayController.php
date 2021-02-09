@@ -20,7 +20,8 @@ class HolidayController extends Controller
             'company_id' => ['required' , 'integer'],
             'paginateCount' => ['sometimes', 'required', 'integer']
         ]);
-        $holidays = Holiday::where('company_id', $request->get('company_id'))->paginate($request->get('paginateCount'));
+        $holidays = Holiday::where('company_id', $request->get('company_id'))
+            ->paginate($request->get('per_page',200));
         return $this->dataResponse($holidays);
     }
 
