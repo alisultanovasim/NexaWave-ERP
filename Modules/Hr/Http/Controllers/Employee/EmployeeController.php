@@ -47,8 +47,8 @@ class EmployeeController extends Controller
             return $this->errorResponse($notExists);
 
         $employees = Employee::where('company_id', $request->get('company_id'))
-            ->with("contracts")
-            ->join('employee_contracts', 'employees.id', 'employee_contracts.employee_id');
+            ->with("contracts");
+//            ->join('employee_contracts', 'employees.id', 'employee_contracts.employee_id');
 
 //        dd($employees->get()->toArray());
 
