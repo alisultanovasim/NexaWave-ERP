@@ -35,6 +35,7 @@ class ContractController extends Controller
             'position_id',
             'start_date',
             'end_date',
+            'salary',
             'employee_id',
             'personal_category_id',
             'specialization_degree_id',
@@ -91,10 +92,11 @@ class ContractController extends Controller
             'res_days',
         ]);
 
-        $data['salary'] = +$request->get('position_salary_praise_about') +
-            +$request->header('addition_package_fee') +
-            +$request->get('work_environment_addition') +
-            +$request->get('overtime_addition');
+
+        $data['salary'] = (int)$data['salary']+(int)$request->get('position_salary_praise_about') +
+            +(int)$request->header('addition_package_fee') +
+            +(int)$request->get('work_environment_addition') +
+            +(int)$request->get('overtime_addition');
 
         $contract = Contract::create($data);
 
