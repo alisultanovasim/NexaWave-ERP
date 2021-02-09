@@ -30,7 +30,7 @@ class EducationPlaceController extends Controller
         if ($request->has('cit_id')) $result->where('cit_id' , $request->get('cit_id'));
         if ($request->has('region_id')) $result->where('region_id' , $request->get('region_id'));
 
-        $result = $result->paginate($request->get('paginateCount'));
+        $result = $result->paginate($request->input('paginateCount',200));
         return $this->dataResponse($result);
 
     }
