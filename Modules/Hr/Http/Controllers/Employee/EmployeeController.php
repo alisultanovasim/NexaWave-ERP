@@ -95,7 +95,7 @@ class EmployeeController extends Controller
                 'contracts.currency'
             ])
         ->orderBy($orderBy, $sortBy)
-        ->paginate($request->get('per_page'), ['employees.*']);
+        ->paginate($request->input('per_page',200), ['employees.*']);
 
         return $this->successResponse($employees);
 

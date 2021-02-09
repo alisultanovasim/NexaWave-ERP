@@ -260,8 +260,7 @@ class OfficeController extends Controller
                 $locations[] = $arr;
             }
 
-            Location::insert($locations);
-
+            Location::insert($locations);  
 
             if ($request->has('documents')) {
                 $documents = [];
