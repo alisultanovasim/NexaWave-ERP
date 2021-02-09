@@ -33,8 +33,8 @@ class EmployeeController extends Controller
             'position_id' => ['nullable', 'integer'],
             'section_id' => ['nullable', 'integer'],
             'sector_id' => ['nullable', 'integer'],
-            'is_filter' => ['nullable' , 'boolean'],
-            "tabel_no" => ['nullable' , 'string' , 'max:255'],
+            'is_filter' => ['nullable', 'boolean'],
+            "tabel_no" => ['nullable', 'string', 'max:255'],
             'order_by' => [
                 'nullable', Rule::in(['employee_contracts.start_date'])
             ],
@@ -47,9 +47,8 @@ class EmployeeController extends Controller
             return $this->errorResponse($notExists);
 
         $employees = Employee::where('company_id', $request->get('company_id'))
-            ->with("contracts");
-        //TODO change it
-//        ->join('employee_contracts', 'employees.id', 'employee_contracts.employee_id');
+            ->with("contracts")
+            ->join('employee_contracts', 'employees.id', 'employee_contracts.employee_id');
 
 //        dd($employees->get()->toArray());
 
@@ -64,16 +63,16 @@ class EmployeeController extends Controller
             });
 
         if ($request->get('section_id'))
-            $employees->whereHas('contract' , function ($q) use ($request){
+            $employees->whereHas('contract', function ($q) use ($request) {
                 $q->where('section_id', $request->get('section_id'));
             });
 
         if ($request->get('sector_id'))
-            $employees->whereHas('contract' , function ($q) use ($request){
+            $employees->whereHas('contract', function ($q) use ($request) {
                 $q->where('sector_id', $request->get('sector_id'));
             });
         if ($request->get('tabel_no'))
-            $employees->where('tabel_no' , 'like' , $request->get('tabel_no')."%");
+            $employees->where('tabel_no', 'like', $request->get('tabel_no') . "%");
 
         if ($request->get('is_filter')) {
             $employees = $employees->with([
@@ -81,21 +80,21 @@ class EmployeeController extends Controller
                 'contract:id,employee_id,position_id',
                 'contract.position:id,name'
             ])
-            ->orderBy($orderBy, $sortBy)
-            ->take(50)
-            ->get(['employees.id', 'employees.user_id', 'employees.company_id']);
+                ->orderBy($orderBy, $sortBy)
+                ->take(50)
+                ->get(['employees.id', 'employees.user_id', 'employees.company_id']);
             return $this->successResponse(['data' => $employees]);
         }
 
         $employees = $employees->with([
-                'user:id,name,surname',
-                'user.details:user_id,father_name,gender',
-                'contracts',
-                'contracts.position',
-                'contracts.currency'
-            ])
-        ->orderBy($orderBy, $sortBy)
-        ->paginate($request->input('per_page',200), ['employees.*']);
+            'user:id,name,surname',
+            'user.details:user_id,father_name,gender',
+            'contracts',
+            'contracts.position',
+            'contracts.currency'
+        ])
+            ->orderBy($orderBy, $sortBy)
+            ->paginate($request->input('per_page', 200), ['employees.*']);
 
         return $this->successResponse($employees);
 
@@ -139,7 +138,7 @@ class EmployeeController extends Controller
             'is_active' => ['sometimes', 'required', 'boolean'],
             'user_id' => ['sometimes', 'required', 'integer'],
             'create_contract' => ['required', 'boolean'],
-            'tabel_no' => ['nullable' , 'string' , 'max:255'],
+            'tabel_no' => ['nullable', 'string', 'max:255'],
             'roles' => ['required', 'array', 'min:1'],
             'roles.*' => [
                 Rule::exists('roles', 'id')->where('company_id', $request->get('company_id'))
@@ -169,7 +168,7 @@ class EmployeeController extends Controller
                 'user_id' => $user->getKey(),
             ]);
         } catch (QueryException  $exception) {
-            if ($exception->errorInfo[1] == 1062){
+            if ($exception->errorInfo[1] == 1062) {
                 if (strpos($exception->errorInfo[2], 'employees_user_id_company_id_unique') !== false)
                     return $this->errorResponse(['user_id' => trans('response.userAlreadyWorkOn')], 422);
                 return $this->errorResponse(['fin' => trans('response.alreadyExists')], 422);
@@ -180,9 +179,10 @@ class EmployeeController extends Controller
         }
     }
 
-    private function setUserRoles($roles, $userId, $companyId): void {
+    private function setUserRoles($roles, $userId, $companyId): void
+    {
         $insertData = [];
-        foreach ($roles as $role){
+        foreach ($roles as $role) {
             $insertData[] = [
                 'user_id' => $userId,
                 'company_id' => $companyId,
@@ -223,7 +223,7 @@ class EmployeeController extends Controller
         if ($request->get('roles'))
             $this->setUserRoles($request->get('roles'), $employee->user_id, $request->get('company_id'));
 
-        $data = $request->only(['is_active' , 'tabel_no']);
+        $data = $request->only(['is_active', 'tabel_no']);
 
         if (count($data) != 0)
             Employee::where('id', $id)->update($data);
@@ -243,7 +243,7 @@ class EmployeeController extends Controller
         $employee = Employee::where('company_id', $request->get('company_id'))
             ->where('id', $id)
             ->firstOrFail(['id', 'user_id']);
-        DB::transaction(function () use ($request, $employee){
+        DB::transaction(function () use ($request, $employee) {
             $employee->delete();
             UserRole::where([
                 'user_id' => $employee->user_id,
@@ -254,31 +254,33 @@ class EmployeeController extends Controller
     }
 
 
-    public function getEmployeeWithStructureData(Request $request, $id){
+    public function getEmployeeWithStructureData(Request $request, $id)
+    {
         $employee = Employee::where([
             'id' => $id,
             'company_id' => $request->get('company_id'),
             'is_active' => 1
         ])
-        ->select([
-            'id',
-            'user_id',
-            'tabel_no'
-        ])
-        ->with([
-            'user:id,name,surname',
-            'user.details:user_id,father_name'
-        ])
-        ->firstOrFail();
+            ->select([
+                'id',
+                'user_id',
+                'tabel_no'
+            ])
+            ->with([
+                'user:id,name,surname',
+                'user.details:user_id,father_name'
+            ])
+            ->firstOrFail();
         return $this->successResponse($employee);
     }
 
-    public function setAuthorizedEmployees(Request $request){
+    public function setAuthorizedEmployees(Request $request)
+    {
         $this->validate($request, [
             'employee_ids' => 'required|array'
         ]);
 
-        DB::transaction(function () use ($request){
+        DB::transaction(function () use ($request) {
             Employee::where('company_id', $request->get('company_id'))
                 ->whereIn('id', $request->get('employee_ids'))->update([
                     'is_authorized_employee' => 1
