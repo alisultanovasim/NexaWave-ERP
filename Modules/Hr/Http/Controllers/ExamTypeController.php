@@ -21,7 +21,7 @@ class ExamTypeController extends Controller
             'company_id' => ['required' , 'integer'],
             'paginateCount' => ['sometimes','required' , 'integer'],
         ]);
-        $result = ExamType::where('company_id' , $request->get('company_id'))->paginate($request->get('company_id'));
+        $result = ExamType::where('company_id' , $request->get('company_id'))->paginate($request->input('per_page',200));
 
 
         return $this->dataResponse($result);

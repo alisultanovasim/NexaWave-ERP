@@ -22,7 +22,7 @@ class FacultyController extends Controller
             'paginateCount' => ['sometimes','required' , 'integer'],
         ]);
 
-        $result = Faculty::paginate($request->get('paginateCount'));
+        $result = Faculty::paginate($request->get('per_page',200));
 
         return $this->dataResponse($result);
     }

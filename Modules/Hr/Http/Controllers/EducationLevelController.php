@@ -20,7 +20,7 @@ class EducationLevelController extends Controller
         $this->validate($request , [
             'paginateCount' => ['sometimes','required' , 'integer'],
         ]);
-        $educationLevels = EducationLevel::paginate($request->get('paginateCount'));
+        $educationLevels = EducationLevel::paginate($request->get('per_page',200));
         return $this->dataResponse($educationLevels);
     }
 

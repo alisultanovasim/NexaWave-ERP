@@ -22,7 +22,7 @@ class EducationStateController extends Controller
         ]);
 
 
-        $result = EducationState::paginate($request->get('paginateCount'));
+        $result = EducationState::paginate($request->input('per_page',200));
         return $this->dataResponse($result);
     }
 
