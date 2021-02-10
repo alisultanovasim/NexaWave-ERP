@@ -180,7 +180,8 @@ class ContractController extends Controller
             'dividend_amount' => ['nullable', 'string', 'max:255'],
             'user_personal_property' => ['nullable', 'string', 'max:255'],
             'provided_transport' => ['nullable', 'string', 'max:255'],
-            'res_days' => ['nullable', Rule::in(Contract::WEEK_DAYS)],
+            'res_days' => ['nullable',"array"],
+            'res_days.*'=>["string",Rule::in(Contract::WEEK_DAYS)],
             'work_place_type' => ['nullable', Rule::in(Contract::WORK_PLACE_TYPES)]
         ];
     }
