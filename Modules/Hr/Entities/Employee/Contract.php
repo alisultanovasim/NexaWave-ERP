@@ -11,7 +11,7 @@ class Contract extends Model
 {
 
     protected $casts = [
-        'rest_days' => 'json',
+        'res_days' => 'json',
         'versions' => 'json',
         'additions' => 'json',
     ];
