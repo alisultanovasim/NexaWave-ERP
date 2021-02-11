@@ -79,11 +79,11 @@ class CompanyStructureController extends Controller
         ]);
 
         $structure = $this->getStructureModelByType($request->get('structure_type'));
-        $structure->where([
+       $structure= $structure->where([
             'company_id' => $request->get('company_id'),
             'id' => $request->get('structure_id')
         ])->firstOrFail(['id']);
-        $structure->update([
+       $structure->update([
             'curator_id' => $request->get('curator_id')
         ]);
 
