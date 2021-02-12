@@ -52,7 +52,7 @@ class CompanyStructureController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        $structure = $this->companyStructureService->getStructure($request->get('company_id'), $request->get('with_nested_structure'));
+        $structure = $this->companyStructureService->getoStructure($request->get('company_id'), $request->get('with_nested_structure'));
 
         return $this->successResponse($structure);
     }
@@ -103,26 +103,26 @@ class CompanyStructureController extends Controller
         ]);
 
         $employees = Employee::query()
-//        ->whereHas('contracts', function ($query) use ($request){
-//            if ($request->get('department_id')) {
-//                $query->where('department_id', $request->get('department_id'));
-//            }
-//            if ($request->get('sector_id')) {
-//                $query->where('sector_id', $request->get('sector_id'));
-//            }
-//            if ($request->get('section_id')) {
-//                $query->where('section_id', $request->get('section_id'));
-//            }
-//            if ($request->get('position_id')){
-//                $query->where(['position_id' => $request->get('position_id')]);
-//            }
-//            $query->where(function ($query){
-//                $query->where('end_date', '>', Carbon::now());
-//                $query->orWhere('end_date', null);
-//            });
-//        })
+        ->whereHas('contracts', function ($query) use ($request){
+            if ($request->get('department_id')) {
+                $query->where('department_id', $request->get('department_id'));
+            }
+            if ($request->get('sector_id')) {
+                $query->where('sector_id', $request->get('sector_id'));
+            }
+            if ($request->get('section_id')) {
+                $query->where('section_id', $request->get('section_id'));
+            }
+            if ($request->get('position_id')){
+                $query->where(['position_id' => $request->get('position_id')]);
+            }
+            $query->where(function ($query){
+                $query->where('end_date', '>', Carbon::now());
+                $query->orWhere('end_date', null);
+            });
+        })
             ->with('user:id,name,surname')
-//        ->where('company_id', $request->get('company_id'))
+        ->where('company_id', $request->get('company_id'))
             ->get(['id', 'user_id']);
 
         return $this->successResponse($employees);
