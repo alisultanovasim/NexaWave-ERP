@@ -84,7 +84,7 @@ class Handler extends ExceptionHandler
             $model = strtolower(class_basename($exception->getModel()));
             return $this->errorResponse("Does not exist any instance of {$model} with the given id", Response::HTTP_NOT_FOUND);
         } else if ($exception instanceof AuthorizationException) {
-            return $this->errorResponse($message, Response::HTTP_FORBIDDEN);
+            return $this->errorResponse($exception->getMessage(), Response::HTTP_FORBIDDEN);
         } else if ($exception instanceof AuthenticationException) {
             return $this->errorResponse($exception->getMessage(), Response::HTTP_UNAUTHORIZED);
         } else if ($exception instanceof ValidationException) {
