@@ -52,7 +52,7 @@ class CompanyStructureController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        $structure = $this->companyStructureService->getoStructure($request->get('company_id'), $request->get('with_nested_structure'));
+        $structure = $this->companyStructureService->getStructure($request->get('company_id'), $request->get('with_nested_structure'));
 
         return $this->successResponse($structure);
     }
