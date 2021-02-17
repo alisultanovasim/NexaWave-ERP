@@ -79,11 +79,11 @@ class CompanyStructureController extends Controller
         ]);
 
         $structure = $this->getStructureModelByType($request->get('structure_type'));
-       $structure= $structure->where([
+        $structure = $structure->where([
             'company_id' => $request->get('company_id'),
             'id' => $request->get('structure_id')
         ])->firstOrFail(['id']);
-       $structure->update([
+        $structure->update([
             'curator_id' => $request->get('curator_id')
         ]);
 
@@ -102,27 +102,30 @@ class CompanyStructureController extends Controller
             'position_id' => 'nullable|numeric'
         ]);
 
-        $employees = Employee::query()
-//        ->whereHas('contracts', function ($query) use ($request){
-//            if ($request->get('department_id')) {
-//                $query->where('department_id', $request->get('department_id'));
-//            }
-//            if ($request->get('sector_id')) {
-//                $query->where('sector_id', $request->get('sector_id'));
-//            }
-//            if ($request->get('section_id')) {
-//                $query->where('section_id', $request->get('section_id'));
-//            }
-//            if ($request->get('position_id')){
-//                $query->where(['position_id' => $request->get('position_id')]);
-//            }
-//            $query->where(function ($query){
-//                $query->where('end_date', '>', Carbon::now());
-//                $query->orWhere('end_date', null);
-//            });
-//        })
-            ->with('user:id,name,surname')
-//        ->where('company_id', $request->get('company_id'))
+
+        $employees = Employee::with('user:id,name,surname')
+            ->where(function ($q) use ($request) {
+                $q->doesntHave("contracts")
+                    ->orWhereHas('contracts', function ($query) use ($request) {
+                        if ($request->get('department_id')) {
+                            $query->where('department_id', $request->get('department_id'));
+                        }
+                        if ($request->get('sector_id')) {
+                            $query->where('sector_id', $request->get('sector_id'));
+                        }
+                        if ($request->get('section_id')) {
+                            $query->where('section_id', $request->get('section_id'));
+                        }
+                        if ($request->get('position_id')) {
+                            $query->where(['position_id' => $request->get('position_id')]);
+                        }
+                        $query->where(function ($query) {
+                            $query->where('end_date', '>', Carbon::now());
+                            $query->orWhere('end_date', null);
+                        });
+                    });
+            })
+            ->where('company_id', $request->input('company_id'))
             ->get(['id', 'user_id']);
 
         return $this->successResponse($employees);
