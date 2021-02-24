@@ -411,7 +411,7 @@ class UserController extends Controller
     }
 
     /**
-     * @return string[]
+     * @return array[]
      */
     public static function updateRules()
     {
@@ -462,6 +462,7 @@ class UserController extends Controller
     /**
      * @param Request $request
      * @return mixed
+     * @throws ValidationException
      */
     public static function createUser(Request $request)
     {
@@ -505,7 +506,7 @@ class UserController extends Controller
             'driving_license_number',
             'driving_license_categories',
             'driving_license_organ',
-            'driving_license_get_at',
+            'driving_license_get_date',
             'driving_license_expire_date',
             'foreign_passport_number',
             'foreign_passport_organ',

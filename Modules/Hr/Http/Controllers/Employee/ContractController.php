@@ -93,10 +93,10 @@ class ContractController extends Controller
         ]);
 
 
-        $data['salary'] = (int)$data['salary']+(int)$request->get('position_salary_praise_about') +
-            +(int)$request->header('addition_package_fee') +
-            +(int)$request->get('work_environment_addition') +
-            +(int)$request->get('overtime_addition');
+        $data['salary'] = (float)$data['salary']+(float)$request->get('position_salary_praise_about') +
+            +(float)$request->header('addition_package_fee') +
+            +(float)$request->get('work_environment_addition') +
+            +(float)$request->get('overtime_addition');
 
         $contract = Contract::create($data);
 
@@ -120,7 +120,7 @@ class ContractController extends Controller
             'position_id' => ['required', 'integer'],//exists m
 //            'salary' => ['required', 'numeric'],
             'start_date' => ['required', 'date', 'date_format:Y-m-d'],
-            'end_date' => ['required', 'date', 'date_format:Y-m-d'],
+            'end_date' => ['sometimes','required', 'date', 'date_format:Y-m-d'],
             'employee_id' => ['required', 'integer'],//exists m
             'personal_category_id' => ['nullable', 'integer'],//exists
             'specialization_degree_id' => ['nullable', 'integer'],//exists
