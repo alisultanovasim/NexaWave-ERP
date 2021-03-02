@@ -353,7 +353,7 @@ class MeetingRoomController extends Controller
             'start_at' => 'required|date|date_format:Y-m-d H:i:s',
             'finish_at' => 'required|date|date_format:Y-m-d H:i:s',
             'event_name' => 'required|min:2|max:255',
-            'description' => 'sometimes|required',
+            'description' => 'sometimes|required|nullable',
             'time_zone' => 'sometimes|required',
             'meeting_room' => 'required|integer',
         ]);

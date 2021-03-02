@@ -111,7 +111,8 @@ class OfficeController extends Controller
     /**
      * @param Request $request
      * @return JsonResponse
-     * @throws ValidationException
+     * @throws ValidationException|\Throwable
+     * @throws \Throwable
      */
     public function store(Request $request)
     {
@@ -260,7 +261,7 @@ class OfficeController extends Controller
                 $locations[] = $arr;
             }
 
-            Location::insert($locations);  
+            Location::insert($locations);
 
             if ($request->has('documents')) {
                 $documents = [];
@@ -275,8 +276,6 @@ class OfficeController extends Controller
                 Document::insert($documents);
 
             }
-
-
             $ps = $request->has('set_password') ? $request->get('set_password') : Str::random(9);
             $user = User::create([
                 'name' => $request->get('name'),
@@ -1143,6 +1142,11 @@ class OfficeController extends Controller
         DB::commit();
 
         return $this->successResponse('OK');
+    }
+
+    public function addModuleToOffice()
+    {
+
     }
 
     /**
