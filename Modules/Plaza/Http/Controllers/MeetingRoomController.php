@@ -69,7 +69,7 @@ class MeetingRoomController extends Controller
             'company_id' => 'required|integer',
 
             'size' => 'required|numeric',
-            'description' => 'sometimes|required',
+            'description' => 'sometimes|nullable',
             'name' => 'required|string|max:255',
 
             'images' => 'sometimes|required|array',

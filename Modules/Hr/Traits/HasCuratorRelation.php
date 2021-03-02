@@ -16,10 +16,10 @@ trait HasCuratorRelation
         return $this->hasOneThrough(
             User::class,
             Employee::class,
-            'user_id',
+            'id',
             'id',
             'curator_id',
-            'id'
+            'user_id'
         )->select(['users.id', 'users.name', 'users.surname']);
     }
 }
