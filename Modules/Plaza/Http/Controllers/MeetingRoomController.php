@@ -39,11 +39,11 @@ class MeetingRoomController extends Controller
     {
         $this->validate($request, [
             'company_id' => 'required|integer',
-
             'with_images' => ['sometimes', 'required', 'boolean']
         ]);
         try {
-            $rooms = MeetingRooms::with(['type'])->where('company_id', $request->company_id)
+            $rooms = MeetingRooms::with(['type'])
+//                ->where('company_id', $request->company_id)
                 ->orderBy('id', 'desc');
 
             if ($request->with_images) $rooms->with(['images']);
