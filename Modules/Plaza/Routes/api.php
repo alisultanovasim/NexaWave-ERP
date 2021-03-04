@@ -4,18 +4,18 @@ use Illuminate\Support\Facades\Route;
 
 Route::group([
     'prefix' => 'v1/plaza',
-    'middleware' =>   ['auth:api' , 'authorize']
+    'middleware' => ['auth:api', 'authorize']
 ], function ($route) {
 
     Route::group([
         'prefix' => 'floors'
     ], function () {
-            Route::get('/', 'FloorController@index');
-            Route::post('/', 'FloorController@store');
-            Route::get('/{id}', 'FloorController@show');
-            Route::post('/update/{id}', 'FloorController@update');
-            Route::post('/destroy/{id}'  ,'FloorController@destroy');
-        }); //floors
+        Route::get('/', 'FloorController@index');
+        Route::post('/', 'FloorController@store');
+        Route::get('/{id}', 'FloorController@show');
+        Route::post('/update/{id}', 'FloorController@update');
+        Route::post('/destroy/{id}', 'FloorController@destroy');
+    }); //floors
 
     Route::group([
         'prefix' => 'offices'
@@ -73,41 +73,41 @@ Route::group([
     Route::group([
         'prefix' => 'workers'
     ], function ($route) {
-        Route::get('/' , 'WorkerController@index');
-        Route::get('/all' , 'WorkerController@all');
-        Route::post('/' , 'WorkerController@store');
-        Route::get('/{id}' , 'WorkerController@show');
-        Route::post('/update/{id}' , 'WorkerController@update');
-        Route::post('/delete/{id}' , 'WorkerController@delete');
+        Route::get('/', 'WorkerController@index');
+        Route::get('/all', 'WorkerController@all');
+        Route::post('/', 'WorkerController@store');
+        Route::get('/{id}', 'WorkerController@show');
+        Route::post('/update/{id}', 'WorkerController@update');
+        Route::post('/delete/{id}', 'WorkerController@delete');
     }); //workers
 
     Route::group([
         'prefix' => 'attendance'
     ], function ($route) {
-        Route::get('/' , 'AttendanceController@index');
-        Route::get('/advance' , 'AttendanceController@showByOffice');
-        Route::post('/' , 'AttendanceController@store');
+        Route::get('/', 'AttendanceController@index');
+        Route::get('/advance', 'AttendanceController@showByOffice');
+        Route::post('/', 'AttendanceController@store');
     }); //attendance
 
 
     Route::group([
         'prefix' => 'roles'
     ], function ($route) {
-        Route::get('/' , 'WorkerController@getRoles');
-        Route::post('/' , 'WorkerController@storeRole');
-        Route::get('/{id}' , 'WorkerController@showRole');
-        Route::post('/update/{id}' , 'WorkerController@updateRole');
-        Route::post('/delete/{id}' , 'WorkerController@deleteRole');
+        Route::get('/', 'WorkerController@getRoles');
+        Route::post('/', 'WorkerController@storeRole');
+        Route::get('/{id}', 'WorkerController@showRole');
+        Route::post('/update/{id}', 'WorkerController@updateRole');
+        Route::post('/delete/{id}', 'WorkerController@deleteRole');
     }); //roles
 
     Route::group([
         'prefix' => 'cards'
     ], function ($route) {
-        Route::get('/' , 'CardController@index');
-        Route::post('/' , 'CardController@store');
-        Route::get('/{id}' , 'CardController@show');
-        Route::post('/update/{id}' , 'CardController@update');
-        Route::post('/delete/{id}' , 'CardController@delete');
+        Route::get('/', 'CardController@index');
+        Route::post('/', 'CardController@store');
+        Route::get('/{id}', 'CardController@show');
+        Route::post('/update/{id}', 'CardController@update');
+        Route::post('/delete/{id}', 'CardController@delete');
     }); //roles
 
     Route::group([
@@ -160,37 +160,37 @@ Route::group([
     }); //offers
 
     Route::group([
-        'prefix'=>'dialogs'
-    ] , function(){
+        'prefix' => 'dialogs'
+    ], function () {
 
-        Route::group(['prefix'=>'offices'] , function(){
-            Route::get('/' , 'DialogController@getDialogWithPlaza');
-            Route::get('/{id}' , 'DialogController@showDialogWithPlaza');
-            Route::post('/update/{id}' , 'DialogController@updateDialogForOffice');
+        Route::group(['prefix' => 'offices'], function () {
+            Route::get('/', 'DialogController@getDialogWithPlaza');
+            Route::get('/{id}', 'DialogController@showDialogWithPlaza');
+            Route::post('/update/{id}', 'DialogController@updateDialogForOffice');
 
-            Route::post('/' , 'DialogController@createToPlaza');
-            Route::post('/message/{id}' , 'DialogController@addMessageFromOffice');
+            Route::post('/', 'DialogController@createToPlaza');
+            Route::post('/message/{id}', 'DialogController@addMessageFromOffice');
         });
 
-        Route::group(['prefix'=>'plaza'] , function(){
-            Route::get('/' , 'DialogController@getDialogWithOffices');
-            Route::get('/{id}' , 'DialogController@showDialogWithOffices');
-            Route::post('/assign/{id}' , 'DialogController@updateDialogForPlaza');
-            Route::post('/' , 'DialogController@createToOffice');
-            Route::post('/message/{id}' , 'DialogController@addMessageFromPlaza');
+        Route::group(['prefix' => 'plaza'], function () {
+            Route::get('/', 'DialogController@getDialogWithOffices');
+            Route::get('/{id}', 'DialogController@showDialogWithOffices');
+            Route::post('/assign/{id}', 'DialogController@updateDialogForPlaza');
+            Route::post('/', 'DialogController@createToOffice');
+            Route::post('/message/{id}', 'DialogController@addMessageFromPlaza');
         });
-        Route::get('/kinds' , 'KindController@index');
+        Route::get('/kinds', 'KindController@index');
 
     });
     Route::group([
         'prefix' => 'specializations'
     ], function () {
-        Route::get('/' , 'SpecializationController@index');
-        Route::get('/{id}' , 'SpecializationController@show');
+        Route::get('/', 'SpecializationController@index');
+        Route::get('/{id}', 'SpecializationController@show');
 
-        Route::post('/' , 'SpecializationController@store');
-        Route::post('/update/{id}' , 'SpecializationController@update');
-        Route::post('/delete/{id}' , 'SpecializationController@delete');
+        Route::post('/', 'SpecializationController@store');
+        Route::post('/update/{id}', 'SpecializationController@update');
+        Route::post('/delete/{id}', 'SpecializationController@delete');
 
     }); //specializations
 
