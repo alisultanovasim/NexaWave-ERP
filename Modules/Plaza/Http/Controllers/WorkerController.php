@@ -146,11 +146,10 @@ class WorkerController extends Controller
             'company_id' => 'required|integer',
             'name' => 'sometimes|required|min:2|max:255',
             'gender'=> 'sometimes|required|in:1,2',
-
             'office_id' => 'required|integer',
             'description' => 'nullable|max:255',
             'role_id' => 'sometimes|required|integer',
-            'card' => 'sometimes|required|integer'
+            'card' => 'sometimes|nullable|required|integer'
         ]);
         $arr = $request->only('name', 'description', 'office_id', 'role_id' ,'gender');
         try {
