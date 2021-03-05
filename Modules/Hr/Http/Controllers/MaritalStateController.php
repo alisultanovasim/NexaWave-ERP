@@ -22,6 +22,7 @@ class MaritalStateController extends Controller
             'paginateCount' => ['sometimes','required' , 'integer'],
         ]);
         $result = MaritalState::where('company_id' , $request->get('company_id'))
+            ->orWhereNull('company_id')
             ->paginate($request->get('paginateCount'));
 
         return $this->dataResponse($result);
