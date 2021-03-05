@@ -4,6 +4,8 @@ namespace Modules\Plaza\Http\Controllers;
 
 
 use Illuminate\Foundation\Validation\ValidatesRequests;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Validation\ValidationException;
 use Modules\Plaza\Entities\Card;
 use Modules\Plaza\Entities\Office;
 use Modules\Plaza\Entities\Role;
@@ -13,98 +15,127 @@ use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
+
+/**
+ * Class WorkerController
+ * @package Modules\Plaza\Http\Controllers
+ */
 class WorkerController extends Controller
 {
-    use  ApiResponse  , ValidatesRequests;
+    use  ApiResponse, ValidatesRequests;
 
-    public function all(Request $request){
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     * @throws ValidationException
+     */
+    public function all(Request $request)
+    {
         $this->validate($request, [
             'company_id' => 'required|integer',
-            'name'=> 'sometimes|nullable|string|max:255',
-            'has_card'=>'sometimes|required|in:1,0'
+            'name' => 'sometimes|nullable|string|max:255',
+            'has_card' => 'sometimes|required|in:1,0'
         ]);
-            $workers = Worker::with(['card:id,alias','role:id,name', 'office:id,name'])->whereHas('office' , function ($q) use ($request) {
-                $q->where('company_id' ,$request->company_id);
-            });
+        $workers = Worker::with(['card:id,alias', 'role:id,name', 'office:id,name,company_id'])
+            ->whereHas('office', function ($q) use ($request) {
+                $q->where("company_id","=",$request->input("company_id"));
+        });
 
-            if ($request->has('name') and $request->name)
-                $workers->where('name' , 'like' , "%{$request->name}%");
-            if ($request->has('has_card')){
-                if ($request->has_card){
-                    $workers->whereNotNull('card');
-                }else{
-                    $workers->whereNull('card');
-                }
+        if ($request->has('name') and $request->name) {
+            $workers->where('name', 'like', "%{$request->name}%");
+        }
+        if ($request->has('has_card')) {
+            if ($request->has_card) {
+                $workers->whereNotNull('card');
+            } else {
+                $workers->whereNull('card');
             }
+        }
 
-            $workers = $workers->get();
+        $workers = $workers->get();
 
-            return $this->successResponse($workers);
+        return $this->successResponse($workers);
 
 
     }
 
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     * @throws ValidationException
+     */
     public function index(Request $request)
     {
         $this->validate($request, [
             'company_id' => 'required|integer',
             'role_id' => 'sometimes|required|integer',
-            'has_card'=> 'sometimes|required|in:0,1'
+            'has_card' => 'sometimes|required|in:0,1'
         ]);
 
 
-            $workers = Worker::with(['card:id,alias','role:id,name' , 'office:id,name']);
-            if ($request->has('office_id') and $request->get('office_id') != "null"){
+        $workers = Worker::with(['card:id,alias', 'role:id,name', 'office:id,name']);
+        if ($request->has('office_id') and $request->get('office_id') != "null") {
 
-                $check = Office::where('company_id', $request->company_id)->where('id', $request->office_id)->exists();
-                if (!$check) return $this->errorResponse(trans('apiResponse.unProcess'));
+            $check = Office::where('company_id', $request->company_id)->where('id', $request->office_id)->exists();
+            if (!$check) return $this->errorResponse(trans('apiResponse.unProcess'));
 
-                $workers->where("office_id", $request->office_id);
+            $workers->where("office_id", $request->office_id);
+        }
+
+
+        if ($request->has('name'))
+            $workers->where('name', 'like', "%{$request->name}%");
+
+        if ($request->has('role_id'))
+            $workers->where('role_id', $request->role_id);
+
+        if ($request->has('has_card')) {
+            if ($request->has_card) {
+                $workers->whereNotNull('card');
+            } else {
+                $workers->whereNull('card');
             }
+        }
+
+        $workers = $workers->get();
 
 
-            if ($request->has('name'))
-                $workers->where('name' , 'like' , "%{$request->name}%");
-
-            if ($request->has('role_id'))
-                $workers->where('role_id' , $request->role_id  );
-
-            if ($request->has('has_card')){
-                if ($request->has_card){
-                    $workers->whereNotNull('card');
-                }else{
-                    $workers->whereNull('card');
-                }
-            }
-
-           $workers= $workers->get();
-
-
-            return $this->successResponse($workers);
+        return $this->successResponse($workers);
 
     }
 
+    /**
+     * @param Request $request
+     * @param $id
+     * @return JsonResponse
+     * @throws ValidationException
+     */
     public function show(Request $request, $id)
     {
         $this->validate($request, [
             'company_id' => 'required|integer',
             'office_id' => 'required|integer'
         ]);
-            $check = Office::where('company_id', $request->company_id)->where('id', $request->office_id)->exists();
-            if (!$check) return $this->errorResponse(trans('apiResponse.unProcess'));
+        $check = Office::where('company_id', $request->company_id)->where('id', $request->office_id)->exists();
+        if (!$check) return $this->errorResponse(trans('apiResponse.unProcess'));
 
-            $workers = Worker::with(['card:id,alias','role:id,name' , 'office:id,name'])->where('id', $id)->where("office_id", $request->office_id)->get();
+        $workers = Worker::with(['card:id,alias', 'role:id,name', 'office:id,name'])->where('id', $id)->where("office_id", $request->office_id)->get();
 
-            return $this->successResponse($workers);
+        return $this->successResponse($workers);
 
     }
 
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     * @throws ValidationException
+     */
     public function store(Request $request)
     {
         $this->validate($request, [
             'company_id' => 'required|integer',
             'name' => 'required|min:2|max:255',
-            'gender'=>'required|in:1,2',
+            'gender' => 'required|in:1,2',
             'office_id' => 'required|integer',
             'role_id' => 'required|integer',
 
@@ -117,15 +148,15 @@ class WorkerController extends Controller
             if (!$check) return $this->errorResponse(trans('apiResponse.unProcess'));
 
             $worker = new Worker();
-            if ($request->has('card')){
-               $check =  Card::where('company_id' , $request->company_id)->where('id' , $request->card)->exists();
-               if (!$check) return $this->errorResponse(trans('apiResponse.cardNotFound'));
+            if ($request->has('card')) {
+                $check = Card::where('company_id', $request->company_id)->where('id', $request->card)->exists();
+                if (!$check) return $this->errorResponse(trans('apiResponse.cardNotFound'));
 
             }
-            $worker->fill($request->only('name', 'description', 'office_id', 'role_id' , 'gender', 'card'));
+            $worker->fill($request->only('name', 'description', 'office_id', 'role_id', 'gender', 'card'));
             $worker->save();
             return $this->successResponse('OK');
-        }catch (QueryException $e) {
+        } catch (QueryException $e) {
             if ($e->errorInfo[1] == 1452) {
                 if (preg_match("/\(\`[a-z\_]+\`\)/", $e->errorInfo[2], $find)) {
                     $info = substr($find[0], 2, -2);
@@ -140,29 +171,35 @@ class WorkerController extends Controller
         }
     }
 
+    /**
+     * @param Request $request
+     * @param $id
+     * @return JsonResponse
+     * @throws ValidationException
+     */
     public function update(Request $request, $id)
     {
         $this->validate($request, [
             'company_id' => 'required|integer',
             'name' => 'sometimes|required|min:2|max:255',
-            'gender'=> 'sometimes|required|in:1,2',
+            'gender' => 'sometimes|required|in:1,2',
             'office_id' => 'required|integer',
             'description' => 'nullable|max:255',
             'role_id' => 'sometimes|required|integer',
             'card' => 'sometimes|nullable|required|integer'
         ]);
-        $arr = $request->only('name', 'description', 'office_id', 'role_id' ,'gender');
+        $arr = $request->only('name', 'description', 'office_id', 'role_id', 'gender');
         try {
             $check = Office::where('id', $request->office_id)->where('company_id', $request->company_id)
                 ->exists();
             if (!$check) return $this->errorResponse(trans('apiResponse.unProcess'));
 
-            if ($request->has('card')){
-                if ($request->card){
-                    $check =  Card::where('company_id' , $request->company_id)->where('id' , $request->card)->exists();
+            if ($request->has('card')) {
+                if ($request->card) {
+                    $check = Card::where('company_id', $request->company_id)->where('id', $request->card)->exists();
                     if (!$check) return $this->errorResponse(trans('apiResponse.cardNotFound'));
                     $arr['card'] = $request->card;
-                }else{
+                } else {
                     $arr['card'] = null;
                 }
 
@@ -178,6 +215,12 @@ class WorkerController extends Controller
         }
     }
 
+    /**
+     * @param Request $request
+     * @param $id
+     * @return JsonResponse
+     * @throws ValidationException
+     */
     public function delete(Request $request, $id)
     {
         $this->validate($request, [
@@ -200,6 +243,11 @@ class WorkerController extends Controller
         }
     }
 
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     * @throws ValidationException
+     */
     public function getRoles(Request $request)
     {
         $this->validate($request, [
@@ -218,7 +266,13 @@ class WorkerController extends Controller
         }
     }
 
-    public function showRole(Request $request , $id)
+    /**
+     * @param Request $request
+     * @param $id
+     * @return JsonResponse
+     * @throws ValidationException
+     */
+    public function showRole(Request $request, $id)
     {
         $this->validate($request, [
 
@@ -228,7 +282,7 @@ class WorkerController extends Controller
         try {
             $check = Office::where('company_id', $request->company_id)->where('id', $request->office_id)->exists();
             if (!$check) return $this->errorResponse(trans('apiResponse.unProcess'));
-            $roles = Role::where('id' , $id)->where('office_id', $request->office_id)->where('company_id', $request->company_id)->get(['id', 'name']);
+            $roles = Role::where('id', $id)->where('office_id', $request->office_id)->where('company_id', $request->company_id)->get(['id', 'name']);
             if (!$roles) return $this->errorResponse(trans('apiResponse.roleNotFound'));
             return $this->successResponse($roles);
 
@@ -237,6 +291,11 @@ class WorkerController extends Controller
         }
     }
 
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     * @throws ValidationException
+     */
     public function storeRole(Request $request)
     {
         $this->validate($request, [
@@ -258,6 +317,12 @@ class WorkerController extends Controller
 
     }
 
+    /**
+     * @param Request $request
+     * @param $id
+     * @return JsonResponse
+     * @throws ValidationException
+     */
     public function updateRole(Request $request, $id)
     {
         $this->validate($request, [
@@ -279,6 +344,12 @@ class WorkerController extends Controller
 
     }
 
+    /**
+     * @param Request $request
+     * @param $id
+     * @return JsonResponse
+     * @throws ValidationException
+     */
     public function deleteRole(Request $request, $id)
     {
         $this->validate($request, [
