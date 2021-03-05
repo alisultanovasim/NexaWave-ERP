@@ -21,7 +21,8 @@ class MaritalStateController extends Controller
             'company_id' => ['required' , 'integer'],
             'paginateCount' => ['sometimes','required' , 'integer'],
         ]);
-        $result = MaritalState::where('company_id' , $request->get('company_id'))->paginate($request->get('company_id'));
+        $result = MaritalState::where('company_id' , $request->get('company_id'))
+            ->paginate($request->get('paginateCount'));
 
         return $this->dataResponse($result);
     }
