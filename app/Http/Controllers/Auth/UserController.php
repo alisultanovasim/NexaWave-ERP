@@ -211,7 +211,7 @@ class UserController extends Controller
         if ($resetCountForToday >= $userReset->getDailyResetCount())
             return $this->errorResponse(trans('responses.extend_daily_reset_limit'), 400);
         $hash = $userReset->getRandomHash();
-        $resetUrl = env('RESET_PASSWORD_URL') . '?hash=' . $hash;
+        $resetUrl = config("app.reset_password_url") . '?hash=' . $hash;
         $userReset->fill([
             'id' => Str::uuid(),
             'email' => $request->get('email'),
@@ -362,7 +362,6 @@ class UserController extends Controller
     }
 
     /**
-     * @return string[]
      */
     public static function rules()
     {
