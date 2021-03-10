@@ -36,9 +36,6 @@ pipeline {
       steps {
         sh 'ssh-keyscan api.oneof.az >> ~/.ssh/known_hosts'
         sh 'php artisan deploy api.oneof.az -s upload'
-        //Deploy also development
-        sh 'ssh-keyscan time-vps1.serverxx.com >> ~/.ssh/known_hosts'
-        sh 'php artisan deploy time-vps1.serverxx.com -s upload'
       }
 
 
