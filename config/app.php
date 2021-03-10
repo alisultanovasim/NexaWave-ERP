@@ -54,6 +54,7 @@ return [
     */
 
     'url' => env('APP_URL', 'http://localhost'),
+    "reset_password_url" => env("RESET_PASSWORD_URL", "https://oneof.az/change-password"),
 
     'asset_url' => env('ASSET_URL', null),
 
@@ -68,7 +69,7 @@ return [
     |
     */
 
-    'timezone' => 'UTC',
+    'timezone' => 'Asia/Baku',
 
     /*
     |--------------------------------------------------------------------------
