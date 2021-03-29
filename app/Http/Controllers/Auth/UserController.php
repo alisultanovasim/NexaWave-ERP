@@ -217,7 +217,7 @@ class UserController extends Controller
             'email' => $request->get('email'),
             'user_ip' => $request->ip(),
             'user_agent' => $request->userAgent(),
-            'hash' => $userReset->getRandomHash(),
+            'hash' => $hash,
             'expire_date' => Carbon::now()->addSeconds($userReset->getExpireTime())
         ]);
         $userReset->save();

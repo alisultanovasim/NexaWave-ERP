@@ -113,6 +113,7 @@ class EmployeeController extends Controller
             'contracts.section:id,name',
             'contracts.sector:id,name',
             'contracts.specializationDegree',
+            'contracts.contract_type',
             'contracts.personalCategory',
             'user.roles:user_roles.user_id,user_roles.role_id',
             'user.details',
@@ -121,11 +122,18 @@ class EmployeeController extends Controller
             'user.details.birthdayCity',
             'user.details.birthdayCountry',
             'user.details.birthdayRegion',
+            'user.details.eyeColor',
+            'user.details.birthdayRegion',
+            'user.details.birthdayRegion',
+            'user.details.birthdayCountry',
+            'user.details.birthdayCity',
+            'user.details.blood',
         ])
             ->where('id', $id)
             ->where('company_id', $request->get('company_id'))
             ->first();
 
+//        dd($employees->user->details);
         if (!$employees) return $this->errorResponse(trans('response.employeeNotFound'), Response::HTTP_NOT_FOUND);
 
         return $this->successResponse($employees);
