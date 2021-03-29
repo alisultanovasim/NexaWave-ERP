@@ -5,6 +5,7 @@ namespace Modules\Hr\Entities\Employee;
 use Illuminate\Database\Eloquent\Model;
 use Modules\Hr\Entities\BloodGroup;
 use Modules\Hr\Entities\Color;
+use Modules\Hr\Entities\MaritalState;
 
 class UserDetail extends Model
 {
@@ -81,6 +82,11 @@ class UserDetail extends Model
     public function birthdayRegion()
     {
         return $this->belongsTo('Modules\Hr\Entities\Region');
+    }
+
+    public function familyStatusState()
+    {
+        return $this->belongsTo(MaritalState::class);
     }
 
     public function blood()
