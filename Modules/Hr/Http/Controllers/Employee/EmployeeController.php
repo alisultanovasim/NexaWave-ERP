@@ -128,6 +128,7 @@ class EmployeeController extends Controller
             'user.details.birthdayCountry',
             'user.details.birthdayCity',
             'user.details.blood',
+            'user.details.familyStatusState',
         ])
             ->where('id', $id)
             ->where('company_id', $request->get('company_id'))

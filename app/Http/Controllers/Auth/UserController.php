@@ -531,8 +531,9 @@ class UserController extends Controller
      * @param Request $request
      * @param $id
      * @return bool
+     * @throws ValidationException
      */
-    public static function updateUser(Request $request, $id)
+    public static function updateUser(Request $request, $id): bool
     {
         Validator::make($request->all(), self::updateRules())->validate();
         $data = $request->only('name', 'email', 'voen', 'surname');
