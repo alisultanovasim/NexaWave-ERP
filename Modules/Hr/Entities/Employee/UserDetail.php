@@ -3,12 +3,14 @@
 namespace Modules\Hr\Entities\Employee;
 
 use Illuminate\Database\Eloquent\Model;
+use Modules\Hr\Entities\BloodGroup;
+use Modules\Hr\Entities\Color;
 
 class UserDetail extends Model
 {
-    const DRIVING_CATEGORIES = ['A1','A','B','C','D','E'];
+    const DRIVING_CATEGORIES = ['A1', 'A', 'B', 'C', 'D', 'E'];
     protected $table = 'user_details';
-    protected  $guarded = ['id'];
+    protected $guarded = ['id'];
 //    protected $fillable = [
 //        'fin',
 //        'birthday',
@@ -49,33 +51,50 @@ class UserDetail extends Model
 //        'social_insurance_no'
 //    ];
 
-    public function user(){
+    public function user()
+    {
         return $this->belongsTo('App\Models\User');
     }
 
-    public function nationality(){
+    public function nationality()
+    {
         return $this->belongsTo('Modules\Hr\Entities\Nationality');
     }
 
-    public function citizen(){
+    public function citizen()
+    {
         return $this->belongsTo('Modules\Hr\Entities\Country');
     }
 
 
-    public function birthdayCity(){
+    public function birthdayCity()
+    {
         return $this->belongsTo('Modules\Hr\Entities\City');
     }
 
 
-    public function birthdayCountry(){
+    public function birthdayCountry()
+    {
         return $this->belongsTo('Modules\Hr\Entities\Country');
     }
 
-    public function birthdayRegion(){
+    public function birthdayRegion()
+    {
         return $this->belongsTo('Modules\Hr\Entities\Region');
     }
 
-    public function getAvatarAttribute($value){
+    public function blood()
+    {
+        return $this->belongsTo(BloodGroup::class, "blood_id");
+    }
+
+    public function eyeColor()
+    {
+        return $this->belongsTo(Color::class, "eye_color_id");
+    }
+
+    public function getAvatarAttribute($value)
+    {
         if ($value)
             return env("APP_URL") . "/storage/public/users/" . $value;
         return null;

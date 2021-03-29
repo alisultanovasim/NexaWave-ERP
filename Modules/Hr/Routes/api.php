@@ -525,7 +525,7 @@ Route::group([
         });
     });
 
-    Route::group(['prefix' => 'time/tracking'], function (){
+    Route::group(['prefix' => 'time/tracking'], function () {
 
         Route::group(['prefix' => 'work/events'], function ($router) {
             Route::get('/', 'WorkEventController@index');
@@ -535,7 +535,7 @@ Route::group([
             Route::delete('/{id}', 'WorkEventController@destroy');
         });
 
-        Route::group(['prefix' => 'vacation/planning'], function (){
+        Route::group(['prefix' => 'vacation/planning'], function () {
             Route::get('/', 'VacationPlanningController@index');
             Route::get('/{id}', 'VacationPlanningController@show');
             Route::post('/', 'VacationPlanningController@create');
@@ -543,31 +543,31 @@ Route::group([
             Route::delete('/{id}', 'VacationPlanningController@destroy');
         });
 
-        Route::group(['prefix' => 'past/unused/vacation'], function (){
+        Route::group(['prefix' => 'past/unused/vacation'], function () {
             Route::get('/', 'PastUnusedVacationController@index');
             Route::post('/', 'PastUnusedVacationController@create');
             Route::put('/{id}', 'PastUnusedVacationController@update');
             Route::delete('/{id}', 'PastUnusedVacationController@destroy');
         });
 
-        Route::group(['prefix' => 'labor/vacation'], function (){
+        Route::group(['prefix' => 'labor/vacation'], function () {
             Route::get('/', 'LaborVacationTrackingController@index');
         });
 
-        Route::group(['prefix' => 'work/calendar'], function (){
+        Route::group(['prefix' => 'work/calendar'], function () {
             Route::get('/', 'WorkCalendarController@index');
             Route::post('/', 'WorkCalendarController@create');
             Route::delete('/{id}', 'WorkCalendarController@remove');
         });
 
-        Route::group(['prefix' => 'event'], function (){
+        Route::group(['prefix' => 'event'], function () {
             Route::get('/', 'CompanyEventController@index');
             Route::post('/', 'CompanyEventController@create');
             Route::put('/{id}', 'CompanyEventController@update');
             Route::delete('/{id}', 'CompanyEventController@remove');
         });
 
-        Route::group(['prefix' => 'work/hours'], function (){
+        Route::group(['prefix' => 'work/hours'], function () {
             Route::get('/', 'CompanyWorkingHourController@index');
             Route::get('/{id}', 'CompanyWorkingHourController@show');
             Route::post('/', 'CompanyWorkingHourController@create');
@@ -575,7 +575,7 @@ Route::group([
             Route::delete('/{id}', 'CompanyWorkingHourController@destroy');
         });
 
-        Route::group(['prefix' => 'work/skips'], function (){
+        Route::group(['prefix' => 'work/skips'], function () {
             Route::get('/main', 'WorkSkipsController@getMainWorkSkips');
             Route::get('/', 'WorkSkipsController@index');
             Route::get('/{id}', 'WorkSkipsController@show');
@@ -586,7 +586,7 @@ Route::group([
 
     });
 
-    Route::group(['prefix' => 'company/structure'], function (){
+    Route::group(['prefix' => 'company/structure'], function () {
         Route::post('/set/curator', 'CompanyStructureController@setCuratorToStructure');
         Route::post('/add', 'CompanyStructureController@companyCreateStructures');
         Route::put('/{id}', 'CompanyStructureController@companyUpdateStructure');
@@ -600,13 +600,13 @@ Route::group([
 
     Route::get('company/staff/schedule', 'CompanyStaffScheduleController@index');
 
-    Route::group(['prefix' => 'company/authorized/employees'], function (){
+    Route::group(['prefix' => 'company/authorized/employees'], function () {
         Route::get('/', 'CompanyAuthorizedUsersController@index');
         Route::post('/', 'CompanyAuthorizedUsersController@addOrUpdateAuthorizedEmployee');
         Route::delete('/', 'CompanyAuthorizedUsersController@removeEmployeeFromAuthorizedUsers');
     });
 
-    Route::group(['prefix' => 'company/orders'], function (){
+    Route::group(['prefix' => 'company/orders'], function () {
         Route::get('/', 'CompanyOrderController@index');
         Route::get('/employees', 'CompanyOrderController@getOrderEmployees');
         Route::post('/', 'CompanyOrderController@create');
@@ -615,6 +615,5 @@ Route::group([
         Route::put('/confirm/{id}', 'CompanyOrderController@confirm');
         Route::delete('/{id}', 'CompanyOrderController@destroy');
     });
-
 });
 
