@@ -56,10 +56,6 @@ class EmployeeController extends Controller
         $orderBy = $request->get('order_by') ?? 'employees.id';
         $sortBy = $request->get('sort_by') == 'asc' ? 'asc' : 'desc';
 
-        $isTerminatedQuery = Contract::whereColumn("employee_contracts.employee_id", "=", "employees.id")
-            ->select("is_terminated")->where("is_active", "=", true)->orderByDesc("created_at")
-            ->limit(1)->getQuery();
-
         if ($notExists = $this->companyInfo($request->get('company_id'), $request->only(['profession_id'])))
             return $this->errorResponse($notExists);
 
@@ -109,7 +105,7 @@ class EmployeeController extends Controller
             'contracts',
             'contracts.position',
             'contracts.currency'
-        ])->selectSub($isTerminatedQuery, "is_terminated")
+        ])
             ->orderBy($orderBy, $sortBy)
             ->paginate($request->input('per_page', 200), ['employees.*']);
 
