@@ -22,17 +22,17 @@ class CompanyStructureService
             'name'
         ]);
 
-        if ($getNestedFormat){
+        if ($getNestedFormat) {
             //when update company structure unset company-structure-comapnyId-* cache keys
-//            $cacheKey = 'company-structure-'. $companyId . '-' . md5(serialize($structure));
-//            if (Cache::has($cacheKey)){
-//                $structure->children = Cache::get($cacheKey);
-//            }
-//            else {
+            $cacheKey = 'company-structure-'. $companyId . '-' . md5(serialize($structure));
+            if (Cache::has($cacheKey)){
+                $structure->children = Cache::get($cacheKey);
+            }
+            else {
                 $children = $this->getNestedStructure($structure);
-//                Cache::put($cacheKey, $children, 24 * 60 * 60);
+                Cache::put($cacheKey, $children, 24 * 60 * 60);
                 $structure->children = $children;
-//            }
+            }
             unset($structure->structuredDepartments);
             unset($structure->structuredSections);
             unset($structure->structuredSectors);
@@ -62,7 +62,7 @@ class CompanyStructureService
                 'name' => $section['name'],
                 'is_closed' => $section['is_closed'],
                 'type' => 'section',
-                'curator' => $department['curator'] ?? null,
+                'curator' => $section['curator'] ?? null,
                 'children' => $this->getNestedStructure($section)
             ];
         }
@@ -73,7 +73,7 @@ class CompanyStructureService
                 'name' => $sector['name'],
                 'is_closed' => $sector['is_closed'],
                 'type' => 'sector',
-                'curator' => $department['curator'] ?? null,
+                'curator' => $sector['curator'] ?? null,
                 'children' => $this->getNestedStructure($sector)
             ];
         }
