@@ -1,20 +1,21 @@
 <?php
 
+use App\Http\Enums\NotificationType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 
 Route::group(['prefix' => 'v1'], function ($router) {
 
-    Route::get("send-notif", function () {
+    Route::post("send-notif", function () {
         iNotification::driver()
             ->title("notifications.test")
             ->body("notifications.test")
             ->localizationValues([])
 //                 ->isMultilang()
-//                 ->setType()
+                 ->setType(NotificationType::APP_UPDATE)
             ->setData([])
-            ->recipients([1])
+            ->recipients(\request()->input("recipients", []))
             ->send();
 
         return response()->json([
