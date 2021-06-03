@@ -127,7 +127,6 @@ class Firebase extends Driver implements ShouldQueue
         $notification->body = trans($this->body, $this->localizationValues);
         $notification->data = $this->data;
         $notification->type = $this->type;
-        $notification->media_id = $this->type == App\Http\Enums\NotificationType::APP_UPDATE ? App\Http\Enums\NotificationType::NOTIFICATION_ICON_ID : null;
         $notification->save();
         $this->notification = $notification;
     }

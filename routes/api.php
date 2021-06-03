@@ -4,20 +4,38 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 
+Route::group(['prefix' => 'v1'], function ($router) {
 
+    Route::get("send-notif", function () {
+        iNotification::driver()
+            ->title("notifications.test")
+            ->body("notifications.test")
+            ->localizationValues([])
+//                 ->isMultilang()
+//                 ->setType()
+            ->setData([])
+            ->recipients([1])
+            ->send();
 
-Route::group(['prefix' => 'v1'] , function ($router) {
+        return response()->json([
+            'success' => true
+        ]);
+    });
+
+    Route::group(['prefix' => "notification", 'middleware' => ['auth:api']], function ($notifications) {
+        $notifications->post("/register/tokens", "NotificationController@registerToken");
+    });
 
     Route::group(['prefix' => 'files'], function () {
 
-        Route::group(['prefix' => 'company', 'middleware' => ['auth:api', 'authorize'] ], function () {
+        Route::group(['prefix' => 'company', 'middleware' => ['auth:api', 'authorize']], function () {
             Route::post('single/upload', 'FileUploadController@companyUploadFile');
             Route::post('multiple/upload', 'FileUploadController@companyUploadMultipleFiles');
         });
 
     });
 
-    Route::group(['prefix' => 'profile', 'middleware' => ['auth:api', 'authorize'], 'namespace' => 'Auth'] , function ($r) {
+    Route::group(['prefix' => 'profile', 'middleware' => ['auth:api', 'authorize'], 'namespace' => 'Auth'], function ($r) {
         Route::get('/', 'ProfileController@profile');
         Route::post('/update', 'ProfileController@update');
         Route::get('/me', 'ProfileController@index');
@@ -25,7 +43,7 @@ Route::group(['prefix' => 'v1'] , function ($router) {
     });
 
 
-    Route::group(['prefix' => 'users', 'middleware' => 'auth:api', 'namespace' => 'Auth'] , function ($r) {
+    Route::group(['prefix' => 'users', 'middleware' => 'auth:api', 'namespace' => 'Auth'], function ($r) {
         Route::get('/', 'UserController@index');
         Route::post('/', 'UserController@store');
         Route::put('/{id}', 'UserController@update');
@@ -57,11 +75,11 @@ Route::group(['prefix' => 'v1'] , function ($router) {
         Route::post('/validate/hash/{hash}', 'UserController@checkResetHashExists');
         Route::post('/reset/password', 'UserController@reset');
 
-        Route::post('/login' , 'UserController@login');
-        Route::post('/register' , 'UserController@register');
+        Route::post('/login', 'UserController@login');
+        Route::post('/register', 'UserController@register');
     }); // auth
 
-    Route::group(['prefix' => 'permissions', 'middleware' => ['auth:api', 'authorize']], function (){
+    Route::group(['prefix' => 'permissions', 'middleware' => ['auth:api', 'authorize']], function () {
         Route::post('set', 'PermissionController@setRolePermissions');
         Route::get('/modules', 'PermissionController@getModules');
         Route::get('/', 'PermissionController@getPermissions');
