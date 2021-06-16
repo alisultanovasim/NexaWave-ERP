@@ -7,7 +7,6 @@ namespace Modules\Plaza\Http\Controllers;
 use App\Mail\ReservationEmail;
 use App\Traits\ApiResponse;
 use Carbon\Carbon;
-use DemeterChain\C;
 use Exception;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\JsonResponse;
@@ -16,6 +15,7 @@ use Illuminate\Http\Response;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\ValidationException;
 use Modules\Plaza\Entities\Meeting;
 use Modules\Plaza\Entities\MeetingRoomImage;
@@ -402,8 +402,8 @@ class MeetingRoomController extends Controller
             if ($check) return $this->errorResponse(trans('apiResponse.reservationTimeError'));
            Meeting::create($request->only('company_id', 'start_at', 'finish_at', 'office_id', 'finish_at', 'event_name', 'description', 'meeting_room'));
            //Send email to plaza
-           dispatch(new ReservationEmail("isa.qurbanov996@gmail.com",$office->name,$start,$meeting_rooms->name));
-
+//           dispatch(new ReservationEmail("isa.qurbanov996@gmail.com",$office->name,$start,$meeting_rooms->name));
+            Mail::to("i.babirli@outlook.com")->send(new ReservationEmail("isa.qurbanov996@gmail.com",$office->name,$start,$meeting_rooms->name));
             return $this->successResponse('OK');
         } catch (Exception $e) {
             return $this->errorResponse(trans('apiResponse.tryLater'), Response::HTTP_INTERNAL_SERVER_ERROR);

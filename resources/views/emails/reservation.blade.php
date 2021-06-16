@@ -8,10 +8,9 @@
     <title>Yeni Rezervasiya var</title>
 </head>
 <body>
-
-Şirkətin adı: {!! $company !!}
-Saatı: {!! $date !!}
-Zal: {!! $room !!}
+Şirkətin adı: {!! $company !!} <br>
+Saatı: {!! $date !!}<br>
+Zal: {!! $room !!}<br>
 
 </body>
 </html>
