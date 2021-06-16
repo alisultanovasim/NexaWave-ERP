@@ -1,5 +1,8 @@
 <?php
 
+use App\Notification\Facades\NotificationFacade;
+use App\Notification\NotificationServiceProvider;
+
 return [
 
     'log' => 'daily',
@@ -177,6 +180,8 @@ return [
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
 //        App\Providers\PermissionProvider::class
+        NotificationServiceProvider::class,
+
 
     ],
 
@@ -229,6 +234,7 @@ return [
         'URL' => Illuminate\Support\Facades\URL::class,
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
+        "iNotification" => NotificationFacade::class,
 
     ],
 
