@@ -30,6 +30,7 @@ class ReservationEmail extends Mailable
         $this->date = $date;
         $this->room = $room;
         $this->email = $email;
+        \Log::info("Email queued");
     }
 
     /**
@@ -39,6 +40,7 @@ class ReservationEmail extends Mailable
      */
     public function build()
     {
+        \Log::info("email is builded");
         return $this->view('emails.reservation')->with([
             'company' => $this->company,
             "date" => $this->date,
