@@ -403,7 +403,7 @@ class MeetingRoomController extends Controller
            Meeting::create($request->only('company_id', 'start_at', 'finish_at', 'office_id', 'finish_at', 'event_name', 'description', 'meeting_room'));
            //Send email to plaza
 //           dispatch(new ReservationEmail("isa.qurbanov996@gmail.com",$office->name,$start,$meeting_rooms->name));
-            Mail::to("i.babirli@outlook.com")->send(new ReservationEmail("i.babirli@outlook.com",$office->name,$start,$meeting_rooms->name));
+            Mail::to("info@timetower.az")->send(new ReservationEmail("info@timetower.az",$office->name,$start,$meeting_rooms->name));
             return $this->successResponse('OK');
         } catch (Exception $e) {
             return $this->errorResponse(trans('apiResponse.tryLater'), Response::HTTP_INTERNAL_SERVER_ERROR);
