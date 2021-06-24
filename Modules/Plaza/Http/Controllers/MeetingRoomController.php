@@ -4,9 +4,9 @@
 namespace Modules\Plaza\Http\Controllers;
 
 
+use App\Mail\ReservationEmail;
 use App\Traits\ApiResponse;
 use Carbon\Carbon;
-use DemeterChain\C;
 use Exception;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\JsonResponse;
@@ -15,6 +15,7 @@ use Illuminate\Http\Response;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\ValidationException;
 use Modules\Plaza\Entities\Meeting;
 use Modules\Plaza\Entities\MeetingRoomImage;
@@ -360,6 +361,7 @@ class MeetingRoomController extends Controller
         $company_id = $request->company_id;
 
         try {
+
             $timezone = $request->timezone ?? 'Asia/Baku';
             $start = Carbon::createFromFormat('Y-m-d H:i:s', $request->start_at, $timezone);
             $end = Carbon::createFromFormat('Y-m-d H:i:s', $request->finish_at, $timezone);
@@ -369,18 +371,18 @@ class MeetingRoomController extends Controller
             if ($start == $end) return $this->errorResponse(trans('apiResponse.timeError'));
 
             if ($request->has('office_id')) {
-                $check = Office::where([
+                $office = Office::where([
                     'id' => $request->office_id,
                     'company_id' => $company_id
-                ])->exists();
-                if (!$check) return $this->errorResponse(trans('apiResponse.unProcess'));
+                ])->first();
+                if (!$office) return $this->errorResponse(trans('apiResponse.unProcess'));
             }
-            $check = MeetingRooms::where([
+            $meeting_rooms = MeetingRooms::where([
                 'id' => $request->meeting_room,
                 'company_id' => $company_id
-            ])->first('status');
-            if (!$check) return $this->errorResponse(trans('apiResponse.MeetingRoomNotFound'));
-            if ($check->status != 1) return $this->errorResponse(['meeting_room' => trans('apiResponse.roomIsNotActive')]);
+            ])->first();
+            if (!$meeting_rooms) return $this->errorResponse(trans('apiResponse.MeetingRoomNotFound'));
+            if ($meeting_rooms->status != 1) return $this->errorResponse(['meeting_room' => trans('apiResponse.roomIsNotActive')]);
 
             $check = Meeting::where('company_id', $company_id)
                 ->where('meeting_room', $request->meeting_room)
@@ -398,7 +400,10 @@ class MeetingRoomController extends Controller
                     ]);
                 })->exists();
             if ($check) return $this->errorResponse(trans('apiResponse.reservationTimeError'));
-            Meeting::create($request->only('company_id', 'start_at', 'finish_at', 'office_id', 'finish_at', 'event_name', 'description', 'meeting_room'));
+           Meeting::create($request->only('company_id', 'start_at', 'finish_at', 'office_id', 'finish_at', 'event_name', 'description', 'meeting_room'));
+           //Send email to plaza
+//           dispatch(new ReservationEmail("isa.qurbanov996@gmail.com",$office->name,$start,$meeting_rooms->name));
+            Mail::to("i.babirli@outlook.com")->send(new ReservationEmail("i.babirli@outlook.com",$office->name,$start,$meeting_rooms->name));
             return $this->successResponse('OK');
         } catch (Exception $e) {
             return $this->errorResponse(trans('apiResponse.tryLater'), Response::HTTP_INTERNAL_SERVER_ERROR);

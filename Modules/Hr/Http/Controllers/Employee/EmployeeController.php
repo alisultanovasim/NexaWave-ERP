@@ -10,18 +10,31 @@ use App\Traits\Query;
 use Carbon\Carbon;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Validation\ValidatesRequests;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
+use Modules\Hr\Entities\Employee\Contract;
 use Modules\Hr\Entities\Employee\Employee;
 use Modules\Hr\Traits\DocumentUploader;
+use Throwable;
 
+/**
+ * Class EmployeeController
+ * @package Modules\Hr\Http\Controllers\Employee
+ */
 class EmployeeController extends Controller
 {
     use ApiResponse, Query, DocumentUploader, ValidatesRequests;
 
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     * @throws ValidationException
+     */
     public function index(Request $request)
     {
         $this->validate($request, [
@@ -100,6 +113,12 @@ class EmployeeController extends Controller
 
     }
 
+    /**
+     * @param Request $request
+     * @param $id
+     * @return JsonResponse
+     * @throws ValidationException
+     */
     public function show(Request $request, $id)
     {
         $this->validate($request, [
@@ -134,12 +153,18 @@ class EmployeeController extends Controller
             ->where('company_id', $request->get('company_id'))
             ->first();
 
-//        dd($employees->user->details);
-        if (!$employees) return $this->errorResponse(trans('response.employeeNotFound'), Response::HTTP_NOT_FOUND);
-
+        if (!$employees) {
+            return $this->errorResponse(trans('response.employeeNotFound'), Response::HTTP_NOT_FOUND);
+        }
         return $this->successResponse($employees);
     }
 
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     * @throws ValidationException
+     * @throws Throwable
+     */
     public function store(Request $request)
     {
         $this->validate($request, [
@@ -188,6 +213,11 @@ class EmployeeController extends Controller
         }
     }
 
+    /**
+     * @param $roles
+     * @param $userId
+     * @param $companyId
+     */
     private function setUserRoles($roles, $userId, $companyId): void
     {
         $insertData = [];
@@ -205,6 +235,13 @@ class EmployeeController extends Controller
         UserRole::insert($insertData);
     }
 
+    /**
+     * @param Request $request
+     * @param $id
+     * @return JsonResponse
+     * @throws ValidationException
+     * @throws Throwable
+     */
     public function update(Request $request, $id)
     {
         $this->validate($request, [
@@ -244,6 +281,13 @@ class EmployeeController extends Controller
         return $this->successResponse('ok');
     }
 
+    /**
+     * @param Request $request
+     * @param $id
+     * @return JsonResponse
+     * @throws ValidationException
+     * @throws Throwable
+     */
     public function delete(Request $request, $id)
     {
         $this->validate($request, [

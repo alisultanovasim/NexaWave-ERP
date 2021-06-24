@@ -47,6 +47,8 @@ pipeline {
       }
       steps {
         sh 'ssh-keyscan time-vps1.serverxx.com >> ~/.ssh/known_hosts'
+        sh 'php artisan deploy time-vps1.serverxx.com -s upload'
+
       }
     }
 

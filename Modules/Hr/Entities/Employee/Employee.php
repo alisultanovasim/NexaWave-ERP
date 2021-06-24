@@ -31,6 +31,7 @@ class Employee extends Model
         return $this->hasOne('Modules\Hr\Entities\Employee\Contract')->active();
     }
 
+
     public function authorizedDetails(){
         return $this->hasOne(CompanyAuthorizedEmployee::class, 'employee_id', 'id')
             ->latest();

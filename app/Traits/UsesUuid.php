@@ -21,7 +21,7 @@ trait UsesUuid
      */
     public function getKeyName()
     {
-        return 'uuid';
+        return 'id';
     }
 
     /**
