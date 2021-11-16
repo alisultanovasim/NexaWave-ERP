@@ -166,7 +166,7 @@ class CompanyOrderController extends Controller
                 [
                     'order_id' => $orderId,
                     'details' => $orderEmployee['details']
-//                    'details' => $this->trimOrderEmployeeDetailsJsonFromUnvalidatedFields($orderEmployee['details'], $orderType)
+//                      'details' => $this->trimOrderEmployeeDetailsJsonFromUnvalidatedFields($orderEmployee['details'], $orderType)
                 ]
             );
             $ids[] = $orderEmployee->getKey();
