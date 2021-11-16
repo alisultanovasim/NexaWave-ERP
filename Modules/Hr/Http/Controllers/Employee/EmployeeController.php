@@ -105,7 +105,8 @@ class EmployeeController extends Controller
             'contracts',
             'contracts.position',
             'contracts.currency'
-        ])-where('is_active' , 1)
+        ])
+            ->where('is_active' , 1)
             ->orderBy($orderBy, $sortBy)
             ->paginate($request->input('per_page', 200), ['employees.*']);
 
