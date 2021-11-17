@@ -20,7 +20,6 @@ use Illuminate\Validation\ValidationException;
 use Modules\Hr\Entities\Employee\Contract;
 use Modules\Hr\Entities\Employee\Employee;
 use Modules\Hr\Traits\DocumentUploader;
-use Illuminate\Support\Facades\Mail;
 use Throwable;
 
 /**
@@ -34,7 +33,6 @@ class EmployeeController extends Controller
     public function index(Request $request)
     {
 
-        Mail::to('anarceferov1996@gmail.com')->send();
         $this->validate($request, [
             'company_id' => ['required', 'integer'],
             'per_page' => ['sometimes', 'required', 'integer'],
@@ -108,7 +106,6 @@ class EmployeeController extends Controller
             ->paginate($request->input('per_page', 200), ['employees.*']);
 
 
-        return $this->successResponse($employees);
 
     }
 
