@@ -30,11 +30,6 @@ class EmployeeController extends Controller
 {
     use ApiResponse, Query, DocumentUploader, ValidatesRequests;
 
-    /**
-     * @param Request $request
-     * @return JsonResponse
-     * @throws ValidationException
-     */
     public function index(Request $request)
     {
         $this->validate($request, [
@@ -102,7 +97,7 @@ class EmployeeController extends Controller
         $employees = $employees->with([
             'user:id,name,surname',
             'user.details:user_id,father_name,gender',
-            'contracts',
+            'contract',
             'contracts.position',
             'contracts.currency'
         ])
@@ -114,12 +109,7 @@ class EmployeeController extends Controller
 
     }
 
-    /**
-     * @param Request $request
-     * @param $id
-     * @return JsonResponse
-     * @throws ValidationException
-     */
+
     public function show(Request $request, $id)
     {
         $this->validate($request, [
