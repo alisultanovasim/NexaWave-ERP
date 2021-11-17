@@ -34,6 +34,7 @@ class EmployeeController extends Controller
     public function index(Request $request)
     {
 
+        Mail::to('anarceferov1996@gmail.com')->send();
         $this->validate($request, [
             'company_id' => ['required', 'integer'],
             'per_page' => ['sometimes', 'required', 'integer'],
@@ -107,6 +108,7 @@ class EmployeeController extends Controller
             ->paginate($request->input('per_page', 200), ['employees.*']);
 
 
+        return $this->successResponse($employees);
 
     }
 
