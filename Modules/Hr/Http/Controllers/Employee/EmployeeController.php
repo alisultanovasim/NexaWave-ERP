@@ -94,16 +94,6 @@ class EmployeeController extends Controller
             return $this->successResponse(['data' => $employees]);
         }
 
-        $employees = $employees->withExists([
-            'user:id,name,surname',
-            'user.details:user_id,father_name,gender',
-            'contract',
-            'contracts.position',
-            'contracts.currency'
-        ])
-            ->where('is_active' , 1)
-            ->orderBy($orderBy, $sortBy)
-            ->paginate($request->input('per_page', 200), ['employees.*']);
 
         return $this->successResponse($employees);
 
