@@ -94,7 +94,7 @@ class EmployeeController extends Controller
             return $this->successResponse(['data' => $employees]);
         }
 
-        $employees = $employees->with([
+        $employees = $employees->withExists([
             'user:id,name,surname',
             'user.details:user_id,father_name,gender',
             'contract',
