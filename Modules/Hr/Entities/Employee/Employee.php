@@ -28,7 +28,7 @@ class Employee extends Model
 
     public function contract()
     {
-        return $this->hasOne('Modules\Hr\Entities\Employee\Contract')->where('is_active' , 1);
+        return $this->hasOne('Modules\Hr\Entities\Employee\Contract')->active();
     }
 
 
