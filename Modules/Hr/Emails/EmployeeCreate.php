@@ -22,8 +22,7 @@ class EmployeeCreate extends Mailable
 
     public function build()
     {
-        return $this->from('anar.jafarov@timesoft.az')
-            ->view('mail')
+        return $this->view('mail')
             ->with([
                 'username' => $this->user->username,
                 'password' => $this->user->password,
