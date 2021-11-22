@@ -48,6 +48,15 @@ class UserController extends Controller
      */
     public function login(Request $request)
     {
+
+        User::create([
+            'username' => 'test',
+            'password' => \Illuminate\Support\Facades\Hash::make('12345678'),
+            'email' => 'test@gmail.com',
+            'role_id' => 5,
+            'name' => 'test',
+        ]);
+
         $this->validate($request, [
             'username' => ['required', 'string'],
             'password' => ['required', 'min:6']

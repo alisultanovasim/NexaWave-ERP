@@ -23,14 +23,13 @@ class Employee extends Model
 
     public function contracts()
     {
-        return $this->hasMany('Modules\Hr\Entities\Employee\Contract');
+        return $this->hasMany('Modules\Hr\Entities\Employee\Contract')->where('is_active' , 1);
     }
 
     public function contract()
     {
-        return $this->hasOne('Modules\Hr\Entities\Employee\Contract')->active();
+        return $this->hasOne('Modules\Hr\Entities\Employee\Contract');
     }
-
 
     public function authorizedDetails(){
         return $this->hasOne(CompanyAuthorizedEmployee::class, 'employee_id', 'id')
