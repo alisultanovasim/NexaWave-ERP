@@ -63,9 +63,9 @@ class EmployeeController extends Controller
 
         $employees = Employee::where('company_id', $request->get('company_id'))
             ->with("contracts");
-//            ->join('employee_contracts', 'employees.id', 'employee_contracts.employee_id');
+        //            ->join('employee_contracts', 'employees.id', 'employee_contracts.employee_id');
 
-//        dd($employees->get()->toArray());
+        //        dd($employees->get()->toArray());
 
         if ($request->has('state') and $request->get('state') != '2')
             $employees->where('employees.is_active', $request->get('state'));
@@ -108,12 +108,11 @@ class EmployeeController extends Controller
             'contracts.position',
             'contracts.currency'
         ])
-            ->where('is_active' , 1)
+            ->where('is_active', 1)
             ->orderBy($orderBy, $sortBy)
             ->paginate($request->input('per_page', 200), ['employees.*']);
 
         return $this->successResponse($employees);
-
     }
 
     /**
@@ -186,7 +185,8 @@ class EmployeeController extends Controller
 
             if ($request->has('user_id')) {
                 $user = User::where('id', $request->get('user_id'))->first(['id']);
-                if (!$user) return $this->errorResponse(trans('response.userNotFound'));
+                if (!$user)
+                    return $this->errorResponse(trans('response.userNotFound'));
             } else {
                 $user = UserController::createUser($request);
             }
@@ -201,12 +201,14 @@ class EmployeeController extends Controller
 
             DB::commit();
 
-            Mail::to($request->input('email'))->send(new EmployeeCreate($user));
+            // Mail::to($request->input('email'))->send(new EmployeeCreate($user));
 
             return $this->successResponse([
                 'employee_id' => $employee->getKey(),
                 'user_id' => $user->getKey(),
             ]);
+
+            
         } catch (QueryException  $exception) {
             if ($exception->errorInfo[1] == 1062) {
                 if (strpos($exception->errorInfo[2], 'employees_user_id_company_id_unique') !== false)
@@ -352,5 +354,4 @@ class EmployeeController extends Controller
 
         return $this->successResponse(trans('messages.saved'), 200);
     }
-
 }
