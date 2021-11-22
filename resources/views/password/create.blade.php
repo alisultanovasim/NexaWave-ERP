@@ -8,12 +8,12 @@
     <title>Document</title>
 </head>
 <body>
-<h1>{{$user->name . " " . $user->surname}} </h1>
+<h1>Hörmətli {{$user->name . " " . $user->surname}}. </h1>
 <ul>
-    <li>Login : {{$user->username}}</li>
-    <li>Parol : {{$password}}</li>
-    <br>
-    <a href="https://1of.az">One Office</a>
+    <li>İstifadəçi adı : {{$user->username}}</li>
+    <li>Şifrə : {{$password}}</li>
 </ul>
+<br>
+<p>Dəvəti qəbul etmək üçün <a href="https://1of.az">One Office</a></p>
 </body>
 </html>

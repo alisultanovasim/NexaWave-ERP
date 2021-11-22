@@ -15,8 +15,10 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
+use Modules\Hr\Emails\EmployeeCreate;
 use Modules\Hr\Entities\Employee\Contract;
 use Modules\Hr\Entities\Employee\Employee;
 use Modules\Hr\Traits\DocumentUploader;
@@ -30,9 +32,13 @@ class EmployeeController extends Controller
 {
     use ApiResponse, Query, DocumentUploader, ValidatesRequests;
 
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     * @throws ValidationException
+     */
     public function index(Request $request)
     {
-
         $this->validate($request, [
             'company_id' => ['required', 'integer'],
             'per_page' => ['sometimes', 'required', 'integer'],
@@ -57,9 +63,9 @@ class EmployeeController extends Controller
 
         $employees = Employee::where('company_id', $request->get('company_id'))
             ->with("contracts");
-//            ->join('employee_contracts', 'employees.id', 'employee_contracts.employee_id');
+        //            ->join('employee_contracts', 'employees.id', 'employee_contracts.employee_id');
 
-//        dd($employees->get()->toArray());
+        //        dd($employees->get()->toArray());
 
         if ($request->has('state') and $request->get('state') != '2')
             $employees->where('employees.is_active', $request->get('state'));
@@ -95,21 +101,26 @@ class EmployeeController extends Controller
             return $this->successResponse(['data' => $employees]);
         }
 
-        $employees = $employees->withExists([
+        $employees = $employees->with([
             'user:id,name,surname',
             'user.details:user_id,father_name,gender',
-            'contract',
+            'contracts',
             'contracts.position',
             'contracts.currency'
         ])
+            ->where('is_active', 1)
             ->orderBy($orderBy, $sortBy)
             ->paginate($request->input('per_page', 200), ['employees.*']);
 
-
-
+        return $this->successResponse($employees);
     }
 
-
+    /**
+     * @param Request $request
+     * @param $id
+     * @return JsonResponse
+     * @throws ValidationException
+     */
     public function show(Request $request, $id)
     {
         $this->validate($request, [
@@ -174,7 +185,8 @@ class EmployeeController extends Controller
 
             if ($request->has('user_id')) {
                 $user = User::where('id', $request->get('user_id'))->first(['id']);
-                if (!$user) return $this->errorResponse(trans('response.userNotFound'));
+                if (!$user)
+                    return $this->errorResponse(trans('response.userNotFound'));
             } else {
                 $user = UserController::createUser($request);
             }
@@ -188,10 +200,15 @@ class EmployeeController extends Controller
             ]);
 
             DB::commit();
+
+            // Mail::to($request->input('email'))->send(new EmployeeCreate($user));
+
             return $this->successResponse([
                 'employee_id' => $employee->getKey(),
                 'user_id' => $user->getKey(),
             ]);
+
+            
         } catch (QueryException  $exception) {
             if ($exception->errorInfo[1] == 1062) {
                 if (strpos($exception->errorInfo[2], 'employees_user_id_company_id_unique') !== false)
@@ -337,5 +354,4 @@ class EmployeeController extends Controller
 
         return $this->successResponse(trans('messages.saved'), 200);
     }
-
 }
