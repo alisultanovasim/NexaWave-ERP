@@ -40,7 +40,7 @@ class UserSeeder extends Seeder
 
         $vusalEmp = \Modules\Hr\Entities\Employee\Employee::create([
             'user_id' => $vusal->id,
-            'company_id' => $company->id,
+            'company_id' => $company->id, 
         ]);
         $position = \Modules\Hr\Entities\Positions::create([
             'name' => 'Php developer',
