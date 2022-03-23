@@ -26,9 +26,11 @@ class ProfileController extends Controller
             ->with(['details'])
             ->where('id', Auth::id())
             ->first();
-        $users = User::query()->with(['details' => function ($query, $user) {
-            $query->where('details.fin', $user->details->fin);
-        }])->get();
+
+        $users = User::query()
+            ->join('user_details','user_id','=','id')
+            ->where("user_details.fin",$user->details->fin)
+            ->get();
 
         return $this->dataResponse([
             'user' => $user,
