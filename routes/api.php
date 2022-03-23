@@ -41,6 +41,7 @@ Route::group(['prefix' => 'v1'], function ($router) {
         Route::post('/update', 'ProfileController@update');
         Route::get('/me', 'ProfileController@index');
         Route::get('/history', 'ProfileController@history');
+        Route::get('/getCurrentLogin', 'ProfileController@getCurrentLogin');
     });
 
 
@@ -91,5 +92,3 @@ Route::group(['prefix' => 'v1'], function ($router) {
     }); // permissions
 
 });
-
-Route::get('/getCurrentLogin', 'ProfileController@getCurrentLogin');
