@@ -103,10 +103,10 @@ class Handler extends ExceptionHandler
                 return $this->errorResponse('Client Request Error', Response::HTTP_BAD_REQUEST);
             }
         } else {
-            if (config('app.debug'))
+//            if (config('app.debug'))
                 return parent::render($request, $exception);
-            else
-                return $this->errorResponse('Try later', Response::HTTP_INTERNAL_SERVER_ERROR);
+//            else
+//                return $this->errorResponse('Try later', Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 }
