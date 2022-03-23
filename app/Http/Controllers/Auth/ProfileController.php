@@ -28,8 +28,8 @@ class ProfileController extends Controller
             ->first();
 
         $users = User::query()
-            ->join('user_details','user_id','=','id')
-            ->where("user_details.fin",$user->details->fin)
+            ->join('user_details', 'user_id', '=', 'users', 'id')
+            ->where("user_details.fin", $user->details->fin)
             ->get();
 
         return $this->dataResponse([
