@@ -21,9 +21,12 @@ class ProfileController extends Controller
 
     public function getCurrentLogin()
     {
-        $user = User::with(['details' => function ($query) {
-            $query->select("avatar");
-        }])->where('id', Auth::id())->first();
+        $user = User::query()
+            ->with(['details' => function ($query) {
+                $query->select("avatar");
+            }])
+            ->where('id', Auth::id())
+            ->first();
         return $this->dataResponse([
             'user' => $user
         ]);
