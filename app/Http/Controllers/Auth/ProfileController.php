@@ -19,6 +19,14 @@ class ProfileController extends Controller
 {
     use  ApiResponse;
 
+    public function getCurrentLogin()
+    {
+        $user = User::with(['details'])->where('id', Auth::id())->get();
+        return $this->dataResponse([
+            'user' => $user
+        ]);
+    }
+
     public function profile(Request $request, Role $role)
     {
         $user = Auth::user();
@@ -73,13 +81,13 @@ class ProfileController extends Controller
         }
 
         $modules = $modules
-        ->orderBy('position_id')
-        ->get([
-            'id',
-            'name',
-            'icon',
-            'route'
-        ]);
+            ->orderBy('position_id')
+            ->get([
+                'id',
+                'name',
+                'icon',
+                'route'
+            ]);
 
         if (
             (in_array($role->getCompanyAdminRoleId(), \auth()->user()->getUserRolesForRequest())) or
