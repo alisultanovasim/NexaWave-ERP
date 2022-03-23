@@ -22,6 +22,7 @@ class ProfileController extends Controller
     public function getCurrentLogin()
     {
         $user = User::query()
+            ->select('name','surname')
             ->with(['details' => function ($query) {
                 $query->select("avatar");
             }])
