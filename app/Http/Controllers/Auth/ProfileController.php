@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\Company;
 use App\Models\Module;
 use App\Models\Role;
 use App\Models\User;
@@ -25,8 +26,11 @@ class ProfileController extends Controller
             ->with(['details'])
             ->where('id', Auth::id())
             ->first();
+        $employee = Employee::query()->where('user_id', Auth::id())->first();
+        $company = Company::query()->where('owner_id', $employee->id)->get();
         return $this->dataResponse([
-            'user' => $user
+            'user' => $user,
+            'companies' => $company
         ]);
     }
 
