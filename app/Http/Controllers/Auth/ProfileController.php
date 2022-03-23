@@ -22,7 +22,7 @@ class ProfileController extends Controller
     public function getCurrentLogin()
     {
         $user = User::with(['details' => function ($query) {
-            $query->select("details.avatar");
+            $query->select("avatar");
         }])->where('id', Auth::id())->get();
         return $this->dataResponse([
             'user' => $user
