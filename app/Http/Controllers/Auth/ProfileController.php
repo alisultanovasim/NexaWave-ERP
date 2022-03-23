@@ -23,7 +23,7 @@ class ProfileController extends Controller
     {
         $user = User::with(['details' => function ($query) {
             $query->select("avatar");
-        }])->where('id', Auth::id())->get();
+        }])->where('id', Auth::id())->first();
         return $this->dataResponse([
             'user' => $user
         ]);
