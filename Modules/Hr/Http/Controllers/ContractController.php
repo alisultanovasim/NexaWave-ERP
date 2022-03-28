@@ -26,7 +26,7 @@ class ContractController extends Controller
         $rewards = Reward::where('employee_id', \Auth::id())->sum('id');
         $punishment = Punishment::where('employee_id', \Auth::id())->sum('id');
 
-        $employeeCount = \Modules\Hr\Entities\Employee\Contract::where('employee_id', \Auth::id())->sum('id');
+        $employeeCount = \Modules\Hr\Entities\Employee\Contract::where('employee_id', \Auth::id())->count('id');
         $womenEmployeeCount = \Modules\Hr\Entities\Employee\Contract::query()
             ->join('employees', 'employee_contracts.id', '=', 'employees.id')
             ->join('user_details', 'employees.user_id', '=', 'user_details.user_id')
