@@ -17,10 +17,10 @@ class ContractController extends Controller
 
     public function getContactStatics()
     {
-
+        $contracts=Contract::where('employee_id',\Auth::id())->get();
         return $this->dataResponse([
             'count' => 200,
-            'userId'=>\Auth::id()
+            'contracts'=>$contracts
         ]);
     }
 
