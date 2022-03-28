@@ -10,6 +10,8 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
 use Modules\Hr\Entities\Contract;
+use Modules\Hr\Entities\Punishment;
+use Modules\Hr\Entities\Reward;
 
 class ContractController extends Controller
 {
@@ -17,10 +19,13 @@ class ContractController extends Controller
 
     public function getContactStatics()
     {
-        $contracts=\Modules\Hr\Entities\Employee\Contract::where('employee_id',\Auth::id())->sum('salary');
+        $contracts = \Modules\Hr\Entities\Employee\Contract::where('employee_id', \Auth::id())->sum('salary');
+        $rewards = Reward::where('employee_id', \Auth::id())->sum('id');
+        $punishment = Punishment::where('employee_id', \Auth::id())->sum('id');
         return $this->dataResponse([
-            'count' => 200,
-            'contracts'=>$contracts
+            'totalSalary' => $contracts,
+            'totalReward' => $rewards,
+            'totalPunishment' => $punishment
         ]);
     }
 
