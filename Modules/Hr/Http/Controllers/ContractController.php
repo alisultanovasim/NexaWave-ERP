@@ -4,6 +4,7 @@
 namespace Modules\Hr\Http\Controllers;
 
 
+use App\Models\Company;
 use App\Traits\ApiResponse;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\Request;
@@ -19,6 +20,8 @@ class ContractController extends Controller
 
     public function getContactStatics()
     {
+        $company = Company::select('id')->where('owner_id', \Auth::id())->first();
+
         $contracts = \Modules\Hr\Entities\Employee\Contract::where('employee_id', \Auth::id())->sum('salary');
         $rewards = Reward::where('employee_id', \Auth::id())->sum('id');
         $punishment = Punishment::where('employee_id', \Auth::id())->sum('id');
@@ -28,8 +31,8 @@ class ContractController extends Controller
             ->join('employees', 'employee_contracts.id', '=', 'employees.id')
             ->join('user_details', 'employees.user_id', '=', 'user_details.user_id')
             ->where('employee_contracts.employee_id', \Auth::id())
-            ->where('user_details.gender','f')
-            ->sum('user_details.id');
+            ->where('user_details.gender', 'f')
+            ->count('user_details.id');
         return $this->dataResponse([
             'totalSalary' => $contracts,
             'totalReward' => $rewards,
