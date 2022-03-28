@@ -27,14 +27,12 @@ class ProfileController extends Controller
             ->where('id', Auth::id())
             ->first();
 
-        $users = User::query()
-            ->join('user_details', 'user_details.user_id', '=', 'users.id')
-            ->where("user_details.fin", $user->details->fin)
-            ->get();
+        $employee = Employee::query()->where('user_id', Auth::id())->first();
+        $company = Company::query()->where('owner_id', $employee->id)->get();
 
         return $this->dataResponse([
             'user' => $user,
-            'users' => $users
+            'companies' => $company
         ]);
     }
 
