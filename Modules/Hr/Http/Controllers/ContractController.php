@@ -17,8 +17,10 @@ class ContractController extends Controller
 
     public function getContactStatics()
     {
+
         return $this->dataResponse([
-            'count' => 200
+            'count' => 200,
+            'userId'=>\Auth::id()
         ]);
     }
 
