@@ -2,7 +2,12 @@
 
 use Illuminate\Support\Facades\Route;
 
-Route::get('getContactStatics','ContractController@getContactStatics');
+Route::group([
+    'prefix' => "v1/contract",
+    'middleware' => ['auth:api']
+], function ($route) {
+    Route::get('getContactStatics', 'ContractController@getContactStatics');
+});
 Route::group([
     'prefix' => "v1/hr",
     'middleware' => ['auth:api', 'authorize']
