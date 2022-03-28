@@ -25,8 +25,8 @@ class ContractController extends Controller
 
         $employeeCount = \Modules\Hr\Entities\Employee\Contract::where('employee_id', \Auth::id())->sum('id');
         $womenEmployeeCount = \Modules\Hr\Entities\Employee\Contract::query()
-            ->join('employees','employee_contracts.employee_id','id')
-//            ->join('user_details','employees.employee_id','id')
+            ->join('employees', 'employee_contracts.id', '=', 'employees.id')
+            ->join('user_details', 'employees.user_id', '=', 'user_details.user_id')
             ->where('employee_contracts.employee_id', \Auth::id())
             ->get();
         return $this->dataResponse([
