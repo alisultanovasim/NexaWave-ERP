@@ -23,7 +23,7 @@ class ContractController extends Controller
         $rewards = Reward::where('employee_id', \Auth::id())->sum('id');
         $punishment = Punishment::where('employee_id', \Auth::id())->sum('id');
         return $this->dataResponse([
-            'totalSalary' => (float)number_format($contracts),
+            'totalSalary' => $contracts,
             'totalReward' => $rewards,
             'totalPunishment' => $punishment
         ]);
