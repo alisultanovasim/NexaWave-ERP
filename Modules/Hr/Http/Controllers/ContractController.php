@@ -17,7 +17,7 @@ class ContractController extends Controller
 
     public function getContactStatics()
     {
-        $contracts=\Modules\Hr\Entities\Employee\Contract::where('employee_id',\Auth::id())->get();
+        $contracts=\Modules\Hr\Entities\Employee\Contract::where('employee_id',\Auth::id())->sum('salary');
         return $this->dataResponse([
             'count' => 200,
             'contracts'=>$contracts
