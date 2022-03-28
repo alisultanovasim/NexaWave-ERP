@@ -22,10 +22,18 @@ class ContractController extends Controller
         $contracts = \Modules\Hr\Entities\Employee\Contract::where('employee_id', \Auth::id())->sum('salary');
         $rewards = Reward::where('employee_id', \Auth::id())->sum('id');
         $punishment = Punishment::where('employee_id', \Auth::id())->sum('id');
+
+        $employeeCount = \Modules\Hr\Entities\Employee\Contract::where('employee_id', \Auth::id())->sum('id');
+        $womenEmployeeCount = \Modules\Hr\Entities\Employee\Contract::query()
+            ->join('employee','employee_contracts.employee.id','id')
+            ->where('employee_id', \Auth::id())
+            ->sum('id');
         return $this->dataResponse([
             'totalSalary' => $contracts,
             'totalReward' => $rewards,
-            'totalPunishment' => $punishment
+            'totalPunishment' => $punishment,
+            'employeeCount' => $employeeCount,
+            'womenEmployeeCount' => $womenEmployeeCount,
         ]);
     }
 

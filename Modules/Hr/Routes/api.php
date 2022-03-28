@@ -6,7 +6,8 @@ Route::group([
     'prefix' => "v1/contract",
     'middleware' => ['auth:api']
 ], function ($route) {
-    Route::get('getContactStatics', 'ContractController@getContactStatics');
+    Route::get('getContactTotalStatics', 'ContractController@getContactTotalStatics');
+    Route::get('getContract', 'ContractController@getContract');
 });
 Route::group([
     'prefix' => "v1/hr",
