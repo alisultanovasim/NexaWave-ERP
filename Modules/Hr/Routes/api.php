@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 
+Route::get('getContactStatics','ContractController@getContactStatics');
 Route::group([
     'prefix' => "v1/hr",
     'middleware' => ['auth:api', 'authorize']
@@ -397,7 +398,6 @@ Route::group([
         Route::group([
             'prefix' => 'contracts'
         ], function ($route) {
-            Route::get('getContactStatics','ContractController@getContactStatics');
             Route::get("/", 'ContractController@index');
             Route::put("/terminate/{id}", 'ContractController@terminate');
             Route::get("/{id}", 'ContractController@show');
