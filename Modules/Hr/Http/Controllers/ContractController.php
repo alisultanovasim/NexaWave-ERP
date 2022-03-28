@@ -28,7 +28,8 @@ class ContractController extends Controller
             ->join('employees', 'employee_contracts.id', '=', 'employees.id')
             ->join('user_details', 'employees.user_id', '=', 'user_details.user_id')
             ->where('employee_contracts.employee_id', \Auth::id())
-            ->get();
+            ->where('user_details.gener','f')
+            ->sum('user_details.id');
         return $this->dataResponse([
             'totalSalary' => $contracts,
             'totalReward' => $rewards,
