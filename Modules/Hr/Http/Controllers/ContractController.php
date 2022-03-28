@@ -4,16 +4,23 @@
 namespace Modules\Hr\Http\Controllers;
 
 
-use Illuminate\Foundation\Validation\ValidatesRequests;
-use Modules\Hr\Entities\Contract;
 use App\Traits\ApiResponse;
+use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\DB;
+use Modules\Hr\Entities\Contract;
 
 class ContractController extends Controller
 {
-    use ApiResponse,ValidatesRequests;
+    use ApiResponse, ValidatesRequests;
+
+    public function getContactStatics()
+    {
+        return $this->dataResponse([
+            'count' => 200
+        ]);
+    }
 
     public function index(Request $request)
     {
@@ -30,8 +37,7 @@ class ContractController extends Controller
         $error = $this->validateRequest($request->all());
         if ($error)
             return $this->errorResponse($error, 422);
-        try
-        {
+        try {
             DB::beginTransaction();
             $saved = true;
             Contract::create([
@@ -49,9 +55,7 @@ class ContractController extends Controller
                 'company_id' => $request->get('company_id')
             ]);
             DB::commit();
-        }
-        catch (\Exception $exception)
-        {
+        } catch (\Exception $exception) {
             $saved = false;
             DB::rollBack();
         }
@@ -65,8 +69,7 @@ class ContractController extends Controller
         $error = $this->validateRequest($request->all());
         if ($error)
             return $this->errorResponse($error, 422);
-        try
-        {
+        try {
             DB::beginTransaction();
             $saved = true;
             $contract = Contract::where('id', $id)->first();
@@ -86,9 +89,7 @@ class ContractController extends Controller
                 'position' => $request->get('position')
             ]);
             DB::commit();
-        }
-        catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             $saved = false;
             DB::rollBack();
         }
@@ -104,7 +105,8 @@ class ContractController extends Controller
             : $this->errorResponse(trans('messages.not_saved'));
     }
 
-    protected function validateRequest($input){
+    protected function validateRequest($input)
+    {
         $validationArray = [
             'name' => 'required|max:256',
             'code' => 'max:50',
@@ -120,7 +122,7 @@ class ContractController extends Controller
         ];
         $validator = \Validator::make($input, $validationArray);
 
-        if($validator->fails())
+        if ($validator->fails())
             return $validator->errors();
         return null;
     }

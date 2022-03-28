@@ -7,6 +7,8 @@ Route::group([
     'middleware' => ['auth:api', 'authorize']
 ], function ($route) {
 
+    Route::get('getContactStatics','ContactController@getContactStatics');
+
     Route::post("organizationType", "OrganizationTypeController@store");
     Route::get("organizationType", "OrganizationTypeController@index");
     Route::delete("organizationType/{id}", "OrganizationTypeController@destroy");
