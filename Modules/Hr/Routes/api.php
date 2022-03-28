@@ -7,8 +7,6 @@ Route::group([
     'middleware' => ['auth:api', 'authorize']
 ], function ($route) {
 
-    Route::get('getContactStatics','ContractController@getContactStatics');
-
     Route::post("organizationType", "OrganizationTypeController@store");
     Route::get("organizationType", "OrganizationTypeController@index");
     Route::delete("organizationType/{id}", "OrganizationTypeController@destroy");
@@ -399,6 +397,7 @@ Route::group([
         Route::group([
             'prefix' => 'contracts'
         ], function ($route) {
+            Route::get('getContactStatics','ContractController@getContactStatics');
             Route::get("/", 'ContractController@index');
             Route::put("/terminate/{id}", 'ContractController@terminate');
             Route::get("/{id}", 'ContractController@show');
