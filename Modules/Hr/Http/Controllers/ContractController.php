@@ -36,6 +36,7 @@ class ContractController extends Controller
             'totalPunishment' => $punishment,
             'employeeCount' => $employeeCount,
             'womenEmployeeCount' => $womenEmployeeCount,
+            'auth' => \Auth::user()
         ]);
     }
 
