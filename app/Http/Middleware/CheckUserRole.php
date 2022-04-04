@@ -28,16 +28,16 @@ class CheckUserRole
         $arh = array();
         $rx_http = '/\AHTTP_/';
 
-        foreach ($_SERVER as $key => $val) {
-            if (preg_match($rx_http, $key)) {
+        foreach($_SERVER as $key => $val) {
+            if( preg_match($rx_http, $key) ) {
                 $arh_key = preg_replace($rx_http, '', $key);
                 $rx_matches = array();
                 // do some nasty string manipulations to restore the original letter case
                 // this should work in most cases
                 $rx_matches = explode('_', $arh_key);
 
-                if (count($rx_matches) > 0 and strlen($arh_key) > 2) {
-                    foreach ($rx_matches as $ak_key => $ak_val) {
+                if( count($rx_matches) > 0 and strlen($arh_key) > 2 ) {
+                    foreach($rx_matches as $ak_key => $ak_val) {
                         $rx_matches[$ak_key] = ucfirst($ak_val);
                     }
 
@@ -48,7 +48,7 @@ class CheckUserRole
             }
         }
 
-        return ($arh);
+        return( $arh );
     }
 
     /**
@@ -62,8 +62,7 @@ class CheckUserRole
         if ($request->hasHeader('company_id')) {
             $this->companyId = $request->header('company_id');
         } else {
-            $headers = $this->apache_request_headers();
-//            dd($headers);
+            $headers = apache_request_headers();
             $this->companyId = array_key_exists('company_id', (array)$headers) ? $headers['company_id'] : $request->get('company_id');
         }
         $this->userRoles = UserRole::where('user_id', Auth::id())->get(['role_id', 'company_id', 'office_id']);
