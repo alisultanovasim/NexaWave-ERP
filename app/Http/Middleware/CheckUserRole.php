@@ -58,6 +58,7 @@ class CheckUserRole
          * When user requests as company employee (sends company_id)
          */
         if ($this->companyId){
+            dd("#1");
             $this->validateUserCompanyAndMergeToRequest($this->companyId);
         }
 
@@ -65,6 +66,7 @@ class CheckUserRole
          * When user requests as platform user
          */
         else {
+            dd("#2");
             $this->removeCompanyRolesFromUserRoleListForThisRequest();
         }
 
