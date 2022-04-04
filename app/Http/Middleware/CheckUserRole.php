@@ -54,7 +54,6 @@ class CheckUserRole
      */
     public function handle(Request $request, Closure $next){
         return $next($this->request);
-        exit();
         /*
          * When user requests as company employee (sends company_id)
          */
