@@ -63,6 +63,7 @@ class CheckUserRole
             $this->companyId = $request->header('company_id');
         } else {
             $headers = apache_request_headers();
+            dd($headers);
             $this->companyId = array_key_exists('company_id', (array)$headers) ? $request->header('company_id') : $request->get('company_id');
 //            $this->companyId = $request->header('company_id') !== null ? $request->hasHeader('company_id') : $request->get('company_id');
             echo $this->companyId;
