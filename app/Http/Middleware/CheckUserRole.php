@@ -39,6 +39,7 @@ class CheckUserRole
             $this->companyId = $request->header('company_id');
         } else {
             $headers = apache_request_headers();
+            dd($headers);
             $this->companyId =  array_key_exists('company_id' , (array)$headers) ? $headers['company_id'] : $request->get('company_id');
         }
         $this->userRoles = UserRole::where('user_id', Auth::id())->get(['role_id', 'company_id', 'office_id']);
