@@ -59,12 +59,13 @@ class CheckUserRole
     public function __construct(Request $request, Role $role)
     {
         $this->request = $request;
+        echo $request->header('company_id');
+        exit();
         if ($request->hasHeader('company_id')) {
             $this->companyId = $request->header('company_id');
         } else {
             $headers = apache_request_headers();
-            dd($headers);
-            $this->companyId = array_key_exists('company_new_id', (array)$headers) ? $request->header('company_new_id') : $request->get('company_new_id');
+            $this->companyId = array_key_exists('company_id', (array)$headers) ? $request->header('company_id') : $request->get('company_id');
         }
         $this->userRoles = UserRole::where('user_id', Auth::id())->get(['role_id', 'company_id', 'office_id']);
         $this->permissionProvider = new PermissionProvider($role, $this->companyId);
