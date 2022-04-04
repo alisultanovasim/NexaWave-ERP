@@ -25,7 +25,7 @@ return [
 
     'allowed_headers' => ['*'],
 
-    'exposed_headers' => ['x-company_id'], //['x-company_id' , 'company_id'],
+    'exposed_headers' => ['x-company_id', 'company_id'], //['x-company_id' , 'company_id'],
 
     'max_age' => false,
 
