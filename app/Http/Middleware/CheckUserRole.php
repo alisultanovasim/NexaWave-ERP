@@ -53,6 +53,7 @@ class CheckUserRole
      * @throws AuthorizationException
      */
     public function handle(Request $request, Closure $next){
+        return $next($this->request);
         /*
          * When user requests as company employee (sends company_id)
          */
