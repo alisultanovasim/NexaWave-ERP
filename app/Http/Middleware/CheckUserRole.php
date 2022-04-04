@@ -27,24 +27,24 @@ class CheckUserRole
     private $request;
     private $roleModel;
 
-    /**
-     * CheckUserAccess constructor.
-     * @param Request $request
-     * @param Role $role
-     */
-    public function __construct(Request $request, Role $role)
-    {
-        $this->request = $request;
-        if ($request->hasHeader('company_id')){
-            $this->companyId = $request->header('company_id');
-        } else {
-            $headers = apache_request_headers();
-            $this->companyId =  array_key_exists('company_id' , (array)$headers) ? $headers['company_id'] : $request->get('company_id');
-        }
-        $this->userRoles = UserRole::where('user_id', Auth::id())->get(['role_id', 'company_id', 'office_id']);
-        $this->permissionProvider = new PermissionProvider($role, $this->companyId);
-        $this->roleModel = $role;
-    }
+//    /**
+//     * CheckUserAccess constructor.
+//     * @param Request $request
+//     * @param Role $role
+//     */
+//    public function __construct(Request $request, Role $role)
+//    {
+//        $this->request = $request;
+//        if ($request->hasHeader('company_id')){
+//            $this->companyId = $request->header('company_id');
+//        } else {
+//            $headers = apache_request_headers();
+//            $this->companyId =  array_key_exists('company_id' , (array)$headers) ? $headers['company_id'] : $request->get('company_id');
+//        }
+//        $this->userRoles = UserRole::where('user_id', Auth::id())->get(['role_id', 'company_id', 'office_id']);
+//        $this->permissionProvider = new PermissionProvider($role, $this->companyId);
+//        $this->roleModel = $role;
+//    }
 
     /**
      * @param Request $request
@@ -54,6 +54,7 @@ class CheckUserRole
      */
     public function handle(Request $request, Closure $next){
         return $next($this->request);
+        exit();
         /*
          * When user requests as company employee (sends company_id)
          */
