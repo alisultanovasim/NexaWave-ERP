@@ -64,7 +64,7 @@ class CheckUserRole
          * When user requests as platform user
          */
         else {
-//            $this->removeCompanyRolesFromUserRoleListForThisRequest();
+            $this->removeCompanyRolesFromUserRoleListForThisRequest();
         }
 
         /*
