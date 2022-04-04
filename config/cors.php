@@ -25,11 +25,11 @@ return [
 
     'allowed_headers' => ['*'],
 
-    'exposed_headers' => ['x-company_id', 'company_id'], //['x-company_id' , 'company_id'],
+    'exposed_headers' => ['x-company_id', 'company_id','kamran'], //['x-company_id' , 'company_id'],
 
     'max_age' => false,
 
-    'supports_credentials' => ['x-company_id', 'company_id'],
+    'supports_credentials' => ['x-company_id', 'company_id','kamran'],
 
 
 ];
