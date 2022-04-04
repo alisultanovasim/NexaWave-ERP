@@ -9,8 +9,8 @@ use App\Providers\PermissionProvider;
 use App\Traits\ApiResponse;
 use Closure;
 use Illuminate\Auth\Access\AuthorizationException;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 
 class CheckUserRole
@@ -59,6 +59,7 @@ class CheckUserRole
     public function __construct(Request $request, Role $role)
     {
         $this->request = $request;
+        dd($request->headers());
         echo $request->header('company_id');
         exit();
         if ($request->hasHeader('company_id')) {
