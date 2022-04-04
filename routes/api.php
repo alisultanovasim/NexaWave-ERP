@@ -56,7 +56,7 @@ Route::group(['prefix' => 'v1'], function ($router) {
 
 
     Route::group(['prefix' => 'logs',], function () {
-        Route::get('/', 'GlobalLogsController@index');
+        Route::get('/', 'GlobalLogsController@loginindex');
         Route::get('/{id:[0-9]+}', 'GlobalLogsController@show');
         Route::post('/delete/{id:[0-9]+}', 'GlobalLogsController@delete');
     }); // logs
@@ -91,3 +91,4 @@ Route::group(['prefix' => 'v1'], function ($router) {
     }); // permissions
 
 });
+

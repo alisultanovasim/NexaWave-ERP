@@ -208,7 +208,7 @@ class EmployeeController extends Controller
                 'user_id' => $user->getKey(),
             ]);
 
-            
+
         } catch (QueryException  $exception) {
             if ($exception->errorInfo[1] == 1062) {
                 if (strpos($exception->errorInfo[2], 'employees_user_id_company_id_unique') !== false)
@@ -261,7 +261,6 @@ class EmployeeController extends Controller
                 Rule::exists('roles', 'id')->where('company_id', $request->get('company_id'))
             ]
         ]);
-
 
         $data = $request->only(['is_active', 'update_user']);
         if (!$data) return $this->errorResponse(trans('response.nothing'));

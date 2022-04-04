@@ -6,9 +6,11 @@ namespace Modules\Hr\Http\Controllers;
 
 use App\Models\Company;
 use App\Traits\ApiResponse;
+use Carbon\Carbon;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Modules\Hr\Entities\Contract;
 use Modules\Hr\Entities\Punishment;
@@ -28,17 +30,33 @@ class ContractController extends Controller
 
         $employeeCount = \Modules\Hr\Entities\Employee\Contract::where('employee_id', \Auth::id())->count('id');
         $womenEmployeeCount = \Modules\Hr\Entities\Employee\Contract::query()
-            ->join('employees', 'employee_contracts.id', '=', 'employees.id')
+            ->join('employees', 'employee_contracts.employee_id', '=', 'employees.id')
             ->join('user_details', 'employees.user_id', '=', 'user_details.user_id')
             ->where('employee_contracts.employee_id', \Auth::id())
             ->where('user_details.gender', 'f')
+            ->count('user_details.id');
+        $invalidEmployeeCount=\Modules\Hr\Entities\Employee\Contract::query()
+            ->join('employees','employee_contracts.employee_id','=','employees.id')
+            ->join('user_details','employees.user_id','=','user_details.user_id')
+            ->where('employee_contracts.employee_id', \Auth::id())
+            ->where('user_details.user_id',\Auth::id())
+            ->where('user_details.military_status',0)
+            ->count('user_details.id');
+        $pensioners=\Modules\Hr\Entities\Employee\Contract::query()
+            ->join('employees','employee_contracts.employee_id','=','employees.id')
+            ->join('user_details','employees.user_id','=','user_details.user_id')
+            ->where('user_details.user_id',Auth::id())
+            ->where('employee_contracts.employee_id',Auth::id())
+            ->whereRaw('DATEDIFF(user_details.birthday,"'.Carbon::now().'") > 65')
             ->count('user_details.id');
         return $this->dataResponse([
             'totalSalary' => $contracts,
             'totalReward' => $rewards,
             'totalPunishment' => $punishment,
             'employeeCount' => $employeeCount,
-            'womenEmployeeCount' => $womenEmployeeCount
+            'womenEmployeeCount' => $womenEmployeeCount,
+            'invalidEmployeeCount'=>$invalidEmployeeCount,
+            'pensioners'=>$pensioners
         ]);
     }
 

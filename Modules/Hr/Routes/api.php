@@ -610,5 +610,6 @@ Route::group([
         Route::put('/confirm/{id}', 'CompanyOrderController@confirm');
         Route::delete('/{id}', 'CompanyOrderController@destroy');
     });
+
 });
 
