@@ -42,11 +42,6 @@ class CheckUserRole
             $this->companyId =  array_key_exists('company_id' , (array)$headers) ? $headers['company_id'] : $request->get('company_id');
         }
         $this->userRoles = UserRole::where('user_id', Auth::id())->get(['role_id', 'company_id', 'office_id']);
-//        foreach ($this->userRoles as $userRole) {
-//            echo $userRole->role_id;
-//            echo "<br>";
-//        }
-//        exit;
         $this->permissionProvider = new PermissionProvider($role, $this->companyId);
         $this->roleModel = $role;
     }
@@ -69,7 +64,7 @@ class CheckUserRole
          * When user requests as platform user
          */
         else {
-//            $this->removeCompanyRolesFromUserRoleListForThisRequest();
+            $this->removeCompanyRolesFromUserRoleListForThisRequest();
         }
 
         /*
