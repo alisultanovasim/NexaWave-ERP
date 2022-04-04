@@ -54,7 +54,7 @@ class ProfileController extends Controller
                 ->first();
         }
 
-        if ($request->get('company_id')) {
+//        if ($request->get('company_id')) {
             $companies = Employee::where('user_id', Auth::id())
                 ->active()
                 ->with([
@@ -66,7 +66,7 @@ class ProfileController extends Controller
                     'contracts.position'
                 ])
                 ->get();
-        }
+//        }
 
         $modules = (new Module())
             ->where('parent_id', null)
