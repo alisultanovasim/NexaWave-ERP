@@ -13,12 +13,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        echo "Provider";
-        echo "<br>";
-        echo "<pre>";
-        print_r($_SERVER);
-        echo "</pre>";
-        exit();
+        //
     }
 
     /**
