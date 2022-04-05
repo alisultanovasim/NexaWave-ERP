@@ -59,7 +59,7 @@ class CheckUserRole
     public function __construct(Request $request, Role $role)
     {
         echo "<pre>";
-        print_r(request()->header('company_id'));
+        print_r(request()->header());
         echo "</pre>";
         exit;
         $this->request = $request;
