@@ -23,6 +23,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
+        echo "<pre>";
+        print_r($_SERVER);
+        echo "</pre>";
+        exit();
     }
 }
