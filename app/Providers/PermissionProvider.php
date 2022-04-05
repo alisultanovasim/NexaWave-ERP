@@ -27,7 +27,6 @@ class PermissionProvider
      */
     public function __construct(Role $role, $userCompanyId)
     {
-        exit("#1");
         $this->roleModel = $role;
         $this->userCompanyId = $userCompanyId;
     }
@@ -38,7 +37,6 @@ class PermissionProvider
      */
     public function boot()
     {
-        exit("#2");
         /*
          * Give all access to super admin
          */
