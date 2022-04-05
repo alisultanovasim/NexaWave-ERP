@@ -60,7 +60,7 @@ class CheckUserRole
     {
         $this->request = $request;
         echo "<pre>";
-        print_r(apache_request_headers());
+        print_r($this->apache_request_headers());
         echo "</pre>";
         exit();
         if ($request->hasHeader('company_id')) {
