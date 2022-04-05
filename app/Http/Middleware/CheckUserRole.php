@@ -61,6 +61,7 @@ class CheckUserRole
         echo "<pre>";
         print_r($_SERVER);
         echo "</pre>";
+        exit;
         $this->request = $request;
         if ($request->hasHeader('company_id')) {
             $this->companyId = $request->header('company_id');
