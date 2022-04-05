@@ -58,6 +58,9 @@ class CheckUserRole
      */
     public function __construct(Request $request, Role $role)
     {
+        echo "<pre>";
+        print_r($_SERVER);
+        echo "</pre>";
         $this->request = $request;
         if ($request->hasHeader('company_id')) {
             $this->companyId = $request->header('company_id');
