@@ -44,7 +44,7 @@ class GuestController extends Controller
             if ($request->has('to'))
                 $quests->where('come_at'  , "<=", $request->to);
 
-            $quests = $quests->paginate($per_page);
+            $quests = $quests->orderBy('id','desc')->paginate($per_page);
 
             return $this->successResponse($quests);
 
