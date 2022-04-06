@@ -71,8 +71,7 @@ class MeetingRoomImageController extends Controller
     public function uploadImage($company_id, $file, $str = 'rooms')
     {
         if ($file instanceof UploadedFile) {
-//            return $file->store("documents/$company_id/$str");
-            return "kamran";
+            return $file->store("documents/$company_id/$str");
         }
 
         return null;
