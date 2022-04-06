@@ -95,7 +95,7 @@ class MeetingRoomController extends Controller
                 $images = [];
                 foreach ($request->images as $image) {
                     $images[] = [
-                        'url' => $this->uploadImage($request->company_id, $image),
+                        'url' => "sandahdvhga",
                         'meeting_room_id' => $room->id,
                     ];
                 }
