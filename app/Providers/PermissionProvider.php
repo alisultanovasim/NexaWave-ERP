@@ -37,7 +37,6 @@ class PermissionProvider
      */
     public function boot()
     {
-
         /*
          * Give all access to super admin
          */
