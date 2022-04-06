@@ -349,7 +349,6 @@ class MeetingRoomController extends Controller
      */
     public function store(Request $request)
     {
-        dd($request->all());
         $this->validate($request, [
             'office_id' => 'sometimes|required|integer',
             'company_id' => 'required|integer',
