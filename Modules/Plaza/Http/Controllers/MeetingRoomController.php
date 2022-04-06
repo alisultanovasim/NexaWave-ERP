@@ -95,7 +95,7 @@ class MeetingRoomController extends Controller
                 $images = [];
                 foreach ($request->images as $image) {
                     $images[] = [
-                        'url' => "sandahdvhga",
+                        'url' => $this->uploadImage($request->company_id, $image),
                         'meeting_room_id' => $room->id,
                     ];
                 }
@@ -349,6 +349,7 @@ class MeetingRoomController extends Controller
      */
     public function store(Request $request)
     {
+        dd($request->all());
         $this->validate($request, [
             'office_id' => 'sometimes|required|integer',
             'company_id' => 'required|integer',
