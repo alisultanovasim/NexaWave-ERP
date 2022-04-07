@@ -238,13 +238,20 @@ class MeetingRoomController extends Controller
     public function deleteRoom(Request $request, $id)
     {
         $this->validate($request, [
-            'company_id' => 'required|integer',
-            'user_id' => 'required|integer'
+            'company_id' => 'required|integer'
         ]);
         try {
-            $check = MeetingRooms::where('company_id', $request->company_id)
-                ->where('id', $id)
+            $meeting_room_reservations_delete=DB::table('meeting_room_reservations')
+                ->where('meeting_room',$id)
+                ->where('company_id',$request->company_id)
                 ->delete();
+            $meeting_room_images_delete=DB::table('meeting_room_images')
+                ->where('meeting_room_id',$id)
+                ->delete();
+            $check = MeetingRooms::query()
+            ->where('company_id', $request->company_id)
+            ->where('id', $id)
+            ->delete();
             if (!$check) return $this->errorResponse(trans('apiResponse.RoomNotFound'));
             return $this->successResponse('ok');
         } catch (\Illuminate\Database\QueryException $e) {
