@@ -15,7 +15,7 @@ class MeetingRoomImage extends Model
 
     public function getUrlAttribute($value){
         if ($value)
-            return env('APP_URL') . '/documents/'  . $value;
+            return env('APP_URL') . '/'  . $value;
         return $value;
     }
 }
