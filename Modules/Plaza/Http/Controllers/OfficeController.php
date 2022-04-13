@@ -327,9 +327,7 @@ class OfficeController extends Controller
     public function uploadImage($company_id, $file, $str = 'offices')
     {
         if ($file instanceof UploadedFile) {
-            echo $str;
-            echo "<br>";
-            echo $company_id;
+            return $str . " " . $company_id;
 //            $file->store("/public/documents/$company_id/$str");
 //            return "";
         }
