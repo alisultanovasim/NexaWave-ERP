@@ -154,7 +154,7 @@ class LaborActivityController extends Controller
             'labor_book_number' => 'required',
             'labor_book_filling_date' => 'required|date',
             'labor_bool_stuffing_number' => 'required',
-            'in_this_company' => 'required|boolean',
+            'in_this_company' => 'nullable|boolean',
             'is_civil_service' => 'required|boolean',
             'termination_reason' => 'nullable|min:3|max:255',
             'note' => 'nullable|min:3|max:255',

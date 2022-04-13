@@ -419,8 +419,8 @@ class UserController extends Controller
     public static function updateRules()
     {
         return [
-            'name' => ['nullable', 'string', 'max:255'],
-            'surname' => ['nullable', 'string', 'max:255'],
+            'name' => ['required', 'string', 'min:3','max:255'],
+            'surname' => ['required', 'string','min:3', 'max:255'],
             'voen' => ['nullable', 'string', 'max:255'],
             'email' => ['nullable', 'email', 'max:255'],
 //            'fin' => ['nullable', 'string', 'max:255'],
