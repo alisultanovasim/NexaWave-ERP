@@ -252,7 +252,6 @@ class EmployeeController extends Controller
      */
     public function update(Request $request, $id)
     {
-        exit('test');
         $this->validate($request, [
             'is_active' => ['sometimes', 'required', 'boolean'],
             'company_id' => ['required', 'integer'],
