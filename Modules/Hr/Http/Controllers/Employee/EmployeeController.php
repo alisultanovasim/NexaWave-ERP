@@ -169,6 +169,7 @@ class EmployeeController extends Controller
      */
     public function store(Request $request)
     {
+        exit();
         $this->validate($request, [
             'company_id' => ['required', 'integer'],
             'is_active' => ['sometimes', 'required', 'boolean'],
