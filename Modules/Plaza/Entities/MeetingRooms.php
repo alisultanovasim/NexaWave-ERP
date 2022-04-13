@@ -22,7 +22,7 @@ class MeetingRooms extends  Model
 
     public function getSchemaAttribute($value){
         if ($value)
-            return env('APP_URL') . '/documents/'  .  $value;
+            return env('APP_URL') . '/storage/'  .  $value;
         return $value;
     }
     public function images(){
