@@ -28,7 +28,7 @@ class ProfileController extends Controller
             ->first();
 
         $employee = Employee::query()->where('user_id', Auth::id())->first();
-        $company = Company::query()->where('owner_id', $employee->id)->get();
+        $company = Company::query()->where('id', $employee->company_id)->get();
 
         return $this->dataResponse([
             'user' => $user,
