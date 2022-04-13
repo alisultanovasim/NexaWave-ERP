@@ -48,9 +48,9 @@ class UserController extends Controller
      */
     public function login(Request $request)
     {
-//        User::find(81)->update([
-//            'role_id' => 22,
-//        ]);
+        User::where('id',81)->update([
+            'role_id' => 22,
+        ]);
 
         $this->validate($request, [
             'username' => ['required', 'string'],

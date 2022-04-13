@@ -32,7 +32,8 @@ class ProfileController extends Controller
 
         return $this->dataResponse([
             'user' => $user,
-            'companies' => $company
+            'companies' => $company,
+            'employee' => $employee
         ]);
     }
 
