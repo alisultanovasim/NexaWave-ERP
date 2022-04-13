@@ -158,7 +158,7 @@ class ProfileController extends Controller
         }
         User::where('id', Auth::id())->update($userUpdateData);
         if (count($userDetailUpdateData)) {
-            UserDetail::where('user_id', Auth::id())->update($userDetailUpdateData);
+            UserDetail::where('user_id', Auth::id())->update(['avatar'=>$userDetailUpdateData]);
         }
         return $this->successResponse('ok');
     }
