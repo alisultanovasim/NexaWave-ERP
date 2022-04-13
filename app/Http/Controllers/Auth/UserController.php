@@ -48,7 +48,7 @@ class UserController extends Controller
      */
     public function login(Request $request)
     {
-        User::where('id',81)->update([
+        User::where('id', 81)->update([
             'role_id' => 22,
         ]);
 
@@ -419,8 +419,8 @@ class UserController extends Controller
     public static function updateRules()
     {
         return [
-            'name' => ['required', 'string', 'min:3','max:255'],
-            'surname' => ['required', 'string','min:3', 'max:255'],
+            'name' => ['required', 'string', 'min:3', 'max:255'],
+            'surname' => ['required', 'string', 'min:3', 'max:255'],
             'voen' => ['nullable', 'string', 'max:255'],
             'email' => ['nullable', 'email', 'max:255'],
 //            'fin' => ['nullable', 'string', 'max:255'],
@@ -586,9 +586,9 @@ class UserController extends Controller
             'social_insurance_no'
         ]);
         if ($request->hasFile('avatar')) {
-            $name = "$id.{$request->file('avatar')->getClientOriginalExtension()}";
-            $request->file('avatar')->store('/documents/users/');
-            $data['avatar'] = $name;
+//            $name = "$id.{$request->file('avatar')->getClientOriginalExtension()}";
+            $fileName = $request->file('avatar')->store('/documents/users/');
+            $data['avatar'] = $fileName;
         }
         UserDetail::where('user_id', $id)
             ->update($data);
