@@ -586,7 +586,6 @@ class UserController extends Controller
             'social_insurance_no'
         ]);
         if ($request->hasFile('avatar')) {
-//            $name = "$id.{$request->file('avatar')->getClientOriginalExtension()}";
             $fileName = $request->file('avatar')->store('/documents/users/');
             $data['avatar'] = $fileName;
         }
