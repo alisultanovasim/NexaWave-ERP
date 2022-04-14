@@ -11,4 +11,5 @@ class TemporaryFile extends Model
     use UsesUuid, SoftDeletes;
 
     protected $guarded = [];
+    public $timestamps=false;
 }
