@@ -54,14 +54,21 @@ class TemporaryFileService
         $uploadFile->storeAs($path, $name);
 
         $file = new TemporaryFile();
-        $file->fill([
-            'file' => $path . '/' . $name,
-            'disk_name' => 'local',
-            'name' => $name,
-            'extension' => $ext,
-            'size' => $size,
-            'size_type' => 'KB'
-        ])->save();
+        $file->file=$path . '/' . $name;
+        $file->disk_name='local';
+        $file->name=$name;
+        $file->extension=$ext;
+        $file->size=$size;
+        $file->size_type='KB';
+        $file->save();
+//        $file->fill([
+//            'file' => $path . '/' . $name,
+//            'disk_name' => 'local',
+//            'name' => $name,
+//            'extension' => $ext,
+//            'size' => $size,
+//            'size_type' => 'KB'
+//        ])->save();
 
         return $file;
     }
