@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class TemporaryFileService
 {
@@ -48,7 +49,7 @@ class TemporaryFileService
     {
         $ext = $uploadFile->getClientOriginalExtension();
         $size = $uploadFile->getSize();
-        $name = createNewPhotoName($ext);
+        $name = strtolower(Str::random(10) . '_' . time() . '.' . $ext);
         $path = 'temp/files';
         $uploadFile->storeAs($path, $name);
 

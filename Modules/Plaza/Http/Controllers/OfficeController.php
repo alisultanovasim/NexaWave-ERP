@@ -138,7 +138,7 @@ class OfficeController extends Controller
             'month_count' => 'required|integer',
             'payed_month_count' => 'sometimes|required|integer|lte:month_count',
 
-            'location' => 'required|array',
+//            'location' => 'required|array',
 
             'location.*.size' => 'required|numeric',
             'location.*.floor_id' => 'required|integer',
