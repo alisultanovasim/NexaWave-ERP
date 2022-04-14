@@ -11,4 +11,6 @@ class TemporaryFile extends Model
     use UsesUuid, SoftDeletes;
 
     protected $guarded = [];
+
+    protected $hidden = ['id'];
 }
