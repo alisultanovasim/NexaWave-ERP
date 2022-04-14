@@ -11,5 +11,5 @@ class TemporaryFile extends Model
     use UsesUuid, SoftDeletes;
 
     protected $guarded = [];
-    public $timestamps=false;
+    protected $fillable=['uuid','file','disk','name','extension','size','size_type'];
 }
