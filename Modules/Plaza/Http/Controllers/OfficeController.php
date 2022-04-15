@@ -117,46 +117,45 @@ class OfficeController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
-            'company_id' => 'required|integer',
-            'name' => 'required|min:3|max:255',
-            'email' => 'sometimes|required|array',
-            'email.*.contact' => 'required_with:email|email',
-            'email.*.name' => 'sometimes|required|min:2|max:255',
+            'company_id' => 'required|integer',//
+            'name' => 'required|min:3|max:255',//
+            'email' => 'sometimes|required|array',//
+            'email.*.contact' => 'required_with:email|email',//
+            'email.*.name' => 'sometimes|required|min:2|max:255',//
 
-            'entity' => 'required|integer|in:1,2',
+            'entity' => 'required|integer|in:1,2',//
 
-            'voen' => 'sometimes|required',
+            'voen' => 'sometimes|required',//
 
-            'contract' => 'sometimes|required|mimes:pdf,doc,docx',
+//            'contract' => 'sometimes|required|mimes:pdf,doc,docx',
 
-            'phone' => 'sometimes|required|array',
-            'phone.*.name' => 'sometimes|required|min:2|max:255',
-            'phone.*.contact' => 'required_with:phone|regex:/^\+?[0-9]{12}$/',
+            'phone' => 'sometimes|required|array',//
+            'phone.*.name' => 'sometimes|required|min:2|max:255',//
+            'phone.*.contact' => 'required_with:phone|regex:/^\+?[0-9]{12}$/',//
 
-            'image' => 'sometimes|required|file|mimes:jpeg,png,pdf,jpg,gif,svg',
-            'start_time' => 'required|date|date_format:Y-m-d',
-            'month_count' => 'required|integer',
-            'payed_month_count' => 'sometimes|required|integer|lte:month_count',
+//            'image' => 'sometimes|required|file|mimes:jpeg,png,pdf,jpg,gif,svg',
+//            'start_time' => 'required|date|date_format:Y-m-d',
+            'month_count' => 'required|integer',//
+            'payed_month_count' => 'sometimes|required|integer|lte:month_count',//
 
-//            'location' => 'required|array',
+            'location' => 'required|array',//
 
-            'location.*.size' => 'required|numeric',
-            'location.*.floor_id' => 'required|integer',
-            'location.*.number' => 'sometimes|required|integer',
-            'location.*.schema' => 'sometimes|required|file|mimes:jpeg,png,jpg,gif,svg,pdf,docx,doc',
-            'per_month' => 'required|numeric',
+            'location.*.size' => 'required|numeric',//
+            'location.*.floor_id' => 'required|integer',//
+            'location.*.number' => 'sometimes|required|integer',//
+            'per_month' => 'required|numeric',//
 
-            'agree_at' => 'sometimes|required|date|date_format:Y-m-d',
+//            'agree_at' => 'sometimes|required|date|date_format:Y-m-d',
 
-            'documents' => 'sometimes|required|array',
-            'documents.*' => 'sometimes|required|mimes::jpeg,png,jpg,gif,svg,pdf,docx,doc,txt,xls,xlsx',
+//            'documents' => 'sometimes|required|array',
+//            'documents.*' => 'sometimes|required|mimes::jpeg,png,jpg,gif,svg,pdf,docx,doc,txt,xls,xlsx',
 
-            'username' => ['required', 'string', 'min:6', Rule::unique("users", "username")],
+            'username' => ['required', 'string', 'min:6', Rule::unique("users", "username")],//
 
-            'user_email' => ['required', 'email', 'min:6'],
-            'set_password' => ['nullable', 'min:6'],
-//            "price_without_adv" => ["sometimes", "required", "numeric"],
-//            "is_adv_payer" => ["sometimes", "required", "boolean"],
+            'user_email' => ['required', 'email', 'min:6'],//
+            'set_password' => ['nullable', 'min:6'],//
+            "price_without_adv" => ["sometimes", "required", "numeric"],//
+            "is_adv_payer" => ["sometimes", "required", "boolean"],//
 //            "is_buy_attendance" => ["sometimes", "required", "boolean"],
 //            "parking_count" => ["sometimes", "required", "integer"],
 //            "parking_type" => ['sometimes', "required", Rule::in([

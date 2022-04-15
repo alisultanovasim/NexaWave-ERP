@@ -55,7 +55,6 @@ class TemporaryFileService
 
         $file = new TemporaryFile();
         $file->fill([
-            'uuid'=>Str::uuid(),
             'file' => $path . '/' . $name,
             'disk_name' => 'local',
             'name' => $name,
