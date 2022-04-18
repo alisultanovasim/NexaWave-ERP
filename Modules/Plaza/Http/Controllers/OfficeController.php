@@ -155,7 +155,7 @@ class OfficeController extends Controller
             'user_email' => ['required', 'email', 'min:6'],//
             'set_password' => ['nullable', 'min:6'],//
             "price_without_adv" => ["sometimes", "required", "numeric"],//
-            "is_adv_payer" => ["sometimes", "required", "boolean"],//
+            "is_adv_payer" => ["sometimes", "required","in:1,2"],//
 //            "is_buy_attendance" => ["sometimes", "required", "boolean"],
 //            "parking_count" => ["sometimes", "required", "integer"],
 //            "parking_type" => ['sometimes', "required", Rule::in([
