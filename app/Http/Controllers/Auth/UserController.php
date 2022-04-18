@@ -588,7 +588,6 @@ class UserController extends Controller
         if ($request->hasFile('avatar')) {
             $name = "$id.{$request->file('avatar')->getClientOriginalExtension()}";
             $request->file('avatar')->move('documents/users/', $name);
-            $request->file('avatar')->move('documents/users/');
             $data['avatar'] = $name;
 
 //            $fileName = $request->file('avatar')->store('/documents/users/');
