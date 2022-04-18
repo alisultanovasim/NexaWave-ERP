@@ -586,8 +586,13 @@ class UserController extends Controller
             'social_insurance_no'
         ]);
         if ($request->hasFile('avatar')) {
-            $fileName = $request->file('avatar')->store('/documents/users/');
-            $data['avatar'] = $fileName;
+            $name = "$id.{$request->file('avatar')->getClientOriginalExtension()}";
+            $request->file('avatar')->move('documents/users/', $name);
+            $request->file('avatar')->move('documents/users/');
+            $data['avatar'] = $name;
+
+//            $fileName = $request->file('avatar')->store('/documents/users/');
+//            $data['avatar'] = $fileName;
         }
         UserDetail::where('user_id', $id)
             ->update($data);
