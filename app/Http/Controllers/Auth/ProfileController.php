@@ -28,7 +28,11 @@ class ProfileController extends Controller
             ->first();
 
         $employee = Employee::query()->where('user_id', Auth::id())->first();
-        $company = Company::query()->where('id', $employee->company_id)->get();
+        if ($employee != null) {
+            $company = Company::query()->where('id', $employee->company_id)->get();
+        } else {
+            $company = null;
+        }
 
         return $this->dataResponse([
             'user' => $user,
@@ -56,17 +60,17 @@ class ProfileController extends Controller
         }
 
 //        if ($request->get('company_id')) {
-            $companies = Employee::where('user_id', Auth::id())
-                ->active()
-                ->with([
-                    'company',
-                    'contracts' => function ($q) {
-                        $q->where('is_active', true);
-                        $q->select(['id', 'position_id', 'employee_id']);
-                    },
-                    'contracts.position'
-                ])
-                ->get();
+        $companies = Employee::where('user_id', Auth::id())
+            ->active()
+            ->with([
+                'company',
+                'contracts' => function ($q) {
+                    $q->where('is_active', true);
+                    $q->select(['id', 'position_id', 'employee_id']);
+                },
+                'contracts.position'
+            ])
+            ->get();
 //        }
 
         $modules = (new Module())
@@ -158,7 +162,7 @@ class ProfileController extends Controller
         }
         User::where('id', Auth::id())->update($userUpdateData);
         if (count($userDetailUpdateData)) {
-            UserDetail::where('user_id', Auth::id())->update(['avatar'=>$userDetailUpdateData]);
+            UserDetail::where('user_id', Auth::id())->update(['avatar' => $userDetailUpdateData]);
         }
         return $this->successResponse('ok');
     }
