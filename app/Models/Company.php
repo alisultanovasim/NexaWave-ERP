@@ -9,6 +9,7 @@ use Modules\Hr\Entities\Department;
 use Modules\Hr\Entities\Positions;
 use Modules\Hr\Entities\Section;
 use Modules\Hr\Entities\Sector;
+use Modules\Plaza\Entities\Meeting;
 
 /**
  * @property integer $id
@@ -99,6 +100,9 @@ class Company extends Model
         return $this->hasMany(Sector::class, 'structable_id', 'id')
             ->with('curator')
             ->where('structable_type', 'company');
+    }
+    public function meeting(){
+        return $this->hasMany(Meeting::class,'id','company_id');
     }
 
 }

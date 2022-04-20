@@ -6,6 +6,8 @@ Route::group([
     'prefix' => 'v1/plaza',
     'middleware' => ['auth:api', 'authorize']
 ], function ($route) {
+    Route::pattern('key','[0-9]+');
+    Route::pattern('keyword','[A-Za-z]+');
 
     Route::group([
         'prefix' => 'floors'
@@ -79,6 +81,8 @@ Route::group([
         Route::get('/{id}', 'WorkerController@show');
         Route::post('/update/{id}', 'WorkerController@update');
         Route::post('/delete/{id}', 'WorkerController@delete');
+        Route::get('/searchworker/{keyword}','WorkerController@searchworker');
+        Route::get('/searchcard/{key}','WorkerController@searchcard');
     }); //workers
 
     Route::group([
@@ -113,6 +117,12 @@ Route::group([
     Route::group([
         'prefix' => 'meeting'
     ], function () {
+
+        Route::group(['prefix'=>'reserved'],function (){
+            Route::get('/',[\Modules\Plaza\Http\Controllers\ReservedRoomsController::class,'rooms']);
+            Route::get('/filter',[\Modules\Plaza\Http\Controllers\ReservedRoomsController::class,'filter']);
+        });// reserve rooms
+
         Route::group([
             'prefix' => 'rooms'
         ], function () {

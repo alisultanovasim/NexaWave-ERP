@@ -365,4 +365,28 @@ class WorkerController extends Controller
             return $this->errorResponse(trans('apiResponse.tryLater'), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+    public function searchworker(Request $request,$keyword){
+        $this->validate($request,[
+            'company_id'=>'required'
+        ]);
+            $result=Worker::query()
+                ->where('name','like','%'.$keyword.'%')
+                ->get('name');
+             if ($result==null){
+                return $this->errorResponse(trans('apiResponse.notFound'),Response::HTTP_NOT_FOUND);
+            }
+            return $this->dataResponse($result,Response::HTTP_OK);
+    }
+    public function searchcard(Request $request,$key){
+        $this->validate($request,[
+            'company_id'=>'required'
+        ]);
+        $alias=Card::query()
+            ->where('alias','like','%'.$key.'%')
+            ->get('alias');
+        if ($alias==null){
+            return $this->errorResponse(trans('apiResponse.notFound'),Response::HTTP_NOT_FOUND);
+        }
+        return $this->dataResponse($alias,Response::HTTP_OK);
+    }
 }

@@ -4,6 +4,7 @@
 namespace Modules\Plaza\Entities;
 
 
+use App\Models\Company;
 use Illuminate\Database\Eloquent\Model;
 
 class Meeting extends Model
@@ -21,5 +22,8 @@ class Meeting extends Model
     public function office(){
         return $this->belongsTo('Modules\Plaza\Entities\Office');
 
+    }
+    public function company(){
+        return $this->belongsTo(Company::class,'company_id','id');
     }
 }
