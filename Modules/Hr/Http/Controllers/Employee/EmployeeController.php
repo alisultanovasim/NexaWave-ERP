@@ -178,7 +178,23 @@ class EmployeeController extends Controller
             'roles' => ['required', 'array', 'min:1'],
             'roles.*' => [
                 Rule::exists('roles', 'id')->where('company_id', $request->get('company_id'))
-            ]
+            ],
+            'tabel_number'=>'required',
+            'name'=>'required|min:3|max:77',
+            'surname'=>'required|min:3|max:77',
+            'father_name'=>'required|min:3|max:77',
+            'date_of_birth' => 'required|date|before:'.now()->subYears(16)->toDateString(),
+            'gender'=> 'required|in:1,2',
+            'citizenship'=>'required',
+            'id_seria'=>'required|string',
+            'id_number'=>'required|integer',
+            'id_fin'=>'required|string',
+            'institution'=>'required|string',
+            'date_of_issue'=>'required|date',
+            'validity_date'=>'required|date',
+            'email'=>'required|email|unique:users,email'
+
+
         ]);
         try {
             DB::beginTransaction();
