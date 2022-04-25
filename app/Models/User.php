@@ -49,7 +49,10 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
-
+    public function getFullNameAttribute()
+    {
+        return $this->name . ' ' . $this->surname;
+    }
 
     public function details(){
         return $this->hasOne(UserDetail::class);

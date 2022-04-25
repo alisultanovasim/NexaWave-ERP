@@ -3,9 +3,13 @@
 namespace Modules\Plaza\Http\Controllers;
 
 
+use App\Models\User;
+use Carbon\Carbon;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Validation\ValidationException;
+use Modules\Hr\Entities\Employee\Employee;
 use Modules\Plaza\Entities\Card;
 use Modules\Plaza\Entities\Office;
 use Modules\Plaza\Entities\Role;
@@ -367,15 +371,51 @@ class WorkerController extends Controller
     }
     public function searchworker(Request $request,$keyword){
         $this->validate($request,[
-            'company_id'=>'required'
+            'company_id'=>'required',
+            'position_id' => 'nullable|numeric'
         ]);
-            $result=Worker::query()
-                ->where('name','like','%'.$keyword.'%')
-                ->get('name');
-             if ($result==null){
-                return $this->errorResponse(trans('apiResponse.notFound'),Response::HTTP_NOT_FOUND);
-            }
-            return $this->dataResponse($result,Response::HTTP_OK);
+
+        $employees = Employee::query()->with('user')
+            ->whereHas('user',function ($builder) use ($keyword){
+                $builder->where('name','like','%'.$keyword.'%')
+                    ->orWhere('surname','like','%'.$keyword.'%');
+            })
+            ->where(function ($q) use ($request) {
+                $q->doesntHave("contracts")
+                    ->orWhereHas('contracts', function ($query) use ($request) {
+                        if ($request->get('department_id')) {
+                            $query->where('department_id', $request->get('department_id'));
+                        }
+                        if ($request->get('sector_id')) {
+                            $query->where('sector_id', $request->get('sector_id'));
+                        }
+                        if ($request->get('section_id')) {
+                            $query->where('section_id', $request->get('section_id'));
+                        }
+                        if ($request->get('position_id')) {
+                            $query->where(['position_id' => $request->get('position_id')]);
+                        }
+                        $query->where(function ($query) {
+                            $query->where('end_date', '>', Carbon::now());
+                            $query->orWhere('end_date', null);
+                        });
+                    });
+            })
+            ->where('company_id', $request->input('company_id'))
+            ->get();
+
+//        $p=User::all();
+//
+//        $full_names = $p->map(function ($person) {
+//            return $person->fullname;
+//        });
+//        $full_names = $p->map->fullname;
+
+        if (!count($employees)>0){
+            return response()->json('Not found',404);
+        }
+
+        return response()->json($employees,200);
     }
     public function searchcard(Request $request,$key){
         $this->validate($request,[
