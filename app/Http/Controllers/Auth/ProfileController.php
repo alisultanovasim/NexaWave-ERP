@@ -95,7 +95,7 @@ class ProfileController extends Controller
         }
 
         $modules = $modules
-            ->orderBy('position')
+            ->orderBy('position') //position_id change to position ?
             ->get([
                 'id',
                 'name',
