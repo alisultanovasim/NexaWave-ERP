@@ -59,19 +59,19 @@ class ProfileController extends Controller
                 ->first();
         }
 
-//        if ($request->get('company_id')) {
-        $companies = Employee::where('user_id', Auth::id())
-            ->active()
-            ->with([
-                'company',
-                'contracts' => function ($q) {
-                    $q->where('is_active', true);
-                    $q->select(['id', 'position_id', 'employee_id']);
-                },
-                'contracts.position'
-            ])
-            ->get();
-//        }
+        if ($request->get('company_id')) {
+            $companies = Employee::where('user_id', Auth::id())
+                ->active()
+                ->with([
+                    'company',
+                    'contracts' => function ($q) {
+                        $q->where('is_active', true);
+                        $q->select(['id', 'position_id', 'employee_id']);
+                    },
+                    'contracts.position'
+                ])
+                ->get();
+        }
 
         $modules = (new Module())
             ->where('parent_id', null)
@@ -95,7 +95,7 @@ class ProfileController extends Controller
         }
 
         $modules = $modules
-            ->orderBy('position_id')
+            ->orderBy('position') //position_id change to position ?
             ->get([
                 'id',
                 'name',
