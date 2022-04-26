@@ -183,7 +183,7 @@ class EmployeeController extends Controller
             'surname'=>'required|min:3|max:77',
             'father_name'=>'required|min:3|max:77',
             'date_of_birth' => 'required|date|before:'.now()->subYears(16)->toDateString(),
-            'gender'=> 'required|in:1,2',
+            'gender'=> 'required|in:m,f',
             'citizenship'=>'required',
             'id_seria'=>'required|string',
             'id_number'=>'required|integer',
@@ -216,11 +216,11 @@ class EmployeeController extends Controller
 
             DB::commit();
 
-            // Mail::to($request->input('email'))->send(new EmployeeCreate($user));
+             Mail::to($request->input('email'))->send(new EmployeeCreate($user));
 
             return $this->successResponse([
-                'employee_id' => $employee->getKey(),
-                'user_id' => $user->getKey(),
+                'Username:' => $user->username,
+                'Password:' => $user->password,
             ]);
 
 
