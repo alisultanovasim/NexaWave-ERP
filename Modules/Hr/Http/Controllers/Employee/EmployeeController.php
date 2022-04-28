@@ -75,16 +75,18 @@ class EmployeeController extends Controller
         if ($notExists = $this->companyInfo($request->get('company_id'), $request->only(['profession_id'])))
             return $this->errorResponse($notExists);
 
-        $employees = Employee::where('company_id', $request->get('company_id'))
+        $employees = Employee::query()
+            ->where('company_id', $request->get('company_id'))
+            ->where('is_active',true)
             ->with("contracts");
         //            ->join('employee_contracts', 'employees.id', 'employee_contracts.employee_id');
 
         //        dd($employees->get()->toArray());
 
-        if ($request->has('state') and $request->get('state') != '2')
-            $employees->where('employees.is_active', $request->get('state'));
-        else
-            $employees->where('employees.is_active', true);
+//        if ($request->has('state') and $request->get('state') != '2')
+//            $employees->where('employees.is_active', $request->get('state'));
+//        else
+//            $employees->where('employees.is_active', true);
 
         if ($request->get('department_id'))
             $employees->whereHas('contract', function ($q) use ($request) {

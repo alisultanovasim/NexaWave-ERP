@@ -389,8 +389,7 @@ Route::group([
         Route::group(['prefix' => 'punishments'], function () {
             Route::get("/", 'PunishmentController@index');
             Route::get("/{id}", 'PunishmentController@show');
-            Route::post("/", 'Punishme
-            ntController@create');
+            Route::post("/", 'PunishmentController@create');
             Route::put("/{id}", 'PunishmentController@update');
             Route::delete("/{id}", 'PunishmentController@destroy');
         });

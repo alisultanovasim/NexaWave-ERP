@@ -99,6 +99,10 @@ class CompanyOrderController extends Controller
     {
         $this->validate($request, $this->getRules());
         $this->saveOrder($request, $this->order);
+
+        DB::table('employees')
+            ->where(['user_id'=>Auth::id(),'company_id'=>$request->company_id])
+            ->update(['is_active'=>0]);
         return $this->successResponse(trans('messages.saved'), 201);
     }
 
@@ -150,10 +154,6 @@ class CompanyOrderController extends Controller
                 'confirmed_date' => $confirmedDate
             ]);
             $order->save();
-
-            DB::table('employees')
-                ->where(['user_id'=>Auth::id(),'company_id'=>$request->company_id])
-                ->update(['is_active'=>2]);
 
             $this->saveOrderEmployees($order->getKey(), $request->get('employees'), $this->getOrderModelByType($request->get('type')));
         });
