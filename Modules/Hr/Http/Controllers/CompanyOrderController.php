@@ -150,6 +150,11 @@ class CompanyOrderController extends Controller
                 'confirmed_date' => $confirmedDate
             ]);
             $order->save();
+
+            DB::table('employees')
+                ->where(['user_id'=>Auth::id(),'company_id'=>$request->company_id])
+                ->update(['is_active'=>2]);
+
             $this->saveOrderEmployees($order->getKey(), $request->get('employees'), $this->getOrderModelByType($request->get('type')));
         });
     }

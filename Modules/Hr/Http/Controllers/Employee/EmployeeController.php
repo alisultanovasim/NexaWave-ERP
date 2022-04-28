@@ -55,6 +55,20 @@ class EmployeeController extends Controller
             ],
         ]);
 
+//        $data=DB::table('orders')
+//            ->select('order_employees.details')
+//            ->leftJoin('order_employees','order_employees.order_id','=','orders.id')
+//            ->where('company_id',$request->company_id)
+//            ->get();
+//        $val=[];
+//        foreach ($data as $key=>$item){
+//            $decode=json_decode($item->details);
+//        }
+//
+//        return response()->json($decode->employee_name,200);
+
+
+
         $orderBy = $request->get('order_by') ?? 'employees.id';
         $sortBy = $request->get('sort_by') == 'asc' ? 'asc' : 'desc';
 
