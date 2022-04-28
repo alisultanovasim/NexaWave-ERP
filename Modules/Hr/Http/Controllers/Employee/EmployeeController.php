@@ -77,7 +77,6 @@ class EmployeeController extends Controller
 
         $employees = Employee::query()
             ->where('company_id', $request->get('company_id'))
-            ->where('is_active',true)
             ->with("contracts");
         //            ->join('employee_contracts', 'employees.id', 'employee_contracts.employee_id');
 
