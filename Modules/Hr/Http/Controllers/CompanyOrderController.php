@@ -95,13 +95,13 @@ class CompanyOrderController extends Controller
         return $this->successResponse($order);
     }
 
-    public function create(Request $request)
+    public function create(Request $request,$user_id)
     {
         $this->validate($request, $this->getRules());
         $this->saveOrder($request, $this->order);
 
         DB::table('employees')
-            ->where(['user_id'=>Auth::id(),'company_id'=>$request->company_id])
+            ->where(['user_id'=>$user_id,'company_id'=>$request->company_id])
             ->update(['is_active'=>0]);
         return $this->successResponse(trans('messages.saved'), 201);
     }

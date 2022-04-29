@@ -39,6 +39,20 @@ class EmployeeController extends Controller
      */
     public function index(Request $request)
     {
+
+        $data=DB::table('orders')
+            ->select('order_employees.details')
+            ->leftJoin('order_employees','order_employees.order_id','=','orders.id')
+            ->where('company_id',$request->company_id)
+            ->get();
+        $val=[];
+        foreach ($data as $key=>$item){
+            $decode=json_decode($item->details, true);
+            if($decode){
+
+                $val[] = $decode['employee_id'];
+            }
+        }
         $this->validate($request, [
             'company_id' => ['required', 'integer'],
             'per_page' => ['sometimes', 'required', 'integer'],
@@ -54,21 +68,6 @@ class EmployeeController extends Controller
                 'nullable', Rule::in(['employee_contracts.start_date'])
             ],
         ]);
-
-//        $data=DB::table('orders')
-//            ->select('order_employees.details')
-//            ->leftJoin('order_employees','order_employees.order_id','=','orders.id')
-//            ->where('company_id',$request->company_id)
-//            ->get();
-//        $val=[];
-//        foreach ($data as $key=>$item){
-//            $decode=json_decode($item->details);
-//        }
-//
-//        return response()->json($decode->employee_name,200);
-
-
-
         $orderBy = $request->get('order_by') ?? 'employees.id';
         $sortBy = $request->get('sort_by') == 'asc' ? 'asc' : 'desc';
 
@@ -77,6 +76,7 @@ class EmployeeController extends Controller
 
         $employees = Employee::query()
             ->where('company_id', $request->get('company_id'))
+            ->whereNotIn('id',$val)
             ->with("contracts");
         //            ->join('employee_contracts', 'employees.id', 'employee_contracts.employee_id');
 
