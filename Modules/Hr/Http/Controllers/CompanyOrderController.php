@@ -102,7 +102,7 @@ class CompanyOrderController extends Controller
 
         DB::table('employees')
             ->where(['user_id'=>$user_id,'company_id'=>$request->company_id])
-            ->update(['is_active'=>0]);
+            ->update(['is_active'=>2]);
         return $this->successResponse(trans('messages.saved'), 201);
     }
 
