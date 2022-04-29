@@ -24,9 +24,10 @@ class ReservedRoomsController extends Controller
         ]);
         $reserved_rooms=\DB::table('meeting_room_reservations')
             ->where('meeting_room_reservations.company_id',$request->company_id)
-            ->select('companies.name as company_name','meeting_rooms.name as room_name','start_at as date','meeting_room_reservations.status','price')
+            ->select('offices.name as office_name','companies.name as company_name','meeting_rooms.name as room_name','start_at as date','meeting_room_reservations.status','price')
             ->leftJoin('companies','companies.id','=','meeting_room_reservations.company_id')
             ->leftJoin('meeting_rooms','meeting_rooms.id','=','meeting_room_reservations.meeting_room')
+            ->leftJoin('offices','offices.company_id','=','meeting_room_reservations.company_id')
             ->get();
         if ($reserved_rooms==null){
             return \response()->json(['message'=>'Rezerv edilmis otaq yoxdur'],404);

@@ -40,19 +40,20 @@ class EmployeeController extends Controller
     public function index(Request $request)
     {
 
-        $data=DB::table('orders')
-            ->select('order_employees.details')
-            ->leftJoin('order_employees','order_employees.order_id','=','orders.id')
-            ->where('company_id',$request->company_id)
-            ->get();
-        $val=[];
-        foreach ($data as $key=>$item){
-            $decode=json_decode($item->details, true);
-            if($decode){
+//        $data=DB::table('orders')
+//            ->select('order_employees.details')
+//            ->leftJoin('order_employees','order_employees.order_id','=','orders.id')
+//            ->where('company_id',$request->company_id)
+//            ->get();
+//        $val=[];
+//        foreach ($data as $key=>$item){
+//            $decode=json_decode($item->details, true);
+//            if($decode){
+//
+//                $val[] = $decode['employee_id'];
+//            }
+//        }
 
-                $val[] = $decode['employee_id'];
-            }
-        }
         $this->validate($request, [
             'company_id' => ['required', 'integer'],
             'per_page' => ['sometimes', 'required', 'integer'],
@@ -75,8 +76,10 @@ class EmployeeController extends Controller
             return $this->errorResponse($notExists);
 
         $employees = Employee::query()
+            ->whereHas('contract',function ($query){
+                $query->where('is_terminated','!=',1);
+            })
             ->where('company_id', $request->get('company_id'))
-            ->whereNotIn('id',$val)
             ->with("contracts");
         //            ->join('employee_contracts', 'employees.id', 'employee_contracts.employee_id');
 

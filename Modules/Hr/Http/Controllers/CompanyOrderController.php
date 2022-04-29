@@ -12,6 +12,7 @@ use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
+use Modules\Hr\Entities\Employee\Contract;
 use Modules\Hr\Entities\Employee\Employee;
 use Modules\Hr\Entities\EmployeeOrders\BusinessTrip;
 use Modules\Hr\Entities\EmployeeOrders\ContractConclusion;
@@ -100,9 +101,23 @@ class CompanyOrderController extends Controller
         $this->validate($request, $this->getRules());
         $this->saveOrder($request, $this->order);
 
-        DB::table('employees')
-            ->where(['user_id'=>$user_id,'company_id'=>$request->company_id])
-            ->update(['is_active'=>0]);
+//        DB::table('employees')
+//            ->where(['user_id'=>$user_id,'company_id'=>$request->company_id])
+//            ->update(['is_active'=>0]);
+
+//        Contract::query()
+//            ->whereHas('employee',function ($query) use ($user_id,$request){
+//                $query->where('user_id',$user_id)
+//                        ->where('company_id',$request->company_id);
+//            })->where('is_terminated',0)
+//                ->update(['is_terminated'=>1]);
+
+
+        DB::statement("UPDATE employee_contracts
+                            INNER JOIN employees ON employee_contracts.employee_id = employees.id
+                            SET employee_contracts.is_terminated=1
+                            WHERE employees.user_id='".$user_id."' and employees.company_id='".$request->company_id."'");
+
         return $this->successResponse(trans('messages.saved'), 201);
     }
 
