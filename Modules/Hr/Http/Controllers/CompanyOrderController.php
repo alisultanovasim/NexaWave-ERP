@@ -96,7 +96,7 @@ class CompanyOrderController extends Controller
         return $this->successResponse($order);
     }
 
-    public function create(Request $request,$user_id)
+    public function create(Request $request)
     {
         $this->validate($request, $this->getRules());
         $this->saveOrder($request, $this->order);

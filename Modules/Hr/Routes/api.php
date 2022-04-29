@@ -604,7 +604,7 @@ Route::group([
     Route::group(['prefix' => 'company/orders'], function () {
         Route::get('/', 'CompanyOrderController@index');
         Route::get('/employees', 'CompanyOrderController@getOrderEmployees');
-        Route::post('/{user_id}', 'CompanyOrderController@create');
+        Route::post('/', 'CompanyOrderController@create');
         Route::put('/{id}', 'CompanyOrderController@update');
         Route::get('/{id}', 'CompanyOrderController@show');
         Route::put('/confirm/{id}', 'CompanyOrderController@confirm');
