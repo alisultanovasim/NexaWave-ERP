@@ -113,10 +113,10 @@ class CompanyOrderController extends Controller
 //                ->update(['is_terminated'=>1]);
 
 
-        DB::statement("UPDATE employee_contracts
-                            INNER JOIN employees ON employee_contracts.employee_id = employees.id
-                            SET employee_contracts.is_terminated=1
-                            WHERE employees.user_id='".$user_id."' and employees.company_id='".$request->company_id."'");
+//        DB::statement("UPDATE employee_contracts
+//                            INNER JOIN employees ON employee_contracts.employee_id = employees.id
+//                            SET employee_contracts.is_terminated=1
+//                            WHERE employees.user_id='".$user_id."' and employees.company_id='".$request->company_id."'");
 
         return $this->successResponse(trans('messages.saved'), 201);
     }
