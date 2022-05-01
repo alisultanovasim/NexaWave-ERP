@@ -98,8 +98,8 @@ class CompanyOrderController extends Controller
 
     public function create(Request $request)
     {
-        $this->validate($request, $this->getRules());
-        $this->saveOrder($request, $this->order);
+//        $this->validate($request, $this->getRules());
+//        $this->saveOrder($request, $this->order);
 
 //        DB::table('employees')
 //            ->where(['user_id'=>$user_id,'company_id'=>$request->company_id])
@@ -112,13 +112,27 @@ class CompanyOrderController extends Controller
 //            })->where('is_terminated',0)
 //                ->update(['is_terminated'=>1]);
 
+//        $val=[];
+//        foreach ($request->employees as $key=>$item) {
+//            $decode = json_decode($item->details, true);
+//            if ($decode) {
+//                $val[] = $decode['employee_id'];
+//            }
+//        }
 
-//        DB::statement("UPDATE employee_contracts
+//        $imp_array=implode(',',$val);
+
+//            $data=DB::statement("SELECT employee_contracts.id from employee_contracts
 //                            INNER JOIN employees ON employee_contracts.employee_id = employees.id
-//                            SET employee_contracts.is_terminated=1
-//                            WHERE employees.user_id='".$user_id."' and employees.company_id='".$request->company_id."'");
+//                            WHERE employees.user_id =48 and employees.company_id='" . $request->company_id . "'");
+           Contract::query()
+                ->join('employees','employee_contracts.employee_id','=','employees.id')
+                ->where('employees.user_id',48)
+                ->where('employees.company_id',1)
+                ->get();
 
-        return $this->successResponse(trans('messages.saved'), 201);
+
+        return $this->successResponse(trans('message.saved'), 201);
     }
 
     public function update(Request $request, $id)
