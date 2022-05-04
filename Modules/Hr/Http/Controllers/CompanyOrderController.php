@@ -111,7 +111,7 @@ class CompanyOrderController extends Controller
 
         $val=[];
         foreach ($request->employees as $key=>$item) {
-            $decode = json_decode($item->details, true);
+            $decode = json_decode($item[0]->details, true);
             if ($decode) {
 
                 $val[] = $decode['employee_id'];
@@ -131,7 +131,7 @@ class CompanyOrderController extends Controller
 //            ->where('employees.company_id',$request->company_id)
 //            ->update(['employee_contracts.is_terminated'=>1]);
 
-        $data=DB::table('employee_contracts')
+        DB::table('employee_contracts')
             ->whereIn('employee_id',$imp_array)
             ->update(['is_terminated'=>1]);
 
