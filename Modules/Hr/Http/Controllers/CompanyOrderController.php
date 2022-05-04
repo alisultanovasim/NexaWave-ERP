@@ -117,6 +117,9 @@ class CompanyOrderController extends Controller
 //            }
         }
 
+
+
+        return $val;
         $imp_array=implode(',',$val);
 
 //        DB::statement("UPDATE employee_contracts
