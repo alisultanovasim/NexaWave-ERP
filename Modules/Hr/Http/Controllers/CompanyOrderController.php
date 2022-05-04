@@ -111,10 +111,7 @@ class CompanyOrderController extends Controller
 
         $val=[];
         foreach ($request->employees as $item) {
-            $decode = json_decode(json_encode($item['details']), true);
-//            if ($decode) {
-                $val[] = $decode['employee_id'];
-//            }
+            $val[] = json_decode(json_encode($item['details']), true)['employee_id'];
         }
 
 
