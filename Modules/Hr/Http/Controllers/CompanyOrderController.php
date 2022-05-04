@@ -91,19 +91,16 @@ class CompanyOrderController extends Controller
             'id' => $id,
             'company_id' => $request->get('company_id')
         ])
-        ->with('employees')
-        ->firstOrFail();
+            ->with('employees')
+            ->firstOrFail();
         return $this->successResponse($order);
     }
 
     public function create(Request $request)
     {
-//        $this->validate($request, $this->getRules());
-//        $this->saveOrder($request, $this->order);
+        $this->validate($request, $this->getRules());
+        $this->saveOrder($request, $this->order);
 
-//        DB::table('employees')
-//            ->where(['user_id'=>$user_id,'company_id'=>$request->company_id])
-//            ->update(['is_active'=>0]);
 
 //        Contract::query()
 //            ->whereHas('employee',function ($query) use ($user_id,$request){
@@ -112,24 +109,43 @@ class CompanyOrderController extends Controller
 //            })->where('is_terminated',0)
 //                ->update(['is_terminated'=>1]);
 
-//        $val=[];
-//        foreach ($request->employees as $key=>$item) {
-//            $decode = json_decode($item->details, true);
-//            if ($decode) {
-//                $val[] = $decode['employee_id'];
-//            }
-//        }
+        $val=[];
+        foreach ($request->employees as $key=>$item) {
+            $decode = json_decode($item->details, true);
+            if ($decode) {
 
-//        $imp_array=implode(',',$val);
+                $val[] = $decode['employee_id'];
+            }
+        }
 
-//            $data=DB::statement("SELECT employee_contracts.id from employee_contracts
+        $imp_array=implode(',',$val);
+
+//        DB::statement("UPDATE employee_contracts
 //                            INNER JOIN employees ON employee_contracts.employee_id = employees.id
-//                            WHERE employees.user_id =48 and employees.company_id='" . $request->company_id . "'");
-           Contract::query()
-                ->join('employees','employee_contracts.employee_id','=','employees.id')
-                ->where('employees.user_id',48)
-                ->where('employees.company_id',1)
-                ->get();
+//                            SET employee_contracts.is_terminated=1
+//                            WHERE employees.user_id IN ('" .$imp_array. "') and employees.company_id='" . $request->company_id . "'");
+
+//        DB::table('employee_contracts')
+//            ->join('employees','employee_contracts.employee_id','=','employees.id')
+//            ->whereIn('employees.user_id',$imp_array)
+//            ->where('employees.company_id',$request->company_id)
+//            ->update(['employee_contracts.is_terminated'=>1]);
+
+        $data=DB::table('employee_contracts')
+            ->whereIn('employee_id',$imp_array)
+            ->update(['is_terminated'=>1]);
+
+//        DB::table('orders')
+//            ->insert([
+//               'type'=>2,
+//               'number'=>$request->number,
+//                'company_id'=>$request->company_id,
+//                'labor_code_id'=>$request->labor_code_id,
+//                'order_sign_date'=>Carbon::today(),
+//                'created_by'=>$request->compnay_id,
+//                'confirmed_date'=>Carbon::today(),
+//                'confirmed_by'=>$request->company_id
+//            ]);
 
 
         return $this->successResponse(trans('message.saved'), 201);
@@ -284,7 +300,7 @@ class CompanyOrderController extends Controller
         else if ($typeId == 8)
             return new BusinessTrip();
         else
-           throw new InvalidArgumentException('Invalid order type');
+            throw new InvalidArgumentException('Invalid order type');
     }
 
 }
