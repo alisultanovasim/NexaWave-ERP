@@ -119,7 +119,7 @@ class CompanyOrderController extends Controller
 
 
 
-        return $val;
+
         $imp_array=implode(',',$val);
 
 //        DB::statement("UPDATE employee_contracts
@@ -132,7 +132,7 @@ class CompanyOrderController extends Controller
 //            ->whereIn('employees.user_id',$imp_array)
 //            ->where('employees.company_id',$request->company_id)
 //            ->update(['employee_contracts.is_terminated'=>1]);
-
+        return $imp_array;
         DB::table('employee_contracts')
             ->whereIn('employee_id',$imp_array)
             ->update(['is_terminated'=>1]);
