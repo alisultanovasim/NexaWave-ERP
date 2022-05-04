@@ -110,12 +110,11 @@ class CompanyOrderController extends Controller
 //                ->update(['is_terminated'=>1]);
 
         $val=[];
-        foreach ($request->employees as $key=>$item) {
-            $decode = json_decode($item[$key]->details, true);
-            if ($decode) {
-
+        foreach ($request->employees as $item) {
+            $decode = json_decode(json_encode($item->details), true);
+//            if ($decode) {
                 $val[] = $decode['employee_id'];
-            }
+//            }
         }
 
         $imp_array=implode(',',$val);
