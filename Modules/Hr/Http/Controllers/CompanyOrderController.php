@@ -122,7 +122,7 @@ class CompanyOrderController extends Controller
             ->delete();
 
         DB::table('employees')
-            ->where('id',[$val])
+            ->whereIn('id',[$val])
             ->update(['is_active'=>0]);
         return $this->successResponse(trans('message.saved'), 201);
     }
