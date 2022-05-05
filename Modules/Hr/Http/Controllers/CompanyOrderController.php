@@ -124,7 +124,7 @@ class CompanyOrderController extends Controller
 
         DB::table('employees')
             ->where('id',[$imp_array])
-            ->update(['deleted_at'=>Carbon::now()]);
+            ->update(['is_active'=>0]);
         return $this->successResponse(trans('message.saved'), 201);
     }
 
