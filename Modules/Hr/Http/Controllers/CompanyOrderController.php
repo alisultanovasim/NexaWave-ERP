@@ -41,24 +41,25 @@ class CompanyOrderController extends Controller
         $this->orderEmployee = $orderEmployee;
     }
 
-    public function index(Request $request){
+    public function index(Request $request)
+    {
         $sql = "select type, count(type) as count, (case when confirmed_date is not null then 1 else 0 end) as is_confirmed from orders where company_id = ? group by type, is_confirmed";
         $orders = DB::select($sql, [$request->get('company_id')]);
         $response = [];
 
-        foreach ($this->order->getTypeIds() as $id){
+        foreach ($this->order->getTypeIds() as $id) {
             $response[$id] = [
                 'type' => $id,
-                'name' => trans('hr_orders.type.'.$id.'.name'),
-                'description' => trans('hr_orders.type.'.$id.'.description'),
-                'route' => trans('hr_orders.type.'.$id.'.route'),
+                'name' => trans('hr_orders.type.' . $id . '.name'),
+                'description' => trans('hr_orders.type.' . $id . '.description'),
+                'route' => trans('hr_orders.type.' . $id . '.route'),
                 'sum' => 0,
                 'sum_of_confirmed' => 0,
                 'sum_of_not_confirmed' => 0
             ];
         }
 
-        foreach ($orders as $order){
+        foreach ($orders as $order) {
             $response[$order->type]['sum']++;
             if ($order->is_confirmed)
                 $response[$order->type]['sum_of_confirmed']++;
@@ -72,7 +73,7 @@ class CompanyOrderController extends Controller
     {
         $employees = $this->orderEmployee
             ->filter($employeeFilters)
-            ->whereHas('order', function ($query) use ($request, $orderFilters){
+            ->whereHas('order', function ($query) use ($request, $orderFilters) {
                 $query->filter($orderFilters);
             })
             ->with('order:id,type,number,labor_code_id,order_sign_date,confirmed_date')
@@ -104,49 +105,21 @@ class CompanyOrderController extends Controller
 
 //        Contract::query()
 //            ->whereHas('employee',function ($query) use ($user_id,$request){
-//                $query->where('user_id',$user_id)
-//                        ->where('company_id',$request->company_id);
+//                $query->where('user_id',$user_id)->where('company_id',$request->company_id);
 //            })->where('is_terminated',0)
 //                ->update(['is_terminated'=>1]);
 
-        $val=[];
+        $val = [];
         foreach ($request->employees as $item) {
             $val[] = json_decode(json_encode($item['details']), true)['employee_id'];
         }
 
 
+        $imp_array = implode(',', $val);
 
-
-        $imp_array=implode(',',$val);
-
-//        DB::statement("UPDATE employee_contracts
-//                            INNER JOIN employees ON employee_contracts.employee_id = employees.id
-//                            SET employee_contracts.is_terminated=1
-//                            WHERE employees.user_id IN ('" .$imp_array. "') and employees.company_id='" . $request->company_id . "'");
-
-//        DB::table('employee_contracts')
-//            ->join('employees','employee_contracts.employee_id','=','employees.id')
-//            ->whereIn('employees.user_id',$imp_array)
-//            ->where('employees.company_id',$request->company_id)
-//            ->update(['employee_contracts.is_terminated'=>1]);
-//        return $imp_array;
         DB::table('employee_contracts')
-            ->whereIn('employee_id',[$imp_array])
-            ->update(['is_terminated'=>1]);
-
-//        DB::table('orders')
-//            ->insert([
-//               'type'=>2,
-//               'number'=>$request->number,
-//                'company_id'=>$request->company_id,
-//                'labor_code_id'=>$request->labor_code_id,
-//                'order_sign_date'=>Carbon::today(),
-//                'created_by'=>$request->compnay_id,
-//                'confirmed_date'=>Carbon::today(),
-//                'confirmed_by'=>$request->company_id
-//            ]);
-
-
+            ->whereIn('employee_id', [$imp_array])
+            ->update(['is_terminated' => 1]);
         return $this->successResponse(trans('message.saved'), 201);
     }
 
@@ -178,15 +151,14 @@ class CompanyOrderController extends Controller
 
     public function saveOrder(Request $request, Order $order)
     {
-        if ($request->get('is_confirmed')){
+        if ($request->get('is_confirmed')) {
             $confirmedBy = ($this->getEmployeeByUserId(Auth::id(), $request->get('company_id')))->getKey();
             $confirmedDate = Carbon::now();
-        }
-        else {
+        } else {
             $confirmedBy = null;
             $confirmedDate = null;
         }
-        DB::transaction(function () use ($request, $order, $confirmedBy, $confirmedDate){
+        DB::transaction(function () use ($request, $order, $confirmedBy, $confirmedDate) {
             $order->fill([
                 'company_id' => $request->get('company_id'),
                 'type' => $request->get('type'),
@@ -206,7 +178,7 @@ class CompanyOrderController extends Controller
     private function saveOrderEmployees(int $orderId, array $orderEmployees, OrderType $orderType): void
     {
         $ids = [];
-        foreach ($orderEmployees as $orderEmployee){
+        foreach ($orderEmployees as $orderEmployee) {
             $orderEmployee = $this->orderEmployee->updateOrCreate(
                 [
                     'order_id' => $orderId,
@@ -220,7 +192,7 @@ class CompanyOrderController extends Controller
             );
             $ids[] = $orderEmployee->getKey();
         }
-        if (count($ids)){
+        if (count($ids)) {
             $this->deleteOrderEmployeesWhichIsNotInArray($orderId, $ids);
         }
     }
@@ -229,7 +201,7 @@ class CompanyOrderController extends Controller
     {
         $rules = $orderType->getEmployeeValidateRules();
         $newRules = [];
-        foreach ($rules as $ruleName => $rule){
+        foreach ($rules as $ruleName => $rule) {
             $newRules[] = explode('employees.*.details', $ruleName);
         }
 //        dd($rules);
@@ -260,7 +232,8 @@ class CompanyOrderController extends Controller
         ])->first();
     }
 
-    private function getRules(): array {
+    private function getRules(): array
+    {
         $rules = [
             'type' => [
                 'required',
@@ -272,7 +245,7 @@ class CompanyOrderController extends Controller
             'employees' => 'required_if:is_confirmed,1|array',
             'is_confirmed' => 'required|boolean'
         ];
-        if (\request()->get('type')){
+        if (\request()->get('type')) {
             $rules = array_merge(
                 $rules,
                 $this->getOrderModelByType(\request()->get('type'))->getEmployeeValidateRules()
@@ -281,7 +254,8 @@ class CompanyOrderController extends Controller
         return $rules;
     }
 
-    private function getOrderModelByType($typeId): OrderType {
+    private function getOrderModelByType($typeId): OrderType
+    {
         if ($typeId == 1)
             return new ContractConclusion();
         else if ($typeId == 2)
