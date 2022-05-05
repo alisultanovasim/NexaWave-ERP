@@ -62,9 +62,6 @@ class EmployeeController extends Controller
             return $this->errorResponse($notExists);
 
         $employees = Employee::query()
-            ->whereHas('contract',function ($query){
-                $query->where('is_terminated','!=',1);
-            })
             ->where('company_id', $request->get('company_id'))
             ->with("contracts");
         //            ->join('employee_contracts', 'employees.id', 'employee_contracts.employee_id');
