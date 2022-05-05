@@ -118,12 +118,12 @@ class CompanyOrderController extends Controller
         $imp_array = implode(',', $val);
 
         DB::table('employee_contracts')
-            ->whereIn('employee_id', [$imp_array])
+            ->where('employee_id', [$imp_array])
             ->update(['is_terminated' => 1,'is_active'=>0]);
 
         DB::table('employees')
             ->whereIn('id',[$imp_array])
-            ->update(['is_active'=>0]);
+            ->delete();
         return $this->successResponse(trans('message.saved'), 201);
     }
 
