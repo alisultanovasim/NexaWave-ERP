@@ -121,7 +121,7 @@ class CompanyOrderController extends Controller
             ->whereIn('employee_id', [$imp_array])
             ->update(['is_terminated' => 1]);
         DB::table('employees')
-            ->whereIn('id',$imp_array)
+            ->whereIn('id',[$imp_array])
             ->update(['is_active'=>0]);
         return $this->successResponse(trans('message.saved'), 201);
     }
