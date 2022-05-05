@@ -23,7 +23,7 @@ class Employee extends Model
 
     public function contracts()
     {
-        return $this->hasMany('Modules\Hr\Entities\Employee\Contract')->where('is_active' , 1)->where('is_terminated',0);
+        return $this->hasMany('Modules\Hr\Entities\Employee\Contract')->where('is_active' , 1);
     }
 
     public function contract()
