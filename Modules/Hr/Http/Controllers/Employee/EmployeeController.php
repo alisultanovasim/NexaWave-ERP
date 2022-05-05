@@ -189,7 +189,7 @@ class EmployeeController extends Controller
 //            'date_of_birth' => 'required|date|before:'.now()->subYears(16)->toDateString(),
             'gender'=> 'required|in:m,f',
 //            'citizenship'=>'required',
-            'id_seria'=>'required|string',
+//            'id_seria'=>'required|string',
 //            'id_number'=>'required|integer',
 //            'id_fin'=>'required|string',
 //            'institution'=>'required|string',
