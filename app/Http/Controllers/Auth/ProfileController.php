@@ -157,7 +157,7 @@ class ProfileController extends Controller
         if ($request->hasFile('avatar')) {
             $id = Auth::id();
             $name = md5($id . time()) . '.' . $request->file('avatar')->getClientOriginalExtension();
-            Storage::disk('public')->putFileAs('users', $request->file('avatar'), $name);
+            Storage::disk('public2')->putFileAs('users', $request->file('avatar'), $name);
             $userDetailUpdateData['avatar'] = $name;
         }
         User::where('id', Auth::id())->update($userUpdateData);
