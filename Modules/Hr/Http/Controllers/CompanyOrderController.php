@@ -122,7 +122,7 @@ class CompanyOrderController extends Controller
             ->update(['is_terminated'=>1]);//for terminated status
 
         DB::table('employees')
-            ->whereIn('id',$imp_array)
+            ->whereIn('id',[$imp_array])
             ->update(['is_active'=>0]);
 
         return $this->successResponse(trans('message.saved'), 201);
