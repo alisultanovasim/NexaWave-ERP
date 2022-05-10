@@ -203,7 +203,7 @@ class EmployeeController extends Controller
             DB::beginTransaction();
 
             if ($request->has('user_id')) {
-                $user = User::where('id', $request->get('user_id'))->first(['id']);
+                $user = User::where('id', $request->get('user_id'))->first();
                 if (!$user)
                     return $this->errorResponse(trans('response.userNotFound'));
             } else {
