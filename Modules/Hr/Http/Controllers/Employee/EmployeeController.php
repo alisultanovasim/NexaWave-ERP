@@ -224,7 +224,7 @@ class EmployeeController extends Controller
 
             return $this->successResponse([
                 'Username:' => $user->username,
-                'Password:' => $user->password,
+                'Password:' => \Str::random(9),
             ]);
 
 
