@@ -119,7 +119,7 @@ class CompanyOrderController extends Controller
 
         DB::table('employee_contracts')
             ->whereIn('employee_id', [$imp_array])
-            ->update(['is_terminated'=>1,'is_active'=>0]);//for terminated status
+            ->update(['is_terminated'=>1]);//for terminated status
 
         DB::table('employees')
             ->whereIn('id',[$imp_array])
