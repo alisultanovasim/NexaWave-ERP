@@ -423,7 +423,7 @@ class WorkerController extends Controller
         ]);
         $alias=Card::query()
             ->where('alias','like','%'.$key.'%')
-            ->get('alias');
+            ->get(['id','alias']);
         if ($alias==null){
             return $this->errorResponse(trans('apiResponse.notFound'),Response::HTTP_NOT_FOUND);
         }
