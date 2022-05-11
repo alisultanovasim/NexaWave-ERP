@@ -65,7 +65,7 @@ class EmployeeController extends Controller
             ->where('company_id', $request->get('company_id'))
             ->with("contracts")
             ->whereHas('contract', function ($q) use ($request) {
-                $q->where('is_active', 1);
+                $q->where('is_terminated', 0);
             });
         //            ->join('employee_contracts', 'employees.id', 'employee_contracts.employee_id');
 
