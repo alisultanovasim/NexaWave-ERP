@@ -63,10 +63,10 @@ class EmployeeController extends Controller
 
         $employees = Employee::query()
             ->where('company_id', $request->get('company_id'))
-            ->with("contracts")
-            ->whereHas('contract', function ($q) use ($request) {
-                $q->where('is_terminated', 0);
-            });
+            ->with("contracts");
+//            ->whereHas('contract', function ($q) use ($request) {
+//                $q->where('is_terminated', 0);
+//            });
         //            ->join('employee_contracts', 'employees.id', 'employee_contracts.employee_id');
 
         //        dd($employees->get()->toArray());
@@ -186,15 +186,15 @@ class EmployeeController extends Controller
             'name'=>'required|min:3|max:77',
             'surname'=>'required|min:3|max:77',
             'father_name'=>'required|min:3|max:77',
-//            'date_of_birth' => 'required|date|before:'.now()->subYears(16)->toDateString(),
+            'date_of_birth' => 'required|date|before:'.now()->subYears(16)->toDateString(),
             'gender'=> 'required|in:m,f',
-//            'citizenship'=>'required',
-//            'id_seria'=>'required|string',
-//            'id_number'=>'required|integer',
-//            'id_fin'=>'required|string',
-//            'institution'=>'required|string',
-//            'date_of_issue'=>'required|date',
-//            'validity_date'=>'required|date',
+            'citizenship'=>'required',
+            'id_seria'=>'required|string',
+            'id_number'=>'required|integer',
+            'id_fin'=>'required|string',
+            'institution'=>'required|string',
+            'date_of_issue'=>'required|date',
+            'validity_date'=>'required|date',
             'email'=>'required|email|unique:users,email'
 
 
@@ -224,7 +224,7 @@ class EmployeeController extends Controller
 
             return $this->successResponse([
                 'Username:' => $user->username,
-                'Password:' => \Str::random(9),
+                'Password:' => \Str::random(6),
             ]);
 
 
