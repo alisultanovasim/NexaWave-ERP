@@ -221,12 +221,12 @@ class EmployeeController extends Controller
 
             DB::commit();
 
-             Mail::to($request->input('email'))->send(new EmployeeCreate($user));
-
-            return $this->successResponse([
-                'Username:' => $user->username,
-                'Password:' => \Str::random(6),
-            ]);
+//             Mail::to($request->input('email'))->send(new EmployeeCreate($user));
+//
+//            return $this->successResponse([
+//                'Username:' => $user->username,
+//                'Password:' => \Str::random(6),
+//            ]);
 
 
         } catch (QueryException  $exception) {

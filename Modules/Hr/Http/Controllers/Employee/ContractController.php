@@ -5,14 +5,17 @@ namespace Modules\Hr\Http\Controllers\Employee;
 use App\Traits\ApiResponse;
 use App\Traits\Query;
 use Carbon\Carbon;
+use http\Client\Curl\User;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationData;
+use Modules\Hr\Emails\EmployeeCreate;
 use Modules\Hr\Entities\CompanyAuthorizedEmployee;
 use Modules\Hr\Entities\Employee\Contract;
 use Modules\Hr\Entities\Employee\Employee;
@@ -261,6 +264,14 @@ class ContractController extends Controller
         self::storeContract($request);
 
         DB::commit();
+            $employee=Employee::query()
+                ->where('id',$request->employee_id)
+                ->first();
+            $user=\Illuminate\Foundation\Auth\User::query()
+                ->where('id',$employee->user_id)
+                ->get();
+
+        Mail::to($request->email)->send(new EmployeeCreate($user));
 
         return $this->successResponse('ok');
 
