@@ -267,11 +267,11 @@ class ContractController extends Controller
             $employee=Employee::query()
                 ->where('id',$request->employee_id)
                 ->first();
-            $user=\Illuminate\Foundation\Auth\User::query()
+            $user=\App\Models\User::query()
                 ->where('id',$employee->user_id)
                 ->get();
 
-        Mail::to($request->email)->send(new EmployeeCreate($user));
+        Mail::to($user->email)->send(new EmployeeCreate($user));
 
         return $this->successResponse('ok');
 
