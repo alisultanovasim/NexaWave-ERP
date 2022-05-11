@@ -63,10 +63,10 @@ class EmployeeController extends Controller
 
         $employees = Employee::query()
             ->where('company_id', $request->get('company_id'))
-            ->with("contracts")
-            ->whereHas('contract', function ($q) use ($request) {
-                $q->where('is_terminated', 0);
-            });
+            ->with("contracts");
+//            ->whereHas('contract', function ($q) use ($request) {
+//                $q->where('is_terminated', 0);
+//            });
         //            ->join('employee_contracts', 'employees.id', 'employee_contracts.employee_id');
 
         //        dd($employees->get()->toArray());
