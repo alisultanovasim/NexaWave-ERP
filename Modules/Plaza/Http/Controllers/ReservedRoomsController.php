@@ -55,12 +55,7 @@ class ReservedRoomsController extends Controller
                 ->leftJoin('meeting_rooms','meeting_rooms.id','=','meeting_room_reservations.meeting_room');
 
             if ($request->has('company_name'))
-                if ($request->company_name==true){
-                    $data=$data->orderBy('companies.name','ASC');
-                }
-                else{
-                    $data=$data->orderBy('companies.name','DESC');
-                }
+
 
 
 

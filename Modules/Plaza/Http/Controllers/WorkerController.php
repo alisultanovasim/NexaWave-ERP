@@ -369,16 +369,17 @@ class WorkerController extends Controller
             return $this->errorResponse(trans('apiResponse.tryLater'), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
-    public function searchworker(Request $request,$keyword){
+    public function searchworker(Request $request){
         $this->validate($request,[
+            'workername'=>'required|string',
             'company_id'=>'required',
             'position_id' => 'nullable|numeric'
         ]);
 
         $employees = Employee::query()->with('user')
-            ->whereHas('user',function ($builder) use ($keyword){
-                $builder->where('name','like','%'.$keyword.'%')
-                    ->orWhere('surname','like','%'.$keyword.'%');
+            ->whereHas('user',function ($builder) use ($request){
+                $builder->where('name','like','%'.$request->workername.'%')
+                    ->orWhere('surname','like','%'.$request->workername.'%');
             })
             ->where(function ($q) use ($request) {
                 $q->doesntHave("contracts")

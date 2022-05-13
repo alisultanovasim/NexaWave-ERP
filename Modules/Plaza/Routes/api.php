@@ -81,7 +81,7 @@ Route::group([
         Route::get('/{id}', 'WorkerController@show');
         Route::post('/update/{id}', 'WorkerController@update');
         Route::post('/delete/{id}', 'WorkerController@delete');
-        Route::get('/searchworker/{keyword}','WorkerController@searchworker');
+        Route::get('/searchworker','WorkerController@searchworker');
         Route::get('/searchcard/{key}','WorkerController@searchcard');
     }); //workers
 
