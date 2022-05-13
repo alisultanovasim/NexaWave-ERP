@@ -121,7 +121,7 @@ class ContractController extends Controller
 //            'section_id' => ['sometimes', 'required', 'integer'], //exists m
 //            'sector_id' => ['sometimes', 'required', 'integer'],//exists m
 //            'position_id' => ['required', 'integer'],//exists m
-////            'salary' => ['required', 'numeric'],
+            'salary' => ['required', 'numeric'],
 //            'start_date' => ['required', 'date', 'date_format:Y-m-d'],
 //            'end_date' => ['sometimes','required', 'date', 'date_format:Y-m-d'],
 //            'employee_id' => ['required', 'integer'],//exists m
@@ -236,7 +236,7 @@ class ContractController extends Controller
 
     public function store(Request $request)
     {
-//        $this->validate($request, self::getValidateRules());
+        $this->validate($request, self::getValidateRules());
 
         DB::beginTransaction();
 
