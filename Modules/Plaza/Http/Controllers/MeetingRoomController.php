@@ -406,7 +406,7 @@ class MeetingRoomController extends Controller
                         ['finish_at', "<=", $end]
                     ]);
                 })->exists();
-            if ($check) return $this->errorResponse(trans('apiResponse.reservationTimeError'));
+            if (!$check) return $this->errorResponse(trans('apiResponse.reservationTimeError'));
            Meeting::create($request->only('company_id', 'start_at', 'finish_at', 'office_id', 'finish_at', 'event_name', 'description', 'meeting_room'));
            //Send email to plaza
         $name=$office->name;
