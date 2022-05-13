@@ -367,7 +367,7 @@ class MeetingRoomController extends Controller
         ]);
         $company_id = $request->company_id;
 
-        try {
+//        try {
 
             $timezone = $request->timezone ?? 'Asia/Baku';
             $start = Carbon::createFromFormat('Y-m-d H:i:s', $request->start_at, $timezone);
@@ -412,9 +412,9 @@ class MeetingRoomController extends Controller
            dispatch(new ReservationEmail("isa.qurbanov996@gmail.com",$office->name,$start,$meeting_rooms->name));
             Mail::to("info@timetower.az")->send(new ReservationEmail("info@timetower.az",$office->name,$start,$meeting_rooms->name));
             return $this->successResponse('OK');
-        } catch (Exception $e) {
+//        } catch (Exception $e) {
             return $this->errorResponse(trans('apiResponse.tryLater'), Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
+//        }
     }
 
     /**
