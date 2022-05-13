@@ -413,7 +413,8 @@ class MeetingRoomController extends Controller
             Mail::to("info@timetower.az")->send(new ReservationEmail("info@timetower.az",$office->name,$start,$meeting_rooms->name));
             return $this->successResponse('OK');
         } catch (Exception $e) {
-            return $this->errorResponse(trans('apiResponse.tryLater'), Response::HTTP_INTERNAL_SERVER_ERROR);
+//            return $this->errorResponse(trans('apiResponse.tryLater'), Response::HTTP_INTERNAL_SERVER_ERROR);
+            return $e->getMessage();
         }
     }
 
