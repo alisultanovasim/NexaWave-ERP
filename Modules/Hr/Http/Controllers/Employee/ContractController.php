@@ -269,7 +269,7 @@ class ContractController extends Controller
                 ->first();
             $user=\App\Models\User::query()
                 ->where('id',$employee->user_id)
-                ->get();
+                ->first();
 
         Mail::to($user->email)->send(new EmployeeCreate($user));
 
