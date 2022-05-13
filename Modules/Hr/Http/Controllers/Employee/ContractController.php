@@ -116,76 +116,76 @@ class ContractController extends Controller
     public static function getValidateRules()
     {
         return [
-//            'draft' => ['sometimes', 'boolean'],
-//            'department_id' => ['sometimes', 'required', 'integer'], //exists m
-//            'section_id' => ['sometimes', 'required', 'integer'], //exists m
-//            'sector_id' => ['sometimes', 'required', 'integer'],//exists m
-//            'position_id' => ['required', 'integer'],//exists m
-            'salary' => ['required', 'numeric'],
-//            'start_date' => ['required', 'date', 'date_format:Y-m-d'],
-//            'end_date' => ['sometimes','required', 'date', 'date_format:Y-m-d'],
-//            'employee_id' => ['required', 'integer'],//exists m
-//            'personal_category_id' => ['nullable', 'integer'],//exists
-//            'specialization_degree_id' => ['nullable', 'integer'],//exists
-//            'work_environment_id' => ['nullable', 'integer'],//exists
-//            'state_value' => ['nullable', 'numeric'],
-//            'intern_start_date' => ['nullable', 'date'],
-//            'intern_end_date' => ['nullable', 'date'],
-//            'currency_id' => ['required', 'integer'],//exists
-//            'contract_type_id' => [
-//                'required',
-//                Rule::exists('contract_types', 'id')
-//            ],//exists
-//            'work_start_date' => ['nullable', 'date_format:Y-m-d'],
-//            'work_end_date' => ['nullable', 'date_format:Y-m-d'],
-//            'break_time_start' => ['nullable', 'date_format:H:i'],
-//            'break_time_end' => ['nullable', 'date_format:H:i'],
-//            'work_time_start_at' => ['nullable', 'date_format:H:i'],
-//            'work_time_end_at' => ['nullable', 'date_format:H:i'],
-//            'contract_no' => ['required', 'string', 'max:255'],
-//            'duration_type_id' => [
-//                'required',
-//                Rule::exists('duration_types', 'id')
-//            ], //exists
-//            'labor_protection_addition' => ['nullable', 'string'],
-//            'labor_meal_addition' => ['nullable', 'string'],
-//            'labor_sport_addition' => ['nullable', 'string'],
-//            'vacation_main' => ['nullable', 'integer'],
-//            'vacation_work_insurance' => ['nullable', 'integer'],
-//            'vacation_work_envs' => ['nullable', 'integer'],
-//            'vacation_for_child' => ['nullable', 'integer'],
-//            'vacation_collective_contract' => ['nullable', 'integer'],
-//            'vacation_total' => ['nullable', 'integer'],
-//            'vacation_social_benefits' => ['nullable', 'numeric'],
-//            'vacation_start_date' => ['nullable', 'date_format:Y-m-d'],
-//            'vacation_end_date' => ['nullable', 'date_format:Y-m-d'],
-//            'contract_sing_date' => ['nullable', 'date_format:Y-m-d'],
-//            'company_authorized_employee_id' => ['nullable', 'integer'],
-//            'contract_id' => ['nullable', 'integer'],
-//            'position_salary_praise_about' => ['nullable', 'numeric'],
-//            'addition_package_fee' => ['nullable', 'numeric', "min:0", "max:100"],
-//            'award_amount' => ['nullable', 'numeric'],
-//            'award_period' => ['nullable', Rule::in(Contract::AWARD_PERIODS)],
-//            'work_environment_addition' => ['nullable', 'numeric'],
-//            'overtime_addition' => ['nullable', 'numeric'],
-//            'incomplete_work_hours' => ['nullable', 'numeric', "min:0", 'max:12'],
-//            'work_days_in_week' => ['nullable', 'integer', 'min:1', 'max:7'],
-//            'work_shift_count' => ['nullable', 'integer', 'min:0'],
-//            'first_shift_start_at' => ['nullable', 'date_format:H:i'],
-//            'first_shift_end_at' => ['nullable', 'date_format:H:i'],
-//            'second_shift_start_at' => ['nullable', 'date_format:H:i'],
-//            'second_shift_end_at' => ['nullable', 'date_format:H:i'],
-//            'third_shift_start_at' => ['nullable', 'date_format:H:i'],
-//            'third_shift_end_at' => ['nullable', 'date_format:H:i'],
-//            'social_amount' => ['nullable', 'string', 'max:255'],
-//            'addition_social_amount' => ['nullable', 'string', 'max:255'],
-//            'company_share' => ['nullable', 'string', 'max:255'],
-//            'dividend_amount' => ['nullable', 'string', 'max:255'],
-//            'user_personal_property' => ['nullable', 'string', 'max:255'],
-//            'provided_transport' => ['nullable', 'string', 'max:255'],
-//            'res_days' => ['nullable',"array"],
-//            'res_days.*'=>["string",Rule::in(Contract::WEEK_DAYS)],
-//            'work_place_type' => ['nullable', Rule::in(Contract::WORK_PLACE_TYPES)]
+            'draft' => ['sometimes', 'boolean'],
+            'department_id' => ['sometimes', 'required', 'integer'], //exists m
+            'section_id' => ['sometimes', 'required', 'integer'], //exists m
+            'sector_id' => ['sometimes', 'required', 'integer'],//exists m
+            'position_id' => ['required', 'integer'],//exists m
+//            'salary' => ['required', 'numeric'],
+            'start_date' => ['required', 'date', 'date_format:Y-m-d'],
+            'end_date' => ['sometimes','required', 'date', 'date_format:Y-m-d'],
+            'employee_id' => ['required', 'integer'],//exists m
+            'personal_category_id' => ['nullable', 'integer'],//exists
+            'specialization_degree_id' => ['nullable', 'integer'],//exists
+            'work_environment_id' => ['nullable', 'integer'],//exists
+            'state_value' => ['nullable', 'numeric'],
+            'intern_start_date' => ['nullable', 'date'],
+            'intern_end_date' => ['nullable', 'date'],
+            'currency_id' => ['required', 'integer'],//exists
+            'contract_type_id' => [
+                'required',
+                Rule::exists('contract_types', 'id')
+            ],//exists
+            'work_start_date' => ['nullable', 'date_format:Y-m-d'],
+            'work_end_date' => ['nullable', 'date_format:Y-m-d'],
+            'break_time_start' => ['nullable', 'date_format:H:i'],
+            'break_time_end' => ['nullable', 'date_format:H:i'],
+            'work_time_start_at' => ['nullable', 'date_format:H:i'],
+            'work_time_end_at' => ['nullable', 'date_format:H:i'],
+            'contract_no' => ['required', 'string', 'max:255'],
+            'duration_type_id' => [
+                'required',
+                Rule::exists('duration_types', 'id')
+            ], //exists
+            'labor_protection_addition' => ['nullable', 'string'],
+            'labor_meal_addition' => ['nullable', 'string'],
+            'labor_sport_addition' => ['nullable', 'string'],
+            'vacation_main' => ['nullable', 'integer'],
+            'vacation_work_insurance' => ['nullable', 'integer'],
+            'vacation_work_envs' => ['nullable', 'integer'],
+            'vacation_for_child' => ['nullable', 'integer'],
+            'vacation_collective_contract' => ['nullable', 'integer'],
+            'vacation_total' => ['nullable', 'integer'],
+            'vacation_social_benefits' => ['nullable', 'numeric'],
+            'vacation_start_date' => ['nullable', 'date_format:Y-m-d'],
+            'vacation_end_date' => ['nullable', 'date_format:Y-m-d'],
+            'contract_sing_date' => ['nullable', 'date_format:Y-m-d'],
+            'company_authorized_employee_id' => ['nullable', 'integer'],
+            'contract_id' => ['nullable', 'integer'],
+            'position_salary_praise_about' => ['nullable', 'numeric'],
+            'addition_package_fee' => ['nullable', 'numeric', "min:0", "max:100"],
+            'award_amount' => ['nullable', 'numeric'],
+            'award_period' => ['nullable', Rule::in(Contract::AWARD_PERIODS)],
+            'work_environment_addition' => ['nullable', 'numeric'],
+            'overtime_addition' => ['nullable', 'numeric'],
+            'incomplete_work_hours' => ['nullable', 'numeric', "min:0", 'max:12'],
+            'work_days_in_week' => ['nullable', 'integer', 'min:1', 'max:7'],
+            'work_shift_count' => ['nullable', 'integer', 'min:0'],
+            'first_shift_start_at' => ['nullable', 'date_format:H:i'],
+            'first_shift_end_at' => ['nullable', 'date_format:H:i'],
+            'second_shift_start_at' => ['nullable', 'date_format:H:i'],
+            'second_shift_end_at' => ['nullable', 'date_format:H:i'],
+            'third_shift_start_at' => ['nullable', 'date_format:H:i'],
+            'third_shift_end_at' => ['nullable', 'date_format:H:i'],
+            'social_amount' => ['nullable', 'string', 'max:255'],
+            'addition_social_amount' => ['nullable', 'string', 'max:255'],
+            'company_share' => ['nullable', 'string', 'max:255'],
+            'dividend_amount' => ['nullable', 'string', 'max:255'],
+            'user_personal_property' => ['nullable', 'string', 'max:255'],
+            'provided_transport' => ['nullable', 'string', 'max:255'],
+            'res_days' => ['nullable',"array"],
+            'res_days.*'=>["string",Rule::in(Contract::WEEK_DAYS)],
+            'work_place_type' => ['nullable', Rule::in(Contract::WORK_PLACE_TYPES)]
         ];
     }
 
