@@ -24,7 +24,7 @@ class ReservedRoomsController extends Controller
         ]);
         $reserved_rooms=\DB::table('meeting_room_reservations')
             ->where('meeting_room_reservations.company_id',$request->company_id)
-            ->select('offices.name as office_name','companies.name as company_name','meeting_rooms.name as room_name','start_at as date','meeting_room_reservations.status','price')
+            ->select('offices.name as office_name','companies.name as company_name','meeting_rooms.name as room_name','start_at as start_date','finish_at as end_date','meeting_room_reservations.status','price')
             ->leftJoin('companies','companies.id','=','meeting_room_reservations.company_id')
             ->leftJoin('meeting_rooms','meeting_rooms.id','=','meeting_room_reservations.meeting_room')
             ->leftJoin('offices','offices.company_id','=','meeting_room_reservations.company_id')
@@ -55,7 +55,12 @@ class ReservedRoomsController extends Controller
                 ->leftJoin('meeting_rooms','meeting_rooms.id','=','meeting_room_reservations.meeting_room');
 
             if ($request->has('company_name'))
-
+                if ($request->company_name==true){
+                    $data=$data->orderBy('companies.name','ASC');
+                }
+                else{
+                    $data=$data->orderBy('companies.name','DESC');
+                }
 
 
 
