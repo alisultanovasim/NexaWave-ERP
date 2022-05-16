@@ -119,7 +119,7 @@ Route::group([
     ], function () {
 
         Route::group(['prefix'=>'reserved'],function (){
-            Route::get('/{office_id?}',[\Modules\Plaza\Http\Controllers\ReservedRoomsController::class,'rooms']);
+            Route::get('/',[\Modules\Plaza\Http\Controllers\ReservedRoomsController::class,'rooms']);
             Route::get('/filter',[\Modules\Plaza\Http\Controllers\ReservedRoomsController::class,'filter']);
         });// reserve rooms
 
