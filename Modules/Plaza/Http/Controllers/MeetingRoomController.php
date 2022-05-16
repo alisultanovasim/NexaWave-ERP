@@ -241,17 +241,17 @@ class MeetingRoomController extends Controller
             'company_id' => 'required|integer'
         ]);
         try {
-            $meeting_room_reservations_delete=DB::table('meeting_room_reservations')
-                ->where('meeting_room',$id)
-                ->where('company_id',$request->company_id)
+            $meeting_room_reservations_delete = DB::table('meeting_room_reservations')
+                ->where('meeting_room', $id)
+                ->where('company_id', $request->company_id)
                 ->delete();
-            $meeting_room_images_delete=DB::table('meeting_room_images')
-                ->where('meeting_room_id',$id)
+            $meeting_room_images_delete = DB::table('meeting_room_images')
+                ->where('meeting_room_id', $id)
                 ->delete();
             $check = MeetingRooms::query()
-            ->where('company_id', $request->company_id)
-            ->where('id', $id)
-            ->delete();
+                ->where('company_id', $request->company_id)
+                ->where('id', $id)
+                ->delete();
             if (!$check) return $this->errorResponse(trans('apiResponse.RoomNotFound'));
             return $this->successResponse('ok');
         } catch (\Illuminate\Database\QueryException $e) {
@@ -367,54 +367,50 @@ class MeetingRoomController extends Controller
         ]);
         $company_id = $request->company_id;
 
-        try {
 
-            $timezone = $request->timezone ?? 'Asia/Baku';
-            $start = Carbon::createFromFormat('Y-m-d H:i:s', $request->start_at, $timezone);
-            $end = Carbon::createFromFormat('Y-m-d H:i:s', $request->finish_at, $timezone);
-            $now = Carbon::now()->timezone($timezone);
-            if ($start < $now) return $this->errorResponse(trans('apiResponse.reservationTimeError'));
-            if ($start > $end) return $this->errorResponse(trans('apiResponse.reservationTimeError'));
-            if ($start == $end) return $this->errorResponse(trans('apiResponse.timeError'));
+        $timezone = $request->timezone ?? 'Asia/Baku';
+        $start = Carbon::createFromFormat('Y-m-d H:i:s', $request->start_at, $timezone);
+        $end = Carbon::createFromFormat('Y-m-d H:i:s', $request->finish_at, $timezone);
+        $now = Carbon::now()->timezone($timezone);
+        if ($start < $now) return $this->errorResponse(trans('apiResponse.reservationTimeError'));
+        if ($start > $end) return $this->errorResponse(trans('apiResponse.reservationTimeError'));
+        if ($start == $end) return $this->errorResponse(trans('apiResponse.timeError'));
 
-            if ($request->has('office_id')) {
-                $office = Office::where([
-                    'id' => $request->office_id,
-                    'company_id' => $company_id
-                ])->first();
-                if (!$office) return $this->errorResponse(trans('apiResponse.unProcess'));
-            }
-            $meeting_rooms = MeetingRooms::where([
-                'id' => $request->meeting_room,
+        if ($request->has('office_id')) {
+            $office = Office::where([
+                'id' => $request->office_id,
                 'company_id' => $company_id
             ])->first();
-            if (!$meeting_rooms) return $this->errorResponse(trans('apiResponse.MeetingRoomNotFound'));
-            if ($meeting_rooms->status != 1) return $this->errorResponse(['meeting_room' => trans('apiResponse.roomIsNotActive')]);
-
-            $check = Meeting::where('company_id', $company_id)
-                ->where('meeting_room', $request->meeting_room)
-                ->where('status', config('plaza.reservation.status.wait'))
-                ->where(function ($query) use ($start, $end) {
-                    $query->where([
-                        ['start_at', "<", $start],
-                        ['finish_at', ">", $start]
-                    ])->orWhere([
-                        ['start_at', "<", $end],
-                        ['finish_at', ">", $end]
-                    ])->orWhere([
-                        ['start_at', ">=", $start],
-                        ['finish_at', "<=", $end]
-                    ]);
-                })->exists();
-            if ($check) return $this->errorResponse(trans('apiResponse.reservationTimeError'));
-           Meeting::create($request->only('company_id', 'start_at', 'finish_at', 'office_id', 'finish_at', 'event_name', 'description', 'meeting_room'));
-           //Send email to plaza
-           dispatch(new ReservationEmail("isa.qurbanov996@gmail.com",$office->name,$start,$meeting_rooms->name));
-            Mail::to("info@timetower.az")->send(new ReservationEmail("info@timetower.az",$office->name,$start,$meeting_rooms->name));
-            return $this->successResponse('OK');
-        } catch (Exception $e) {
-            return $this->errorResponse(trans('apiResponse.tryLater'), Response::HTTP_INTERNAL_SERVER_ERROR);
+            if (!$office) return $this->errorResponse(trans('apiResponse.unProcess'));
         }
+        $meeting_rooms = MeetingRooms::where([
+            'id' => $request->meeting_room,
+            'company_id' => $company_id
+        ])->first();
+        if (!$meeting_rooms) return $this->errorResponse(trans('apiResponse.MeetingRoomNotFound'));
+        if ($meeting_rooms->status != 1) return $this->errorResponse(['meeting_room' => trans('apiResponse.roomIsNotActive')]);
+
+        $check = Meeting::where('company_id', $company_id)
+            ->where('meeting_room', $request->meeting_room)
+            ->where('status', config('plaza.reservation.status.wait'))
+            ->where(function ($query) use ($start, $end) {
+                $query->where([
+                    ['start_at', "<", $start],
+                    ['finish_at', ">", $start]
+                ])->orWhere([
+                    ['start_at', "<", $end],
+                    ['finish_at', ">", $end]
+                ])->orWhere([
+                    ['start_at', ">=", $start],
+                    ['finish_at', "<=", $end]
+                ]);
+            })->exists();
+        if ($check) return $this->errorResponse(trans('apiResponse.reservationTimeError'));
+        Meeting::create($request->only('company_id', 'start_at', 'finish_at', 'office_id', 'finish_at', 'event_name', 'description', 'meeting_room'));
+        //Send email to plaza
+        dispatch(new ReservationEmail("isa.qurbanov996@gmail.com", $office->name, $start, $meeting_rooms->name));
+        Mail::to("info@timetower.az")->send(new ReservationEmail("info@timetower.az", $office->name, $start, $meeting_rooms->name));
+        return $this->successResponse('OK');
     }
 
     /**
@@ -569,10 +565,11 @@ class MeetingRoomController extends Controller
 
     }
 
-    public function waiting_rooms(){
-        $waiting_rooms=DB::table('meeting_room_reservations')
-            ->where('meeting_room_reservations.status','=',1)
+    public function waiting_rooms()
+    {
+        $waiting_rooms = DB::table('meeting_room_reservations')
+            ->where('meeting_room_reservations.status', '=', 1)
             ->count();
-        return $this->dataResponse(['count'=>$waiting_rooms],Response::HTTP_OK);
+        return $this->dataResponse(['count' => $waiting_rooms], Response::HTTP_OK);
     }
 }
