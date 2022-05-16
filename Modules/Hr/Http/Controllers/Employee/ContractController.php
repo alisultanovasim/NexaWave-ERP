@@ -209,11 +209,11 @@ class ContractController extends Controller
         ])->whereHas(
             'employee', function ($q) use ($request) {
             $q->where('company_id', $request->get('company_id'));
-            if ($request->has('employee_status') and $request->get('employee_status') != 2) {
-                $q->where('is_active', $request->get('employee_status'));
-            } else {
-                $q->where('is_active', true);
-            }
+//            if ($request->has('employee_status') and $request->get('employee_status') != 2) {
+//                $q->where('is_active', $request->get('employee_status'));
+//            } else {
+//                $q->where('is_active', true);
+//            }
         })->noInitial();
 
 
