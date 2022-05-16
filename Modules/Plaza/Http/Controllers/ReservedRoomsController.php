@@ -28,6 +28,7 @@ class ReservedRoomsController extends Controller
             ->leftJoin('companies','companies.id','=','meeting_room_reservations.company_id')
             ->leftJoin('meeting_rooms','meeting_rooms.id','=','meeting_room_reservations.meeting_room')
             ->leftJoin('offices','offices.company_id','=','meeting_room_reservations.company_id')
+           ->orderBy('meeting_room_reservations.start_at','desc')
             ->get();
         if ($reserved_rooms==null){
             return \response()->json(['message'=>'Rezerv edilmis otaq yoxdur'],404);
