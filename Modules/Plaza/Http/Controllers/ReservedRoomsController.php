@@ -23,7 +23,7 @@ class ReservedRoomsController extends Controller
             'company_id'=>'required',
             'office_id'=>'nullable'
         ]);
-        if ($office_id){
+        if ($office_id!=null){
             $reserved_rooms=\DB::table('meeting_room_reservations')
                 ->where(['meeting_room_reservations.company_id'=>$request->company_id,'meeting_room_reservations.office_id'=>$office_id])
                 ->select('offices.name as office_name','companies.name as company_name','meeting_rooms.name as room_name','start_at as start_date','finish_at as end_date','meeting_room_reservations.status','price')
