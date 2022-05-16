@@ -220,7 +220,7 @@ class EmployeeController extends Controller
             ]);
 
             DB::commit();
-            return $this->successResponse(['data'=>['employee_id'=>$employee->id,'user_id'=>$employee->user_id]]);
+            return $this->successResponse(['employee_id'=>$employee->id,'user_id'=>$employee->user_id]);
 
 
         } catch (QueryException  $exception) {

@@ -47,6 +47,7 @@ class ProfileController extends Controller
         $office = null;
         $companies = null;
         $modules = null;
+        $role=null;
 
         if ($user->getAttribute('is_office_user')) {
             $userRole = UserRole::where('user_id', Auth::id())
