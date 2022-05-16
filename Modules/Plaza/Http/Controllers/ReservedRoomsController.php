@@ -21,19 +21,21 @@ class ReservedRoomsController extends Controller
     public function rooms(Request $request,$office_id=null){
         $this->validate($request,[
             'company_id'=>'required',
-            'office_id'=>'nullable'
+            'per_page'=>'sometimes|integer'
         ]);
-        if ($office_id!=null){
+
+        $per_page=$request->per_page??10;
+        if (!isset($office_id)){
             $reserved_rooms=\DB::table('meeting_room_reservations')
-                ->where(['meeting_room_reservations.office_id'=>$office_id])
+                ->where(['meeting_room_reservations.office_id'=>$office_id,'meeting_room_reservations.company_id'=>$request->company_id])
                 ->select('offices.name as office_name','companies.name as company_name','meeting_rooms.name as room_name','start_at as start_date','finish_at as end_date','meeting_room_reservations.status','price')
-//                ->leftJoin('companies','companies.id','=','meeting_room_reservations.company_id')
+                ->leftJoin('companies','companies.id','=','meeting_room_reservations.company_id')
                 ->leftJoin('meeting_rooms','meeting_rooms.id','=','meeting_room_reservations.meeting_room')
                 ->leftJoin('offices','offices.company_id','=','meeting_room_reservations.company_id')
                 ->orderBy('meeting_room_reservations.start_at','desc')
-                ->get();
+                ->paginate($per_page);
         }
-        else{
+        else {
             $reserved_rooms=\DB::table('meeting_room_reservations')
                 ->where('meeting_room_reservations.company_id',$request->company_id)
                 ->select('offices.name as office_name','companies.name as company_name','meeting_rooms.name as room_name','start_at as start_date','finish_at as end_date','meeting_room_reservations.status','price')
@@ -41,11 +43,11 @@ class ReservedRoomsController extends Controller
                 ->leftJoin('meeting_rooms','meeting_rooms.id','=','meeting_room_reservations.meeting_room')
                 ->leftJoin('offices','offices.company_id','=','meeting_room_reservations.company_id')
                 ->orderBy('meeting_room_reservations.start_at','desc')
-                ->get();
+                ->paginate($per_page);
         }
 
         if ($reserved_rooms==null){
-            return \response()->json(['message'=>'Rezerv edilmis otaq yoxdur'],404);
+            return response()->json(['message'=>'Rezerv edilmis otaq yoxdur'],404);
         }
         return $this->dataResponse($reserved_rooms,200);
     }
@@ -56,12 +58,14 @@ class ReservedRoomsController extends Controller
             'room_name'=>'sometimes|string',
             'date'=>'sometimes|date',
             'status'=>'sometimes|in:0,1,2,3',
-            'price'=>'sometimes'
+            'price'=>'sometimes',
+            'per_page'=>'sometimes|integer'
         ]);
 
 
 //        $data=Meeting::query()->with(['company:id,name','room:id,name'])->where('company_id',$request->company_id)->get();
 
+        $per_page=$request->per_page??10;
         try {
             $data=\DB::table('meeting_room_reservations')
                 ->where('meeting_room_reservations.company_id',$request->company_id)
@@ -89,7 +93,7 @@ class ReservedRoomsController extends Controller
                 $data=$data->where('meeting_room_reservations.price','like','%'.$request->price.'%');
 
 
-            return $this->dataResponse($data->get(),200);
+            return $this->dataResponse($data->paginate($per_page),200);
         }
         catch (\Exception $e){
             return $e->getMessage();
