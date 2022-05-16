@@ -187,15 +187,15 @@ class EmployeeController extends Controller
             'name'=>'required|min:3|max:77',
             'surname'=>'required|min:3|max:77',
             'father_name'=>'required|min:3|max:77',
-            'date_of_birth' => 'required|date|before:'.now()->subYears(16)->toDateString(),
+            'birthday' => 'required|date|before:'.now()->subYears(16)->toDateString(),
             'gender'=> 'required|in:m,f',
-            'citizenship'=>'required',
-            'id_seria'=>'required|string',
-            'id_number'=>'required|integer',
-            'id_fin'=>'required|string',
-            'institution'=>'required|string',
+            'citizen_id'=>'required',
+            'passport_seria'=>'required|string',
+            'passport_number'=>'required|integer',
+            'fin'=>'required|string',
+            'passport_from_organ'=>'required|string',
             'date_of_issue'=>'required|date',
-            'validity_date'=>'required|date',
+            'duration_type_id'=>'required|date',
             'email'=>'required|email|unique:users,email'
 
 
