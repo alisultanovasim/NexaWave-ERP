@@ -20,16 +20,30 @@ class ReservedRoomsController extends Controller
 
     public function rooms(Request $request){
         $this->validate($request,[
-            'company_id'=>'required'
+            'company_id'=>'required',
+            'office_id'=>'nullable'
         ]);
-        $reserved_rooms=\DB::table('meeting_room_reservations')
-            ->where('meeting_room_reservations.company_id',$request->company_id)
-            ->select('offices.name as office_name','companies.name as company_name','meeting_rooms.name as room_name','start_at as start_date','finish_at as end_date','meeting_room_reservations.status','price')
-            ->leftJoin('companies','companies.id','=','meeting_room_reservations.company_id')
-            ->leftJoin('meeting_rooms','meeting_rooms.id','=','meeting_room_reservations.meeting_room')
-            ->leftJoin('offices','offices.company_id','=','meeting_room_reservations.company_id')
-           ->orderBy('meeting_room_reservations.start_at','desc')
-            ->get();
+        if ($request->has('office_id')){
+            $reserved_rooms=\DB::table('meeting_room_reservations')
+                ->where(['meeting_room_reservations.company_id'=>$request->company_id,'meeting_room_reservations.office_id'=>$request->office_id])
+                ->select('offices.name as office_name','companies.name as company_name','meeting_rooms.name as room_name','start_at as start_date','finish_at as end_date','meeting_room_reservations.status','price')
+                ->leftJoin('companies','companies.id','=','meeting_room_reservations.company_id')
+                ->leftJoin('meeting_rooms','meeting_rooms.id','=','meeting_room_reservations.meeting_room')
+                ->leftJoin('offices','offices.company_id','=','meeting_room_reservations.company_id')
+                ->orderBy('meeting_room_reservations.start_at','desc')
+                ->get();
+        }
+        else{
+            $reserved_rooms=\DB::table('meeting_room_reservations')
+                ->where('meeting_room_reservations.company_id',$request->company_id)
+                ->select('offices.name as office_name','companies.name as company_name','meeting_rooms.name as room_name','start_at as start_date','finish_at as end_date','meeting_room_reservations.status','price')
+                ->leftJoin('companies','companies.id','=','meeting_room_reservations.company_id')
+                ->leftJoin('meeting_rooms','meeting_rooms.id','=','meeting_room_reservations.meeting_room')
+                ->leftJoin('offices','offices.company_id','=','meeting_room_reservations.company_id')
+                ->orderBy('meeting_room_reservations.start_at','desc')
+                ->get();
+        }
+
         if ($reserved_rooms==null){
             return \response()->json(['message'=>'Rezerv edilmis otaq yoxdur'],404);
         }
