@@ -381,7 +381,36 @@ class MeetingRoomController extends Controller
                 'id' => $request->office_id,
                 'company_id' => $company_id
             ])->first();
+<<<<<<< HEAD
+            if (!$meeting_rooms) return $this->errorResponse(trans('apiResponse.MeetingRoomNotFound'));
+            if ($meeting_rooms->status != 1) return $this->errorResponse(['meeting_room' => trans('apiResponse.roomIsNotActive')]);
+
+            $check = Meeting::where('company_id', $company_id)
+                ->where('meeting_room', $request->meeting_room)
+                ->where('status', config('plaza.reservation.status.wait'))
+                ->where(function ($query) use ($start, $end) {
+                    $query->where([
+                        ['start_at', "<", $start],
+                        ['finish_at', ">", $start]
+                    ])->orWhere([
+                        ['start_at', "<", $end],
+                        ['finish_at', ">", $end]
+                    ])->orWhere([
+                        ['start_at', ">=", $start],
+                        ['finish_at', "<=", $end]
+                    ]);
+                })->exists();
+            if ($check) return $this->errorResponse(trans('apiResponse.reservationTimeError'));
+           Meeting::create($request->only('company_id', 'start_at', 'finish_at', 'office_id', 'finish_at', 'event_name', 'description', 'meeting_room'));
+           //Send email to plaza
+           dispatch(new ReservationEmail("isa.qurbanov996@gmail.com",$office->name,$start,$meeting_rooms->name));
+            Mail::to("info@timetower.az")->send(new ReservationEmail("info@timetower.az",$office->name,$start,$meeting_rooms->name));
+            return $this->successResponse('OK');
+        } catch (Exception $e) {
+            return $e->getMessage();
+=======
             if (!$office) return $this->errorResponse(trans('apiResponse.unProcess'));
+>>>>>>> 6f15ef4ad84784cac4755a4ab9afba09aa068c34
         }
         $meeting_rooms = MeetingRooms::where([
             'id' => $request->meeting_room,
