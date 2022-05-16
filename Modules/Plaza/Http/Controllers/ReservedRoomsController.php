@@ -29,7 +29,7 @@ class ReservedRoomsController extends Controller
                 ->leftJoin('meeting_rooms', 'meeting_rooms.id', '=', 'meeting_room_reservations.meeting_room')
                 ->leftJoin('offices', 'offices.company_id', '=', 'meeting_room_reservations.company_id')
                 ->orderBy('meeting_room_reservations.start_at', 'desc')
-                ->get();
+                ->paginate($per_page);
         } else {
             $reserved_rooms = \DB::table('meeting_room_reservations')
                 ->where('meeting_room_reservations.company_id', $request->company_id)
