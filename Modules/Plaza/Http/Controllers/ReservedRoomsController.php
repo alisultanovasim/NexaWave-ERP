@@ -29,7 +29,7 @@ class ReservedRoomsController extends Controller
             ->join('offices', 'offices.company_id', '=', 'meeting_room_reservations.company_id')
             ->orderBy('meeting_room_reservations.start_at', 'desc');
         if (isset($request->office_id) && $request->office_id != null) {
-            $reserved_rooms=$reserved_rooms->where('meeting_room_reservations.company_id' , $request->office_id);
+            $reserved_rooms=$reserved_rooms->where('meeting_room_reservations.office_id' , $request->office_id);
         }
 
         $reserved_rooms=$reserved_rooms->paginate($per_page);
