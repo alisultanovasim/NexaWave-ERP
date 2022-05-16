@@ -391,6 +391,7 @@ class MeetingRoomController extends Controller
             if (!$meeting_rooms) return $this->errorResponse(trans('apiResponse.MeetingRoomNotFound'));
             if ($meeting_rooms->status != 1) return $this->errorResponse(['meeting_room' => trans('apiResponse.roomIsNotActive')]);
 
+<<<<<<< HEAD
             $check = Meeting::where('company_id', $company_id)
                 ->where('meeting_room', $request->meeting_room)
                 ->where('status', config('plaza.reservation.status.wait'))
@@ -415,6 +416,29 @@ class MeetingRoomController extends Controller
         } catch (Exception $e) {
             return $e->getMessage();
         }
+=======
+        $check = Meeting::where('company_id', $company_id)
+            ->where('meeting_room', $request->meeting_room)
+            ->where('status', config('plaza.reservation.status.wait'))
+            ->where(function ($query) use ($start, $end) {
+                $query->where([
+                    ['start_at', "<", $start],
+                    ['finish_at', ">", $start]
+                ])->orWhere([
+                    ['start_at', "<", $end],
+                    ['finish_at', ">", $end]
+                ])->orWhere([
+                    ['start_at', ">=", $start],
+                    ['finish_at', "<=", $end]
+                ]);
+            })->exists();
+        if ($check) return $this->errorResponse(trans('apiResponse.reservationTimeError'));
+        Meeting::create($request->only('company_id', 'start_at', 'finish_at', 'office_id', 'finish_at', 'event_name', 'description', 'meeting_room'));
+        //Send email to plaza
+//        dispatch(new ReservationEmail("isa.qurbanov996@gmail.com", $office->name, $start, $meeting_rooms->name));
+        Mail::to("info@timetower.az")->send(new ReservationEmail("info@timetower.az", $office->name, $start, $meeting_rooms->name));
+        return $this->successResponse('OK');
+>>>>>>> 91fab85875a4f3ced921f099df727ee2f2c4dc9a
     }
 
     /**
