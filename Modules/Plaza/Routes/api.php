@@ -7,7 +7,7 @@ Route::group([
     'middleware' => ['auth:api', 'authorize']
 ], function ($route) {
     Route::pattern('key','[0-9]+');
-    Route::pattern('keyword','[A-Za-z]+');
+    Route::pattern('office_id','[0-9]+');
 
     Route::group([
         'prefix' => 'floors'
@@ -119,7 +119,7 @@ Route::group([
     ], function () {
 
         Route::group(['prefix'=>'reserved'],function (){
-            Route::get('/',[\Modules\Plaza\Http\Controllers\ReservedRoomsController::class,'rooms']);
+            Route::get('/{office_id?}',[\Modules\Plaza\Http\Controllers\ReservedRoomsController::class,'rooms']);
             Route::get('/filter',[\Modules\Plaza\Http\Controllers\ReservedRoomsController::class,'filter']);
         });// reserve rooms
 

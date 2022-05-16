@@ -18,14 +18,14 @@ class ReservedRoomsController extends Controller
 {
     use ApiResponse  , ValidatesRequests;
 
-    public function rooms(Request $request){
+    public function rooms(Request $request,$office_id=null){
         $this->validate($request,[
             'company_id'=>'required',
             'office_id'=>'nullable'
         ]);
-        if ($request->has('office_id')){
+        if ($office_id){
             $reserved_rooms=\DB::table('meeting_room_reservations')
-                ->where(['meeting_room_reservations.company_id'=>$request->company_id,'meeting_room_reservations.office_id'=>$request->office_id])
+                ->where(['meeting_room_reservations.company_id'=>$request->company_id,'meeting_room_reservations.office_id'=>$office_id])
                 ->select('offices.name as office_name','companies.name as company_name','meeting_rooms.name as room_name','start_at as start_date','finish_at as end_date','meeting_room_reservations.status','price')
                 ->leftJoin('companies','companies.id','=','meeting_room_reservations.company_id')
                 ->leftJoin('meeting_rooms','meeting_rooms.id','=','meeting_room_reservations.meeting_room')
