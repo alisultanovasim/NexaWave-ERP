@@ -196,7 +196,7 @@ class EmployeeController extends Controller
             'passport_from_organ'=>'required|string',
 //            'date_of_issue'=>'required|date',
 //            'duration_type_id'=>'required|date',
-            'email'=>'required|email|unique:users,email'
+            'email'=>'sometimes|email|unique:users,email'
 
 
         ]);
