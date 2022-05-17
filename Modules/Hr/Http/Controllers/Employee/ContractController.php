@@ -268,7 +268,7 @@ class ContractController extends Controller
             $employee=Employee::query()
                 ->where('id',$request->employee_id)
                 ->first();
-            $pass=Str::random(6);
+            $pass=Str::random(8);
             $user=\App\Models\User::query()
                 ->where('id',$employee->user_id)
                 ->first();
