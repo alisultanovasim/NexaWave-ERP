@@ -287,7 +287,7 @@ class EmployeeController extends Controller
 
         if (!$employee) return $this->errorResponse(trans('response.employeeNotFound'), 404);
 
-        if ($request->roles!=null)
+        if ($request->roles!=null && isset($request->roles))
             $this->setUserRoles($request->get('roles'), $employee->user_id, $request->get('company_id'));
 
         $data = $request->only(['is_active', 'tabel_no']);
