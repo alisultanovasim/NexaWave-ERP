@@ -472,7 +472,7 @@ class UserController extends Controller
         Validator::make($request->all(), self::rules())->validate();
 
 
-        $password = Str::random(9);
+        $password = Str::random(8);
         $user = User::create(array_merge(
             $request->only(['name', 'email', 'surname', 'voen']),
             [
