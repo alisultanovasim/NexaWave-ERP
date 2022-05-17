@@ -231,7 +231,7 @@ class EmployeeController extends Controller
             }
             if ($exception->errorInfo[1] == 1452)
                 return $this->errorResponse([trans('response.SomeFiledIsNotFoundInDatabase')], 422);
-//            return $this->errorResponse(trans('response.tryLater'), Response::HTTP_INTERNAL_SERVER_ERROR);
+            return $this->errorResponse(trans('response.tryLater'), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -287,7 +287,7 @@ class EmployeeController extends Controller
 
         if (!$employee) return $this->errorResponse(trans('response.employeeNotFound'), 404);
 
-        if ($request->get('roles'))
+        if ($request->has('roles'))
             $this->setUserRoles($request->get('roles'), $employee->user_id, $request->get('company_id'));
 
         $data = $request->only(['is_active', 'tabel_no']);
