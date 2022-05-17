@@ -180,10 +180,10 @@ class EmployeeController extends Controller
             'user_id' => ['sometimes', 'required', 'integer'],
             'create_contract' => ['required', 'boolean'],
             'tabel_no' => ['required', 'string', 'max:255'],
-            'roles' => ['required', 'array', 'min:1'],
-            'roles.*' => [
-                Rule::exists('roles', 'id')->where('company_id', $request->get('company_id'))
-            ],
+//            'roles' => ['required', 'array', 'min:1'],
+//            'roles.*' => [
+//                Rule::exists('roles', 'id')->where('company_id', $request->get('company_id'))
+//            ],
             'name'=>'required|min:3|max:77',
             'surname'=>'required|min:3|max:77',
             'father_name'=>'required|min:3|max:77',
