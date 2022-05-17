@@ -592,8 +592,8 @@ class MeetingRoomController extends Controller
 
     public function waiting_rooms(){
         $waiting_rooms=DB::table('meeting_room_reservations')
-            ->where('meeting_room_reservations.status','=',1)
+            ->where('meeting_room_reservations.status','=',0)
             ->count();
-        return $this->dataResponse(['count'=>$waiting_rooms],Response::HTTP_OK);
+        return $this->dataResponse(['count'=>$waiting_rooms],200);
     }
 }

@@ -138,7 +138,7 @@ Route::group([
             Route::get('/{id}', 'MeetingRoomController@showRooms');
             Route::post('/update/{id}', 'MeetingRoomController@updateRoom');
             Route::post('/delete/{id}', 'MeetingRoomController@deleteRoom');
-            Route::get('/waiting', 'MeetingRoomController@waiting_rooms');
+            Route::get('/waiting', [\Modules\Plaza\Http\Controllers\MeetingRoomController::class,'waiting_rooms']);
         });
 
         Route::get('/', 'MeetingRoomController@index');
