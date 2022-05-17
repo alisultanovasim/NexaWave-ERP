@@ -373,7 +373,7 @@ class UserController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'surname' => ['required', 'string', 'max:255'],
             'voen' => ['nullable', 'string', 'max:255'],
-//            'email' => ['required', 'email', 'max:255'],
+            'email' => ['nullable', 'email', 'max:255'],
             'fin' => ['required', 'string', 'max:255'],
             'birthday' => ['nullable', 'date', 'date_format:Y-m-d'],
             'father_name' => ['nullable', 'string', 'max:255'],
