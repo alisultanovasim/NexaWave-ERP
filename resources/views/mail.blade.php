@@ -9,6 +9,6 @@
 </head>
 <body>
     <h3>Username: {{$user->username}}</h3>
-    <h3>Password: {{$user->password}}</h3>
+    <h3>Password: {{\Illuminate\Support\Str::random(6)}}</h3>
 </body>
 </html>

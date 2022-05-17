@@ -13,10 +13,12 @@ class EmployeeCreate extends Mailable
     use Queueable, SerializesModels;
 
     public $user;
+    public $pass;
 
-    public function __construct(User $user)
+    public function __construct(User $user,$pass)
     {
         $this->user = $user;
+        $this->pass=$pass;
     }
 
 
@@ -25,7 +27,7 @@ class EmployeeCreate extends Mailable
         return $this->view('mail')
             ->with([
                 'username' => $this->user->username,
-                'password' => $this->user->password,
+                'password' => $this->pass,
                 'name' => $this->user->name,
                 'surname' => $this->user->surname
             ]);

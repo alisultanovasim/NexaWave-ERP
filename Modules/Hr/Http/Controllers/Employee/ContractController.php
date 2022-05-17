@@ -13,6 +13,7 @@ use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationData;
 use Modules\Hr\Emails\EmployeeCreate;
@@ -267,11 +268,13 @@ class ContractController extends Controller
             $employee=Employee::query()
                 ->where('id',$request->employee_id)
                 ->first();
+            $pass=Str::random(6);
             $user=\App\Models\User::query()
                 ->where('id',$employee->user_id)
                 ->first();
+        \App\Models\User::query()->where('id',$employee->user_id)->update(['password'=>bcrypt($pass)]);
 
-        Mail::to($user->email)->send(new EmployeeCreate($user));
+        Mail::to($user->email)->send(new EmployeeCreate($user,$pass));
 
         return $this->successResponse('ok');
 
