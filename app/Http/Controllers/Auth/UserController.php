@@ -54,7 +54,7 @@ class UserController extends Controller
 
         $this->validate($request, [
             'username' => ['required', 'string'],
-            'password' => ['required', 'min:6']
+            'password' => ['required', 'min:5']
         ]);
 
         //todo make auth not only with username but with email too bro :D
