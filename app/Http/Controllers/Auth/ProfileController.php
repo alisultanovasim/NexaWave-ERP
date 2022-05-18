@@ -48,6 +48,12 @@ class ProfileController extends Controller
         $companies = null;
         $modules = null;
 
+        $status=\DB::table('user_roles')
+            ->select('roles.name as status')
+            ->leftJoin('roles','roles.id','=','user_roles.role_id')
+            ->where('user_roles.user_id',$user->id)
+            ->get();
+
         if ($user->getAttribute('is_office_user')) {
             $userRole = UserRole::where('user_id', Auth::id())
                 ->where('company_id', $request->get('company_id'))
@@ -118,7 +124,8 @@ class ProfileController extends Controller
             'user' => $user,
             'companies' => $companies,
             'modules' => $modules,
-            'office' => $office
+            'office' => $office,
+            'status'=>$status
         ]);
 
     }
