@@ -1213,4 +1213,7 @@ class OfficeController extends Controller
             return false;
         return $office;
     }
+    public function getAllOffices(){
+        return Office::all();
+    }
 }

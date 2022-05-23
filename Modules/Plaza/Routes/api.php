@@ -24,6 +24,7 @@ Route::group([
     ], function () {
 
         Route::get('/', 'OfficeController@index');
+        Route::get('/getalloffices', 'OfficeController@getAllOffices');
 
 //        Route::get('/my', 'OfficeController@my'); //  if we need to ty office then ->  my offices in office controller
 
