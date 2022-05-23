@@ -81,6 +81,7 @@ class ProfileController extends Controller
 
         $modules = (new Module())
             ->where('parent_id', null)
+            ->where('is_active',1)
             ->with([
                 'permissionList' => function ($query) {
                     $query->whereIn('role_module_permissions.role_id', \auth()->user()->getUserRolesForRequest());
