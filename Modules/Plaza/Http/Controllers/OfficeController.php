@@ -1214,6 +1214,6 @@ class OfficeController extends Controller
         return $office;
     }
     public function getAllOffices(){
-        return Office::all();
+        return response()->json(Office::query()->select('id','name')->get(),200);
     }
 }
