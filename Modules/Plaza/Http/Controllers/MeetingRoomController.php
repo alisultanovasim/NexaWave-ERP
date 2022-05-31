@@ -590,10 +590,19 @@ class MeetingRoomController extends Controller
 
     }
 
-    public function waiting_rooms(){
+    public function waiting_rooms(Request $request){
+        $this->validate($request,[
+            'company_id'=>'required',
+           'office_id' =>'nullable'
+        ]);
         $waiting_rooms=DB::table('meeting_room_reservations')
-            ->where('meeting_room_reservations.status','=',0)
-            ->count();
+            ->where(['status'=>0,'company_id'=>$request->company_id]);
+
+        if (isset($request->office_id) && $request->office_id!=null){
+            $waiting_rooms=$waiting_rooms->where('meeting_room_reservations.office_id',$request->office_id);
+        }
+
+        $waiting_rooms=$waiting_rooms->count();
         return $this->dataResponse(['count'=>$waiting_rooms],200);
     }
 }
