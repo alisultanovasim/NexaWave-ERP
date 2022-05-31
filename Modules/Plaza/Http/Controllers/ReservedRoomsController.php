@@ -15,11 +15,12 @@ class ReservedRoomsController extends Controller
 
     public function rooms(Request $request)
     {
-//        $this->validate($request, [
-//            'company_id' => 'required',
-//            'per_page' => 'sometimes|integer'
-//        ]);
-//
+        $this->validate($request, [
+            'company_id' => 'required',
+            'per_page' => 'sometimes|integer',
+            'office_id'=>'nullable'
+        ]);
+
         $per_page = $request->per_page ?? 10;
         $reserved_rooms=\DB::table('meeting_room_reservations')
             ->select('meeting_room_reservations.event_name','offices.name as office_name','meeting_rooms.name as room_name','start_at as start_date','finish_at as end_date','meeting_room_reservations.status','price')
