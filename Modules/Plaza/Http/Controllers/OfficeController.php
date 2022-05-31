@@ -135,7 +135,7 @@ class OfficeController extends Controller
 
 //            'image' => 'sometimes|required|file|mimes:jpeg,png,pdf,jpg,gif,svg',
 //            'start_time' => 'required|date|date_format:Y-m-d',
-            'month_count' => 'required|integer',//
+//            'month_count' => 'required|integer',
             'payed_month_count' => 'sometimes|required|integer|lte:month_count',//
 
             'location' => 'required|array',//

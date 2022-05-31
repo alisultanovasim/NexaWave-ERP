@@ -15,24 +15,22 @@ class ReservedRoomsController extends Controller
 
     public function rooms(Request $request)
     {
-        $this->validate($request, [
-            'company_id' => 'required',
-            'per_page' => 'sometimes|integer'
-        ]);
-
+//        $this->validate($request, [
+//            'company_id' => 'required',
+//            'per_page' => 'sometimes|integer'
+//        ]);
+//
         $per_page = $request->per_page ?? 10;
-        $reserved_rooms = \DB::table('meeting_room_reservations')
-            ->where('meeting_room_reservations.company_id' , $request->company_id)
-            ->select('offices.name as office_name', 'companies.name as company_name', 'meeting_rooms.name as room_name', 'start_at as start_date', 'finish_at as end_date', 'meeting_room_reservations.status', 'price')
-            ->join('companies', 'companies.id', '=', 'meeting_room_reservations.company_id')
-            ->join('meeting_rooms', 'meeting_rooms.id', '=', 'meeting_room_reservations.meeting_room')
-            ->join('offices', 'offices.company_id', '=', 'meeting_room_reservations.company_id')
+        $reserved_rooms=\DB::table('meeting_room_reservations')
+            ->select('meeting_room_reservations.event_name','offices.name as office_name','meeting_rooms.name as room_name','start_at as start_date','finish_at as end_date','meeting_room_reservations.status','price')
+            ->leftJoin('meeting_rooms','meeting_rooms.id','=','meeting_room_reservations.meeting_room')
+            ->leftJoin('offices','offices.id','=','meeting_room_reservations.office_id')
+            ->where(['meeting_room_reservations.company_id'=>$request->company_id])
             ->orderBy('meeting_room_reservations.start_at', 'desc');
         if (isset($request->office_id) && $request->office_id != null) {
             $reserved_rooms=$reserved_rooms->where('meeting_room_reservations.office_id' , $request->office_id);
         }
-
-        $reserved_rooms=$reserved_rooms->paginate($per_page);
+            $reserved_rooms=$reserved_rooms->paginate($per_page);
         if ($reserved_rooms == null) {
             return response()->json(['message' => 'Rezerv edilmis otaq yoxdur'], 404);
         }
