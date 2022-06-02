@@ -5,6 +5,7 @@ namespace Modules\Plaza\Http\Controllers;
 
 
 use App\Mail\ReservationEmail;
+use App\Models\ReferenceOffice;
 use App\Traits\ApiResponse;
 use Carbon\Carbon;
 use Exception;
@@ -364,7 +365,23 @@ class MeetingRoomController extends Controller
             'description' => 'sometimes|nullable',
             'time_zone' => 'sometimes|required',
             'meeting_room' => 'required|integer',
+            'ref_status'=>'nullable|boolean',
+            'ref_office'=>'nullable|string'
         ]);
+        $ref_ids=ReferenceOffice::query()
+            ->select('reference_offices.id')
+            ->where('reference_offices.ref_name',$request->get('ref_office'))
+            ->get();
+        $available_id=[];
+        foreach ($ref_ids as $val){
+            array_push($available_id,$val['id']);
+        }
+        $ref_names=ReferenceOffice::query()->select('reference_offices.ref_name')->get();
+        $name_arr=[];
+        foreach ($ref_names as $item) {
+            array_push($name_arr,$item['ref_name']);
+        }
+
         $company_id = $request->company_id;
 
         try {
@@ -407,7 +424,34 @@ class MeetingRoomController extends Controller
                     ]);
                 })->exists();
             if ($check) return $this->errorResponse(trans('apiResponse.reservationTimeError'));
-            Meeting::create($request->only('company_id', 'start_at', 'finish_at', 'office_id', 'finish_at', 'event_name', 'description', 'meeting_room'));
+                if ($request->has('ref_office') && $request->get('ref_office')!=null){
+                        if (!in_array($request->get('ref_office'),$name_arr)) {
+                            $new_reference = new ReferenceOffice();
+                            $new_reference->ref_name = $request->ref_office;
+                            $new_reference->save();
+
+                            $ref_id = $new_reference->id;
+                        }
+                        else{
+                            $ref_id=$available_id[0];
+                        }
+
+                    $new_meeting=new Meeting();
+                    $new_meeting->company_id=$request->company_id;
+                    $new_meeting->start_at=$request->start_at;
+                    $new_meeting->finish_at=$request->finish_at;
+                    $new_meeting->office_id=$request->office_id;
+                    $new_meeting->event_name=$request->event_name;
+                    $new_meeting->description=$request->description;
+                    $new_meeting->meeting_room=$request->meeting_room;
+                    $new_meeting->ref_status=$request->ref_status;
+                    $new_meeting->ref_office=$ref_id;
+                    $new_meeting->save();
+//                    Meeting::create($request->only('company_id', 'start_at', 'finish_at', 'office_id', 'event_name', 'description', 'meeting_room','ref_status','ref_office'));
+                }
+                else{
+                    Meeting::create($request->only('company_id', 'start_at', 'finish_at', 'office_id', 'event_name', 'description', 'meeting_room'));
+                }
             //Send email to plaza
 //            dispatch(new ReservationEmail("isa.qurbanov996@gmail.com",$office->name,$start,$meeting_rooms->name));
             Mail::to("info@timetower.az")->send(new ReservationEmail("info@timetower.az",$office->name,$start,$meeting_rooms->name));
@@ -415,27 +459,6 @@ class MeetingRoomController extends Controller
         } catch (Exception $e) {
             return $e->getMessage();
         }
-        $check = Meeting::where('company_id', $company_id)
-            ->where('meeting_room', $request->meeting_room)
-            ->where('status', config('plaza.reservation.status.wait'))
-            ->where(function ($query) use ($start, $end) {
-                $query->where([
-                    ['start_at', "<", $start],
-                    ['finish_at', ">", $start]
-                ])->orWhere([
-                    ['start_at', "<", $end],
-                    ['finish_at', ">", $end]
-                ])->orWhere([
-                    ['start_at', ">=", $start],
-                    ['finish_at', "<=", $end]
-                ]);
-            })->exists();
-        if ($check) return $this->errorResponse(trans('apiResponse.reservationTimeError'));
-        Meeting::create($request->only('company_id', 'start_at', 'finish_at', 'office_id', 'finish_at', 'event_name', 'description', 'meeting_room'));
-        //Send email to plaza
-//        dispatch(new ReservationEmail("isa.qurbanov996@gmail.com", $office->name, $start, $meeting_rooms->name));
-        Mail::to("info@timetower.az")->send(new ReservationEmail("info@timetower.az", $office->name, $start, $meeting_rooms->name));
-        return $this->successResponse('OK');
     }
 
     /**

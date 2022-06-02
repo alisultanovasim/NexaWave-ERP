@@ -23,7 +23,13 @@ class ReservedRoomsController extends Controller
 
         $per_page = $request->per_page ?? 10;
         $reserved_rooms=\DB::table('meeting_room_reservations')
-            ->select('meeting_room_reservations.event_name','offices.name as office_name','meeting_rooms.name as room_name','start_at as start_date','finish_at as end_date','meeting_room_reservations.status','price')
+            ->select('meeting_room_reservations.event_name',
+                'offices.name as office_name',
+                'meeting_rooms.name as room_name',
+                'start_at as start_date',
+                'finish_at as end_date',
+                'meeting_room_reservations.status',
+                'price')
             ->leftJoin('meeting_rooms','meeting_rooms.id','=','meeting_room_reservations.meeting_room')
             ->leftJoin('offices','offices.id','=','meeting_room_reservations.office_id')
             ->where(['meeting_room_reservations.company_id'=>$request->company_id])
