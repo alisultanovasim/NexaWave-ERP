@@ -386,7 +386,7 @@ class MeetingRoomController extends Controller
 
         try {
 
-            $timezone = $request->timezone ?? 'Asia/Baku';
+            $timezone = $request->time_zone ?? 'Asia/Baku';
             $start = Carbon::createFromFormat('Y-m-d H:i:s', $request->start_at, $timezone);
             $end = Carbon::createFromFormat('Y-m-d H:i:s', $request->finish_at, $timezone);
             $now = Carbon::now()->timezone($timezone);
