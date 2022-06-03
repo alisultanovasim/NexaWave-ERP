@@ -77,7 +77,7 @@ class PermissionController extends Controller
         ){
             foreach ($modules as $key => $module){
                 $modules[$key]['permission_list'] = ['*'];
-                unset($module['permissionList']);
+//                unset($module['permissionList']);
             }
         }
         return $this->successResponse($modules);
