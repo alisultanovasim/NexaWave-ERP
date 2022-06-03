@@ -97,6 +97,7 @@ class PermissionController extends Controller
                 $moduleIds = $this->convertNestedModulesToModelsArray($module['subModuleIds'], $moduleIds);
             }
         }
+        dd($moduleIds);
         return $moduleIds;
     }
 
