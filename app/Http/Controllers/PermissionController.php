@@ -45,10 +45,8 @@ class PermissionController extends Controller
         if ($request->get('company_id'))
             $modules = $modules->hasCompany($request->get('company_id'));
         if (!Auth::user()->getAttribute('is_office_user')) {
-            dd("#1");
             $modules = $modules->where('is_office_module', 0);
         } else {
-            dd("#2");
             $modules = $modules->where('is_office_module', 1);
         }
         $modules = $modules->get(['id']);
