@@ -51,7 +51,6 @@ class PermissionController extends Controller
             $modules = $modules->where('is_office_module', 1);
         $modules = $modules->get(['id']);
 
-        dd($modules);
         $moduleIds = $this->convertNestedModulesToModelsArray($modules);
         $modules = Module::whereIn('id', $moduleIds)
         ->with([
