@@ -41,6 +41,7 @@ class PermissionController extends Controller
      */
     public function userGetPermissionsByModuleId(Request $request, $moduleId): JsonResponse
     {
+        dd(\auth()->user()->getUserRolesForRequest());
         $modules = Module::where('parent_id', $moduleId)->with('subModuleIds:id,parent_id');
         if ($request->get('company_id'))
             $modules = $modules->hasCompany($request->get('company_id'));
@@ -97,7 +98,7 @@ class PermissionController extends Controller
                 $moduleIds = $this->convertNestedModulesToModelsArray($module['subModuleIds'], $moduleIds);
             }
         }
-        dd($moduleIds);
+
         return $moduleIds;
     }
 
