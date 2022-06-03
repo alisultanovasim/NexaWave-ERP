@@ -75,9 +75,10 @@ class PermissionController extends Controller
             (in_array($this->role->getSuperAdminRoleId(), \auth()->user()->getUserRolesForRequest())) or
             (in_array($this->role->getOfficeAdminRoleId(), \auth()->user()->getUserRolesForRequest()))
         ){
+            dd("end");
             foreach ($modules as $key => $module){
                 $modules[$key]['permission_list'] = ['*'];
-//                unset($module['permissionList']);
+                unset($module['permissionList']);
             }
         }
         return $this->successResponse($modules);
