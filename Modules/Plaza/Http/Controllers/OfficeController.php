@@ -143,7 +143,7 @@ class OfficeController extends Controller
             'location.*.size' => 'required|numeric',//
             'location.*.floor_id' => 'required|integer',//
             'location.*.number' => 'sometimes|required|integer',//
-            'per_month' => 'required|numeric',//
+//            'per_month' => 'required|numeric',//
 
 //            'agree_at' => 'sometimes|required|date|date_format:Y-m-d',
 
