@@ -116,33 +116,38 @@ class OfficeController extends Controller
      */
     public function store(Request $request)
     {
-        $this->validate($request, [
-            'company_id' => 'required|integer',//
-            'name' => 'required|min:3|max:255',//
-            'email' => 'sometimes|required|array',//
-            'email.*.contact' => 'required_with:email|email',//
-            'email.*.name' => 'sometimes|required|min:2|max:255',//
+//        $is_edv_payer=$request->get('is_adv_payer');
+//        if (isset($is_edv_payer)){
+//            $this->validate($request,$this->withEdvValidation());
+//        }
+//        else {
+            $this->validate($request, [
+                'company_id' => 'required|integer',//
+                'name' => 'required|min:3|max:255',//
+                'email' => 'sometimes|required|array',//
+                'email.*.contact' => 'required_with:email|email',//
+                'email.*.name' => 'sometimes|required|min:2|max:255',//
 
-            'entity' => 'required|integer|in:1,2',//
+                'entity' => 'required|integer|in:1,2',//
 
-            'voen' => 'sometimes|required',//
+                'voen' => 'sometimes|required',//
 
 //            'contract' => 'sometimes|required|mimes:pdf,doc,docx',
 
-            'phone' => 'sometimes|required|array',//
-            'phone.*.name' => 'sometimes|required|min:2|max:255',//
-            'phone.*.contact' => 'required_with:phone|regex:/^\+?[0-9]{12}$/',//
+                'phone' => 'sometimes|required|array',//
+                'phone.*.name' => 'sometimes|required|min:2|max:255',//
+                'phone.*.contact' => 'required_with:phone|regex:/^\+?[0-9]{12}$/',//
 
 //            'image' => 'sometimes|required|file|mimes:jpeg,png,pdf,jpg,gif,svg',
 //            'start_time' => 'required|date|date_format:Y-m-d',
 //            'month_count' => 'required|integer',
-            'payed_month_count' => 'sometimes|integer|lte:month_count',//
+                'payed_month_count' => 'sometimes|integer|lte:month_count',//
 
-            'location' => 'required|array',//
+                'location' => 'required|array',//
 
-            'location.*.size' => 'required|numeric',//
-            'location.*.floor_id' => 'required|integer',//
-            'location.*.number' => 'sometimes|required|integer',//
+                'location.*.size' => 'required|numeric',//
+                'location.*.floor_id' => 'required|integer',//
+                'location.*.number' => 'sometimes|required|integer',//
 //            'per_month' => 'required|numeric',//
 
 //            'agree_at' => 'sometimes|required|date|date_format:Y-m-d',
@@ -150,12 +155,12 @@ class OfficeController extends Controller
 //            'documents' => 'sometimes|required|array',
 //            'documents.*' => 'sometimes|required|mimes::jpeg,png,jpg,gif,svg,pdf,docx,doc,txt,xls,xlsx',
 
-            'username' => ['required', 'string', 'min:6', Rule::unique("users", "username")],//
+                'username' => ['required', 'string', 'min:6', Rule::unique("users", "username")],//
 
-            'user_email' => ['required', 'email', 'min:6'],//
-            'set_password' => ['nullable', 'min:6'],//
-            "price_without_adv" => ["sometimes", "required", "numeric"],//
-//            "is_adv_payer" => ["sometimes", "required", "boolean"],//
+                'user_email' => ['required', 'email', 'min:6'],//
+                'set_password' => ['nullable', 'min:6'],//
+                "price_without_adv" => ["sometimes", "required", "numeric"],//
+//                "is_adv_payer" => ["sometimes", "required", "boolean"],//
 //            "is_buy_attendance" => ["sometimes", "required", "boolean"],
 //            "parking_count" => ["sometimes", "required", "integer"],
 //            "parking_type" => ['sometimes', "required", Rule::in([
@@ -168,9 +173,10 @@ class OfficeController extends Controller
 //            "free_entrance_card" => ['sometimes', "required", "integer"],
 //            "paid_entrance_card" => ['sometimes', "required", "integer"],
 //            "price_per_card" => ['sometimes', "required", "numeric"],
-//            "requests" => ['sometimes', "required", "string", "min:1"]
+//            "requests" => ["required", "string", "min:1"]
 
-        ]);
+            ]);
+//        }
         try {
             DB::beginTransaction();
 
@@ -315,6 +321,62 @@ class OfficeController extends Controller
             return $this->errorResponse(trans('apiResponse.tryLater'), Response::HTTP_INTERNAL_SERVER_ERROR);
 
         }
+    }
+    public function withEdvValidation(){
+        return [
+//            'company_id' => 'required|integer',//
+//            'name' => 'required|min:3|max:255',//
+            'email' => 'sometimes|required|array',//
+//            'email.*.contact' => 'required_with:email|email',//
+//            'email.*.name' => 'sometimes|required|min:2|max:255',//
+//
+//            'entity' => 'required|integer|in:1,2',//
+//
+//            'voen' => 'sometimes|required',//
+//
+////            'contract' => 'sometimes|required|mimes:pdf,doc,docx',
+//
+//            'phone' => 'sometimes|required|array',//
+//            'phone.*.name' => 'sometimes|required|min:2|max:255',//
+//            'phone.*.contact' => 'required_with:phone|regex:/^\+?[0-9]{12}$/',//
+//
+////            'image' => 'sometimes|required|file|mimes:jpeg,png,pdf,jpg,gif,svg',
+////            'start_time' => 'required|date|date_format:Y-m-d',
+////            'month_count' => 'required|integer',
+//            'payed_month_count' => 'sometimes|integer|lte:month_count',//
+//
+//            'location' => 'required|array',//
+//
+//            'location.*.size' => 'required|numeric',//
+//            'location.*.floor_id' => 'required|integer',//
+//            'location.*.number' => 'sometimes|required|integer',//
+//            'per_month' => 'required|numeric',//
+//
+//            'agree_at' => 'sometimes|required|date|date_format:Y-m-d',
+//
+////            'documents' => 'sometimes|required|array',
+////            'documents.*' => 'sometimes|required|mimes::jpeg,png,jpg,gif,svg,pdf,docx,doc,txt,xls,xlsx',
+//
+//            'username' => ['required', 'string', 'min:6', Rule::unique("users", "username")],//
+//
+//            'user_email' => ['required', 'email', 'min:6'],//
+//            'set_password' => ['nullable', 'min:6'],//
+//            "price_without_adv" => ["sometimes", "required", "numeric"],//
+//            "is_adv_payer" => ["sometimes", "required", "boolean"],//
+//            "is_buy_attendance" => ["sometimes", "required", "boolean"],
+//            "parking_count" => ["sometimes", "required", "integer"],
+//            "parking_type" => ['sometimes', "required", Rule::in([
+//                Office::PARKING_ABOVE_GROUND,
+//                Office::PARKING_UNDERGROUND
+//            ])],
+//            "internet_monthly_price" => ["sometimes", "required", "numeric"],
+//            "electric_monthly_price" => ["sometimes", "required", "numeric"],
+//            "is_pay_for_repair" => ['sometimes', 'required', "numeric"],
+//            "free_entrance_card" => ['sometimes', "required", "integer"],
+//            "paid_entrance_card" => ['sometimes', "required", "integer"],
+//            "price_per_card" => ['sometimes', "required", "numeric"],
+//            "requests" => ['sometimes', "required", "string", "min:1"]
+        ];
     }
 
     /**

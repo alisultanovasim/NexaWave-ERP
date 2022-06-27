@@ -105,8 +105,7 @@ class CompanyStructureController extends Controller
 
         $employees = Employee::with('user:id,name,surname')
             ->where(function ($q) use ($request) {
-                $q->doesntHave("contracts")
-                    ->orWhereHas('contracts', function ($query) use ($request) {
+                    $q->orWhereHas('contracts', function ($query) use ($request) {
                         if ($request->get('department_id')) {
                             $query->where('department_id', $request->get('department_id'));
                         }
