@@ -31,7 +31,7 @@ Route::group([
         Route::post('/', 'OfficeController@store');
         Route::get('/{id}', 'OfficeController@show');
         Route::post('/update/{id}', 'OfficeController@update');
-        Route::delete('/delete/{id}', 'OfficeController@delete');
+        Route::post('/delete/{id}', 'OfficeController@delete');
 
         Route::post("/contact/add/{id}", 'OfficeController@contactAdd');
         Route::post("/contact/update/{id}", 'OfficeController@contactUpdate');
