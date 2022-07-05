@@ -5,6 +5,7 @@ namespace Modules\Hr\Entities\Employee;
 use Illuminate\Database\Eloquent\Model;
 use Modules\Hr\Entities\BloodGroup;
 use Modules\Hr\Entities\Color;
+use Modules\Hr\Entities\Consent;
 use Modules\Hr\Entities\MaritalState;
 
 class UserDetail extends Model

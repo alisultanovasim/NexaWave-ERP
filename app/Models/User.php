@@ -6,6 +6,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Passport\HasApiTokens;
+use Modules\Hr\Entities\Consent;
 use Modules\Hr\Entities\Employee\Employee;
 use Modules\Hr\Entities\Employee\UserDetail;
 use Modules\Hr\Entities\User\UserEducation;
@@ -78,6 +79,9 @@ class User extends Authenticatable
     public function education(){
         return $this->hasMany(UserEducation::class);
     }
+    public function consent(){
+        return $this->hasOne(Consent::class);
+    }
 
     public function getRoleId(){
         if (!$this->roleId){
@@ -128,5 +132,6 @@ class User extends Authenticatable
     {
         $this->userWorkingOfficeId = $userWorkingOfficeId;
     }
+
 
 }
