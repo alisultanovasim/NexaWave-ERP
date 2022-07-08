@@ -89,7 +89,15 @@ class ConsentController extends Controller
 
         return response()->json(['message'=>'Created'],201);
     }
-    public function show(Consent $consent){
+    public function getResponsibles(){
+        $user=DB::table('user_roles')
+            ->select('users.*','employees.*')
+            ->leftJoin('employees','employees.user_id','=','user_roles.user_id')
+            ->leftJoin('users','users.id','=','employees.user_id')
+            ->where('user_roles.role_id','=',8)
+            ->orWhere('user_roles.role_id',9)
+            ->get();
+        return $this->successResponse($user);
         return $this->successResponse($consent,200);
     }
     public function delete(Request $request,$id){
