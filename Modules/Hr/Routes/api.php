@@ -616,6 +616,8 @@ Route::group([
        Route::post('/','ConsentController@create');
        Route::get('/getresponsibles','ConsentController@getResponsibles');
        Route::post('/{id}','ConsentController@delete');
+       Route::post('/allowconsent/{consent_id}','ConsentController@allowConsent');
+       Route::post('/disallowconsent/{consent_id}','ConsentController@disAllowConsent');
     });
 
 });

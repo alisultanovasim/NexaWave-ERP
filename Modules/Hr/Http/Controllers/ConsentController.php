@@ -133,4 +133,19 @@ class ConsentController extends Controller
 
     }
 
+    public function allowConsent($consent_id)
+    {
+        $consent=Consent::query()->findOrFail($consent_id);
+        $consent->status=2;
+        $consent->save();
+        return response()->json(['message'=>'Allowed by Director!'],200);
+    }
+    public function disAllowConsent($consent_id)
+    {
+        $consent=Consent::query()->findOrFail($consent_id);
+        $consent->status=1;
+        $consent->save();
+        return response()->json(['message'=>'Disallowed by Director!'],200);
+    }
+
 }
