@@ -98,7 +98,6 @@ class ConsentController extends Controller
             ->orWhere('user_roles.role_id',9)
             ->get();
         return $this->successResponse($user);
-        return $this->successResponse($consent,200);
     }
     public function delete(Request $request,$id){
         $this->validate($request,[
