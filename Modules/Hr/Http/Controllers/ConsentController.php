@@ -7,6 +7,7 @@ namespace Modules\Hr\Http\Controllers;
 use App\Models\UserRole;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 use Modules\Hr\Entities\AcademicDegree;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
@@ -22,9 +23,9 @@ class ConsentController extends Controller
     public function index(Request $request)
     {
         $this->validate($request,[
-           'company_id'=>'required',
-           'employee_id'=>'required',
-            'office_id'=>'required'
+           'company_id'=>['required'],
+           'employee_id'=>['required',Rule::exists('employees','id')],
+            'office_id'=>['required']
 
         ]);
         $employee=Employee::query()
@@ -58,19 +59,19 @@ class ConsentController extends Controller
             }
             if ($consents->count())
                 return $this->successResponse($consents);
-            else return  response()->json(['message'=>'There are no info.']);
+            else return  response()->json(['message'=>'There is no information yet.']);
     }
 
     public function create(Request $request)
     {
         $this->validate($request,[
            'company_id'=>'required',
-           'office_id'=>'required',
+           'office_id'=>['required',Rule::exists('offices','id')],
            'requester_id'=>'required|integer',
            'start_date'=>'required|date|before_or_equal:end_date',
            'end_date'=>'required|date|after_or_equal:start_date',
            'work_date'=>'required|date|after_or_equal:start_date',
-            'responsible_id'=>'required',
+            'responsible_id'=>['required',Rule::exists('employees','id')],
             'reason'=>'nullable|string|min:3|max:77',
         ]);
 //        $consent=new Consent();
@@ -88,8 +89,8 @@ class ConsentController extends Controller
 
         return response()->json(['message'=>'Created'],201);
     }
-    public function show(Consent $id){
-        return $this->successResponse($id,200);
+    public function show(Consent $consent){
+        return $this->successResponse($consent,200);
     }
     public function delete(Request $request,$id){
         $this->validate($request,[
