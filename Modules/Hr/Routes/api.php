@@ -614,7 +614,7 @@ Route::group([
     Route::group(['prefix'=>'consent'],function (){
        Route::get('/','ConsentController@index');
        Route::post('/','ConsentController@create');
-       Route::get('/getResponsibles','ConsentController@getResponsibles');
+       Route::get('/getresponsibles','ConsentController@getResponsibles');
        Route::post('/{id}','ConsentController@delete');
     });
 

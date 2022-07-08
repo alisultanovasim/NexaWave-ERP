@@ -96,6 +96,7 @@ class ConsentController extends Controller
             ->leftJoin('users','users.id','=','employees.user_id')
             ->where('user_roles.role_id','=',8)
             ->orWhere('user_roles.role_id',9)
+            ->distinct()
             ->get();
         return $this->successResponse($user);
     }
