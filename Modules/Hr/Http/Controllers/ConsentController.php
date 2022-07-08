@@ -91,7 +91,7 @@ class ConsentController extends Controller
     }
     public function getResponsibles(){
         $user=DB::table('user_roles')
-            ->select('users.*','employees.*')
+            ->select('users.name','users.surname','employees.id as employee_id')
             ->leftJoin('employees','employees.user_id','=','user_roles.user_id')
             ->leftJoin('users','users.id','=','employees.user_id')
             ->where('user_roles.role_id','=',8)
