@@ -158,10 +158,21 @@ class ConsentController extends Controller
                 $consent->status = $request->status;
                 $consent->save();
             }
-            if ($request->status==1)
-                return response()->json(['message'=>'DisAllowed by Director!'],200);
-            elseif ($request->status==2)
-                return response()->json(['message'=>'Allowed by Director!'],200);
+            else{
+                return $this->errorResponse('Bu prosesi yerine yetire bilmezsiz!',422);
+            }
+            if ($request->status==1 && in_array(8,$user_roles_id))
+                return response()->json(['message'=>'Baş direktor terefinden redd edildi!'],200);
+            elseif ($request->status==2 && in_array(8,$user_roles_id)) {
+                return response()->json(['message' => 'Baş direktor terefinden tesdiqlendi!'], 200);
+            }
+            elseif ($request->status==1 && in_array(9,$user_roles_id)){
+                return response()->json(['message'=>'İcraçı direktor terefinden redd edildi!'],200);
+            }
+            elseif ($request->status==2 && in_array(9,$user_roles_id)){
+                return response()->json(['message'=>'İcraçı direktor terefinden tesdiqlendi!'],200);
+            }
+
     }
 
 
