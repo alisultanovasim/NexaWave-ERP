@@ -8,6 +8,7 @@ use App\Models\UserRole;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
+use Modules\Esd\Entities\User;
 use Modules\Hr\Entities\AcademicDegree;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
@@ -133,19 +134,35 @@ class ConsentController extends Controller
 
     }
 
-    public function allowConsent($consent_id)
+    public function allowConsent(Request $request,$consent_id)
     {
-        $consent=Consent::query()->findOrFail($consent_id);
-        $consent->status=2;
-        $consent->save();
-        return response()->json(['message'=>'Allowed by Director!'],200);
+        $this->validate($request,[
+            'employee_id'=>'required',
+           'status'=>'required|in:1,2'
+        ]);
+            $user_id=Employee::query()->findOrFail($request->employee_id);
+            $user=\App\Models\User::query()
+                ->where('users.id',$user_id['user_id'])
+                ->with('roles')
+                ->get();
+            $user_roles=[];
+            foreach ($user as $item){
+                $user_roles[]=$item->roles;
+            }
+            $user_roles_id=[];
+            foreach ($user_roles[0] as $key=>$item){
+                 $user_roles_id[]=$item['id'];
+            }
+            if (in_array(8,$user_roles_id) || in_array(9,$user_roles_id)) {
+                $consent = Consent::query()->findOrFail($consent_id);
+                $consent->status = $request->status;
+                $consent->save();
+            }
+            if ($request->status==1)
+                return response()->json(['message'=>'DisAllowed by Director!'],200);
+            elseif ($request->status==2)
+                return response()->json(['message'=>'Allowed by Director!'],200);
     }
-    public function disAllowConsent($consent_id)
-    {
-        $consent=Consent::query()->findOrFail($consent_id);
-        $consent->status=1;
-        $consent->save();
-        return response()->json(['message'=>'Disallowed by Director!'],200);
-    }
+
 
 }
