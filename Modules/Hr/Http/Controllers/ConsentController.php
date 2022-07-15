@@ -47,7 +47,8 @@ class ConsentController extends Controller
                 $consents=Consent::query()
                     ->with('employee.user.details')
                     ->where(['company_id'=>$request->company_id,
-                            'office_id'=>$request->office_id
+                            'office_id'=>$request->office_id,
+                            'responsible_id'=>$request->employee_id
                         ])
                     ->get();
             else{
