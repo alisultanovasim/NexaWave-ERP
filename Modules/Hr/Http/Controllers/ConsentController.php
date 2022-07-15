@@ -137,7 +137,7 @@ class ConsentController extends Controller
     public function allowConsent(Request $request,$consent_id)
     {
         $this->validate($request,[
-            'employee_id'=>'required',
+            'employee_id'=>['required',Rule::exists('employees','id')],
            'status'=>'required|in:1,2'
         ]);
             $user_id=Employee::query()->findOrFail($request->employee_id);
