@@ -40,7 +40,9 @@ class Product extends Model
         'make_date',
         "company_id",
         'status',
-        'sell_act_id'
+        'sell_act_id',
+        'room',
+        'floor'
     ];
 
     public const CAT_UPDATE = [

@@ -321,6 +321,8 @@ class ProductController extends Controller
     public static function getValidationRules()
     {
         return [
+            'floor'=>['nullable','integer'],
+            'room'=>['nullable','integer'],
             'unit_id' => ['required', 'integer', 'min:1'],
             'less_value' => ['required', 'boolean'],
             'quickly_old' => ['required', 'boolean'],
