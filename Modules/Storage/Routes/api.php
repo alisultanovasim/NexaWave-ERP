@@ -26,6 +26,7 @@ Route::group([
         Route::get('/', 'ProductController@firstPage');
         Route::get('/history/{id}', 'ProductController@showHistory');
         Route::get('/{id}', 'ProductController@show');
+        Route::get('/filterproducts', 'ProductController@filterProducts');
         Route::put('/{id}', 'ProductController@update');
         Route::post('/', 'ProductController@store');
         Route::post('/increase/{id}', 'ProductController@increase');

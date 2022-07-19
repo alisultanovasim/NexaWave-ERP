@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 use Modules\Storage\Entities\Product;
 use Modules\Storage\Entities\ProductDelete;
 use Modules\Storage\Entities\ProductKind;
@@ -321,7 +322,7 @@ class ProductController extends Controller
     public static function getValidationRules()
     {
         return [
-            'floor'=>['nullable','integer'],
+            'floor'=>['nullable','integer',Rule::exists('floors','number')],
             'room'=>['nullable','integer'],
             'unit_id' => ['required', 'integer', 'min:1'],
             'less_value' => ['required', 'boolean'],
@@ -409,5 +410,41 @@ class ProductController extends Controller
         $deletes = $deletes->paginate($request->get('per_page'));
 
         return $this->successResponse($deletes);
+    }
+
+    public function filterProducts(Request $request)
+    {
+        $this->validate($request,[
+            'company_id'=>'required',
+            'title'=>'nullable|string',
+            'kind'=>'nullable|string',
+            'amount'=>'nullable|integer',
+            'floor'=>['nullable','integer',Rule::exists('floors','number')],
+            'room'=>'nullable|integer',
+            'per_page'=>'nullable|integer'
+        ]);
+        $per_page=$request->per_page ?? 10;
+            $products=Product::query();
+
+            if ($request->has('title'))
+                $products->whereHas('title',function ($q) use ($request) {
+                    $q->where('name','like','%'.$request->get('title').'%');
+                });
+            if ($request->has('kind'))
+                $products->whereHas('kind',function ($q) use ($request) {
+                    $q->where('name','like','%'.$request->get('kind').'%');
+                });
+            if ($request->has('amount'))
+                $products->where('products.amount',$request->get('amount'));
+            if ($request->has('floor'))
+                $products->where('products.floor',$request->get('floor'));
+            if ($request->has('room'))
+                $products->where('products.room',$request->get('room'));
+            if (!$products->count()){
+                return $this->errorResponse("There is no info!",404);
+            }
+        return $this->successResponse($products->paginate($per_page),200);
+
+
     }
 }
