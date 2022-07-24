@@ -61,19 +61,19 @@ class AssignmentController extends Controller
             if (!$document)
                 return $this->errorResponse(trans("apiResponse.documentNotFound"));
 
-            if ($document->status !== Document::ACTIVE and  $document->status !== Document::WAIT)
+            if ($document->status !== Document::ACTIVE and $document->status !== Document::WAIT)
                 return $this->errorResponse(['error' => trans("apiResponse.docStatusError", ["status" => $document->status])]);
 
 //            if ($request->has('expire_time')) $document->update(['expire_time' => $request->expire_time]);
 
             if ($document->status == Document::WAIT)
-                Document::where('id' , $id)
-                    ->update(['status' =>Document::ACTIVE]);
+                Document::where('id', $id)
+                    ->update(['status' => Document::ACTIVE]);
 
             $helper = array_unique($request->user_ids);
 
-            if (!$this->checkUser($helper , $request))
-             return $this->errorResponse(trans('response.EmployeesIsIncorrect'));
+            if (!$this->checkUser($helper, $request))
+                return $this->errorResponse(trans('response.EmployeesIsIncorrect'));
             $data = array_merge($request->only('description', 'expire_time'), [
                 'document_id' => $document->id,
                 'uploader_user_id' => Auth::id(),
@@ -123,93 +123,92 @@ class AssignmentController extends Controller
             'base' => 'required_with:user_ids|integer',
             'is_extension' => ['required', 'boolean']
         ]);
-            DB::beginTransaction();
-            $document = Document::where([
-                ["id", $id],
-                ["company_id", $request->company_id],
-            ])->first(["status"]);
-            if (!$document)
-                return $this->errorResponse(trans("apiResponse.unProcess"));
-            if ($document->status !== Document::ACTIVE)
-                return $this->errorResponse(trans("apiResponse.docStatusError", ["status" => $document->status]));
+        DB::beginTransaction();
+        $document = Document::where([
+            ["id", $id],
+            ["company_id", $request->company_id],
+        ])->first(["status"]);
+        if (!$document)
+            return $this->errorResponse(trans("apiResponse.unProcess"));
+        if ($document->status !== Document::ACTIVE)
+            return $this->errorResponse(trans("apiResponse.docStatusError", ["status" => $document->status]));
 
 
+        $assignment = Assignment::where('document_id', $id)->first(['id', 'expire_time', 'versions', 'expire_description']);
+        if (!$assignment) return $this->errorResponse(trans('response.assignmentNotFound'));
 
-            $assignment = Assignment::where('document_id', $id)->first(['id'  , 'expire_time' , 'versions' , 'expire_description']);
-            if (!$assignment) return $this->errorResponse(trans('response.assignmentNotFound'));
+        if ($request->get('is_extension')) {
+            $version = $assignment->versions;
+            $updated = $request->only(['description']);
+            if ($request->has('expire_time')) {
+                $newTime = Carbon::parse($request->get('expire_time'));
+                if (!$newTime->equalTo(Carbon::parse($assignment->expire_time))) {
+                    $updated['expire_time'] = $request->get('expire_time');
+                    $updated['expire_description'] = $request->get('expire_description');
+                    array_push($version, [
+                        'expire_time' => $assignment->expire_time,
+                        'expire_description' => $assignment->expire_description,
+                        'changed_user' => Auth::user()->name . " " . Auth::user()->surname,
+                        'changed_user_id' => Auth::id(),
+                    ]);
 
-            if ($request->get('is_extension')){
-                $version = $assignment->versions;
-                $updated = $request->only(['description']);
-                if ($request->has('expire_time')){
-                    $newTime = Carbon::parse($request->get('expire_time'));
-                    if (!$newTime->equalTo(Carbon::parse($assignment->expire_time))){
-                        $updated['expire_time'] = $request->get('expire_time');
-                        $updated['expire_description'] = $request->get('expire_description');
-                        array_push($version , [
-                            'expire_time' => $assignment->expire_time ,
-                            'expire_description' => $assignment->expire_description,
-                            'changed_user' =>  Auth::user()->name . " " .  Auth::user()->surname ,
-                            'changed_user_id' =>  Auth::id(),
-                        ]);
-
-                        $updated['versions'] = $version;
-                    }
-                }
-            }else{
-                $updated = $request->only([
-                    'expire_time',
-                    'expire_description',
-                    'description'
-                ]);
-            }
-
-            Assignment::where('id', $assignment->id)->update($updated);
-
-            if ($request->has('user_ids')) {
-                if (!in_array($request->base, $request->user_ids))
-                    return $this->errorResponse(["base" => trans("apiResponse.notFound")]);
-
-                $helper = array_unique($request->user_ids);
-                if (!$this->checkUser($helper , $request))
-                    return $this->errorResponse(trans('response.unProcess'));
-
-
-                $allItems = AssignmentItem::where('assignment_id', $assignment->id)->pluck('user_id')->toArray();
-
-                $check = AssignmentItem::where('assignment_id', $assignment->id)
-                    ->where('is_base', 1)
-                    ->where('user_id', "!=", $request->base)
-                    ->update(['is_base' => 0]);
-                $needToDelete = array_diff($allItems, $helper);
-                if ($needToDelete) {
-                    AssignmentItem::whereIn('user_id', $needToDelete)->delete();
-                }
-
-                $needToAdd = array_diff($helper, $allItems);
-                if ($needToAdd) {
-                    $assignmentItems = [];
-                    foreach ($needToAdd as $v) {
-                        $assignmentItems[] = [
-                            "user_id" => $v,
-                            "assignment_id" => $assignment->id
-                        ];
-                    }
-                    AssignmentItem::insert($assignmentItems);
-                }
-
-                if ($check) {
-                    AssignmentItem::where('assignment_id', $assignment->id)
-                        ->where('user_id', "=", $request->base)
-                        ->update(['is_base' => 1]);
+                    $updated['versions'] = $version;
                 }
             }
+        } else {
+            $updated = $request->only([
+                'expire_time',
+                'expire_description',
+                'description'
+            ]);
+        }
+
+        Assignment::where('id', $assignment->id)->update($updated);
+
+        if ($request->has('user_ids')) {
+            if (!in_array($request->base, $request->user_ids))
+                return $this->errorResponse(["base" => trans("apiResponse.notFound")]);
+
+            $helper = array_unique($request->user_ids);
+            if (!$this->checkUser($helper, $request))
+                return $this->errorResponse(trans('response.unProcess'));
 
 
-            DB::commit();
+            $allItems = AssignmentItem::where('assignment_id', $assignment->id)->pluck('user_id')->toArray();
+
+            $check = AssignmentItem::where('assignment_id', $assignment->id)
+                ->where('is_base', 1)
+                ->where('user_id', "!=", $request->base)
+                ->update(['is_base' => 0]);
+            $needToDelete = array_diff($allItems, $helper);
+            if ($needToDelete) {
+                AssignmentItem::whereIn('user_id', $needToDelete)->delete();
+            }
+
+            $needToAdd = array_diff($helper, $allItems);
+            if ($needToAdd) {
+                $assignmentItems = [];
+                foreach ($needToAdd as $v) {
+                    $assignmentItems[] = [
+                        "user_id" => $v,
+                        "assignment_id" => $assignment->id
+                    ];
+                }
+                AssignmentItem::insert($assignmentItems);
+            }
+
+            if ($check) {
+                AssignmentItem::where('assignment_id', $assignment->id)
+                    ->where('user_id', "=", $request->base)
+                    ->update(['is_base' => 1]);
+            }
+        }
 
 
-            return $this->successResponse('OK');
+        DB::commit();
+
+
+        return $this->successResponse('OK');
 
     }
 
@@ -222,9 +221,9 @@ class AssignmentController extends Controller
             'company_id' => 'required|integer',
         ]);
         $company_id = $request->company_id;
-            $document = Document::where("id", $id)
-                ->where("company_id", $company_id)
-                ->exists();
+        $document = Document::where("id", $id)
+            ->where("company_id", $company_id)
+            ->exists();
         if (!$document)
             return $this->errorResponse(trans("apiResponse.documentNotExists"));
         Assignment::where("document_id", $id)
@@ -251,9 +250,9 @@ class AssignmentController extends Controller
         ]);
         $helper = array_unique($request->user_ids);
 
-        if (in_array(Auth::id() , $helper)) return $this->errorResponse(trans('response.selfsend'),422);
+        if (in_array(Auth::id(), $helper)) return $this->errorResponse(trans('response.selfsend'), 422);
 
-        if (!$this->checkUser($helper , $request))
+        if (!$this->checkUser($helper, $request))
             return $this->errorResponse(trans('response.unProcess'));
 
 
@@ -264,9 +263,6 @@ class AssignmentController extends Controller
         })->first(['id']);
 
         if (!$assignment) return $this->errorResponse(['assignment' => trans('apiResponse.assignmentNotFound')]);
-
-
-
 
         $base = AssignmentItem::where('assignment_id', $assignment->id)
             ->where('user_id', Auth::id())
@@ -288,6 +284,12 @@ class AssignmentController extends Controller
                 'user_id' => $user_id,
                 'status' => AssignmentItem::NOT_SEEN
             ];
+
+            DB::table('documents_participants')->insert([
+                'document_id' => $id,
+                'user_id' => $user_id,
+                'type' => 0
+            ]);
         }
 
         AssignmentItem::insertOrIgnore($items);
@@ -335,7 +337,7 @@ class AssignmentController extends Controller
             'tome' => 'sometimes|required|integer|int:1,0'
 
         ]);
-        $assignments = Assignment::with(['items' ,'items.employee.user'  ])
+        $assignments = Assignment::with(['items', 'items.employee.user'])
             ->whereHas('document', function ($q) use ($request) {
                 $q->where('company_id', $request->company_id);
                 if ($request->has('finished_at'))
@@ -344,7 +346,7 @@ class AssignmentController extends Controller
         if ($request->has('tome')) {
             $assignments->whereHas('items', function ($q) use ($request) {
                 if ($request->get('tome'))
-                    $q->whereHas('employee' , function ($q){
+                    $q->whereHas('employee', function ($q) {
                         $q->where('user_id', Auth::id());
                     });
             });
@@ -386,7 +388,7 @@ class AssignmentController extends Controller
 
         $assignmentItem = AssignmentItem::where('assignment_id', $assignment->id)
             ->where('user_id', Auth::user()->getEmployeeId($company_id))
-                ->first('id');
+            ->first('id');
 
         if (!$assignmentItem)
             return $this->errorResponse(trans('apiResponse.itemNotFound'));
@@ -413,38 +415,38 @@ class AssignmentController extends Controller
         $company_id = $request->company_id;
 
         $document = Document::where("id", $id)
-                ->where("company_id", $company_id)
-                ->where("status", Document::ACTIVE)
-                ->exists();
-            if (!$document)
-                return $this->errorResponse(trans("apiResponse.documentNotFound"));
+            ->where("company_id", $company_id)
+            ->where("status", Document::ACTIVE)
+            ->exists();
+        if (!$document)
+            return $this->errorResponse(trans("apiResponse.documentNotFound"));
 
-            $assignment = Assignment::where("document_id", $id)
-                ->first('id');
-            if (!$assignment)
-                return $this->errorResponse(trans("apiResponse.AssignmentNotFound"));
+        $assignment = Assignment::where("document_id", $id)
+            ->first('id');
+        if (!$assignment)
+            return $this->errorResponse(trans("apiResponse.AssignmentNotFound"));
 
 
-            $assignmentItem = AssignmentItem::where('assignment_id', $assignment->id)
-                ->where('user_id',  Auth::id())
-                ->first('id');
+        $assignmentItem = AssignmentItem::where('assignment_id', $assignment->id)
+            ->where('user_id', Auth::id())
+            ->first('id');
 
-            if (!$assignmentItem) return $this->errorResponse(trans('apiResponse.assignmentItemNotFound'));
+        if (!$assignmentItem) return $this->errorResponse(trans('apiResponse.assignmentItemNotFound'));
 
-            $note = Note::where("id", $request->note_id)
-                ->where('assignment_item_id', $assignmentItem->id)
-                ->first();
-            if (!$note)
-                return $this->errorResponse(trans("apiResponse.noteNotFound"));
+        $note = Note::where("id", $request->note_id)
+            ->where('assignment_item_id', $assignmentItem->id)
+            ->first();
+        if (!$note)
+            return $this->errorResponse(trans("apiResponse.noteNotFound"));
 
-            $versions = json_decode($note->versions, true);
-            $addingVersions = [
-                "resource" => $note->resource,
-                "type" => $note->type,
-                'size' => $note->size
-            ];
-            $versions = $versions ?? [];
-            array_push($versions, $addingVersions);
+        $versions = json_decode($note->versions, true);
+        $addingVersions = [
+            "resource" => $note->resource,
+            "type" => $note->type,
+            'size' => $note->size
+        ];
+        $versions = $versions ?? [];
+        array_push($versions, $addingVersions);
 
 
         $note->versions = json_encode($versions);
@@ -473,27 +475,27 @@ class AssignmentController extends Controller
         $document = Document::where("id", $id)
             ->where("company_id", $request->company_id)
             ->where("status", Document::ACTIVE)
-                ->exists();
-            if (!$document)
-                return $this->errorResponse(trans("apiResponse.docStatusOrNotFound"));
+            ->exists();
+        if (!$document)
+            return $this->errorResponse(trans("apiResponse.docStatusOrNotFound"));
 
-            $assignment = Assignment::where("document_id", $id)
-                ->first('id');
-            if (!$assignment)
-                return $this->errorResponse(trans("apiResponse.assignmentNotFound"));
-
-
-            $assignmentItem = AssignmentItem::where('assignment_id', $assignment->id)
-                ->where('user_id', Auth::id())
-                ->first('id');
-
-            if (!$assignmentItem)
-                return $this->errorResponse(trans("apiResponse.notAssignmentToYou"));
+        $assignment = Assignment::where("document_id", $id)
+            ->first('id');
+        if (!$assignment)
+            return $this->errorResponse(trans("apiResponse.assignmentNotFound"));
 
 
-            $check = Note::where('assignment_item_id', $assignmentItem->id)
-                ->where('id', $request->note_id)
-                ->delete();
+        $assignmentItem = AssignmentItem::where('assignment_id', $assignment->id)
+            ->where('user_id', Auth::id())
+            ->first('id');
+
+        if (!$assignmentItem)
+            return $this->errorResponse(trans("apiResponse.notAssignmentToYou"));
+
+
+        $check = Note::where('assignment_item_id', $assignmentItem->id)
+            ->where('id', $request->note_id)
+            ->delete();
         if (!$check)
             return $this->errorResponse(trans("apiResponse.unProcess"));
 
@@ -518,19 +520,19 @@ class AssignmentController extends Controller
         $assignment = Assignment::whereHas('document', function ($q) use ($id, $company_id) {
             $q->where("id", $id)
                 ->where("company_id", $company_id)
-                    ->where('status', Document::ACTIVE);
-            })->where("document_id", $id)
-                ->first('id');
+                ->where('status', Document::ACTIVE);
+        })->where("document_id", $id)
+            ->first('id');
 
-            if (!$assignment)
-                return $this->errorResponse(trans("apiResponse.unProcess"));
+        if (!$assignment)
+            return $this->errorResponse(trans("apiResponse.unProcess"));
 
 
-            $check = AssignmentItem::where('assignment_id', $assignment->id)
-                ->where('user_id', Auth::id())
-                ->update([
-                    'status' => AssignmentItem::WAIT
-                ]);
+        $check = AssignmentItem::where('assignment_id', $assignment->id)
+            ->where('user_id', Auth::id())
+            ->update([
+                'status' => AssignmentItem::WAIT
+            ]);
         if (!$check)
             return $this->errorResponse(trans("apiResponse.unProcess"));
         return $this->successResponse("OK");
@@ -554,31 +556,31 @@ class AssignmentController extends Controller
         $company_id = $request->company_id;
         $assignment = Assignment::whereHas('document', function ($q) use ($id, $company_id) {
             $q->where("id", $id)
-                    ->where("company_id", $company_id)
-                    ->where('status', Document::ACTIVE);
-            })
-                ->where("document_id", $id)
-                ->first(['id', 'document_id']);
-            if (!$assignment)
-                return $this->errorResponse(trans("apiResponse.unProcess"));
+                ->where("company_id", $company_id)
+                ->where('status', Document::ACTIVE);
+        })
+            ->where("document_id", $id)
+            ->first(['id', 'document_id']);
+        if (!$assignment)
+            return $this->errorResponse(trans("apiResponse.unProcess"));
 
-            $assignmentItem = AssignmentItem::where('assignment_id', $assignment->id)
-                ->where('user_id',  Auth::id())
-                ->first(['id', 'is_base']);
+        $assignmentItem = AssignmentItem::where('assignment_id', $assignment->id)
+            ->where('user_id', Auth::id())
+            ->first(['id', 'is_base']);
 
-            if (!$assignmentItem)
-                return $this->errorResponse(trans("apiResponse.unProcess"));
-            if ($assignmentItem->is_base and !$request->return) {
-                $check = AssignmentItem::where('assignment_id', $assignment->id)
-                    ->where('parent_id', $assignmentItem->id)
-                    ->where('status', "!=", AssignmentItem::DONE)
-                    ->exists();
-                if ($check)
-                    return $this->errorResponse(['error' => trans('apiResponse.subAssignedUserNotFinishWork')]);
-            }
+        if (!$assignmentItem)
+            return $this->errorResponse(trans("apiResponse.unProcess"));
+        if ($assignmentItem->is_base and !$request->return) {
+            $check = AssignmentItem::where('assignment_id', $assignment->id)
+                ->where('parent_id', $assignmentItem->id)
+                ->where('status', "!=", AssignmentItem::DONE)
+                ->exists();
+            if ($check)
+                return $this->errorResponse(['error' => trans('apiResponse.subAssignedUserNotFinishWork')]);
+        }
 
-            if ($this->LastMakeDone($assignment->id , $assignmentItem->id)) Document::where('id', $id)->update(['status' => Document::WAIT_FOR_ACCEPTANCE]);
-            else if ($assignmentItem->is_base and $this->issetSubAssigners($assignment->id)) return  $this->errorResponse(['error' => trans('apiResponse.subAssignedUserNotFinishWork')]);
+        if ($this->LastMakeDone($assignment->id, $assignmentItem->id)) Document::where('id', $id)->update(['status' => Document::WAIT_FOR_ACCEPTANCE]);
+        else if ($assignmentItem->is_base and $this->issetSubAssigners($assignment->id)) return $this->errorResponse(['error' => trans('apiResponse.subAssignedUserNotFinishWork')]);
 
         $check = $assignmentItem->update(["status" => ($request->return) ? AssignmentItem::WAIT : AssignmentItem::DONE]);
 
@@ -605,24 +607,24 @@ class AssignmentController extends Controller
         ]);
         DB::beginTransaction();
         $assignment = Assignment::whereHas('document', function ($q) use ($id, $request) {
-                $q->where("id", $id)
-                    ->where("company_id", $request->company_id)
-                    ->where('status', Document::ACTIVE);
-            })
-                ->first(['id', 'document_id']);
-            if (!$assignment)
-                return $this->errorResponse(trans("apiResponse.unProcess"));
+            $q->where("id", $id)
+                ->where("company_id", $request->company_id)
+                ->where('status', Document::ACTIVE);
+        })
+            ->first(['id', 'document_id']);
+        if (!$assignment)
+            return $this->errorResponse(trans("apiResponse.unProcess"));
 
-            $assignmentItem = AssignmentItem::where('assignment_id', $assignment->id)
-                ->where('user_id', Auth::id())
-                ->first(['id', 'is_base']);
-            if (!$assignmentItem)
-                return $this->errorResponse(trans("apiResponse.unProcess"));
+        $assignmentItem = AssignmentItem::where('assignment_id', $assignment->id)
+            ->where('user_id', Auth::id())
+            ->first(['id', 'is_base']);
+        if (!$assignmentItem)
+            return $this->errorResponse(trans("apiResponse.unProcess"));
 
-            if ($request->status == AssignmentItem::DONE){
-                if ($this->LastMakeDone($assignment->id , $assignmentItem->id)) Document::where('id', $id)->update(['status' => Document::WAIT_FOR_ACCEPTANCE]);
-                else if ($assignmentItem->is_base and $this->issetSubAssigners($assignment->id)) return  $this->errorResponse(['error' => trans('apiResponse.subAssignedUserNotFinishWork')]);
-            }
+        if ($request->status == AssignmentItem::DONE) {
+            if ($this->LastMakeDone($assignment->id, $assignmentItem->id)) Document::where('id', $id)->update(['status' => Document::WAIT_FOR_ACCEPTANCE]);
+            else if ($assignmentItem->is_base and $this->issetSubAssigners($assignment->id)) return $this->errorResponse(['error' => trans('apiResponse.subAssignedUserNotFinishWork')]);
+        }
         AssignmentItem::where('id', $assignmentItem->id)
             ->update([
                 'status' => $request->status
