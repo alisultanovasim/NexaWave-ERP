@@ -24,6 +24,7 @@ Route::group([
         Route::get('/all', 'ProductController@index');
         Route::get('/deleted', 'ProductController@getDeletes');
         Route::get('/', 'ProductController@firstPage');
+        Route::get('/titles', 'ProductController@getTitles');
         Route::get('/history/{id}', 'ProductController@showHistory');
         Route::get('/{id}', 'ProductController@show');
         Route::get('/filterproducts', 'ProductController@filterProducts');

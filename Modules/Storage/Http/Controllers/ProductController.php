@@ -91,6 +91,18 @@ class ProductController extends Controller
         return $this->dataResponse($title);
     }
 
+    public function getTitles(Request $request)
+    {
+        $this->validate($request,[
+           'company_id'=>'required'
+        ]);
+
+        $titles=DB::table('product_titles')
+            ->where('company_id',$request->company_id)
+            ->get();
+        return $this->dataResponse($titles,200);
+    }
+
     public function show(Request $request, $id)
     {
         $this->validate($request, [
