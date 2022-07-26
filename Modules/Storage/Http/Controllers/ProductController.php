@@ -77,10 +77,14 @@ class ProductController extends Controller
             "category_id" => ['sometimes', 'required', "int"]
         ]);
 
-        $title = ProductKind::with(['title', 'unit'])
+        $title = ProductKind::with([
+            'title',
+            'unit'
+
+        ])
             ->withCount(['products as product_amount' => function ($q) {
                 $q->where('status', Product::STATUS_ACTIVE);
-                $q->select(DB::raw("SUM(amount)"));
+                $q->select(DB::raw("SUM(amount)"),'room','floor');
             }])
             ->company();
 
