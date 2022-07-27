@@ -442,7 +442,8 @@ class ProductController extends Controller
             'per_page'=>'nullable|integer'
         ]);
         $per_page=$request->per_page ?? 10;
-        $products=Product::query();
+        $products=Product::query()
+        ->with(['kind']);
 
         if ($request->has('title'))
             $products->whereHas('title',function ($q) use ($request) {
