@@ -77,16 +77,17 @@ class ProductController extends Controller
             "category_id" => ['sometimes', 'required', "int"]
         ]);
 
-        $title = ProductKind::with([
-            'title',
-            'unit'
-
-        ])
+        $title = ProductKind::query()
+            ->with([
+                'title',
+                'unit',
+                'products:id,floor'
+            ])
             ->withCount(['products as product_amount' => function ($q) {
                 $q->where('status', Product::STATUS_ACTIVE);
                 $q->select(DB::raw("SUM(amount)"),'room','floor');
-            }])
-            ->company();
+            }]);
+//            ->company();
 
         if ($request->has("title_id"))
             $title = $title->where("title_id", "=", $request->input("title_id"));
@@ -98,7 +99,7 @@ class ProductController extends Controller
     public function getTitles(Request $request)
     {
         $this->validate($request,[
-           'company_id'=>'required'
+            'company_id'=>'required'
         ]);
 
         $titles=DB::table('product_titles')
@@ -433,6 +434,7 @@ class ProductController extends Controller
         $this->validate($request,[
             'company_id'=>'required',
             'title'=>'nullable|string',
+            'title_id'=>'nullable|integer',
             'kind'=>'nullable|string',
             'amount'=>'nullable|integer',
             'floor'=>['nullable','integer',Rule::exists('floors','number')],
@@ -440,25 +442,27 @@ class ProductController extends Controller
             'per_page'=>'nullable|integer'
         ]);
         $per_page=$request->per_page ?? 10;
-            $products=Product::query();
+        $products=Product::query();
 
-            if ($request->has('title'))
-                $products->whereHas('title',function ($q) use ($request) {
-                    $q->where('name','like','%'.$request->get('title').'%');
-                });
-            if ($request->has('kind'))
-                $products->whereHas('kind',function ($q) use ($request) {
-                    $q->where('name','like','%'.$request->get('kind').'%');
-                });
-            if ($request->has('amount'))
-                $products->where('products.amount',$request->get('amount'));
-            if ($request->has('floor'))
-                $products->where('products.floor',$request->get('floor'));
-            if ($request->has('room'))
-                $products->where('products.room',$request->get('room'));
-            if (!$products->count()){
-                return $this->errorResponse("There is no info!",404);
-            }
+        if ($request->has('title'))
+            $products->whereHas('title',function ($q) use ($request) {
+                $q->where('name','like','%'.$request->get('title').'%');
+            });
+        if ($request->has('title_id'))
+            $products->where('title_id',$request->get('title_id'));
+        if ($request->has('kind'))
+            $products->whereHas('kind',function ($q) use ($request) {
+                $q->where('name','like','%'.$request->get('kind').'%');
+            });
+        if ($request->has('amount'))
+            $products->where('products.amount',$request->get('amount'));
+        if ($request->has('floor'))
+            $products->where('products.floor',$request->get('floor'));
+        if ($request->has('room'))
+            $products->where('products.room',$request->get('room'));
+        if (!$products->count()){
+            return $this->errorResponse("There is no info!",404);
+        }
         return $this->successResponse($products->paginate($per_page),200);
 
 
