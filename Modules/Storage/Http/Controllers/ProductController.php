@@ -80,8 +80,7 @@ class ProductController extends Controller
         $title = ProductKind::query()
             ->with([
                 'title',
-                'unit',
-                'products:id,floor'
+                'unit'
             ])
             ->withCount(['products as product_amount' => function ($q) {
                 $q->where('status', Product::STATUS_ACTIVE);
