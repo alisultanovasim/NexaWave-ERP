@@ -443,7 +443,8 @@ class ProductController extends Controller
         ]);
         $per_page=$request->per_page ?? 10;
         $products=Product::query()
-        ->with(['kind']);
+            ->select(['amount','room','floor','kind_id'])
+        ->with(['kind:id,name,title_id']);
 
         if ($request->has('title'))
             $products->whereHas('title',function ($q) use ($request) {
