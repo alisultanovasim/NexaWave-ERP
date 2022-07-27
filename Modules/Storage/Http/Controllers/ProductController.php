@@ -100,10 +100,11 @@ class ProductController extends Controller
         $this->validate($request,[
             'company_id'=>'required'
         ]);
+        $per_page=$request->per_page ?? 10;
 
         $titles=DB::table('product_titles')
             ->where('company_id',$request->company_id)
-            ->get();
+            ->paginate($per_page);
         return $this->dataResponse($titles,200);
     }
 
