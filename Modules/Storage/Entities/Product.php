@@ -65,7 +65,7 @@ class Product extends Model
     protected $hidden = ['mark_id' , 'product_model'];
 
     public function kind(){
-        return $this->belongsTo(ProductKind::class);
+        return $this->belongsTo(ProductKind::class)->distinct();
     }
     public function unit(){
         return $this->belongsTo(Unit::class);

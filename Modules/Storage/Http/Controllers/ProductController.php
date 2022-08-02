@@ -482,4 +482,21 @@ class ProductController extends Controller
 
 
     }
+
+    public function getKinds(Request $request)
+    {
+        $this->validate($request,[
+           'company_id'=>'required',
+           'title_id'=>'required|integer',
+            'per_page'=>'nullable'
+        ]);
+        $per_page=$request->per_page ?? 10;
+
+        $kinds=ProductKind::query()
+            ->where('title_id',$request->title_id)
+            ->withCount('products as productCount')
+            ->paginate($per_page);
+
+        return $this->dataResponse($kinds,200);
+    }
 }
