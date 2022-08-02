@@ -14,6 +14,7 @@ use Illuminate\Validation\Rule;
 use Modules\Storage\Entities\Product;
 use Modules\Storage\Entities\ProductDelete;
 use Modules\Storage\Entities\ProductKind;
+use Modules\Storage\Entities\ProductTitle;
 use Modules\Storage\Entities\ProductUpdate;
 
 class ProductController extends Controller
@@ -80,7 +81,7 @@ class ProductController extends Controller
         $title = ProductKind::query()
             ->with([
                 'title',
-                'unit'
+                'unit',
             ])
             ->withCount(['products as product_amount' => function ($q) {
                 $q->where('status', Product::STATUS_ACTIVE);
@@ -95,16 +96,24 @@ class ProductController extends Controller
         return $this->dataResponse($title);
     }
 
-    public function getTitles(Request $request)
+    /**
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function getTitles(Request $request): \Illuminate\Http\JsonResponse
     {
         $this->validate($request,[
             'company_id'=>'required'
         ]);
         $per_page=$request->per_page ?? 10;
 
-        $titles=DB::table('product_titles')
-            ->where('company_id',$request->company_id)
-            ->paginate($per_page);
+//        $titles=ProductTitle::select('product_titles.*',DB::raw('count(product_kinds.title_id) as titleCount'))
+//            ->leftJoin('product_kinds','product_kinds.title_id','=','product_titles.id')
+//            ->where('product_kinds.company_id',$request->company_id)
+//            ->paginate($per_page);
+
+        $titles=ProductTitle::query()
+            ->withCount('kinds as kindCount')
+            ->withCount('products as productCount')->paginate($per_page);
         return $this->dataResponse($titles,200);
     }
 
@@ -443,10 +452,11 @@ class ProductController extends Controller
         ]);
         $per_page=$request->per_page ?? 10;
         $products=Product::query()
-            ->select(['id','amount','room','floor','kind_id','state_id'])
+            ->select(['id','amount','room','floor','kind_id','state_id','model_id'])
         ->with([
             'kind:id,name,title_id',
-            'state:id,name'
+            'state:id,name',
+            'model:id,name'
             ]);
 
         if ($request->has('title'))
