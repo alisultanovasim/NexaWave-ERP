@@ -11,6 +11,8 @@ class ProductAssignment extends Model
     const RETURNED = 1;
     const ACTIVE = 2;
     const ALL = 3;
+    const OPERATION_TYPE=2;
+    const ATTACHMENT_TYPE=1;
 
     protected $guarded = [];
 

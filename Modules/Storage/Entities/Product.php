@@ -15,6 +15,9 @@ class Product extends Model
     const STATUS_ACTIVE = 1;
     const STATUS_DEMAND = 2;
     const TOTAL_DELETED = 3;
+    protected $appends=[
+      'total_amount'
+    ];
     protected $fillable = [
         'initial_amount',
         'unit_id',

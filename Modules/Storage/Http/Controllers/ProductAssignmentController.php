@@ -30,10 +30,16 @@ class ProductAssignmentController extends Controller
             ])],
         ]);
 
-        $assignments = ProductAssignment::with(['employee:id,user_id' ,'employee.user:id,name,surname' , 'department' , 'section' , 'sector' , 'product' ,'product.kind','product.kind.unit'])
+        $assignments = ProductAssignment::with(['employee:id,user_id' ,
+            'employee.user:id,name,surname' ,
+            'department' ,
+            'section' ,
+            'sector' ,
+            'product' ,
+            'product.kind',
+            'product.kind.unit'])
             ->company()
             ->orderBy('id' , 'desc');
-
         if ($request->get('employee_id'))
             $assignments->where('employee_id' , $request->get('employee_id'));
 
@@ -44,7 +50,6 @@ class ProductAssignmentController extends Controller
         }else{
             $assignments->where('status' , ProductAssignment::ACTIVE);
         }
-
         if ($request->get('department_id'))
             $assignments->where('department_id' , $request->get('department_id'));
 
@@ -62,22 +67,26 @@ class ProductAssignmentController extends Controller
             $assignments->where('sector_id' , $request->get('sector_id'));
 
         $assignments = $assignments->paginate($request->get('per_page'));
-
-        return $this->successResponse($assignments);
+        $operation_count=$assignments->where('assignment_type',ProductAssignment::OPERATION_TYPE)->count();
+        $attachment_count=$assignments->where('assignment_type',ProductAssignment::ATTACHMENT_TYPE)->count();
+        return $this->dataResponse([
+            'assignments'=>$assignments,
+            'attachment_count'=>$attachment_count,
+            'operation_count'=>$operation_count]);
     }
 
     public function store(Request $request)
     {
         $this->validate($request, [
-                'product_id' => ['required', 'integer'],
-                'amount' => ['required', 'numeric'],
-                'assignment_type' => ['required', 'integer',
-                    Rule::in([ProductAssignment::ASSIGN_TO_PLACE, ProductAssignment::ASSIGN_TO_USER])
-                ],
-                'employee_id' => ['required_if:assignment_type,' . ProductAssignment::ASSIGN_TO_USER, 'integer'],
-                'section_id' => ['nullable', 'integer'],
-                'sector_id' => ['nullable', 'integer'],
-                'department_id' => ['nullable', 'integer'],
+            'product_id' => ['required', 'integer'],
+            'amount' => ['required', 'numeric'],
+            'assignment_type' => ['required', 'integer',
+                Rule::in([ProductAssignment::ASSIGN_TO_PLACE, ProductAssignment::ASSIGN_TO_USER])
+            ],
+            'employee_id' => ['required_if:assignment_type,' . ProductAssignment::ASSIGN_TO_USER, 'integer'],
+            'section_id' => ['nullable', 'integer'],
+            'sector_id' => ['nullable', 'integer'],
+            'department_id' => ['nullable', 'integer'],
         ]);
 
         $product = Product::company()
@@ -91,6 +100,7 @@ class ProductAssignmentController extends Controller
             return $this->errorResponse(trans('response.productAmountLessThanAssign'), 422);
 
         $product->decrement('amount' , $request->get('amount'));
+        $product->increment('assignment_amount',$request->get('amount'));
 
         if ($notExists = $this->companyInfo($request->get('company_id'),
             $request->only([
