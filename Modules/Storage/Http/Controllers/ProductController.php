@@ -127,6 +127,7 @@ class ProductController extends Controller
         $product = Product::with([
             'kind',
             'kind.unit',
+            'deletes:id,product_id,amount',
             'model:id,name',
             'title:id,name',
             'state:id,name',
