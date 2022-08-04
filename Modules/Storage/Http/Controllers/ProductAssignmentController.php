@@ -67,12 +67,8 @@ class ProductAssignmentController extends Controller
             $assignments->where('sector_id' , $request->get('sector_id'));
 
         $assignments = $assignments->paginate($request->get('per_page'));
-        $operation_count=$assignments->where('assignment_type',ProductAssignment::OPERATION_TYPE)->count();
-        $attachment_count=$assignments->where('assignment_type',ProductAssignment::ATTACHMENT_TYPE)->count();
         return $this->dataResponse([
-            'assignments'=>$assignments,
-            'attachment_count'=>$attachment_count,
-            'operation_count'=>$operation_count]);
+            'assignments'=>$assignments]);
     }
 
     public function store(Request $request)

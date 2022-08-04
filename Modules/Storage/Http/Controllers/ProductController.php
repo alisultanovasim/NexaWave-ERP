@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Modules\Storage\Entities\Product;
+use Modules\Storage\Entities\ProductAssignment;
 use Modules\Storage\Entities\ProductDelete;
 use Modules\Storage\Entities\ProductKind;
 use Modules\Storage\Entities\ProductTitle;
@@ -153,14 +154,31 @@ class ProductController extends Controller
         }
 
 
-        $product = $product->where('id', $id)
+        $product = $product
+            ->where('id', $id)
             ->first();
+        $attach_count=ProductAssignment::query()
+            ->where([
+                'product_id'=>$id,
+                'assignment_type'=>ProductAssignment::ATTACHMENT_TYPE
+            ])
+            ->get('amount');
+        $operation_count=ProductAssignment::query()
+            ->where([
+                'product_id'=>$id,
+                'assignment_type'=>ProductAssignment::OPERATION_TYPE
+            ])
+            ->get('amount');
+
 
         if (!$product)
             return $this->errorResponse(trans('response.ProductNotFound'));
 
 
-        return $this->successResponse($product);
+        return $this->dataResponse([
+            'product'=>$product,
+            'attach_count'=>$attach_count,
+            'operation_count'=>$operation_count]);
     }
 
     public function showHistory(Request $request, $id)
@@ -453,10 +471,10 @@ class ProductController extends Controller
         $per_page=$request->per_page ?? 10;
         $products=Product::query()
             ->select(['id','amount','room','floor','kind_id','state_id','model_id'])
-        ->with([
-            'kind:id,name,title_id',
-            'state:id,name',
-            'model:id,name'
+            ->with([
+                'kind:id,name,title_id',
+                'state:id,name',
+                'model:id,name'
             ]);
 
         if ($request->has('title'))
@@ -486,8 +504,8 @@ class ProductController extends Controller
     public function getKinds(Request $request)
     {
         $this->validate($request,[
-           'company_id'=>'required',
-           'title_id'=>'required|integer',
+            'company_id'=>'required',
+            'title_id'=>'required|integer',
             'per_page'=>'nullable'
         ]);
         $per_page=$request->per_page ?? 10;
