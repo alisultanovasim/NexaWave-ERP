@@ -88,6 +88,11 @@ class AssignmentController extends Controller
                     "user_id" => $v,
                     "assignment_id" => $assignment->id,
                 ];
+
+                DB::create([
+                    'document_id' => $id,
+                    'user_id' => $v
+                ]);
                 if ($request->base == $v)
                     $assignmentItems[$k]["is_base"] = 1;
                 else
@@ -338,6 +343,9 @@ class AssignmentController extends Controller
 
         ]);
         $assignments = Assignment::with(['items', 'items.employee.user'])
+            ->whereHas("item", function ($q) {
+                $q->where("user_id", Auth::id());
+            })
             ->whereHas('document', function ($q) use ($request) {
                 $q->where('company_id', $request->company_id);
                 if ($request->has('finished_at'))
