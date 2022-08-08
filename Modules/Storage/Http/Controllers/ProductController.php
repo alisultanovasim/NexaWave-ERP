@@ -179,7 +179,7 @@ class ProductController extends Controller
         return $this->dataResponse([
             'product'=>$product,
             'attach_count'=>$attach_count,
-            'operation_count'=>$operation_count]);
+            'operation_count'=>$operation_count],200);
     }
 
     public function showHistory(Request $request, $id)
@@ -475,7 +475,7 @@ class ProductController extends Controller
             ->with([
                 'kind:id,name,title_id',
                 'state:id,name',
-                'model:id,name'
+                'model:id,name',
             ]);
 
         if ($request->has('title'))

@@ -96,7 +96,6 @@ class ProductAssignmentController extends Controller
             return $this->errorResponse(trans('response.productAmountLessThanAssign'), 422);
 
         $product->decrement('amount' , $request->get('amount'));
-        $product->increment('assignment_amount',$request->get('amount'));
 
         if ($notExists = $this->companyInfo($request->get('company_id'),
             $request->only([

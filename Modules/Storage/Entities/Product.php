@@ -54,6 +54,14 @@ class Product extends Model
         'main_funds',
         'description'
     ];
+    protected $appends=[
+      'count'
+    ];
+
+    public function getCountAttribute()
+    {
+        return $this->assignments()->select('amount')->where('assignment_type',ProductAssignment::ATTACHMENT_TYPE)->get();
+    }
 
     public function deletes_logs(){
         return $this->hasMany(ProductDelete::class , 'product_id' , 'id');
