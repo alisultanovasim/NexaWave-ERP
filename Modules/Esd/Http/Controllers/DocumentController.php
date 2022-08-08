@@ -71,10 +71,10 @@ class DocumentController extends Controller
                 'section:id,name', 'sendForm', 'sendType',
                 'assignment' => function ($q) {
                     $q->with(['item' => function ($q) {
-//                        $q
-//                            ->whereHas('employee' , function ($q) {
-                        $q->where('user_id', Auth::id())
-//                            })
+                        $q
+                            ->whereHas('employee', function ($q) {
+                                $q->where('user_id', Auth::id());
+                            })
                             ->select(['assignment_id', 'status', 'is_base']);
                     }, 'stuck' => function ($q) {
                         $q->with(['employee:id,user_id', 'employee.user:id,name,surname'])
