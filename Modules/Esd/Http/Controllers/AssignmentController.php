@@ -343,9 +343,9 @@ class AssignmentController extends Controller
 
         ]);
         $assignments = Assignment::with(['items', 'items.employee.user'])
-            ->whereHas("item", function ($q) {
-                $q->where("user_id", 2);
-            })
+//            ->whereHas("item", function ($q) {
+//                $q->where("user_id", 2);
+//            })
             ->whereHas('document', function ($q) use ($request) {
                 $q->where('company_id', $request->company_id);
                 if ($request->has('finished_at'))
