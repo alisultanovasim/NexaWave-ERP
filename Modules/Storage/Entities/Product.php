@@ -16,7 +16,7 @@ class Product extends Model
     const STATUS_DEMAND = 2;
     const TOTAL_DELETED = 3;
     protected $fillable = [
-//        'initial_amount',
+        'initial_amount',
 //        'unit_id',
 //        'less_value',
 //        'quickly_old',
@@ -39,7 +39,7 @@ class Product extends Model
 //        'buy_from_country',
 //        'make_date',
         "company_id",
-//        'status',
+        'status',
 //        'sell_act_id',
 //        'room',
 //        'floor'
