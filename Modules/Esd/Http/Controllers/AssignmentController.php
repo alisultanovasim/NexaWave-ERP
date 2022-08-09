@@ -88,6 +88,11 @@ class AssignmentController extends Controller
                     "user_id" => $v,
                     "assignment_id" => $assignment->id,
                 ];
+
+                DB::create([
+                    'document_id' => $id,
+                    'user_id' => $v
+                ]);
                 if ($request->base == $v)
                     $assignmentItems[$k]["is_base"] = 1;
                 else

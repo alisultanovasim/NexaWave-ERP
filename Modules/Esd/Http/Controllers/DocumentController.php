@@ -3,23 +3,22 @@
 
 namespace Modules\Esd\Http\Controllers;
 
-use Illuminate\Foundation\Validation\ValidatesRequests;
-use Illuminate\Support\Facades\Auth;
-use Modules\Esd\Entities\AssignmentItem;
-use Modules\Esd\Entities\Section;
+use App\Traits\ApiResponse;
 use App\Traits\DocumentBySection;
 use App\Traits\DocumentUploader;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Validation\ValidationException;
-use App\Traits\ApiResponse;
 use Illuminate\Database\QueryException;
-use Illuminate\Support\Facades\DB;
-
+use Illuminate\Foundation\Validation\ValidatesRequests;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
+use Modules\Esd\Entities\AssignmentItem;
 use Modules\Esd\Entities\Doc;
 use Modules\Esd\Entities\Document;
-use Illuminate\Routing\Controller;
+use Modules\Esd\Entities\Section;
 
 
 class DocumentController extends Controller
@@ -73,15 +72,15 @@ class DocumentController extends Controller
                 'assignment' => function ($q) {
                     $q->with(['item' => function ($q) {
                         $q
-                            ->whereHas('employee' , function ($q) {
-                                $q->where('user_id' , Auth::id());
+                            ->whereHas('employee', function ($q) {
+                                $q->where('user_id', Auth::id());
                             })
-                            ->select(['assignment_id' , 'status' , 'is_base']);
-                    },'stuck' => function($q){
-                        $q->with(['employee:id,user_id' , 'employee.user:id,name,surname'])
-                            ->where('status' , AssignmentItem::NOT_SEEN)
-                            ->orWhere('status' , AssignmentItem::REJECTED)
-                            ->orWhere('status' , AssignmentItem::WAIT);
+                            ->select(['assignment_id', 'status', 'is_base']);
+                    }, 'stuck' => function ($q) {
+                        $q->with(['employee:id,user_id', 'employee.user:id,name,surname'])
+                            ->where('status', AssignmentItem::NOT_SEEN)
+                            ->orWhere('status', AssignmentItem::REJECTED)
+                            ->orWhere('status', AssignmentItem::WAIT);
                     }]);
                 },
             ])
@@ -103,8 +102,8 @@ class DocumentController extends Controller
             /**  Start filter  */
             if ($request->has("status")) {
                 $documents->where("status", $request->get('status'));
-            }else{
-                $documents->where("status", '!=' , Document::ARCHIVE);
+            } else {
+                $documents->where("status", '!=', Document::ARCHIVE);
             }
 
             if ($request->has('year'))
@@ -151,21 +150,21 @@ class DocumentController extends Controller
 
 
             if ($request->has("expire_time_to"))
-                $documents->where("expire_time",">=" ,   $request->get('expire_time_to'));
+                $documents->where("expire_time", ">=", $request->get('expire_time_to'));
 
             if ($request->has("expire_time_from"))
-                $documents->where("expire_time", "<=" , $request->get('expire_time_from'));
+                $documents->where("expire_time", "<=", $request->get('expire_time_from'));
 
 
-            if($request->has('inner_inspect')){
-                $documents->where('inner_inspect' , $request->get('inner_inspect'));
+            if ($request->has('inner_inspect')) {
+                $documents->where('inner_inspect', $request->get('inner_inspect'));
             }
 
             if ($request->has("register_time_to"))
-                $documents->where("register_time", ">=" , $request->get('register_time_to'));
+                $documents->where("register_time", ">=", $request->get('register_time_to'));
 
             if ($request->has("register_time_from"))
-                $documents->where("register_time","<=" ,  $request->get('register_time_from'));
+                $documents->where("register_time", "<=", $request->get('register_time_from'));
 
 
             if ($request->has("register_time"))
@@ -280,7 +279,7 @@ class DocumentController extends Controller
             $data = $this->saveBySection($request, $table);
             if ($data instanceof JsonResponse) return $data;
 
-            DB::table($table)->insert($data +  ['document_id' => $document->id]);
+            DB::table($table)->insert($data + ['document_id' => $document->id]);
 
             DB::commit();
             return $this->successResponse("OK");
@@ -322,19 +321,19 @@ class DocumentController extends Controller
 
         $company_id = $request->company_id;
 
-            $document = Document::where("id", $id)
-                ->where("company_id", $company_id)
-                ->whereIn("status", [Document::WAIT, Document::ACTIVE])
-                ->first('id');
-            if (!$document)
-                return $this->errorResponse(trans("apiResponse.docNotFound"), Response::HTTP_UNPROCESSABLE_ENTITY);
-            $baseDoc = Doc::where("document_id", $id)->whereNull('parent_id')->first("id");
-            if (!$baseDoc)
-                return $this->errorResponse(trans("apiResponse.unProcess"), Response::HTTP_UNPROCESSABLE_ENTITY);
+        $document = Document::where("id", $id)
+            ->where("company_id", $company_id)
+            ->whereIn("status", [Document::WAIT, Document::ACTIVE])
+            ->first('id');
+        if (!$document)
+            return $this->errorResponse(trans("apiResponse.docNotFound"), Response::HTTP_UNPROCESSABLE_ENTITY);
+        $baseDoc = Doc::where("document_id", $id)->whereNull('parent_id')->first("id");
+        if (!$baseDoc)
+            return $this->errorResponse(trans("apiResponse.unProcess"), Response::HTTP_UNPROCESSABLE_ENTITY);
 
-            Doc::insert($this->SubDocumentsBuilder($document, $request->document, $baseDoc, $request));
+        Doc::insert($this->SubDocumentsBuilder($document, $request->document, $baseDoc, $request));
 
-            return $this->successResponse("OK");
+        return $this->successResponse("OK");
 
     }
 
@@ -346,37 +345,37 @@ class DocumentController extends Controller
             "doc_id" => "required|integer",
         ]);
         $company_id = $request->company_id;
-            $document = Document::where("id", $id)
-                ->where("company_id", $company_id)
-                ->whereIn("status", [Document::WAIT, Document::ACTIVE])
-                ->exists();
-            if (!$document)
-                return $this->errorResponse(trans("apiResponse.unProcess"));
+        $document = Document::where("id", $id)
+            ->where("company_id", $company_id)
+            ->whereIn("status", [Document::WAIT, Document::ACTIVE])
+            ->exists();
+        if (!$document)
+            return $this->errorResponse(trans("apiResponse.unProcess"));
 
-            $doc = Doc::where("id", $request->doc_id)->where("document_id", $id)->first();
-            if (!$doc)
-                return $this->errorResponse(trans("apiResponse.unProcess"));
-
-
-            $versions = json_decode($doc->versions, true);
-            $addingVersions = [
-                "resource" => $doc->resource,
-                "type" => $doc->type,
-                "uploader" => $doc->uploader,
-                'size' => $doc->size
-            ];
-            $versions = $versions ?? [];
-            array_push($versions, $addingVersions);
+        $doc = Doc::where("id", $request->doc_id)->where("document_id", $id)->first();
+        if (!$doc)
+            return $this->errorResponse(trans("apiResponse.unProcess"));
 
 
-            $doc->versions = json_encode($versions);
+        $versions = json_decode($doc->versions, true);
+        $addingVersions = [
+            "resource" => $doc->resource,
+            "type" => $doc->type,
+            "uploader" => $doc->uploader,
+            'size' => $doc->size
+        ];
+        $versions = $versions ?? [];
+        array_push($versions, $addingVersions);
 
 
-            $sub_document = $this->saveDoc($request->document, $request, $str = 'documents');
-            $doc->fill($sub_document);
-            $doc->save();
+        $doc->versions = json_encode($versions);
 
-            return $this->successResponse("OK");
+
+        $sub_document = $this->saveDoc($request->document, $request, $str = 'documents');
+        $doc->fill($sub_document);
+        $doc->save();
+
+        return $this->successResponse("OK");
 
 
     }
@@ -386,36 +385,36 @@ class DocumentController extends Controller
         $this->validate($request, [
             'company_id' => 'required|integer'
         ]);
-            $document = Document::where([
-                "id" => $id,
-                "company_id" => $request->company_id
-            ])
-                ->where("status", "!=", Document::DRAFT)
-                ->first(['section_id']);
-            if (!$document)
-                return $this->errorResponse(trans("apiResponse.unProcess"));
+        $document = Document::where([
+            "id" => $id,
+            "company_id" => $request->company_id
+        ])
+            ->where("status", "!=", Document::DRAFT)
+            ->first(['section_id']);
+        if (!$document)
+            return $this->errorResponse(trans("apiResponse.unProcess"));
 
-            $table = $document->section['table'];
+        $table = $document->section['table'];
 
-            /**
-             * , 'docs.subDocs'
-             */
-            $document = Document::with([
-                'section', 'docs', 'sendType', 'sendType', 'sendForm',
-                'parent', 'assignment', 'assignment.items',
-                'assignment.uploader:id,name,surname',
-                'assignment.items.employee.user:id,name,surname', 'assignment.items.notes', 'assignment.items.rejects'])->where(["documents.id" => $id])
-                ->where("status", "!=", Document::DRAFT)
-                ->join($table, "documents.id", '=', "$table.document_id");
+        /**
+         * , 'docs.subDocs'
+         */
+        $document = Document::with([
+            'section', 'docs', 'sendType', 'sendType', 'sendForm',
+            'parent', 'assignment', 'assignment.items',
+            'assignment.uploader:id,name,surname',
+            'assignment.items.employee.user:id,name,surname', 'assignment.items.notes', 'assignment.items.rejects'])->where(["documents.id" => $id])
+            ->where("status", "!=", Document::DRAFT)
+            ->join($table, "documents.id", '=', "$table.document_id");
 
-            $data = [DB::raw('documents.*')];
-            foreach (config("esd.tables.{$table}") as $column)
-                array_push($data, "$table.$column");
+        $data = [DB::raw('documents.*')];
+        foreach (config("esd.tables.{$table}") as $column)
+            array_push($data, "$table.$column");
 
-            $document->WithAllRelations();
+        $document->WithAllRelations();
 
-            $document = $document->first($data);
-            return $this->successResponse($document);
+        $document = $document->first($data);
+        return $this->successResponse($document);
 
     }
 
@@ -518,13 +517,13 @@ class DocumentController extends Controller
         $this->validate($request, [
             'company_id' => 'required|integer'
         ]);
-            $check = Document::where("id", $id)
-                ->where("company_id", $request->company_id)
-                ->where("status", "=", Document::WAIT)
-                ->delete();
-            if ($check)
-                return $this->errorResponse(trans("apiResponse.unProcess"));
-            return $this->successResponse("OK");
+        $check = Document::where("id", $id)
+            ->where("company_id", $request->company_id)
+            ->where("status", "=", Document::WAIT)
+            ->delete();
+        if ($check)
+            return $this->errorResponse(trans("apiResponse.unProcess"));
+        return $this->successResponse("OK");
     }
 
     public function makeActive(Request $request, $id)
@@ -532,14 +531,14 @@ class DocumentController extends Controller
         $this->validate($request, [
             'company_id' => 'required|integer'
         ]);
-            $check = Document::where("id", $id)
-                ->where("status", Document::WAIT)
-                ->where("company_id", $request->company_id)
-                ->update(
-                    ["status" => Document::ACTIVE]);
-            if (!$check)
-                return $this->errorResponse(trans("apiResponse.unProcess"));
-            return $this->successResponse("OK");
+        $check = Document::where("id", $id)
+            ->where("status", Document::WAIT)
+            ->where("company_id", $request->company_id)
+            ->update(
+                ["status" => Document::ACTIVE]);
+        if (!$check)
+            return $this->errorResponse(trans("apiResponse.unProcess"));
+        return $this->successResponse("OK");
 
     }
 
@@ -584,7 +583,7 @@ class DocumentController extends Controller
         $documents = $documents
             ->orderBy('id', 'desc')
             ->take(50)
-            ->get(['id', 'register_number', 'theme' , 'theme']);
+            ->get(['id', 'register_number', 'theme', 'theme']);
 
         return $this->successResponse($documents);
     }
@@ -597,26 +596,26 @@ class DocumentController extends Controller
 
             'has_permission' => 'sometimes|required|in:0,1'
         ]);
-            $document = Document::where('id', $id)
-                ->where('company_id', $request->company_id)->first(['status']);
+        $document = Document::where('id', $id)
+            ->where('company_id', $request->company_id)->first(['status']);
 
-            $update = ['status' => $request->status];
-            if (!$document) return $this->errorResponse(trans('apiResponse.unProcess'));
+        $update = ['status' => $request->status];
+        if (!$document) return $this->errorResponse(trans('apiResponse.unProcess'));
 
-            if ($document->status == Document::WAIT_FOR_ACCEPTANCE and $request->status == Document::ACTIVE) {
-                AssignmentItem::whereHas('assignment', function ($q) use ($id) {
-                    $q->where('document_id', $id);
-                })->update([
-                    'status' => AssignmentItem::WAIT
-                ]);
-            }
-            if ($request->status == Document::ARCHIVE and $request->has('folder')) {
-                $update['folder'] = $request->folder;
-            }
-            Document::where('id', $id)
-                ->update($update);
+        if ($document->status == Document::WAIT_FOR_ACCEPTANCE and $request->status == Document::ACTIVE) {
+            AssignmentItem::whereHas('assignment', function ($q) use ($id) {
+                $q->where('document_id', $id);
+            })->update([
+                'status' => AssignmentItem::WAIT
+            ]);
+        }
+        if ($request->status == Document::ARCHIVE and $request->has('folder')) {
+            $update['folder'] = $request->folder;
+        }
+        Document::where('id', $id)
+            ->update($update);
 
-            return $this->successResponse('OK');
+        return $this->successResponse('OK');
 
     }
 }
