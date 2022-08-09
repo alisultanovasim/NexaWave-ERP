@@ -369,8 +369,8 @@ class ProductController extends Controller
         return [
             'floor'=>['nullable','integer',Rule::exists('floors','number')],
             'room'=>['nullable','integer'],
-            'unit_id' => ['nullable', 'integer', 'min:1'],
-            'less_value' => ['nullable', 'boolean'],
+            'unit_id' => ['nullable', 'integer', 'min:1'],//
+            'less_value' => ['nullable', 'boolean'],//
             'quickly_old' => ['nullable', 'boolean'],
             'title_id' => ['required', 'integer', 'min:1'],//
             'kind_id' => ['required', 'integer', 'min:1'],//
