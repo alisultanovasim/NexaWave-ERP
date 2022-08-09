@@ -18,7 +18,7 @@ class Product extends Model
     protected $fillable = [
         'initial_amount',
         'unit_id',
-        'less_value',
+//        'less_value',
 //        'quickly_old',
         'title_id',
         'kind_id',
