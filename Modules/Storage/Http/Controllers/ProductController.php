@@ -374,7 +374,7 @@ class ProductController extends Controller
             'quickly_old' => ['nullable', 'boolean'],
             'title_id' => ['required', 'integer', 'min:1'],//
             'kind_id' => ['required', 'integer', 'min:1'],//
-            'state_id' => ['nullable', 'integer'],
+            'state_id' => ['required', 'integer'],
             'description' => ['nullable', 'string'],
             'amount' => ['nullable', 'numeric'],
             'storage_id' => ['required', 'integer'],//
