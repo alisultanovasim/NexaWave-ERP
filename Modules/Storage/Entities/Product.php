@@ -17,7 +17,7 @@ class Product extends Model
     const TOTAL_DELETED = 3;
     protected $fillable = [
         'initial_amount',
-//        'unit_id',
+        'unit_id',
 //        'less_value',
 //        'quickly_old',
         'title_id',
