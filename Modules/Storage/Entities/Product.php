@@ -22,7 +22,7 @@ class Product extends Model
         'quickly_old',
         'title_id',
         'kind_id',
-//        'state_id',
+        'state_id',
         'description',
         'amount',
         'storage_id',
