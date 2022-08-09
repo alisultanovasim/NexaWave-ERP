@@ -369,24 +369,24 @@ class ProductController extends Controller
         return [
             'floor'=>['nullable','integer',Rule::exists('floors','number')],
             'room'=>['nullable','integer'],
-            'unit_id' => ['required', 'integer', 'min:1'],
-            'less_value' => ['required', 'boolean'],
-            'quickly_old' => ['required', 'boolean'],
+            'unit_id' => ['nullable', 'integer', 'min:1'],
+            'less_value' => ['nullable', 'boolean'],
+            'quickly_old' => ['nullable', 'boolean'],
             'title_id' => ['required', 'integer', 'min:1'],//
             'kind_id' => ['required', 'integer', 'min:1'],//
-            'state_id' => ['required', 'integer'],
+            'state_id' => ['nullable', 'integer'],
             'description' => ['nullable', 'string'],
-            'amount' => ['required', 'numeric'],
-            'storage_id' => ['required', 'integer'],
+            'amount' => ['nullable', 'numeric'],
+            'storage_id' => ['required', 'integer'],//
 //            'product_model' => ['nullable', 'string', 'max:255'],
             'product_mark' => ['nullable', 'string', 'max:255'],
-            'color_id' => ['nullable', 'integer'],//
+            'color_id' => ['nullable', 'integer'],
             'main_funds' => ['nullable', 'boolean'],
             'inv_no' => ['nullable', 'string', 'max:255'],
             'exploitation_date' => ['nullable', 'date', 'date_format:Y-m-d'],
             'size' => ['nullable', 'numeric'],
-            'made_in_country ' => ['nullable', 'integer', 'min:1'],//
-            'buy_from_country ' => ['nullable', 'integer', 'min:1'],//
+            'made_in_country ' => ['nullable', 'integer', 'min:1'],
+            'buy_from_country ' => ['nullable', 'integer', 'min:1'],
             'make_date' => ['nullable', 'date', 'date_format:Y-m-d'],
             'income_description' => ['nullable', 'string'],
             'model_id' => ['nullable', 'integer'],
@@ -459,6 +459,7 @@ class ProductController extends Controller
 
     public function filterProducts(Request $request)
     {
+
         $this->validate($request,[
             'company_id'=>'required',
             'title'=>'nullable|string',
