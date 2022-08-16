@@ -2,6 +2,7 @@
 
 use App\Http\Enums\NotificationType;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
 
 
@@ -90,5 +91,9 @@ Route::group(['prefix' => 'v1'], function ($router) {
         Route::get('/module/{id}', 'PermissionController@userGetPermissionsByModuleId');
     }); // permissions
 
+});
+
+Route::get('/asim',function (){
+   return Http::dd()->get('http://localhost:8000/api/limesurvey/list_survey');
 });
 
