@@ -191,7 +191,7 @@ class EmployeeController extends Controller
             'gender'=> 'required|in:m,f',
             'citizen_id'=>'required',
             'passport_seria'=>'required|string',
-            'passport_number'=>'required|integer',
+            'passport_number'=>'required',
             'fin'=>'required|string',
             'passport_from_organ'=>'nullable|string',
 //            'date_of_issue'=>'required|date',

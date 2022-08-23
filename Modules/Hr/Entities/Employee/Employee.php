@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Modules\Hr\Entities\CompanyAuthorizedEmployee;
+use Modules\Storage\Entities\Purchase;
 
 class Employee extends Model
 {
@@ -50,6 +51,11 @@ class Employee extends Model
 
     public function scopeIsAuthorizedCompanyEmployee($query){
         return $query->whereHas('authorizedDetails');
+    }
+
+    public function purchases(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Purchase::class);
     }
 
     public function scopeHasActiveContracts($queyr){

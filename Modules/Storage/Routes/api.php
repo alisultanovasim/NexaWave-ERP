@@ -144,6 +144,12 @@ Route::group([
         Route::get('/','ProposeController@index');
         Route::post('/','ProposeController@store');
         Route::post('/{id}','ProposeController@delete');
+
+        Route::group(['prefix'=>'purchase'],function (){
+            Route::get('/','PurchaseController@index');
+            Route::post('/','ProposeController@store');
+            Route::post('/{id}','ProposeController@delete');
+        });
     });//proposes
 
     Route::group([
