@@ -9,10 +9,16 @@ use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 use Modules\Hr\Entities\Employee\Employee;
+use Modules\Plaza\Entities\Kind;
 use Modules\Storage\Entities\Demand;
 use Modules\Storage\Entities\Product;
 use Modules\Storage\Entities\ProductColor;
+use Modules\Storage\Entities\ProductKind;
+use Modules\Storage\Entities\ProductModel;
+use Modules\Storage\Entities\ProductTitle;
+use Modules\Storage\Entities\Unit;
 
 class DemandController extends Controller
 {
@@ -70,25 +76,90 @@ class DemandController extends Controller
 
     public function store(Request $request)
     {
-        $this->validate($request, array_merge(ProductController::getValidationRules(), [
+        $this->validate($request,[
+            'name' => ['required', 'string'],
             'demand_description' => ['nullable', 'string'],
-            'want_till' => ['nullable', 'date_format:Y-m-d H:i:s'],
-            'storage_id' => ['nullable', 'integer'],
-        ]));
+            'amount' => ['required', 'integer'],
+            'price_approx' => ['required', 'integer'],
+            'forward_to' => ['required', 'integer',Rule::exists('employees','id')],
+            'productInfo'=>['required','array'],
+            'productInfo.*.storage_id'=>['required','integer',Rule::exists('storages','id')],
+            'productInfo.*.unit_id'=>['required','integer',Rule::exists('units','id')],
+            'productInfo.*.title' => ['required', 'string', 'min:1'],//
+            'productInfo.*.kind' => ['required', 'string', 'min:1'],//
+            'productInfo.*.product_mark' => ['required','string'],
+            'productInfo.*.model' => ['required', 'string','min:1'],
+        ]);
 
 
         //todo check title and kind_id
-        $product = Product::create(array_merge($request->all(), ['status' => Product::STATUS_DEMAND]));
+        $title = ProductTitle::firstOrCreate(
+            [
+                'name'   => $request->productInfo[0]['title'],
+            ],
+            [
+                'name'     => $request->productInfo[0]['title'],
+                'company_id' => $request->get('company_id'),
+            ]
+            );
 
+        $kind=ProductKind::firstOrCreate(
+            [
+                'name'   => $request->productInfo[0]['kind'],
+                'title_id'   => $title->id,
+            ],
+            [
+                'name'     => $request->productInfo[0]['kind'],
+                'company_id' => $request->get('company_id'),
+                'unit_id' =>1,
+                'title_id' => $title->id,
+            ]
+        );
+            $model=ProductModel:: firstOrCreate(
+            [
+                'name'   => $request->productInfo[0]['model'],
+                'kind_id'   => $kind->id,
+            ],
+            [
+                'name'     => $request->productInfo[0]['model'],
+                'kind_id'     => $kind->id,
+            ]
+        );
+
+//        $product = new Product();
+//        $product->title_id=$title->id;
+//        $product->kind_id=$kind->id;
+//        $product->initial_amount=$request->amount;
+//        $product->storage_id=$request->storage_id;
+//        $product->company_id=$request->company_id;
+//        $product->state_id=1;
+//        $product->status=Demand::STATUS_ACCEPTED;
+//        $product->model_id=29;
+//        $product->product_mark=$request->productInfo[0]['product_mark'];
+//        $product->save();
+
+        $product=Product::query()->create([
+            'title_id'=>$title->id,
+            'kind_id'=>$kind->id,
+            'initial_amount'=>$request->amount,
+            'storage_id'=>$request->storage_id,
+            'company_id'=>$request->company_id,
+            'state_id'=>1,
+            'model_id'=>29,
+            'product_mark'=>'sassas'
+        ]);
+//dd($product);
         $employee_id = Employee::where([
             ['user_id' , Auth::id()],
             ['company_id' , $request->get('company_id')]
         ])->first(['id']);
 
         Demand::create([
+            'name' => $request->get('name'),
+            'price_approx' => $request->get('price_approx'),
             'description' => $request->get('demand_description'),
-            'want_till' => $request->get('want_till'),
             'product_id' => $product->id,
+            'amount' => $product->initial_amount,
             'employee_id' => $employee_id->id,
             'company_id' => $request->get('company_id'),
             'status' => Demand::STATUS_WAIT

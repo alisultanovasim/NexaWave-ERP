@@ -140,6 +140,12 @@ Route::group([
 
     }); // demands
 
+    Route::group(['prefix'=>'propose'],function (){
+        Route::get('/','ProposeController@index');
+        Route::post('/','ProposeController@store');
+        Route::post('/{id}','ProposeController@delete');
+    });//proposes
+
     Route::group([
         'prefix' => 'acts'
     ], function ($q) {

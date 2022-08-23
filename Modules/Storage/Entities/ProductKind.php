@@ -7,7 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 class ProductKind extends Model
 {
     protected $table = 'product_kinds';
+
     protected $guarded = ['id'];
+    protected $fillable = ['name', 'title_id', 'company_id','unit_id'];
     public function title(){
         return $this->belongsTo(ProductTitle::class);
     }

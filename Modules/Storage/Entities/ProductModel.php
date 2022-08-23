@@ -6,7 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class ProductModel extends Model
 {
+    protected $table=['product_models'];
     protected $guarded = ['id'];
+    protected $fillable=['name','kind_id'];
 
 
     public function kind(){

@@ -7,6 +7,10 @@ use Illuminate\Database\Eloquent\Model;
 class ProductTitle extends Model
 {
     protected $guarded = ['id'];
+//    protected $fillable=[
+//      'name',
+//      'company_id'
+//    ];
 
     public function products(){
         return $this->hasMany(Product::class, 'title_id' , 'id');

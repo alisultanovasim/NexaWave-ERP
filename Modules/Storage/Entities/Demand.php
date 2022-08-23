@@ -16,6 +16,17 @@ class Demand extends Model
     const STATUS_ACCEPTED = 1;
 
     protected $guarded = ['id'];
+    protected $fillable=[
+      'name',
+      'price_approx',
+      'description',
+      'product_id',
+      'amount',
+      'employee_id',
+      'company_id',
+      'status',
+      'forward_to',
+    ];
 
     public function employee(){
         return $this->belongsTo(Employee::class);

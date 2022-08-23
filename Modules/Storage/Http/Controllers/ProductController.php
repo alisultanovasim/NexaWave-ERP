@@ -37,10 +37,10 @@ class ProductController extends Controller
             'kind',
             'model:id,name',
             'kind.unit',
-            'title:id,name',
-            'state:id,name',
-            'color:id,name',
-            'storage:id,name',
+            'title:id,name',//
+            'state:id,name',//
+            'color:id,name',//
+            'storage:id,name',//
             'kind.unit',
             'buy_from_country:id,name:short_name',
             'made_in_country:id,name:short_name'
@@ -374,7 +374,7 @@ class ProductController extends Controller
             'quickly_old' => ['nullable', 'boolean'],
             'title_id' => ['required', 'integer', 'min:1'],//
             'kind_id' => ['required', 'integer', 'min:1'],//
-            'state_id' => ['required', 'integer'],
+            'state_id' => ['required', 'integer'],//
             'description' => ['nullable', 'string'],
             'amount' => ['nullable', 'numeric'],
             'storage_id' => ['required', 'integer'],//

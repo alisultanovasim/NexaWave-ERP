@@ -15,6 +15,7 @@ class CreateDemandsTable extends Migration
     {
         Schema::create('demands', function (Blueprint $table) {
             $table->bigIncrements('id');
+            $table->string('name');
             $table->unsignedBigInteger('product_id');
             $table->foreign('product_id')
                 ->references('id')
@@ -22,14 +23,14 @@ class CreateDemandsTable extends Migration
                 ->onDelete('restrict');
 
             $table->text('description');
+            $table->decimal('price_approx');
+            $table->double('amount');
 
             $table->unsignedBigInteger('employee_id');
             $table->foreign('employee_id')
                 ->references('id')
                 ->on('employees')
                 ->onDelete('restrict');
-
-            $table->timestamp('want_till')->nullable();
 
             $table->unsignedTinyInteger('status')->default(\Modules\Storage\Entities\Demand::STATUS_WAIT);
 

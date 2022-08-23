@@ -26,9 +26,9 @@ class Product extends Model
 //        'description',
 //        'amount',
         'storage_id',
-//        'model_id',
-//        'product_model',
-//        'product_mark',
+        'model_id',
+        'product_model',
+        'product_mark',
 //        'product_no',
 //        'color_id',
 //        'main_funds',
@@ -57,6 +57,11 @@ class Product extends Model
     protected $appends=[
       'count'
     ];
+
+    public function demands()
+    {
+        return $this->hasMany(Demand::class);
+    }
 
     public function getCountAttribute()
     {
