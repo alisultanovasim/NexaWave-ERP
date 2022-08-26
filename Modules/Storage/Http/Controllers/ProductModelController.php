@@ -52,7 +52,7 @@ class ProductModelController extends Controller
             'kind_id' => ['required', 'integer'],
             'name' => ['required', 'string', 'max:255'],
         ]);
-
+        dd($id);
         $data = ProductModel::with(['kind'])->company()->where('id', $id)->first();
 
         return $this->successResponse($data);
