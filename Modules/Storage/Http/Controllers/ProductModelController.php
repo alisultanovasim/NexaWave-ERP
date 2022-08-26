@@ -23,12 +23,12 @@ class ProductModelController extends Controller
         ]);
 
 
-//        $models = ProductModel
-////            ->company()
-//            ::where('kind_id'  , $request->kind_id)
-//            ->get();
+        $models = ProductModel
 
-        return $this->successResponse([]);
+            ::where('kind_id'  , $request->kind_id)
+            ->get();
+
+        return $this->successResponse($models);
     }
 
     public function store(Request $request)
