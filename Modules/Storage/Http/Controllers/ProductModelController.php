@@ -23,10 +23,13 @@ class ProductModelController extends Controller
         ]);
 
 
-        $models = ProductModel::with('kind')
-//            ->company()
-            ->where('kind_id'  , 7)
+        $models=DB::table('product_models')
+            ->where('kind_id'  , $request->kind_id)
             ->get();
+//        $models = ProductModel::with('kind')
+////            ->company()
+//            ->where('kind_id'  , $request->kind_id)
+//            ->get();
 
         return $this->successResponse($models);
     }
