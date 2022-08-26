@@ -23,12 +23,12 @@ class ProductModelController extends Controller
         ]);
 
 
-//        $models = ProductModel::with(['kind'])
-//            ->company()
-//            ->where('kind_id'  , $request->get('kind_id'))
-//            ->get();
+        $models = ProductModel::with(['kind'])
+            ->company()
+            ->where('kind_id'  , $request->get('kind_id'))
+            ->first();
 
-        return $this->successResponse(true);
+        return $this->successResponse($models);
     }
 
     public function store(Request $request)
