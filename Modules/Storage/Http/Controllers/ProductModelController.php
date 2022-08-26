@@ -21,10 +21,9 @@ class ProductModelController extends Controller
             'kind_id' => ['required', 'integer'],
             "per_page" => ['nullable' , 'integer']
         ]);
-        $as=[];
         $models = DB::table('product_models')
-            ->join('product_kinds','product_kinds.id','=','product_models.kind_id')
-            ->where('kind_id'  , $request->get('kind_id'))
+            ->join("product_kinds", "product_kinds.id", '=', 'product_models.id')
+            ->where('kind_id', $request->kind_id)
             ->get();
         return $this->successResponse($models);
     }
