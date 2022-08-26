@@ -28,8 +28,8 @@ class ProductModelController extends Controller
             ->where('kind_id'  , $request->get('kind_id'))
             ->get();
 
-        dd($models);
-        return $this->successResponse($models);
+       print_r($models);
+//        return $this->successResponse($models);
     }
 
     public function store(Request $request)
