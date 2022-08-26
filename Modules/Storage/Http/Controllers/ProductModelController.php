@@ -24,7 +24,7 @@ class ProductModelController extends Controller
 
 
         $models = ProductModel::with(['kind'])
-//            ->company()
+            ->company()
             ->where('kind_id'  , $request->get('kind_id'))
             ->get();
 
