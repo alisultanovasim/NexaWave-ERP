@@ -28,7 +28,7 @@ class ProductModelController extends Controller
 //            ::where('kind_id'  , $request->kind_id)
 //            ->get();
 
-        return $this->successResponse(true);
+        return $this->successResponse([]);
     }
 
     public function store(Request $request)
