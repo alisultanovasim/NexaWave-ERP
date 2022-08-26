@@ -20,7 +20,7 @@ class ProductKind extends Model
         return $this->hasMany(Product::class , 'kind_id' , 'id');
     }
     public function models(){
-        return $this->hasMany(ProductModel::class , 'kind_id');
+        return $this->hasMany(ProductModel::class );
     }
 
 
