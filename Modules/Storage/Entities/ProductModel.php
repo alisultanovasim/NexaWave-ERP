@@ -3,21 +3,15 @@
 namespace Modules\Storage\Entities;
 
 use Illuminate\Database\Eloquent\Model;
+use Modules\Hr\Entities\Employee\Employee;
 
-class ProductModel extends Model
+class   ProductModel extends Model
 {
-    protected $table=['product_models'];
-//    protected $guarded = ['id'];
-//    protected $fillable=['name','kind_id'];
+    protected $table='product_models';
 
-
-    public function kind(){
-        return $this->belongsTo(ProductKind::class , 'kind_id');
+    public function kind()
+    {
+        return $this->belongsTo(ProductKind::class);
     }
-
-//    public function scopeCompany($q){
-//        return $q->whereHas('kind' , function ($q){
-//            $q->company();
-//        });
-//    }
+//    protected $guarded = [];
 }
