@@ -15,9 +15,9 @@ class ProductModel extends Model
         return $this->belongsTo(ProductKind::class , 'kind_id');
     }
 
-    public function scopeCompany($q){
-        return $q->whereHas('kind' , function ($q){
-            $q->company();
-        });
-    }
+//    public function scopeCompany($q){
+//        return $q->whereHas('kind' , function ($q){
+//            $q->company();
+//        });
+//    }
 }
