@@ -26,7 +26,7 @@ class ProductModelController extends Controller
         $models = ProductModel::with(['kind'])
 //            ->company()
             ->where('kind_id'  , $request->get('kind_id'))
-            ->first();
+            ->get();
 
         return $this->successResponse($models);
     }
