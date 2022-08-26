@@ -21,14 +21,14 @@ class CreatePurchaseProductsTable extends Migration
             $table->unsignedBigInteger('model_id');
             $table->string('mark',50);
             $table->unsignedBigInteger('color_id');
-            $table->string('made_in',50);
+            $table->unsignedBigInteger('made_in');
             $table->decimal('custom_tax');
             $table->decimal('price');
             $table->integer('amount');
             $table->integer('discount');
-            $table->integer('edv_percent');
+            $table->float('edv_percent');
             $table->integer('edv_tax');
-            $table->integer('excise_percent');
+            $table->float('excise_percent');
             $table->integer('excise_tax');
             $table->tinyInteger('status')->default(1);
             $table->integer('total_price');

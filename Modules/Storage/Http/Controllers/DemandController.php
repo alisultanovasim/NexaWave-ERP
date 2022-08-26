@@ -103,6 +103,7 @@ class DemandController extends Controller
             ]
             );
 
+
         $kind=ProductKind::firstOrCreate(
             [
                 'name'   => $request->productInfo[0]['kind'],
@@ -115,7 +116,8 @@ class DemandController extends Controller
                 'title_id' => $title->id,
             ]
         );
-            $model=ProductModel:: firstOrCreate(
+
+            $model=DB::table('product_models')->firstOrCreate(
             [
                 'name'   => $request->productInfo[0]['model'],
                 'kind_id'   => $kind->id,
@@ -125,6 +127,8 @@ class DemandController extends Controller
                 'kind_id'     => $kind->id,
             ]
         );
+        dd('ok');
+        exit();
 
 //        $product = new Product();
 //        $product->title_id=$title->id;

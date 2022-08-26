@@ -147,8 +147,10 @@ Route::group([
 
         Route::group(['prefix'=>'purchase'],function (){
             Route::get('/','PurchaseController@index');
-            Route::post('/','ProposeController@store');
-            Route::post('/{id}','ProposeController@delete');
+            Route::post('/','PurchaseController@store');
+            Route::post('/addtostorage/{id}','PurchaseController@addToStorage')->where('id','[0-9]+');
+            Route::post('/addtoarchive/{id}','PurchaseController@addToArchive')->where('id','[0-9]+');
+            Route::get('/getpurchasearchive','PurchaseController@getAllPurchaseArchive');
         });
     });//proposes
 

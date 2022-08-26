@@ -18,4 +18,9 @@ class Propose extends Model
         'offer_file',
         'description'
     ];
+
+    public function storageDocument()
+    {
+        return $this->belongsTo(StorageDocyment::class);
+    }
 }

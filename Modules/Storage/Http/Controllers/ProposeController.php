@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Storage;
 use Modules\Storage\Entities\ProductColor;
 use Modules\Storage\Entities\ProductKind;
 use Modules\Storage\Entities\Propose;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class ProposeController extends Controller
 {
@@ -22,16 +23,11 @@ class ProposeController extends Controller
 
     public function store(ProposeRequest $proposeRequest)
     {
-        $uploadedFile = $proposeRequest->file('offer_file');
-        $filename = time().$uploadedFile->getClientOriginalName();
-
-        Storage::disk('local')->putFileAs(
-            'propose/'.$filename,
-            $uploadedFile,
-            $filename
-        );
-
         $propose=Propose::query()->create($proposeRequest->all());
+        if ($proposeRequest->hasFile('offer_file')){
+            $propose->offer_file=$this->uploadImage($proposeRequest->company_id,$proposeRequest->offer_file);
+        }
+
         return $this->successResponse($propose,200);
     }
 
@@ -41,5 +37,14 @@ class ProposeController extends Controller
         $propose=Propose::query()->findOrFail($id);
         $propose->delete();
         return response()->json(['message'=>'Teklif silindi!'],200);
+    }
+
+    public function uploadImage($company_id, $file, $str = 'storages')
+    {
+        if ($file instanceof UploadedFile) {
+            return $file->store("/documents/$company_id/$str");
+        }
+
+        return null;
     }
 }

@@ -27,6 +27,7 @@ class CreateDemandsTable extends Migration
             $table->double('amount');
 
             $table->unsignedBigInteger('employee_id');
+            $table->unsignedBigInteger('forward_to');
             $table->foreign('employee_id')
                 ->references('id')
                 ->on('employees')
