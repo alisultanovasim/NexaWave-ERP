@@ -8,6 +8,7 @@ use Modules\Hr\Entities\Employee\Employee;
 class   ProductModel extends Model
 {
     protected $table='product_models';
+    protected $fillable=['kind_id','name'];
 
     public function kind()
     {
