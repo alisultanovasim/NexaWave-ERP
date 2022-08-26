@@ -22,9 +22,10 @@ class ProductModelController extends Controller
             "per_page" => ['nullable' , 'integer']
         ]);
 
-        echo $request->get('kind_id');
-        exit();
-        $models = ProductModel::with(['kind'])->company()->where('kind_id'  , $request->get('kind_id'))
+
+        $models = ProductModel::with(['kind'])
+            ->company()
+            ->where('kind_id'  , $request->get('kind_id'))
             ->get();
 
         dd($models);
