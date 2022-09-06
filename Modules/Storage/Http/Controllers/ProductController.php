@@ -471,7 +471,7 @@ class ProductController extends Controller
         ]);
         $per_page=$request->per_page ?? 10;
         $products=Product::query()
-            ->select(['id','amount','room','floor','kind_id','state_id','model_id'])
+            ->select(['id','amount','room','floor','kind_id','state_id','model_id','product_mark'])
             ->with([
                 'kind:id,name,title_id',
                 'state:id,name',
