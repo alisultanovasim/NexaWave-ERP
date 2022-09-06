@@ -462,9 +462,8 @@ class ProductController extends Controller
 
         $this->validate($request,[
             'company_id'=>'required',
-            'title'=>'nullable|string',
-            'title_id'=>'nullable|integer',
-            'kind'=>'nullable|string',
+            'title_id'=>['nullable','integer',Rule::exists('product_titles','id')],
+            'kind_id'=>['nullable','integer',Rule::exists('product_kinds','id')],
             'amount'=>'nullable|integer',
             'floor'=>['nullable','integer',Rule::exists('floors','number')],
             'room'=>'nullable|integer',
@@ -479,16 +478,10 @@ class ProductController extends Controller
                 'model:id,name',
             ]);
 
-        if ($request->has('title'))
-            $products->whereHas('title',function ($q) use ($request) {
-                $q->where('name','like','%'.$request->get('title').'%');
-            });
         if ($request->has('title_id'))
-            $products->where('title_id',$request->get('title_id'));
-        if ($request->has('kind'))
-            $products->whereHas('kind',function ($q) use ($request) {
-                $q->where('name','like','%'.$request->get('kind').'%');
-            });
+            $products->where('products.title_id',$request->get('title_id'));
+        if ($request->has('kind_id'))
+            $products->where('products.kind_id',$request->get('kind_id'));
         if ($request->has('amount'))
             $products->where('products.amount',$request->get('amount'));
         if ($request->has('floor'))

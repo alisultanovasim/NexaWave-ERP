@@ -3,6 +3,9 @@
 use Illuminate\Support\Facades\Route;
 
 
+
+
+
 Route::group([
     'middleware' => ['auth:api', 'authorize'],
     'prefix' => 'v1/storage'
@@ -114,7 +117,10 @@ Route::group([
     ], function () {
         Route::get('/', 'DemandController@index');
         Route::get('/{id}', 'DemandController@show');
+        Route::get('/directed-demands', 'DemandController@directedToUserDemandList');
         Route::post('/', 'DemandController@store');
+        Route::patch('/{id}', 'DemandController@confirm');
+        Route::post('/reject/{id}', 'DemandController@reject')->where('demand-id','[0-9]+');
         Route::put('/{id}', 'DemandController@update');
         Route::delete('/{id}', 'DemandController@delete');
 
@@ -142,14 +148,16 @@ Route::group([
 
     Route::group(['prefix'=>'propose'],function (){
         Route::get('/','ProposeController@index');
+        Route::get('/{propose}','ProposeController@show');
         Route::post('/','ProposeController@store');
+        Route::post('/reject/{id}','ProposeController@reject');
         Route::post('/{id}','ProposeController@delete');
 
         Route::group(['prefix'=>'purchase'],function (){
             Route::get('/','PurchaseController@index');
             Route::post('/','PurchaseController@store');
             Route::post('/addtostorage/{id}','PurchaseController@addToStorage')->where('id','[0-9]+');
-            Route::post('/addtoarchive/{id}','PurchaseController@addToArchive')->where('id','[0-9]+');
+            Route::post('/add-to-archive/{id}','PurchaseController@addToArchive')->where('id','[0-9]+');
             Route::get('/getpurchasearchive','PurchaseController@getAllPurchaseArchive');
         });
     });//proposes

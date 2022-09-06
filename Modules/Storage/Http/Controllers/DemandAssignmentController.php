@@ -15,6 +15,7 @@ use Modules\Hr\Entities\Employee\Employee;
 use Modules\Storage\Entities\Demand;
 use Modules\Storage\Entities\DemandAssignment;
 use Modules\Storage\Entities\DemandItem;
+use Modules\Storage\Entities\ProductAssignment;
 
 class DemandAssignmentController extends Controller
 {
@@ -34,44 +35,71 @@ class DemandAssignmentController extends Controller
         return $this->successResponse($assignments);
     }
 
-    public function store(Request $request)
+    public function store(Request $request): \Illuminate\Http\JsonResponse
     {
         $this->validate($request, [
             'employees' => ['nullable', 'array'],
+            'company_id' => ['required', 'integer'],
             'employees.*.id' => ['required_with:employees', 'integer'],
             'employees.*.expiry_time' => ['nullable', 'date', 'date_format:Y-m-d H:i:s'],
-            'expiry_time' => ['nullable', 'date', 'date_format:Y-m-d H:i:s'],
-            'demand_id' => ['required', 'integer']
+            'employees.*.description' => ['nullable','string','min:3','max:100'],
+            'demand_id'=>['required','integer',Rule::exists('demands','id')]
         ]);
 
-        DB::beginTransaction();
+//        DB::beginTransaction();
 
-        if ($notExists = $this->companyInfo($request->get('company_id'), $request->only(['demand_id'])))
-            return $this->errorResponse($notExists);
-        $demandAssignment = DemandAssignment::firstOrCreate([
-            'demand_id' => $request->get('demand_id'),
-            'employee_id' => Auth::user()->getEmployeeId($request->get('company_id'))
-        ], [
-            'expiry_time' => $request->get('expiry_time'),
-            'description' => $request->get('description')
-        ]);
-
-        //todo check employee
-        if ($request->has('employees')) {
-            $data = [];
-            foreach ($request->get('employees') as $assignment) {
-                $data = [
-                    'demand_assignment_id' => $demandAssignment->id,
-                    'expiry_time' => isset($assignment["expiry_time"]) ? $assignment["expiry_time"] : null,
-                    'description' => isset($assignment["description"]) ? $assignment["description"] : null,
-                    "employee_id" => $assignment["id"],
-                    'status' => DemandItem::WAIT
-                ];
+//        if ($notExists = $this->companyInfo($request->get('company_id'), $request->only(['demand_id'])))
+//            return $this->errorResponse($notExists);
+//        $demandAssignment = DemandAssignment::firstOrCreate([
+//            'demand_id' => $id,
+//            'employee_id' => Auth::user()->getEmployeeId($request->get('company_id'))
+//        ], [
+//            'expiry_time' => $request->get('expiry_time'),
+//            'description' => $request->get('description')
+//        ]);
+        $counter=0;
+        foreach ($request->employees as $employee){
+            $data=[
+                'description'=>$employee['description'],
+                'employee_id'=>$employee['id'],
+                'demand_id'=>$request->demand_id,
+                'expiry_time'=>$employee['expiry_time']
+            ];
+            if (count($demandAssignment=DemandAssignment::query()->where([
+                    'employee_id'=>$employee['id'],
+                    'demand_id'=>$request->demand_id])->get())>0){
+                $assignmentId=$demandAssignment[0]['id'];
+                $counter++;
+                echo "The assignment is already exist that with $assignmentId \n";
             }
-            DemandItem::insert($data);
+            else{
+                DemandAssignment::query()->insert($data);
+            }
+            if ($counter==count($request->employees)){
+                return $this->errorResponse('The all of assignments already exist');
+            }
         }
-        DB::commit();
-        return $this->successResponse('ok');
+        Demand::query()->where('id',$request->demand_id)->increment('progress_status',1);
+        return $this->successResponse('Assignment successfully created!',201);
+
+
+
+//        //todo check employee
+//        if ($request->has('employees')) {
+//            $data = [];
+//            foreach ($request->get('employees') as $assignment) {
+//                $data = [
+//                    'demand_assignment_id' => $demandAssignment->id,
+//                    'expiry_time' => isset($assignment["expiry_time"]) ? $assignment["expiry_time"] : null,
+//                    'description' => isset($assignment["description"]) ? $assignment["description"] : null,
+//                    "employee_id" => $assignment["id"],
+//                    'status' => DemandItem::WAIT
+//                ];
+//            }
+//            DemandItem::insert($data);
+//        }
+//        DB::commit();
+//        return $this->successResponse('ok');
     }
 
     public function update(Request $request, $id)
@@ -189,6 +217,14 @@ class DemandAssignmentController extends Controller
         ]);
         return $this->successResponse('ok');
 
-
+    }
+    public function getEmployeeId($companyId)
+    {
+        return Employee::query()
+            ->where([
+                'user_id'=>Auth::id(),
+                'company_id'=>$companyId
+            ])
+            ->first()['id'];
     }
 }

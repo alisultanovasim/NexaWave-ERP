@@ -8,41 +8,43 @@ use Modules\Hr\Entities\Employee\Employee;
 
 class Demand extends Model
 {
+    const STATUS_WAIT=1;
+    const STATUS_CONFIRMED=2;
+    const STATUS_REJECTED=3;
 
     use SoftDeletes;
+protected $fillable=[
+    'name',
+    'price_approx',
+    'description',
+    'product_id',
+    'amount',
+    'employee_id',
+    'forward_to',
+    'company_id',
+    'status',
+];
 
-    const STATUS_WAIT = 2;
-    const STATUS_REJECTED = 0;
-    const STATUS_ACCEPTED = 1;
+public function propose()
+{
+   return $this->hasOne(Propose::class);
+}
+public function employee(){
+    return $this->belongsTo(Employee::class);
+}
+public function assignment(){
+    return $this->hasOne(DemandAssignment::class);
+}
 
-    protected $guarded = ['id'];
-    protected $fillable=[
-      'name',
-      'price_approx',
-      'description',
-      'product_id',
-      'amount',
-      'employee_id',
-      'company_id',
-      'status',
-      'forward_to',
-    ];
 
-    public function employee(){
-        return $this->belongsTo(Employee::class);
-    }
-    public function product(){
+public function scopeCompany($q){
+    return $q->where('company_id' , request(
+        'company_id'
+    ));
+}
+
+public function product()
+{
         return $this->belongsTo(Product::class);
-    }
-    public function assignment(){
-        return $this->hasOne(DemandAssignment::class);
-    }
-
-
-    public function scopeCompany($q){
-        return $q->where('company_id' , request(
-            'company_id'
-        ));
-    }
-
+}
 }

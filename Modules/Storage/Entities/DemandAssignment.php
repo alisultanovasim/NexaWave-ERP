@@ -7,11 +7,18 @@ use Modules\Hr\Entities\Employee\Employee;
 
 class DemandAssignment extends Model
 {
-    const STATUS_WAIT = 2;
-    const STATUS_ACCEPTED = 1;
-    const STATUS_REJECTED = 0;
+    const STATUS_ACCEPTED = 2;
+    const STATUS_REJECTED = 3;
 
     protected $guarded = ['id'];
+
+    protected $fillable=[
+        'description',
+        'employee_id',
+        'demand_id',
+        'expiry_time'
+    ];
+    protected $table='demand_assignments';
 
     public function demand(){
         return $this->belongsTo(Demand::class , 'demand_id');

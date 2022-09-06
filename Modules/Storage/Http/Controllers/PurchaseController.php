@@ -89,11 +89,11 @@ class PurchaseController extends Controller
                     'excise_tax'=>$value['excise_tax'],
                     'total_price'=>$value['total_price']
                 ];
-                $purchaseProduct=PurchaseProduct::query()->insert($product);
+                PurchaseProduct::query()->insert($product);
             }
 
             DB::commit();
-            return $this->successResponse($purchaseProduct,201);
+            return $this->successResponse(trans('response.purchaseAddedSuccessfully'),201);
         }
         catch (\Exception $exception){
             DB::rollBack();
@@ -136,7 +136,7 @@ class PurchaseController extends Controller
         $per_page=$request->per_page ?? 10;
         return $this->dataResponse(PurchaseArchive::query()->where('company_id',$request->company_id)->paginate($per_page),200);
     }
-    public function addToArchive(Request $request,$id)
+    public function addToArchive(Request $request,$id): \Illuminate\Http\JsonResponse
     {
         $this->validate($request,[
             'company_name'=>'required|string',

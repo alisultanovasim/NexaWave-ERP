@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class ProposeRequest extends FormRequest
 {
@@ -24,7 +25,7 @@ class ProposeRequest extends FormRequest
     public function rules()
     {
         return [
-            'demand_name'=>['required','string','min:2','max:77'],
+            'demand_id'=>['required','integer',Rule::exists('demands','id')],
             'company_name'=>['required','string','min:2','max:77'],
             'company_id'=>['required','integer'],
             'price'=>['required','integer'],

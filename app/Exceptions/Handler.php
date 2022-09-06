@@ -78,9 +78,11 @@ class Handler extends ExceptionHandler
 
         if ($exception instanceof HttpException) {
             return $this->errorResponse($message, $code);
-        } else if (($exception instanceof QueryException) and $exception->errorInfo[1] == 1452) {
+        }
+        else if (($exception instanceof QueryException) and $exception->errorInfo[1] == 1452) {
             return $this->errorResponse([trans('response.SomeFiledIsNotFoundInDatabase')], 422);
-        } else if ($exception instanceof ModelNotFoundException) {
+        }
+        else if ($exception instanceof ModelNotFoundException) {
             $model = strtolower(class_basename($exception->getModel()));
             return $this->errorResponse("Does not exist any instance of {$model} with the given id", Response::HTTP_NOT_FOUND);
         } else if ($exception instanceof AuthorizationException) {

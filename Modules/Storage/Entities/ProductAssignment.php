@@ -8,6 +8,7 @@ use Modules\Hr\Entities\Employee\Employee;
 
 class ProductAssignment extends Model
 {
+
     const RETURNED = 1;
     const ACTIVE = 2;
     const ALL = 3;
@@ -15,7 +16,6 @@ class ProductAssignment extends Model
     const ATTACHMENT_TYPE=1;
 
     protected $guarded = [];
-
 
     const ASSIGN_TO_USER = 1;
     const ASSIGN_TO_PLACE = 2;

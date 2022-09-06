@@ -15,12 +15,14 @@ class CreateProposesTable extends Migration
     {
         Schema::create('proposes', function (Blueprint $table) {
             $table->id();
-            $table->string('demand_name');
+            $table->unsignedBigInteger('demand_id');
             $table->string('company_name');
             $table->unsignedBigInteger('company_id');
             $table->decimal('price');
             $table->string('offer_file');
             $table->text('description');
+            $table->unsignedBigInteger('employee_id');
+            $table->tinyInteger('status')->default(\Modules\Storage\Entities\Propose::STATUS_WAIT);
             $table->softDeletes();
             $table->timestamps();
         });

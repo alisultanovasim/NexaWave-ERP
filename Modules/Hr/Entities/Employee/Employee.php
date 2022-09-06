@@ -22,6 +22,10 @@ class Employee extends Model
     protected $table = 'employees';
 
 
+    public function demands()
+    {
+        return $this->hasMany(Employee::class,'forward_to');
+    }
     public function contracts()
     {
         return $this->hasMany('Modules\Hr\Entities\Employee\Contract')->where(['is_active'=>1,'is_terminated'=>0]);
