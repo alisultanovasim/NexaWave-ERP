@@ -76,7 +76,7 @@ class ProductAssignmentController extends Controller
     {
         $this->validate($request, [
             'product_id' => ['required', 'integer'],
-            'amount' => ['required', 'numeric'],
+            'amount' => ['required', 'numeric','min:1'],
             'assignment_type' => ['required', 'integer',
                 Rule::in([ProductAssignment::ASSIGN_TO_PLACE, ProductAssignment::ASSIGN_TO_USER])
             ],
