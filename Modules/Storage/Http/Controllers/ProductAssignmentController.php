@@ -92,7 +92,7 @@ class ProductAssignmentController extends Controller
         if (!$product)
             return $this->errorResponse(trans('response.productNotFound'), 422);
 
-        if ($product->amount < $request->get('amount'))
+        if ($product->initial_amount < $request->get('amount'))
             return $this->errorResponse(trans('response.productAmountLessThanAssign'), 422);
 
         $product->decrement('amount' , $request->get('amount'));

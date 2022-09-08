@@ -42,7 +42,7 @@ class CreateProductsTable extends Migration
             $table->string('product_mark');
             $table->string('product_no');
             $table->tinyInteger('main_funds');
-            $table->tinyInteger('status')->default(\Modules\Storage\Entities\Demand::STATUS_ACCEPTED);
+            $table->tinyInteger('status')->default(1);
             $table->unsignedBigInteger('sell_act_id');
             $table->unsignedBigInteger('room');
             $table->unsignedBigInteger('floor');
