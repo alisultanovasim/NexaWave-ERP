@@ -8,6 +8,7 @@ use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Validation\Rule;
+use Modules\Hr\Entities\Employee\Employee;
 use Modules\Storage\Entities\Product;
 use Modules\Storage\Entities\ProductAssignment;
 
@@ -79,11 +80,17 @@ class ProductAssignmentController extends Controller
             'assignment_type' => ['required', 'integer',
                 Rule::in([ProductAssignment::ASSIGN_TO_PLACE, ProductAssignment::ASSIGN_TO_USER])
             ],
-            'employee_id' => ['required_if:assignment_type,' . ProductAssignment::ASSIGN_TO_USER, 'integer'],
+            'user_id' => ['required_if:assignment_type,' . ProductAssignment::ASSIGN_TO_USER, 'integer'],
             'section_id' => ['nullable', 'integer'],
             'sector_id' => ['nullable', 'integer'],
             'department_id' => ['nullable', 'integer'],
         ]);
+        $empId=Employee::query()
+            ->where([
+                'user_id'=>$request->user_id,
+                'company_id'=>$request->company_id
+            ])
+            ->first(['id']);
 
         $product = Product::company()
             ->where('id', $request->get('product_id'))
@@ -102,7 +109,7 @@ class ProductAssignmentController extends Controller
                 'department_id',
                 'section_id',
                 'sector_id',
-                'employee_id',
+//                'employee_id',
                 'state_id'
             ]))) return $this->errorResponse($notExists);
 
@@ -110,7 +117,7 @@ class ProductAssignmentController extends Controller
             'product_id',
             'amount',
             'assignment_type',
-            'employee_id',
+            $empId,
             'section_id',
             'department_id',
             'sector_id'
