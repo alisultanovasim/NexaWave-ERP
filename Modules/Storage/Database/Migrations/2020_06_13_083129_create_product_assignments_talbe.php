@@ -21,6 +21,8 @@ class CreateProductAssignmentsTalbe extends Migration
             $table->unsignedBigInteger('sector_id')->nullable();
             $table->unsignedBigInteger('employee_id')->nullable();
             $table->unsignedBigInteger('product_id')->nullable();
+            $table->integer('room')->nullable();
+            $table->integer('floor')->nullable();
             $table->float('amount');
             $table->unsignedBigInteger('company_id');
             $table->timestamps();

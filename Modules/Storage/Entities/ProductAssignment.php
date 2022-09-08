@@ -19,6 +19,19 @@ class ProductAssignment extends Model
 
     const ASSIGN_TO_USER = 1;
     const ASSIGN_TO_PLACE = 2;
+    protected $table='product_assignments';
+    protected $fillable=[
+        'assignment_type',
+        'department_id',
+        'section_id',
+        'sector_id',
+        'employee_id',
+        'product_id',
+        'amount',
+        'compnay_id',
+        'room',
+        'floor'
+    ];
 
     public function scopeCompany($q)
     {
