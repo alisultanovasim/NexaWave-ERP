@@ -87,7 +87,7 @@ class ProductAssignmentController extends Controller
 
         $product = Product::company()
             ->where('id', $request->get('product_id'))
-            ->first(['amount', 'status' , 'id']);
+            ->first(['initial_amount', 'status' , 'id','amount']);
 
         if (!$product)
             return $this->errorResponse(trans('response.productNotFound'), 422);
@@ -175,6 +175,8 @@ class ProductAssignmentController extends Controller
                     ->where('product_id', $request->get('product_id'))
                     ->first(['amount' ,'id']);
                 if ($product->initial_amount < $request->get('amount'))
+//                    dd('ol');
+//                    exit();
                     return $this->errorResponse(trans('response.productAmountLessThanAssign'), 422);
                 $product->decrement('amount' , $request->get('amount') - $assignment->amount  );
             }
