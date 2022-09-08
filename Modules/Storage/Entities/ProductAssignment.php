@@ -23,6 +23,7 @@ class ProductAssignment extends Model
     protected $fillable=[
         'assignment_type',
         'department_id',
+        'company_id',
         'section_id',
         'sector_id',
         'employee_id',
@@ -30,7 +31,8 @@ class ProductAssignment extends Model
         'amount',
         'compnay_id',
         'room',
-        'floor'
+        'floor',
+        'reasons'
     ];
 
     public function scopeCompany($q)
