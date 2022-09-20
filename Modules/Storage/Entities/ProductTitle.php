@@ -16,6 +16,11 @@ class ProductTitle extends Model
         return $this->hasMany(Product::class, 'title_id' , 'id');
     }
 
+    public function demands()
+    {
+        return $this->hasMany(Demand::class);
+    }
+
     public function kinds(){
         return $this->hasMany(ProductKind::class , 'title_id');
     }

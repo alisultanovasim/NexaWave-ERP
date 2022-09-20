@@ -11,6 +11,8 @@ use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
+use Modules\Hr\Entities\Employee\Employee;
+use Modules\Storage\Entities\NewProductAmount;
 use Modules\Storage\Entities\Product;
 use Modules\Storage\Entities\ProductAssignment;
 use Modules\Storage\Entities\ProductDelete;
@@ -120,10 +122,12 @@ class ProductController extends Controller
 
     public function show(Request $request, $id)
     {
+
         $this->validate($request, [
             'show_deletes_logs' => ['nullable', 'boolean'],
             'show_updates_logs' => ['nullable', 'boolean'],
         ]);
+
         $product = Product::with([
             'kind',
             'kind.unit',
@@ -158,19 +162,44 @@ class ProductController extends Controller
         $product = $product
             ->where('id', $id)
             ->first();
+
         $attach_count=ProductAssignment::query()
             ->where([
                 'product_id'=>$id,
                 'assignment_type'=>ProductAssignment::ATTACHMENT_TYPE
             ])
-            ->get('amount');
+            ->sum('amount');
+
         $operation_count=ProductAssignment::query()
             ->where([
                 'product_id'=>$id,
                 'assignment_type'=>ProductAssignment::OPERATION_TYPE
             ])
-            ->get('amount');
+            ->sum('amount');
 
+        $deletedCount=ProductDelete::query()
+            ->where('product_id',$id)
+            ->sum('amount');
+
+        $attachHistory=DB::table('product_assignments')
+            ->select(['employee_contracts.*','product_assignments.*'])
+            ->leftJoin('employee_contracts','employee_contracts.employee_id','=','product_assignments.employee_id')
+            ->where(['product_id'=>$id,'assignment_type'=>ProductAssignment::ATTACHMENT_TYPE])
+            ->get();
+
+        $operationHistory=DB::table('product_assignments')
+            ->select(['employee_contracts.*','product_assignments.*'])
+            ->leftJoin('employee_contracts','employee_contracts.employee_id','=','product_assignments.employee_id')
+            ->where(['product_id'=>$id,'assignment_type'=>ProductAssignment::OPERATION_TYPE])
+            ->get();
+
+        $deletedHistory=DB::table('product_deletes')
+            ->where('product_id',$id)
+            ->get();
+
+        $addedHistory=DB::table('new_product_amounts')
+            ->where('product_id',$id)
+            ->get();
 
         if (!$product)
             return $this->errorResponse(trans('response.ProductNotFound'));
@@ -179,7 +208,13 @@ class ProductController extends Controller
         return $this->dataResponse([
             'product'=>$product,
             'attach_count'=>$attach_count,
-            'operation_count'=>$operation_count],200);
+            'operation_count'=>$operation_count,
+            'deleted_count'=>$deletedCount,
+            'attachHistory'=>$attachHistory,
+            'addedHistory'=>$addedHistory,
+            'operationHistory'=>$operationHistory,
+            'deletedHistory'=>$deletedHistory,
+        ],200);
     }
 
     public function showHistory(Request $request, $id)
@@ -457,7 +492,7 @@ class ProductController extends Controller
         return $this->successResponse($deletes);
     }
 
-    public function filterProducts(Request $request)
+    public function filterProducts(Request $request): \Illuminate\Http\JsonResponse
     {
 
         $this->validate($request,[
@@ -489,7 +524,7 @@ class ProductController extends Controller
         if ($request->has('room'))
             $products->where('products.room',$request->get('room'));
         if (!$products->count()){
-            return $this->errorResponse("There is no info!",404);
+            return $this->dataResponse([],200);
         }
         return $this->successResponse($products->paginate($per_page),200);
 
@@ -511,5 +546,32 @@ class ProductController extends Controller
             ->paginate($per_page);
 
         return $this->dataResponse($kinds,200);
+    }
+
+    public function addNewAmount(Request $request,$id): \Illuminate\Http\JsonResponse
+    {
+        $this->validate($request,[
+           'amount'=>['required','min:1','integer'],
+           'process_date'=>['required','date'],
+           'price'=>['required','numeric','min:0.01'],
+        ]);
+        $data=$request->all();
+        $data['product_id']=$id;
+        $data['total_price']=$request->price*$request->amount;
+        $data['employee_id']=$this->getEmployeeId($request->company_id);
+        $newAmount=NewProductAmount::query()
+            ->create($data);
+        return $this->successResponse($newAmount,201);
+
+    }
+
+    public function getEmployeeId($companyId)
+    {
+        return Employee::query()
+            ->where([
+                'user_id'=>Auth::id(),
+                'company_id'=>$companyId
+            ])
+            ->first()->id;
     }
 }

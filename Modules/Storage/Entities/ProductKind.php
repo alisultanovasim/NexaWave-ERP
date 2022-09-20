@@ -23,6 +23,11 @@ class ProductKind extends Model
         return $this->hasMany(ProductModel::class );
     }
 
+    public function demands()
+    {
+        return $this->hasMany(Demand::class);
+    }
+
 
     public function scopeCompany($q)
     {

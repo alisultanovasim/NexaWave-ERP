@@ -11,17 +11,26 @@ class Demand extends Model
     const STATUS_WAIT=1;
     const STATUS_CONFIRMED=2;
     const STATUS_REJECTED=3;
+    const DRAFT=1;
+    const NOT_DRAFT=2;
 
     use SoftDeletes;
 protected $fillable=[
     'name',
-    'price_approx',
     'description',
-    'product_id',
+    'title',
+    'title_id',
+    'kind',
+    'kind_id',
+    'model',
+    'mark',
+    'model_id',
+    'type_of_doc',
+    'attachment',
     'amount',
     'employee_id',
-    'forward_to',
     'company_id',
+    'progress_status',
     'status',
 ];
 
@@ -43,8 +52,24 @@ public function scopeCompany($q){
     ));
 }
 
-public function product()
-{
-        return $this->belongsTo(Product::class);
+    public function title()
+    {
+        return $this->belongsTo(ProductTitle::class);
 }
+
+    public function kind()
+    {
+        return $this->belongsTo(ProductKind::class);
+}
+
+    public function model()
+    {
+        return $this->belongsTo(ProductModel::class);
+}
+
+    public function correct()
+    {
+        return $this->belongsTo(DemandCorrect::class);
+}
+
 }

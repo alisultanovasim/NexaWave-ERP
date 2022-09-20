@@ -6,6 +6,8 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Modules\Hr\Entities\CompanyAuthorizedEmployee;
+use Modules\Storage\Entities\NewProductAmount;
+use Modules\Storage\Entities\ProductAssignment;
 use Modules\Storage\Entities\Purchase;
 
 class Employee extends Model
@@ -68,5 +70,15 @@ class Employee extends Model
             $query->where('start_date', '<', Carbon::now());
             $query->where('end_date', '>', Carbon::now());
         });
+    }
+
+    public function addedAmounts(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(NewProductAmount::class);
+    }
+
+    public function assignments(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(ProductAssignment::class);
     }
 }

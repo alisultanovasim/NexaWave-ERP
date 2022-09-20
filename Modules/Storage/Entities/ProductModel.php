@@ -14,5 +14,10 @@ class   ProductModel extends Model
     {
         return $this->belongsTo(ProductKind::class);
     }
+
+    public function demands()
+    {
+        return $this->hasMany(Demand::class);
+    }
 //    protected $guarded = [];
 }

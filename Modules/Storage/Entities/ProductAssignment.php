@@ -40,7 +40,7 @@ class ProductAssignment extends Model
         return $q->where('company_id', request('company_id'));
     }
 
-    public function employee()
+    public function employee(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Employee::class);
     }

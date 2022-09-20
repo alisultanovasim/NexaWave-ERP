@@ -138,4 +138,9 @@ class Product extends Model
     {
         return $q->where('company_id', request('company_id'));
     }
+
+    public function addedAmounts(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(NewProductAmount::class);
+    }
 }

@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Route;
 
 
 
-
+Route::pattern('id','[0-9]+');
 Route::group([
     'middleware' => ['auth:api', 'authorize'],
     'prefix' => 'v1/storage'
@@ -37,6 +37,7 @@ Route::group([
         Route::post('/increase/{id}', 'ProductController@increase');
         Route::post('/reduce/{id}', 'ProductController@reduce');
         Route::post('/delete/{id}', 'ProductController@delete');
+        Route::post('/add-new-amount/{id}', 'ProductController@addNewAmount')->where('id','[0-9]+');
     }); //products
 
     Route::group([
@@ -116,12 +117,17 @@ Route::group([
         'prefix' => 'demands'
     ], function () {
         Route::get('/', 'DemandController@index');
+        Route::get('/get-sent-to-edit-demands', 'DemandController@getSentToEditDemands');
         Route::get('/{id}', 'DemandController@show');
         Route::get('/directed-demands', 'DemandController@directedToUserDemandList');
+        Route::get('/get-sent-to-equipment-demands', 'DemandController@getSentToequipmentDemands');
         Route::post('/', 'DemandController@store');
+        Route::post('/send/{id}/', 'DemandController@send');
+        Route::post('/send-to-correction/{id}', 'DemandController@sendToCorrection');
         Route::patch('/{id}', 'DemandController@confirm');
-        Route::post('/reject/{id}', 'DemandController@reject')->where('demand-id','[0-9]+');
-        Route::put('/{id}', 'DemandController@update');
+        Route::post('/reject/{id}', 'DemandController@reject');
+        Route::post('/{id}', 'DemandController@update');
+        Route::post('/edit-by-supplier/{id}', 'DemandController@editBySupplier');
         Route::delete('/{id}', 'DemandController@delete');
 
         Route::group([
