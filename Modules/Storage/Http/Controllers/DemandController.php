@@ -345,7 +345,7 @@ class DemandController extends Controller
                 $code=400;
             }
         }
-         if (in_array(41,$roleIds)){
+         if (in_array(43,$roleIds)){
             $demand->update(['type_of_doc'=>Demand::NOT_DRAFT]);
             $message=trans('response.theDemandConfirmedBySailor');
             $demand->increment('progress_status',1);
