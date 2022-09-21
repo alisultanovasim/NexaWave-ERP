@@ -18,6 +18,7 @@ use Modules\Storage\Entities\ProductColor;
 use Modules\Storage\Entities\ProductKind;
 use Modules\Storage\Entities\Propose;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\Response;
 
 class ProposeController extends Controller
 {
@@ -41,9 +42,9 @@ class ProposeController extends Controller
     /**
      * @throws \Throwable
      */
-    public function store(ProposeRequest $proposeRequest): \Illuminate\Http\JsonResponse
+    public function store(ProposeRequest $proposeRequest)
     {
-        $isSellerSpecialist=Auth::user()->roles()->find(16);
+        $isSellerSpecialist=Auth::user()->roles()->find(8);
 
         if (!$isSellerSpecialist) return $this->errorResponse(trans('response.onlySalesSpecialistHaveAnAccess'),400);
         DB::beginTransaction();
@@ -67,9 +68,13 @@ class ProposeController extends Controller
             DB::rollBack();
             throw $throwable;
         }
+    }
 
-
-
+    public function sendPropose($id)
+    {
+        $propose=Propose::query()->findOrFail($id);
+        $propose->increment('progress_status',1);
+        return $this->successResponse(['message'=>'Sent successfully'],200);
     }
 
     public function reject($id)
@@ -77,6 +82,16 @@ class ProposeController extends Controller
         $propose=Propose::query()->findOrFail($id);
         $propose->update(['status'=>Demand::STATUS_REJECTED]);
         return $this->successResponse('The demand rejected!',200);
+    }
+
+    public function update(Request $request,$id)
+    {
+        $propose=Propose::query()->findOrFail($id);
+        if ($propose->progress_status!=1)
+            return $this->errorResponse(trans('response.theProposeIsOnProgress'),Response::HTTP_BAD_REQUEST);
+        $propose->update($request->all());
+        return $this->successResponse(['message'=>'Updated!'],200);
+
     }
 
     public function delete(Request $request,$id)

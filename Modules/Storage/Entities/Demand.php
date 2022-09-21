@@ -13,6 +13,10 @@ class Demand extends Model
     const STATUS_REJECTED=3;
     const DRAFT=1;
     const NOT_DRAFT=2;
+    const DIRECTOR_ROLE=8;
+    const SAILOR_ROLE=43;
+    const FINANCIER_ROLE=25;
+
 
     use SoftDeletes;
 protected $fillable=[
@@ -67,9 +71,9 @@ public function scopeCompany($q){
         return $this->belongsTo(ProductModel::class);
 }
 
-    public function correct()
+    public function corrects()
     {
-        return $this->belongsTo(DemandCorrect::class);
+        return $this->hasMany(DemandCorrect::class);
 }
 
 }

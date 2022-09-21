@@ -8,8 +8,8 @@ class DemandCorrect extends Model
 {
     protected $table='demand_corrects';
 
-    public function demands()
+    public function demand()
     {
-        return $this->hasMany(Demand::class);
+        return $this->belongsTo(Demand::class);
     }
 }

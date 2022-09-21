@@ -21,7 +21,9 @@ class Propose extends Model
         'offer_file',
         'description',
         'employee_id',
-        'status'
+        'amount',
+        'status',
+        'progress_status'
     ];
 
     public function demand()

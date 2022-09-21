@@ -51,14 +51,15 @@ class DemandController extends Controller
     public function getSentToEditDemands(Request $request)
     {
         $per_page=$request->per_page ?? 10;
-        $demands=Demand::query()->where('edit_status',1)->paginate($per_page);
-        if (!$demands){
-            return $this->dataResponse([],Response::HTTP_OK);
-        }
+        $demands=Demand::query()
+            ->whereHas('corrects',function ($q) use ($request){
+                $q->where('to_id',$this->getEmployeeId($request->company_id));
+            })
+            ->paginate($per_page);
         return $this->dataResponse($demands,Response::HTTP_OK);
     }
 
-    public function directedToUserDemandList(Request $request): \Illuminate\Http\JsonResponse
+    public function directedToUserDemandList(Request $request)
     {
         $per_page=$request->per_page ?? 10;
         $department_id=DB::table('employee_contracts')
@@ -67,29 +68,26 @@ class DemandController extends Controller
             ->distinct()
             ->get('department_id')->toArray();
 
-        switch ($department_id[0]->department_id){
-            case 1:
-                $progress_status=4;
-                break;
-            case 8:
-                $progress_status=3;
-                break;
-            case 43:
-                $progress_status=2;
+        $user=User::query()
+            ->where('id',Auth::id())
+            ->with('roles')
+            ->get();
+        $roleIds=[];
+        foreach ($user[0]['roles'] as $role){
+            array_push($roleIds,$role['id']);
         }
-
-        $demands=DemandAssignment::query()
+        if(in_array(43,$roleIds))
+            $progress_status=2;
+        else if(in_array(25,$roleIds))
+            $progress_status=3;
+        else if(in_array(8,$roleIds))
+            $progress_status=4;
+        else if(in_array(42,$roleIds))
+            $progress_status=5;
+        $demands=Demand::query()
             ->where([
-                'employee_id'=>$this->getEmployeeId($request->company_id)
+                'progress_status'=>$progress_status
             ])
-            ->with([
-                        'demand.product.model',
-                    ])
-            ->whereHas('demand',function ($q1) use ($progress_status){
-                $q1->where([
-                    'status'=>Demand::STATUS_WAIT,
-                    'progress_status'=>$progress_status]);
-            })
             ->paginate($per_page);
 
         return $this->dataResponse($demands,200);
@@ -304,12 +302,8 @@ class DemandController extends Controller
             $demand=Demand::query()
                 ->where('id',$id)
                 ->where('employee_id',$request->employee_id)->first();
-            if ($demand){
-                $demand->update(['edit_status'=>true]);
-            }
-            else{
-                return $this->errorResponse(trans('response.demandNotFound'),Response::HTTP_NOT_FOUND);
-            }
+
+            $demand->update(['progress_status'=>2]);
 
 
             DB::commit();
@@ -332,7 +326,7 @@ class DemandController extends Controller
         foreach ($user[0]['roles'] as $role){
             array_push($roleIds,$role['id']);
         }
-        if (in_array(8,$roleIds)){
+        if (in_array(Demand::DIRECTOR_ROLE,$roleIds)){
             if ($demand->status==Demand::STATUS_WAIT){
                 $demand->update(['status'=>Demand::STATUS_CONFIRMED]);
                 $demand->increment('progress_status',1);
@@ -345,7 +339,7 @@ class DemandController extends Controller
                 $code=400;
             }
         }
-         if (in_array(43,$roleIds)){
+         else if (in_array(Demand::SAILOR_ROLE,$roleIds)){
             $demand->update(['type_of_doc'=>Demand::NOT_DRAFT]);
             $message=trans('response.theDemandConfirmedBySailor');
             $demand->increment('progress_status',1);

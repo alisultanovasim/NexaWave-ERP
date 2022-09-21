@@ -19,10 +19,12 @@ class CreateProposesTable extends Migration
             $table->string('company_name');
             $table->unsignedBigInteger('company_id');
             $table->decimal('price');
+            $table->double('amount');
             $table->string('offer_file');
             $table->text('description');
             $table->unsignedBigInteger('employee_id');
             $table->tinyInteger('status')->default(\Modules\Storage\Entities\Propose::STATUS_WAIT);
+            $table->tinyInteger('progress_status')->default(1);
             $table->softDeletes();
             $table->timestamps();
         });

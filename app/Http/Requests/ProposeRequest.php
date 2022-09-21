@@ -31,6 +31,7 @@ class ProposeRequest extends FormRequest
             'price'=>['required','integer'],
             'offer_file'=>['required','mimes:pdf','max:2048'],
             'description'=>['nullable','string'],
+            'amount'=>['required','integer'],
 
 
         ];
