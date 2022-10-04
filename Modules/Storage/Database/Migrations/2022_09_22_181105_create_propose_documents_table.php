@@ -13,11 +13,14 @@ class CreateProposeDocumentsTable extends Migration
      */
     public function up()
     {
-        Schema::create('proposes', function (Blueprint $table) {
+        Schema::create('propose_documents', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('propose_document_id');
-            $table->unsignedBigInteger('propose_company_id');
-            $table->tinyInteger('selected')->default(0);
+            $table->unsignedBigInteger('demand_id');
+            $table->string('offer_file');
+            $table->text('description');
+            $table->unsignedBigInteger('employee_id');
+            $table->tinyInteger('status')->default(\Modules\Storage\Entities\ProposeDocument::STATUS_WAIT);
+            $table->tinyInteger('progress_status')->default(1);
             $table->softDeletes();
             $table->timestamps();
         });
@@ -30,6 +33,6 @@ class CreateProposeDocumentsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('proposes');
+        Schema::dropIfExists('propose_documents');
     }
 }

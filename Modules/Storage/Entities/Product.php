@@ -22,6 +22,7 @@ class Product extends Model
         'title_id',
         'kind_id',
         'state_id',
+        'company_name',
         'description',
         'amount',
         'storage_id',

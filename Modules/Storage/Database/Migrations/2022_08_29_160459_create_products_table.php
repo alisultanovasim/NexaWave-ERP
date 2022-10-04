@@ -26,6 +26,7 @@ class CreateProductsTable extends Migration
             $table->unsignedBigInteger('state_id');
 
             $table->text('description')->nullable();
+            $table->string('company_name',55);
             $table->double('amount');
             $table->double('initial_amount');
             $table->unsignedBigInteger('storage_id');

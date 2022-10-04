@@ -25,13 +25,14 @@ class ProposeRequest extends FormRequest
     public function rules()
     {
         return [
-            'demand_id'=>['required','integer',Rule::exists('demands','id')],
-            'company_name'=>['required','string','min:2','max:77'],
-            'company_id'=>['required','integer'],
-            'price'=>['required','integer'],
-            'offer_file'=>['required','mimes:pdf','max:2048'],
-            'description'=>['nullable','string'],
-            'amount'=>['required','integer'],
+//            'proposeDetails'=>['required','array'],
+//            'proposeDetails.*.company_name'=>['required','string','min:2','max:77'],
+//            'proposeDetails.*.indicator'=>['required','string','min:2','max:77'],
+//            'proposeDetails.*.value'=>['required','integer'],
+//            'demand_id'=>['required','integer',Rule::exists('demands','id')],
+//            'company_id'=>['required','integer'],
+//            'offer_file'=>['required','mimes:pdf','max:2048'],
+//            'description'=>['nullable','string'],
 
 
         ];

@@ -17,6 +17,7 @@ use Modules\Storage\Entities\ArchiveRejectedDemand;
 use Modules\Storage\Entities\Demand;
 use Modules\Storage\Entities\DemandAssignment;
 use Modules\Storage\Entities\DemandCorrect;
+use Modules\Storage\Entities\DemandItem;
 use Modules\Storage\Entities\Product;
 use Modules\Storage\Entities\ProductColor;
 use Modules\Storage\Entities\ProductKind;
@@ -39,6 +40,7 @@ class DemandController extends Controller
         $per_page=$request->per_page ?? 10;
 
         $demandCreatedByUser=Demand::query()
+            ->with(['items'])
             ->where([
                 'employee_id'=>$this->getEmployeeId($request->company_id),
                 'company_id'=>$request->company_id,
@@ -48,10 +50,11 @@ class DemandController extends Controller
         return $this->dataResponse(['createdByUserDemands'=>$demandCreatedByUser],200);
     }
 
-    public function getSentToEditDemands(Request $request)
+    public function getSentToCorrectionDemands(Request $request)
     {
         $per_page=$request->per_page ?? 10;
         $demands=Demand::query()
+            ->with(['items'])
             ->whereHas('corrects',function ($q) use ($request){
                 $q->where('to_id',$this->getEmployeeId($request->company_id));
             })
@@ -62,12 +65,6 @@ class DemandController extends Controller
     public function directedToUserDemandList(Request $request)
     {
         $per_page=$request->per_page ?? 10;
-        $department_id=DB::table('employee_contracts')
-//            ->leftJoin('departments','departments.id','=','employee_contracts.department_id')
-            ->where('employee_contracts.employee_id',$this->getEmployeeId($request->company_id))
-            ->distinct()
-            ->get('department_id')->toArray();
-
         $user=User::query()
             ->where('id',Auth::id())
             ->with('roles')
@@ -85,6 +82,7 @@ class DemandController extends Controller
         else if(in_array(42,$roleIds))
             $progress_status=5;
         $demands=Demand::query()
+            ->with(['items'])
             ->where([
                 'progress_status'=>$progress_status
             ])
@@ -93,7 +91,20 @@ class DemandController extends Controller
         return $this->dataResponse($demands,200);
     }
 
-    public function getSentToequipmentDemands()
+    public function getTakenDemands(Request $request)
+    {
+        $per_page=$request->per_page ?? 10;
+        $demands=Demand::query()
+            ->with(['items'])
+            ->where([
+                'took_by'=>$this->getEmployeeId($request->company_id),
+                'progress_status'=>1
+            ])
+            ->paginate($per_page);
+        return $this->dataResponse($demands,200);
+
+    }
+    public function getSentToEquipmentDemands()
     {
         $user=User::query()
             ->where('id',Auth::id())
@@ -105,6 +116,7 @@ class DemandController extends Controller
         }
         if (in_array(43,$roleIds)){
             $demands=Demand::query()
+                ->with(['items'])
                 ->where([
                     'is_sent'=>2
                 ])->get();
@@ -113,14 +125,14 @@ class DemandController extends Controller
 
     }
 
-    public function store(Request $request): \Illuminate\Http\JsonResponse
+    public function store(Request $request)
     {
         $this->validate($request,[
             'name' => ['required', 'string'],
             'description' => ['nullable', 'string'],
-            'amount' => ['required', 'numeric'],
             'attachment' => ['required','mimes:pdf,docx'],
             'productInfo'=>['required','array'],
+            'productInfo.*.amount' => ['required', 'integer'],
             'productInfo.*.title' => ['nullable', 'string','min:1'],//
             'productInfo.*.title_id' => ['nullable', 'integer'],//
             'productInfo.*.kind' => ['nullable', 'string', 'min:1'],//
@@ -134,35 +146,54 @@ class DemandController extends Controller
             ['company_id' , $request->get('company_id')]
         ])->first(['id']);
 
-        $demand=Demand::create([
-            'name' => $request->name,
-            'title' => $request->productInfo[0]['title'],
-            'title_id' => $request->productInfo[0]['title_id'],
-            'kind' => $request->productInfo[0]['kind'],
-            'kind_id' => $request->productInfo[0]['kind_id'],
-            'model' => $request->productInfo[0]['model'],
-            'model_id' => $request->productInfo[0]['model_id'],
-            'type_of_doc' => Demand::DRAFT,
-            'description' => $request->description,
-            'attachment' => $request->attachment,
-            'amount' => $request->amount,
-            'employee_id' => $employee_id->id,
-            'company_id' => $request->company_id,
-            'status' =>Demand::STATUS_WAIT,
-            'progress_status' =>1,
-        ]);
+        DB::beginTransaction();
 
-        if ($request->hasFile('attachment')){
-            $demand->attachment=$this->uploadImage($request->company_id,$request->attachment);
+        try {
+            $demand=Demand::create([
+                'name' => $request->name,
+                'type_of_doc' => Demand::DRAFT,
+                'description' => $request->description,
+                'attachment' => $request->attachment,
+                'employee_id' => $employee_id->id,
+                'company_id' => $request->company_id,
+                'status' =>Demand::STATUS_WAIT,
+                'progress_status' =>1,
+            ]);
+
+            if ($request->hasFile('attachment')){
+                $demand->attachment=$this->uploadImage($request->company_id,$request->attachment);
+            }
+
+            foreach ($request->productInfo as $item){
+                $demandItem=new DemandItem();
+                $demandItem->demand_id=$demand->id;
+                $demandItem->amount=$item['amount'];
+                $demandItem->title=$item['title'];
+                $demandItem->title_id=$item['title_id'];
+                $demandItem->kind=$item['kind'];
+                $demandItem->kind_id=$item['kind_id'];
+                $demandItem->model=$item['model'];
+                $demandItem->model_id=$item['model_id'];
+                $demandItem->mark=$item['mark'];
+                $demandItem->save();
+            }
+
+            DB::commit();
+            return $this->successResponse($demand,\Symfony\Component\HttpFoundation\Response::HTTP_CREATED);
+        } catch (\Exception $e) {
+            DB::rollback();
+            return $this->errorResponse($e->getMessage(), \Symfony\Component\HttpFoundation\Response::HTTP_BAD_REQUEST);
         }
 
 
-        return $this->successResponse($demand,\Symfony\Component\HttpFoundation\Response::HTTP_CREATED);
+
+
     }
 
     public function show(Request $request, $id)
     {
         $demands = Demand::with([
+            'items',
             'employee',
             'assignment',
             'assignment.employee',
@@ -182,45 +213,70 @@ class DemandController extends Controller
         $this->validate($request,[
            'name'=>['string','nullable','min:1'],
            'description'=>['string','nullable','min:1'],
-           'attachment'=>['integer','nullable','min:1'],
+           'attachment' => ['required','mimes:pdf,docx'],
            'productInfo'=>['nullable','array'],
+           'productInfo.*.amount'=>['numeric','nullable'],
            'productInfo.*.title'=>['string','nullable','min:1'],
            'productInfo.*.title_id'=>['integer','nullable'],
            'productInfo.*.kind'=>['string','nullable','min:1'],
            'productInfo.*.kind_id'=>['integer','nullable'],
            'productInfo.*.model'=>['string','nullable','min:1'],
            'productInfo.*.model_id'=>['integer','nullable'],
-           'amount'=>['numeric','nullable'],
         ]);
 
-        $demand = Demand::where('company_id', $request->get('company_id'))
-            ->where('id', $id)
-            ->where('employee_id', $this->getEmployeeId($request->company_id))
-            ->first(['id', 'status','progress_status']);
+        DB::beginTransaction();
 
-        if (!$demand)
-            return $this->errorResponse(trans('response.demandNotFound'), 404);
+        try {
+            $demand = Demand::where('company_id', $request->get('company_id'))
+                ->where('id', $id)
+                ->where('employee_id', $this->getEmployeeId($request->company_id))
+                ->first(['id', 'status','progress_status']);
 
-        else if ($demand->status != Demand::STATUS_WAIT)
-            return $this->errorResponse(trans('response.cannotUpdateStatusError'), 422);
-        else if ($demand->progress_status > 2)
-            return $this->errorResponse(trans('response.demandAlreadyOnProgress'), 400);
-        $demand->update([
-            'name'=>$request->name,
-            'description'=>$request->description,
-            'amount'=>$request->amount,
-            'attachment'=>$request->attachment,
-            'title'=>$request->productInfo[0]['title'],
-            'title_id'=>$request->productInfo[0]['title_id'],
-            'kind'=>$request->productInfo[0]['kind'],
-            'kind_id'=>$request->productInfo[0]['kind_id'],
-            'model'=>$request->productInfo[0]['model'],
-            'model_id'=>$request->productInfo[0]['model_id'],
-        ]);
+            if (!$demand)
+                return $this->errorResponse(trans('response.demandNotFound'), 404);
 
-        if ($request->hasFile('attachment')){
-            $demand->attachment=$this->uploadImage($request->company_id,$request->file('attachment'));
+            else if ($demand->status != Demand::STATUS_WAIT)
+                return $this->errorResponse(trans('response.cannotUpdateStatusError'), 422);
+            else if ($demand->progress_status > 2)
+                return $this->errorResponse(trans('response.demandAlreadyOnProgress'), 400);
+
+            $demand->update([
+                'name'=>$request->name,
+                'description'=>$request->description,
+                'attachment'=>$request->attachment,
+            ]);
+
+
+            if ($request->hasFile('attachment')){
+                $demand->attachment=$this->uploadImage($request->company_id,$request->file('attachment'));
+            }
+
+            DemandItem::query()
+                ->where('demand_id',$demand->id)
+                ->delete();
+
+            foreach ($request->productInfo as $item){
+                $demandItem=new DemandItem();
+                $demandItem->demand_id=$demand->id;
+                $demandItem->amount=$item['amount'];
+                $demandItem->title=$item['title'];
+                $demandItem->title_id=$item['title_id'];
+                $demandItem->kind=$item['kind'];
+                $demandItem->kind_id=$item['kind_id'];
+                $demandItem->model=$item['model'];
+                $demandItem->model_id=$item['model_id'];
+                $demandItem->mark=$item['mark'];
+                $demandItem->save();
+            }
+
+            DB::commit();
+            return $this->successResponse($demand,\Symfony\Component\HttpFoundation\Response::HTTP_CREATED);
+        } catch (\Exception $e) {
+            DB::rollback();
+            return $this->errorResponse($e->getMessage(), \Symfony\Component\HttpFoundation\Response::HTTP_BAD_REQUEST);
         }
+
+
 
         return $this->successResponse('ok');
 
@@ -315,6 +371,16 @@ class DemandController extends Controller
 
     }
 
+    public function takeDemand(Request $request,$id)
+    {
+       $demand= Demand::query()->findOrFail($id);
+       $demand->is_took=true;
+       $demand->took_by=$this->getEmployeeId($request->company_id);
+       $demand->save();
+
+       return $this->successResponse(['message'=>trans('response.theDemandWasTookByPresentUser')]);
+    }
+
     public function confirm($demandId)
     {
         $demand=Demand::query()->findOrFail($demandId);
@@ -329,7 +395,6 @@ class DemandController extends Controller
         if (in_array(Demand::DIRECTOR_ROLE,$roleIds)){
             if ($demand->status==Demand::STATUS_WAIT){
                 $demand->update(['status'=>Demand::STATUS_CONFIRMED]);
-                $demand->increment('progress_status',1);
                 $message=trans('response.theDemandAcceptedByDirector');
                 $code=200;
             }
@@ -339,44 +404,44 @@ class DemandController extends Controller
                 $code=400;
             }
         }
-         else if (in_array(Demand::SAILOR_ROLE,$roleIds)){
+         else if (in_array(Demand::SUPPLIER_ROLE,$roleIds)){
             $demand->update(['type_of_doc'=>Demand::NOT_DRAFT]);
             $message=trans('response.theDemandConfirmedBySailor');
-            $demand->increment('progress_status',1);
             $code=200;
         }
         else{
-            $demand->increment('progress_status',1);
             $message=trans('response.theDemandConfirmed');
             $code=200;
         }
+        $demand->increment('progress_status',1);
       return $this->successResponse($message,$code);
     }
 
-    public function editBySupplier(Request $request,$id)
-    {
-        $this->validate($request,[
-            'description' => ['nullable', 'string'],
-            'amount' => ['nullable', 'numeric'],
-            'attachment' => ['nullable','mimes:pdf,docx'],
-            'productInfo'=>['nullable','array'],
-            'productInfo.*.title_id' => ['nullable', 'integer'],
-            'productInfo.*.kind_id' => ['nullable', 'integer'],
-            'productInfo.*.model_id' => ['nullable', 'integer'],
-            'productInfo.*.mark' => ['nullable', 'string','min:3'],
-        ]);
-
-        $demand=Demand::query()->findOrFail($id);
-        $demand->description=$request->description;
-        $demand->amount=$request->amount;
-        $demand->attachment=$request->attachment;
-        $demand->title_id=$request->productInfo[0]['title_id'];
-        $demand->kind_id=$request->productInfo[0]['kind_id'];
-        $demand->mark=$request->productInfo[0]['mark'];
-        $demand->save();
-
-        return $this->successResponse($demand,Response::HTTP_OK);
-    }
+//    public function editBySupplier(Request $request,$id)
+//    {
+//        $this->validate($request,[
+//            'description' => ['nullable', 'string'],
+//            'amount' => ['nullable', 'numeric'],
+//            'attachment' => ['nullable','mimes:pdf,docx'],
+//            'productInfo'=>['nullable','array'],
+//            'productInfo.*.title_id' => ['nullable', 'integer'],
+//            'productInfo.*.kind_id' => ['nullable', 'integer'],
+//            'productInfo.*.model_id' => ['nullable', 'integer'],
+//            'productInfo.*.mark' => ['nullable', 'string','min:3'],
+//        ]);
+//
+//        $demand=Demand::query()->findOrFail($id);
+//        $demand->description=$request->description;
+//        $demand->attachment=$request->attachment;
+//        $demand->title_id=$request->productInfo[0]['title_id'];
+//        $demand->amount=$request->productInfo[0]['amount'];
+//        $demand->kind_id=$request->productInfo[0]['kind_id'];
+//        $demand->model_id=$request->productInfo[0]['model_id'];
+//        $demand->mark=$request->productInfo[0]['mark'];
+//        $demand->save();
+//
+//        return $this->successResponse($demand,Response::HTTP_OK);
+//    }
 
     public function getEmployeeId($companyId)
     {

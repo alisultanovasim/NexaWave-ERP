@@ -4,6 +4,7 @@ namespace Modules\Storage\Entities;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\DB;
 use Modules\Hr\Entities\Employee\Employee;
 
 class Demand extends Model
@@ -14,7 +15,7 @@ class Demand extends Model
     const DRAFT=1;
     const NOT_DRAFT=2;
     const DIRECTOR_ROLE=8;
-    const SAILOR_ROLE=43;
+    const SUPPLIER_ROLE=43;
     const FINANCIER_ROLE=25;
 
 
@@ -22,25 +23,16 @@ class Demand extends Model
 protected $fillable=[
     'name',
     'description',
-    'title',
-    'title_id',
-    'kind',
-    'kind_id',
-    'model',
-    'mark',
-    'model_id',
     'type_of_doc',
     'attachment',
-    'amount',
     'employee_id',
     'company_id',
-    'progress_status',
     'status',
 ];
 
-public function propose()
+public function proposes()
 {
-   return $this->hasOne(Propose::class);
+   return $this->hasMany(Propose::class);
 }
 public function employee(){
     return $this->belongsTo(Employee::class);
@@ -75,5 +67,20 @@ public function scopeCompany($q){
     {
         return $this->hasMany(DemandCorrect::class);
 }
+
+    public function items()
+    {
+        return $this->hasMany(DemandItem::class);
+}
+
+    public function delete()
+    {
+        DB::transaction(function()
+        {
+            $this->items()->delete();
+            parent::delete();
+        });
+    }
+
 
 }

@@ -5,18 +5,17 @@ namespace Modules\Storage\Entities;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Propose extends Model
+class ProposeCompanyDetail extends Model
 {
-    const SELECTED=1;
-    const STATUS_REJECTED=3;
     use SoftDeletes;
+    protected $table='propose_company_details';
+    protected $fillable=[
+      'propose_company_id',
+      'indicator',
+      'value'
+    ];
 
-    public function proposeDocument()
-    {
-        return $this->belongsTo(ProposeDocument::class);
-    }
-
-    public function company()
+    public function proposeCompany()
     {
         return $this->belongsTo(ProposeCompany::class);
     }

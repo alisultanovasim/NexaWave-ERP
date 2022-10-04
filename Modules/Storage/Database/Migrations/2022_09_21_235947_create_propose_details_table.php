@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateProposeDocumentsTable extends Migration
+class CreateProposeDetailsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,13 +13,14 @@ class CreateProposeDocumentsTable extends Migration
      */
     public function up()
     {
-        Schema::create('proposes', function (Blueprint $table) {
+        Schema::create('propose_details', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('propose_document_id');
-            $table->unsignedBigInteger('propose_company_id');
-            $table->tinyInteger('selected')->default(0);
-            $table->softDeletes();
+            $table->double('amount');
+            $table->decimal('price');
+            $table->unsignedBigInteger('demand_item_id');
+            $table->unsignedBigInteger('propose_id');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
@@ -30,6 +31,6 @@ class CreateProposeDocumentsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('proposes');
+        Schema::dropIfExists('propose_details');
     }
 }

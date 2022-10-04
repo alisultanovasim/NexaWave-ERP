@@ -407,10 +407,11 @@ class ProductController extends Controller
             'unit_id' => ['required', 'integer', 'min:1'],//
             'less_value' => ['nullable', 'boolean'],
             'quickly_old' => ['nullable', 'boolean'],
-            'title_id' => ['required', 'integer', 'min:1'],//
-            'kind_id' => ['required', 'integer', 'min:1'],//
+            'title_id' => ['required', 'integer'],//
+            'kind_id' => ['required', 'integer'],//
             'state_id' => ['required', 'integer'],//
             'description' => ['nullable', 'string'],
+            'company_name' => ['nullable', 'string'],
             'amount' => ['nullable', 'numeric'],
             'storage_id' => ['required', 'integer'],//
 //            'product_model' => ['nullable', 'string', 'max:255'],

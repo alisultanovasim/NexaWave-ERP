@@ -83,7 +83,7 @@ class ProductAssignmentController extends Controller
             'user_id' => ['required_if:assignment_type,' . ProductAssignment::ASSIGN_TO_USER, 'integer'],
             'section_id' => ['nullable', 'integer'],
             'room' => ['nullable', 'integer'],
-            'floor' => ['nullable', 'integer',Rule::exists('floors','id')],
+            'floor' => ['nullable', 'integer'],
             'sector_id' => ['nullable', 'integer'],
             'department_id' => ['nullable', 'integer'],
         ]);

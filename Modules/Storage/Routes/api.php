@@ -117,17 +117,19 @@ Route::group([
         'prefix' => 'demands'
     ], function () {
         Route::get('/', 'DemandController@index');
-        Route::get('/get-sent-to-edit-demands', 'DemandController@getSentToEditDemands');
+        Route::get('/get-sent-to-correction-demands', 'DemandController@getSentToCorrectionDemands');
         Route::get('/{id}', 'DemandController@show');
+        Route::get('/get-taken-demands', 'DemandController@getTakenDemands');
         Route::get('/directed-demands', 'DemandController@directedToUserDemandList');
-        Route::get('/get-sent-to-equipment-demands', 'DemandController@getSentToequipmentDemands');
+        Route::get('/get-sent-to-equipment-demands', 'DemandController@getSentToEquipmentDemands');
         Route::post('/', 'DemandController@store');
         Route::post('/send/{id}/', 'DemandController@send');
+        Route::post('/take-demand/{id}', 'DemandController@takeDemand');
         Route::post('/send-to-correction/{id}', 'DemandController@sendToCorrection');
         Route::patch('/{id}', 'DemandController@confirm');
         Route::post('/reject/{id}', 'DemandController@reject');
         Route::post('/{id}', 'DemandController@update');
-        Route::post('/edit-by-supplier/{id}', 'DemandController@editBySupplier');
+//        Route::post('/edit-by-supplier/{id}', 'DemandController@editBySupplier');
         Route::delete('/{id}', 'DemandController@delete');
 
         Route::group([
@@ -154,12 +156,14 @@ Route::group([
 
     Route::group(['prefix'=>'propose'],function (){
         Route::get('/','ProposeController@index');
+        Route::get('/get-directed-to-user-propose-list','ProposeController@getDirectedToUserProposeList');
         Route::get('/{propose}','ProposeController@show');
         Route::post('/','ProposeController@store');
         Route::post('/send-propose/{id}','ProposeController@sendPropose');
+        Route::post('/send-proposes','ProposeController@sendProposes');
         Route::post('/reject/{id}','ProposeController@reject');
         Route::post('/{id}','ProposeController@delete');
-        Route::put('/{id}','ProposeController@update');
+        Route::post('/{id}','ProposeController@update');
 
         Route::group(['prefix'=>'purchase'],function (){
             Route::get('/','PurchaseController@index');
