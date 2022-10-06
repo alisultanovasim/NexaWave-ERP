@@ -181,10 +181,16 @@ Route::group([
         Route::delete('/{id}','PurchaseController@delete');
         Route::post('/reject/{id}','PurchaseController@reject');
         Route::post('/send-to-director/{id}','PurchaseController@sendToDirector');
-        Route::post('/addtostorage/{id}','PurchaseController@addToStorage')->where('id','[0-9]+');
-        Route::post('/add-to-archive/{id}','PurchaseController@addToArchive')->where('id','[0-9]+');
-        Route::get('/getpurchasearchive','PurchaseController@getAllPurchaseArchive');
+//        Route::post('/addtostorage/{id}','PurchaseController@addToStorage')->where('id','[0-9]+');
+//        Route::post('/add-to-archive/{id}','PurchaseController@addToArchive')->where('id','[0-9]+');
+//        Route::get('/getpurchasearchive','PurchaseController@getAllPurchaseArchive');
     });//purchases
+
+    Route::group([
+        'prefix'=>'purchase-storage'
+    ],function (){
+        Route::get('/');
+    });
 
     Route::group([
         'prefix' => 'acts'

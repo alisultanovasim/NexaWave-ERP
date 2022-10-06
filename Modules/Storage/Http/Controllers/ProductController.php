@@ -191,6 +191,8 @@ class ProductController extends Controller
 
         $operationHistory=DB::table('product_assignments')
             ->select(['employee_contracts.*','product_assignments.*'])
+            ->leftJoin('employees','employees.id','=','product_assignments.employee_id')
+            ->leftJoin('users','users.id','=','employees.user_id')
             ->leftJoin('employee_contracts','employee_contracts.employee_id','=','product_assignments.employee_id')
             ->where(['product_id'=>$id,'assignment_type'=>ProductAssignment::OPERATION_TYPE])
             ->get();
