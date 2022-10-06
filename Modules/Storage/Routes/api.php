@@ -157,22 +157,34 @@ Route::group([
     Route::group(['prefix'=>'propose'],function (){
         Route::get('/','ProposeController@index');
         Route::get('/get-directed-to-user-propose-list','ProposeController@getDirectedToUserProposeList');
-        Route::get('/{propose}','ProposeController@show');
+        Route::get('/{id}','ProposeController@show');
+        Route::get('/get-sent-back-proposes','ProposeController@getAllSentBackProposes');
+        Route::get('/get-all-confirmed-proposes','ProposeController@getAllConfirmedProposes');
         Route::post('/','ProposeController@store');
+        Route::post('/confirm-propose/{id}','ProposeController@confirm');
+        Route::post('/send-back/{id}','ProposeController@sendBack');
         Route::post('/send-propose/{id}','ProposeController@sendPropose');
         Route::post('/send-proposes','ProposeController@sendProposes');
         Route::post('/reject/{id}','ProposeController@reject');
-        Route::post('/{id}','ProposeController@delete');
+        Route::delete('/{id}','ProposeController@delete');
         Route::post('/{id}','ProposeController@update');
-
-        Route::group(['prefix'=>'purchase'],function (){
-            Route::get('/','PurchaseController@index');
-            Route::post('/','PurchaseController@store');
-            Route::post('/addtostorage/{id}','PurchaseController@addToStorage')->where('id','[0-9]+');
-            Route::post('/add-to-archive/{id}','PurchaseController@addToArchive')->where('id','[0-9]+');
-            Route::get('/getpurchasearchive','PurchaseController@getAllPurchaseArchive');
-        });
     });//proposes
+
+    Route::group(['prefix'=>'purchase'],function (){
+        Route::get('/','PurchaseController@index');
+        Route::get('/get-all-sent-back','PurchaseController@getAllSentBack');
+        Route::get('/get-all-confirmed','PurchaseController@getAllConfirmed');
+        Route::post('/','PurchaseController@store');
+        Route::post('/{id}','PurchaseController@update');
+        Route::post('/confirm/{id}','PurchaseController@confirm');
+        Route::post('/send-back/{id}','PurchaseController@sendBack');
+        Route::delete('/{id}','PurchaseController@delete');
+        Route::post('/reject/{id}','PurchaseController@reject');
+        Route::post('/send-to-director/{id}','PurchaseController@sendToDirector');
+        Route::post('/addtostorage/{id}','PurchaseController@addToStorage')->where('id','[0-9]+');
+        Route::post('/add-to-archive/{id}','PurchaseController@addToArchive')->where('id','[0-9]+');
+        Route::get('/getpurchasearchive','PurchaseController@getAllPurchaseArchive');
+    });//purchases
 
     Route::group([
         'prefix' => 'acts'

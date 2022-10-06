@@ -80,7 +80,7 @@ class ProductAssignmentController extends Controller
             'assignment_type' => ['required', 'integer',
                 Rule::in([ProductAssignment::ASSIGN_TO_PLACE, ProductAssignment::ASSIGN_TO_USER])
             ],
-            'user_id' => ['required_if:assignment_type,' . ProductAssignment::ASSIGN_TO_USER, 'integer'],
+//            'user_id' => ['required_if:assignment_type,' . ProductAssignment::ASSIGN_TO_USER, 'integer'],
             'section_id' => ['nullable', 'integer'],
             'room' => ['nullable', 'integer'],
             'floor' => ['nullable', 'integer'],

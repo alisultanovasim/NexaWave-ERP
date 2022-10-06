@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Modules\Hr\Entities\Employee\Employee;
+use Modules\Storage\Entities\ArchiveRejectedDemand;
+use Modules\Storage\Entities\ArchiveRejectedPropose;
 use Modules\Storage\Entities\Demand;
 use Modules\Storage\Entities\DemandItem;
 use Modules\Storage\Entities\ProductColor;
@@ -73,9 +75,10 @@ class ProposeController extends Controller
 
     }
 
-    public function show(Propose $propose)
+    public function show( $id)
     {
-        return $this->dataResponse($propose->with('details')->get(),200);
+        $propose=ProposeDocument::query()->where(['id'=>$id])->with('proposes')->get();
+        return $this->dataResponse($propose,200);
     }
 
     /**
@@ -95,6 +98,7 @@ class ProposeController extends Controller
             $proposeDocument->demand_id=$proposeRequest->demand_id;
             $proposeDocument->description=$proposeRequest->description;
             $proposeDocument->employee_id=$this->getEmployeeId($proposeRequest->company_id);
+            $proposeDocument->company_id=$proposeRequest->company_id;
 
             if ($proposeRequest->hasFile('offer_file')){
                 $proposeDocument->offer_file=$this->uploadImage($proposeRequest->company_id,$proposeRequest->offer_file);
@@ -157,7 +161,9 @@ class ProposeController extends Controller
     {
         $propose=ProposeDocument::query()->findOrFail($id);
         if($propose->progress_status==1){
-                $propose->increment('progress_status',1);
+                $propose->progress_status=3;
+                $propose->send_back=0;
+                $propose->save();
             return $this->successResponse(['message'=>'Sent successfully'],200);
         }
         else{
@@ -181,7 +187,7 @@ class ProposeController extends Controller
         return $this->successResponse(['message'=>trans('response.theProposesWereSent')],200);
     }
 
-    public function reject($id)
+    public function reject(Request $request,$id)
     {
         $user=User::query()
             ->where('id',Auth::id())
@@ -195,12 +201,92 @@ class ProposeController extends Controller
         }
         if (in_array(8,$roleIds)){
             $propose=ProposeDocument::query()->findOrFail($id);
-            $propose->update(['status'=>ProposeDocument::STATUS_REJECTED]);
+            if ($propose->status===ProposeDocument::STATUS_REJECTED)
+                return $this->errorResponse(trans('response.theProposeAlreadyRejected'),Response::HTTP_BAD_REQUEST);
 
-            return $this->successResponse('The propose rejected!',200);
+            DB::beginTransaction();
+            try {
+                $propose->update(['status'=>ProposeDocument::STATUS_REJECTED]);
+                $archive=new ArchiveRejectedPropose();
+                $archive->from_id=$this->getEmployeeId($request->company_id);
+                $archive->propose_document_id=$id;
+                $archive->reason=$request->reason;
+                $archive->save();
+
+                DB::commit();
+                return $this->successResponse('The propose rejected!',200);
+            }
+            catch (\Exception $exception){
+                DB::rollback();
+                return $this->errorResponse($exception->getMessage(), \Illuminate\Http\Response::HTTP_BAD_REQUEST);
+            }
+
         }
+
         return $this->errorResponse(trans('response.youDontHaveAccess'),Response::HTTP_BAD_REQUEST);
 
+    }
+
+    public function confirm($id)
+    {
+        $propose=ProposeDocument::query()->findOrFail($id);
+        $user=User::query()
+            ->where('id',Auth::id())
+            ->with('roles')
+            ->get();
+        $roleIds=[];
+        foreach ($user[0]['roles'] as $role){
+            array_push($roleIds,$role['id']);
+        }
+        if (in_array(ProposeDocument::DIRECTOR_ROLE,$roleIds)){
+            if ($propose->status==ProposeDocument::STATUS_WAIT){
+                $propose->update(['status'=>ProposeDocument::STATUS_CONFIRMED]);
+                $message=trans('response.theProposeAcceptedByDirector');
+                $code=200;
+            }
+
+            else{
+                $message=trans('response.theProposeAlreadyAccepted');
+                $code=400;
+            }
+        }
+        $propose->progress_status=4;
+        $propose->save();
+
+        return $this->successResponse($message,$code);
+    }
+
+    public function getAllConfirmedProposes(Request $request)
+    {
+        $per_page=$request->per_page ?? 10;
+        $proposes=ProposeDocument::query()
+            ->with('proposes')
+            ->where(['progress_status'=>4,'status'=>ProposeDocument::STATUS_CONFIRMED])
+            ->paginate($per_page);
+
+        return $this->dataResponse($proposes,200);
+    }
+
+    public function sendBack(ProposeDocument $id)
+    {
+        if ($id->send_back==1){
+            return $this->errorResponse(trans('response.theProposeDocAlreadySentBack'),Response::HTTP_BAD_REQUEST);
+        }
+            $id->progress_status=2;
+            $id->send_back=1;
+            $id->save();
+        return $this->successResponse(['message'=>'The propose was sent back!'],200);
+    }
+
+    public function getAllSentBackProposes(Request $request)
+    {
+        $per_page=$request->per_page ?? 10;
+
+        $proposes=ProposeDocument::query()
+            ->where(['send_back'=>1,'status'=>ProposeDocument::STATUS_WAIT,'progress_status'=>2])
+            ->with('proposes')
+            ->paginate($per_page);
+        return $this->dataResponse($proposes,200);
     }
 
     public function update(Request $request,$id)
@@ -216,19 +302,17 @@ class ProposeController extends Controller
 
     public function delete(Request $request,$id)
     {
-        $departmentId=DB::table('employee_contracts')
-            ->where('employee_id',$this->getEmployeeId($request->company_id))
-            ->distinct()
-            ->get('department_id');
+//        $departmentId=DB::table('employee_contracts')
+//            ->where('employee_id',$this->getEmployeeId($request->company_id))
+//            ->distinct()
+//            ->get('department_id');
 
-        $propose=Propose::query()->findOrFail($id);
+        $propose=ProposeDocument::query()->findOrFail($id);
 
-        if ($propose->employee_id!=$this->getEmployeeId($propose->company_id))
+        if ($propose->employee_id!=$this->getEmployeeId($request->company_id))
             return $this->errorResponse(trans('response.youDontHaveAccessToDelete'));
-        if ($departmentId[0]->department_id==15)
-            $propose->delete();
-        else
-            return $this->errorResponse(trans('response.youDontHaveAccessToDelete'),400);
+
+        $propose->delete();
         return response()->json(['message'=>trans('response.proposeDeleted')],200);
     }
 

@@ -7,11 +7,21 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ProposeDocument extends Model
 {
-    use SoftDeletes;
 
+    use SoftDeletes;
+    protected $fillable=[
+      'status',
+      'demand_id',
+      'company_id',
+      'offer_file',
+      'description',
+      'send_back'
+    ];
     const STATUS_WAIT=1;
     const STATUS_REJECTED=2;
-    const STATUS_ACCEPTED=3;
+    const STATUS_CONFIRMED=3;
+
+    const DIRECTOR_ROLE=8;
 
     public function proposes()
     {

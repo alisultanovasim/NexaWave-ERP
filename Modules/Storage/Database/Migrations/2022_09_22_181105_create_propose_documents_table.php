@@ -19,6 +19,8 @@ class CreateProposeDocumentsTable extends Migration
             $table->string('offer_file');
             $table->text('description');
             $table->unsignedBigInteger('employee_id');
+            $table->unsignedBigInteger('company_id');
+            $table->tinyInteger('send_back')->default(0);
             $table->tinyInteger('status')->default(\Modules\Storage\Entities\ProposeDocument::STATUS_WAIT);
             $table->tinyInteger('progress_status')->default(1);
             $table->softDeletes();

@@ -9,26 +9,36 @@ use Modules\Hr\Entities\Employee\Employee;
 class Purchase extends Model
 {
     use SoftDeletes;
+    const STATUS_WAIT=1;
+    const STATUS_REJECTED=2;
+    const STATUS_ACCEPTED=3;
+
+    const DIRECTOR_ROLE=8;
 
     protected $fillable=[
+        'company_name',
         'supplier_id',
-        'sender',
+        'sender_id',
         'company_id',
-        'custom_fee',
-        'transport_fee',
-        'transport_tax',
-        'payment_condition',
-        'deliver_condition',
-        'deliver_deadline',
-        'payment_deadline',
-        'total_price'
+        'progress_status',
+        'send_back',
+        'status'
     ];
     public function supplier()
     {
         return $this->belongsTo(Employee::class);
     }
-    public function purchase_products(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function purchaseProducts(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(PurchaseProduct::class);
+    }
+
+    public static function boot() {
+        parent::boot();
+        self::deleting(function($purchase) {
+            $purchase->purchaseProducts()->each(function($products) {
+                $products->delete();
+            });
+        });
     }
 }
