@@ -182,7 +182,9 @@ class ProductController extends Controller
             ->sum('amount');
 
         $attachHistory=DB::table('product_assignments')
-            ->select(['employee_contracts.*','product_assignments.*'])
+            ->select(['employee_contracts.*','product_assignments.*','users.name'])
+            ->leftJoin('employees','employees.id','=','product_assignments.employee_id')
+            ->leftJoin('users','users.id','=','employees.user_id')
             ->leftJoin('employee_contracts','employee_contracts.employee_id','=','product_assignments.employee_id')
             ->where(['product_id'=>$id,'assignment_type'=>ProductAssignment::ATTACHMENT_TYPE])
             ->get();
