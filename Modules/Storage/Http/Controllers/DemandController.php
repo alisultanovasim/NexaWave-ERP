@@ -239,7 +239,6 @@ class DemandController extends Controller
             $demand->update([
                 'name'=>$request->name,
                 'description'=>$request->description,
-                'attachment'=>$request->attachment,
             ]);
 
 
@@ -266,12 +265,6 @@ class DemandController extends Controller
             DB::rollback();
             return $this->errorResponse($e->getMessage(), \Symfony\Component\HttpFoundation\Response::HTTP_BAD_REQUEST);
         }
-
-
-
-        return $this->successResponse('ok');
-
-
     }
 
     public function delete(Request $request,$id)

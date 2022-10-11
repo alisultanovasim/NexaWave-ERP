@@ -87,9 +87,9 @@ class ProposeController extends Controller
      */
     public function store(ProposeRequest $proposeRequest)
     {
-        $isSellerSpecialist=Auth::user()->roles()->find(8);
-
-        if (!$isSellerSpecialist) return $this->errorResponse(trans('response.onlySalesSpecialistHaveAnAccess'),400);
+//        $isSellerSpecialist=Auth::user()->roles()->find(42);
+//
+//        if (!$isSellerSpecialist) return $this->errorResponse(trans('response.onlySalesSpecialistHaveAnAccess'),400);
 
         DB::beginTransaction();
 
@@ -299,12 +299,46 @@ class ProposeController extends Controller
 
     public function update(Request $request,$id)
     {
-        $propose=ProposeDocument::query()->findOrFail($id);
-        if ($propose->progress_status!=1)
+        $proposeDoc=ProposeDocument::query()->findOrFail($id);
+        if ($proposeDoc->progress_status!=1)
             return $this->errorResponse(trans('response.theProposeIsOnProgress'),Response::HTTP_BAD_REQUEST);
-        $propose->update($request->all());
+        DB::beginTransaction();
 
-        return $this->successResponse(['message'=>'Updated!'],200);
+        try {
+            $proposeDoc->update([
+                'description'=>$request->description
+            ]);
+
+            if ($request->hasFile('offer_file')){
+                $proposeDoc->offer_file=$this->uploadImage($request->company_id,$request->offer_file);
+            }
+            $proposeDoc->save();
+
+            foreach ($request->get('proposeDetails') as $value){
+                $propose=[
+                    'amount'=>$value['amount'],
+                    'price'=>$value['price'],
+                ];
+
+                $proposeDetail=ProposeDetail::query()->where(['propose_id'=>$value['propose_id'],'id'=>$value['propose_detail_id']])->first();
+                    $proposeDetail->update($propose);
+            }
+
+            foreach ($request->get('proposeCompanyDetails') as $item){
+                $detail=[
+                    'indicator'=>$item['indicator'],
+                    'value'=>$item['value'],
+                ];
+
+                $proposeCompanyDetail=ProposeCompanyDetail::query()->where(['propose_company_id'=>$item['company_id'],'id'=>$item['company_detail_id']])->first();
+                $proposeCompanyDetail->update($detail);
+            }
+            DB::commit();
+            return $this->successResponse(trans('response.updatedSuccessfully!'),\Symfony\Component\HttpFoundation\Response::HTTP_OK);
+        } catch (\Exception $e) {
+            DB::rollback();
+            return $this->errorResponse($e->getMessage(), \Symfony\Component\HttpFoundation\Response::HTTP_BAD_REQUEST);
+        }
 
     }
 
