@@ -144,4 +144,9 @@ class Product extends Model
     {
         return $this->hasMany(NewProductAmount::class);
     }
+
+    public function purchaseAdditions()
+    {
+        return $this->hasMany(StoragePurchase::class);
+    }
 }

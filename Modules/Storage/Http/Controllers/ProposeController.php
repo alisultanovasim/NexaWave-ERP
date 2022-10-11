@@ -13,8 +13,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Modules\Hr\Entities\Employee\Employee;
-use Modules\Storage\Entities\ArchiveRejectedDemand;
-use Modules\Storage\Entities\ArchiveRejectedPropose;
+use Modules\Storage\Entities\ArchiveDemand;
+use Modules\Storage\Entities\ArchiveDocument;
+use Modules\Storage\Entities\ArchivePropose;
 use Modules\Storage\Entities\Demand;
 use Modules\Storage\Entities\DemandItem;
 use Modules\Storage\Entities\ProductColor;
@@ -105,7 +106,7 @@ class ProposeController extends Controller
             }
             $proposeDocument->save();
 
-            $propose_ids=[];
+            $company_ids=[];
 
             foreach ($proposeRequest->proposeCompanyDetails as $detail){
                 $proposeCompany=ProposeCompany::query()->firstOrCreate(['company_name'=>$detail['company_name']]);
@@ -117,13 +118,18 @@ class ProposeController extends Controller
                         'value'=>$detail['value'],
                     ]);
 
+                array_push($company_ids,$proposeCompany->id);
+            }
+
+            $propose_ids=[];
+            foreach ($company_ids as $company_id){
                 $propose=new Propose();
                 $propose->propose_document_id=$proposeDocument->id;
-                $propose->propose_company_id=$proposeCompany->id;
+                $propose->propose_company_id=$company_id;
                 $propose->save();
                 array_push($propose_ids,$propose->id);
-
             }
+
 
             foreach ($proposeRequest->demandProductDetails as $productDetail){
                 $product=DemandItem::query()
@@ -207,11 +213,12 @@ class ProposeController extends Controller
             DB::beginTransaction();
             try {
                 $propose->update(['status'=>ProposeDocument::STATUS_REJECTED]);
-                $archive=new ArchiveRejectedPropose();
-                $archive->from_id=$this->getEmployeeId($request->company_id);
-                $archive->propose_document_id=$id;
-                $archive->reason=$request->reason;
-                $archive->save();
+                $archiveDocument=new ArchiveDocument();
+                $archiveDocument->document_id=$propose->id;
+                $archiveDocument->document_type=ArchiveDocument::PPROPOSE_TYPE;
+                $archiveDocument->from_id=$this->getEmployeeId($request->company_id);
+                $archiveDocument->reason=$request->reason;
+                $archiveDocument->save();
 
                 DB::commit();
                 return $this->successResponse('The propose rejected!',200);
@@ -241,6 +248,7 @@ class ProposeController extends Controller
         if (in_array(ProposeDocument::DIRECTOR_ROLE,$roleIds)){
             if ($propose->status==ProposeDocument::STATUS_WAIT){
                 $propose->update(['status'=>ProposeDocument::STATUS_CONFIRMED]);
+
                 $message=trans('response.theProposeAcceptedByDirector');
                 $code=200;
             }

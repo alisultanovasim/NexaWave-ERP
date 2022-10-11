@@ -6,6 +6,9 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Modules\Hr\Entities\CompanyAuthorizedEmployee;
+use Modules\Storage\Entities\ArchiveDemand;
+use Modules\Storage\Entities\ArchivePropose;
+use Modules\Storage\Entities\ArchivePurchase;
 use Modules\Storage\Entities\NewProductAmount;
 use Modules\Storage\Entities\ProductAssignment;
 use Modules\Storage\Entities\Purchase;
@@ -80,5 +83,20 @@ class Employee extends Model
     public function assignments(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(ProductAssignment::class);
+    }
+
+    public function archiveDemands()
+    {
+        return $this->hasMany(ArchiveDemand::class);
+    }
+
+    public function archiveProposes()
+    {
+        return $this->hasMany(ArchivePropose::class);
+    }
+
+    public function archivePurchases()
+    {
+        return $this->hasMany(ArchivePurchase::class);
     }
 }

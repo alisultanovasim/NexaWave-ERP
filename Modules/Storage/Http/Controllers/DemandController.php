@@ -13,7 +13,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Modules\Hr\Entities\Employee\Employee;
 use Modules\Plaza\Entities\Kind;
-use Modules\Storage\Entities\ArchiveRejectedDemand;
+use Modules\Storage\Entities\ArchiveDemand;
+use Modules\Storage\Entities\ArchiveDocument;
 use Modules\Storage\Entities\Demand;
 use Modules\Storage\Entities\DemandAssignment;
 use Modules\Storage\Entities\DemandCorrect;
@@ -23,6 +24,7 @@ use Modules\Storage\Entities\ProductColor;
 use Modules\Storage\Entities\ProductKind;
 use Modules\Storage\Entities\ProductModel;
 use Modules\Storage\Entities\ProductTitle;
+use Modules\Storage\Entities\PurchaseProduct;
 use Modules\Storage\Entities\Unit;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
@@ -185,9 +187,6 @@ class DemandController extends Controller
             return $this->errorResponse($e->getMessage(), \Symfony\Component\HttpFoundation\Response::HTTP_BAD_REQUEST);
         }
 
-
-
-
     }
 
     public function show(Request $request, $id)
@@ -213,7 +212,7 @@ class DemandController extends Controller
         $this->validate($request,[
            'name'=>['string','nullable','min:1'],
            'description'=>['string','nullable','min:1'],
-           'attachment' => ['required','mimes:pdf,docx'],
+           'attachment' => ['nullable','mimes:pdf,docx'],
            'productInfo'=>['nullable','array'],
            'productInfo.*.amount'=>['numeric','nullable'],
            'productInfo.*.title'=>['string','nullable','min:1'],
@@ -227,10 +226,7 @@ class DemandController extends Controller
         DB::beginTransaction();
 
         try {
-            $demand = Demand::where('company_id', $request->get('company_id'))
-                ->where('id', $id)
-                ->where('employee_id', $this->getEmployeeId($request->company_id))
-                ->first(['id', 'status','progress_status']);
+            $demand = Demand::query()->findOrFail($id);
 
             if (!$demand)
                 return $this->errorResponse(trans('response.demandNotFound'), 404);
@@ -250,25 +246,20 @@ class DemandController extends Controller
             if ($request->hasFile('attachment')){
                 $demand->attachment=$this->uploadImage($request->company_id,$request->file('attachment'));
             }
+            $demand->save();
 
-            DemandItem::query()
-                ->where('demand_id',$demand->id)
-                ->delete();
+            foreach ($request->get('productInfo') as $value){
+                $product=[
+                    'title_id'=>$value['title'],
+                    'title'=>$value['title'],
+                    'kind'=>$value['kind'],
+                    'mark'=>$value['mark'],
+                    'model'=>$value['model'],
+                    'amount'=>$value['amount'],
+                ];
 
-            foreach ($request->productInfo as $item){
-                $demandItem=new DemandItem();
-                $demandItem->demand_id=$demand->id;
-                $demandItem->amount=$item['amount'];
-                $demandItem->title=$item['title'];
-                $demandItem->title_id=$item['title_id'];
-                $demandItem->kind=$item['kind'];
-                $demandItem->kind_id=$item['kind_id'];
-                $demandItem->model=$item['model'];
-                $demandItem->model_id=$item['model_id'];
-                $demandItem->mark=$item['mark'];
-                $demandItem->save();
+                DemandItem::query()->findOrFail($value['productId'])->update($product);
             }
-
             DB::commit();
             return $this->successResponse($demand,\Symfony\Component\HttpFoundation\Response::HTTP_CREATED);
         } catch (\Exception $e) {
@@ -314,11 +305,19 @@ class DemandController extends Controller
             $demand=Demand::query()->findOrFail($id);
             $demand->status=Demand::STATUS_REJECTED;
             $demand->save();
-            $archive=new ArchiveRejectedDemand();
-            $archive->from_id=$this->getEmployeeId($request->company_id);
-            $archive->demand_id=$id;
-            $archive->reason=$request->reason;
-            $archive->save();
+
+            $archiveDocument=new ArchiveDocument();
+            $archiveDocument->document_id=$demand->id;
+            $archiveDocument->document_type=ArchiveDocument::DEMAND_TYPE;
+            $archiveDocument->from_id=$this->getEmployeeId($request->company_id);
+            $archiveDocument->reason=$request->reason;
+            $archiveDocument->save();
+
+//            $archive=new ArchiveDemand();
+//            $archive->from_id=$this->getEmployeeId($request->company_id);
+//            $archive->demand_id=$id;
+//            $archive->reason=$request->reason;
+//            $archive->save();
             DB::commit();
             return $this->successResponse('The demand rejected!',200);
         } catch (\Exception $e) {
@@ -381,7 +380,7 @@ class DemandController extends Controller
        return $this->successResponse(['message'=>trans('response.theDemandWasTookByPresentUser')]);
     }
 
-    public function confirm($demandId)
+    public function confirm(Request $request,$demandId)
     {
         $demand=Demand::query()->findOrFail($demandId);
         $user=User::query()
@@ -395,6 +394,7 @@ class DemandController extends Controller
         if (in_array(Demand::DIRECTOR_ROLE,$roleIds)){
             if ($demand->status==Demand::STATUS_WAIT){
                 $demand->update(['status'=>Demand::STATUS_CONFIRMED]);
+
                 $message=trans('response.theDemandAcceptedByDirector');
                 $code=200;
             }
@@ -404,16 +404,17 @@ class DemandController extends Controller
                 $code=400;
             }
         }
-         else if (in_array(Demand::SUPPLIER_ROLE,$roleIds)){
+          else if (in_array(Demand::SUPPLIER_ROLE,$roleIds)){
             $demand->update(['type_of_doc'=>Demand::NOT_DRAFT]);
             $message=trans('response.theDemandConfirmedBySailor');
             $code=200;
         }
         else{
-            $message=trans('response.theDemandConfirmed');
+            $message=trans('response.theDemandAlreadyConfirmed');
             $code=200;
         }
-        $demand->increment('progress_status',1);
+        $demand->progress_status=4;
+        $demand->save();
       return $this->successResponse($message,$code);
     }
 

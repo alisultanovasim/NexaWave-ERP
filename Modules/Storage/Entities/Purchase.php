@@ -12,10 +12,12 @@ class Purchase extends Model
     const STATUS_WAIT=1;
     const STATUS_REJECTED=2;
     const STATUS_ACCEPTED=3;
+    const STATUS_FINISHED=4;
 
     const DIRECTOR_ROLE=8;
 
     protected $fillable=[
+        'propose_document_id',
         'company_name',
         'supplier_id',
         'sender_id',
@@ -33,6 +35,11 @@ class Purchase extends Model
         return $this->hasMany(PurchaseProduct::class);
     }
 
+    public function proposeDocument()
+    {
+        return $this->belongsTo(ProposeDocument::class);
+    }
+
     public static function boot() {
         parent::boot();
         self::deleting(function($purchase) {
@@ -40,5 +47,10 @@ class Purchase extends Model
                 $products->delete();
             });
         });
+    }
+
+    public function storage()
+    {
+        return $this->hasOne(StoragePurchase::class);
     }
 }

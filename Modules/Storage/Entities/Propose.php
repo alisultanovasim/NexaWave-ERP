@@ -20,4 +20,9 @@ class Propose extends Model
     {
         return $this->belongsTo(ProposeCompany::class);
     }
+
+    public function detail()
+    {
+        return $this->hasOne(ProposeDetail::class);
+    }
 }

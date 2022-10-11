@@ -32,7 +32,7 @@ protected $fillable=[
 
 public function proposes()
 {
-   return $this->hasMany(Propose::class);
+   return $this->hasMany(ProposeDocument::class);
 }
 public function employee(){
     return $this->belongsTo(Employee::class);

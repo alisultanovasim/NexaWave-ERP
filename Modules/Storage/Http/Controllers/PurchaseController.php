@@ -12,8 +12,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Modules\Hr\Entities\Employee\Employee;
-use Modules\Storage\Entities\ArchiveRejectedPropose;
-use Modules\Storage\Entities\ArchiveRejectedPurchase;
+use Modules\Storage\Entities\ArchiveDocument;
+use Modules\Storage\Entities\ArchivePropose;
+use Modules\Storage\Entities\ArchivePurchase;
 use Modules\Storage\Entities\ProposeArchive;
 use Modules\Storage\Entities\ProposeDocument;
 use Modules\Storage\Entities\Purchase;
@@ -226,7 +227,7 @@ class PurchaseController extends Controller
         return $this->dataResponse($purchases);
     }
 
-    public function confirm($id)
+    public function confirm(Request $request,$id)
     {
         $purchase=Purchase::query()->findOrFail($id);
         $user=User::query()
@@ -240,6 +241,11 @@ class PurchaseController extends Controller
         if (in_array(Purchase::DIRECTOR_ROLE,$roleIds)){
             if ($purchase->status==Purchase::STATUS_WAIT){
                 $purchase->update(['status'=>Purchase::STATUS_ACCEPTED]);
+                $archiveDocument=new ArchiveDocument();
+                $archiveDocument->document_id=$purchase->id;
+                $archiveDocument->document_type=ArchiveDocument::PURCHASE_TYPE;
+                $archiveDocument->from_id=$this->getEmployeeId($request->company_id);
+                $archiveDocument->save();
                 $message=trans('response.thePurchaseAcceptedByDirector');
                 $code=200;
             }
@@ -286,12 +292,12 @@ class PurchaseController extends Controller
             DB::beginTransaction();
             try {
                 $purchase->update(['status'=>Purchase::STATUS_REJECTED]);
-                ArchiveRejectedPurchase::query()
-                    ->firstOrCreate([
-                       'purchase_id'=>$purchase->id,
-                        'from_id'=>$this->getEmployeeId($request->company_id),
-                        'reason'=>$request->reason
-                    ]);
+                $archiveDocument=new ArchiveDocument();
+                $archiveDocument->document_id=$purchase->id;
+                $archiveDocument->document_type=ArchiveDocument::PURCHASE_TYPE;
+                $archiveDocument->from_id=$this->getEmployeeId($request->company_id);
+                $archiveDocument->reason=$request->reason;
+                $archiveDocument->save();
 
                 DB::commit();
                 return $this->successResponse('The purchase rejected!',200);
@@ -309,57 +315,6 @@ class PurchaseController extends Controller
     /**
      * @throws \Illuminate\Validation\ValidationException
      */
-    public function addToStorage(Request $request,$id)
-    {
-        $this->validate($request,[
-            'barcode'=>['required','string','unique:storage_documents'],
-            'storage_id'=>['required','integer',Rule::exists('storages','id')],
-            'expiration_date'=>'required|date',
-            'amount'=>'required|integer|min:1',
-            'document_file'=>['required','mimes:pdf,docx,png,jpg,jpeg','max:2048']
-        ]);
-        $add_to_storage=new StorageDocyment();
-        $add_to_storage->propose_id=$id;
-        $add_to_storage->barcode=$request->barcode;
-        $add_to_storage->storage_id=$request->storage_id;
-        $add_to_storage->expiration_date=$request->expiration_date;
-        $add_to_storage->amount=$request->amount;
-        $add_to_storage->company_id=$request->company_id;
-
-        if ($request->hasFile('document_file')){
-            $add_to_storage->document=$this->uploadDocument($request->company_id,$request->document_file);
-        }
-        $add_to_storage->save();
-
-        return $this->successResponse($add_to_storage,200);
-    }
-
-    public function getAllPurchaseArchive(Request $request)
-    {
-        $per_page=$request->per_page ?? 10;
-        return $this->dataResponse(PurchaseArchive::query()->where('company_id',$request->company_id)->paginate($per_page),200);
-    }
-    public function addToArchive(Request $request,$id): \Illuminate\Http\JsonResponse
-    {
-        $this->validate($request,[
-            'company_name'=>'required|string',
-            'product_name'=>'required|string',
-            'start_date'=>'required|date',
-            'end_date'=>'required|date',
-            'product_type'=>'required|string',
-            'demand_amount'=>'required|integer',
-            'purchase_amount'=>'required|integer',
-            'take_over_amount'=>'required|integer'
-        ]);
-
-        $array_request=$request->toArray();
-        $array_request['supplier_id']=$id;
-
-        $archive=PurchaseArchive::query()
-            ->create($array_request);
-
-        return $this->successResponse($archive,201);
-    }
 
     public function valdiatePurchase()
     {

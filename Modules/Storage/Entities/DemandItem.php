@@ -49,4 +49,9 @@
             return $this->belongsTo(Demand::class);
         }
 
+        public function proposeDetails()
+        {
+            return $this->hasMany(ProposeDetail::class);
+        }
+
     }

@@ -19,4 +19,8 @@ class ProposeDetail extends Model
     {
         return $this->belongsTo(Propose::class);
     }
+
+    public function demandItem(){
+        return $this->belongsTo(DemandItem::class);
+    }
 }

@@ -27,4 +27,19 @@ class ProposeDocument extends Model
     {
         return $this->hasMany(Propose::class);
     }
+
+    public function purchase()
+    {
+        return $this->hasOne(Purchase::class);
+    }
+
+    public function demand()
+    {
+        return $this->belongsTo(Demand::class);
+    }
+
+    public function archive()
+    {
+        return $this->belongsTo(ArchiveDocument::class);
+    }
 }

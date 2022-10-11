@@ -189,8 +189,16 @@ Route::group([
     Route::group([
         'prefix'=>'purchase-storage'
     ],function (){
-        Route::get('/');
-    });
+        Route::get('/','PurchaseStorageController@index');
+        Route::post('/{id}','PurchaseStorageController@store');
+    });//purchase-storage
+
+    Route::group([
+        'prefix'=>'archive-documents'
+    ],function (){
+        Route::get('/','ArchiveDocumentsController@index');
+    });//archive-documents
+
 
     Route::group([
         'prefix' => 'acts'

@@ -17,6 +17,7 @@ class CreatePurchasesTable extends Migration
             $table->id();
             $table->string('company_name',55);
             $table->unsignedBigInteger('sender_id');
+            $table->unsignedBigInteger('propose_document_id');
             $table->unsignedBigInteger('company_id');
             $table->tinyInteger('send_back')->default(0);
 //            $table->decimal('transport_tax');
