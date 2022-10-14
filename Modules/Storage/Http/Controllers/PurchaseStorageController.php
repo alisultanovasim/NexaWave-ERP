@@ -59,6 +59,7 @@ class PurchaseStorageController extends Controller
                 if ($product){
                     $storage->product_id=$product->id;
                 }
+
                 $storage->save();
             }
             DB::commit();

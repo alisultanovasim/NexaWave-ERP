@@ -123,7 +123,7 @@ Route::group([
         Route::get('/directed-demands', 'DemandController@directedToUserDemandList');
         Route::get('/get-sent-to-equipment-demands', 'DemandController@getSentToEquipmentDemands');
         Route::post('/', 'DemandController@store');
-        Route::post('/send/{id}/', 'DemandController@send');
+        Route::post('/send/{id}/',  'DemandController@send');
         Route::post('/take-demand/{id}', 'DemandController@takeDemand');
         Route::post('/send-to-correction/{id}', 'DemandController@sendToCorrection');
         Route::patch('/{id}', 'DemandController@confirm');

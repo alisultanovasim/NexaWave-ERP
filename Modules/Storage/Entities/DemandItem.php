@@ -44,7 +44,7 @@
             });
         }
 
-        public function demand()
+        public function demand(): \Illuminate\Database\Eloquent\Relations\BelongsTo
         {
             return $this->belongsTo(Demand::class);
         }

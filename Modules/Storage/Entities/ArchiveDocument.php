@@ -12,6 +12,8 @@ class ArchiveDocument extends Model
     const DEMAND_TYPE=1;
     const PPROPOSE_TYPE=2;
     const PURCHASE_TYPE=3;
+    const REJECTED_STATUS=1;
+    const FINISHED_STATUS=2;
 
     protected $table='archive_documents';
     protected $fillable=[

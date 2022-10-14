@@ -205,6 +205,10 @@ class ProposeController extends Controller
         foreach ($user[0]['roles'] as $role){
             array_push($roleIds,$role['id']);
         }
+
+        if (in_array(ProposeDocument::DIRECTOR_ROLE,$roleIds))
+            $userRole=ProposeDocument::DIRECTOR_ROLE;
+
         if (in_array(8,$roleIds)){
             $propose=ProposeDocument::query()->findOrFail($id);
             if ($propose->status===ProposeDocument::STATUS_REJECTED)
@@ -216,8 +220,10 @@ class ProposeController extends Controller
                 $archiveDocument=new ArchiveDocument();
                 $archiveDocument->document_id=$propose->id;
                 $archiveDocument->document_type=ArchiveDocument::PPROPOSE_TYPE;
-                $archiveDocument->from_id=$this->getEmployeeId($request->company_id);
+                $archiveDocument->employee_id=$this->getEmployeeId($request->company_id);
+                $archiveDocument->role_id=$userRole;
                 $archiveDocument->reason=$request->reason;
+                $archiveDocument->status=ArchiveDocument::REJECTED_STATUS;
                 $archiveDocument->save();
 
                 DB::commit();
@@ -332,6 +338,14 @@ class ProposeController extends Controller
 
                 $proposeCompanyDetail=ProposeCompanyDetail::query()->where(['propose_company_id'=>$item['company_id'],'id'=>$item['company_detail_id']])->first();
                 $proposeCompanyDetail->update($detail);
+            }
+
+            foreach ($request->get('propose') as $val){
+                $detail=[
+                    'company_name'=>$val['company_name']
+                ];
+                $proposeCompany=Propose::query()->where('id',$val['propose_id'])->first('propose_company_id');
+                ProposeCompany::query()->where('id',$proposeCompany->propose_company_id)->update($detail);
             }
             DB::commit();
             return $this->successResponse(trans('response.updatedSuccessfully!'),\Symfony\Component\HttpFoundation\Response::HTTP_OK);

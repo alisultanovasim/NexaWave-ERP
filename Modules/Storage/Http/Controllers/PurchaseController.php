@@ -15,6 +15,7 @@ use Modules\Hr\Entities\Employee\Employee;
 use Modules\Storage\Entities\ArchiveDocument;
 use Modules\Storage\Entities\ArchivePropose;
 use Modules\Storage\Entities\ArchivePurchase;
+use Modules\Storage\Entities\Demand;
 use Modules\Storage\Entities\ProposeArchive;
 use Modules\Storage\Entities\ProposeDocument;
 use Modules\Storage\Entities\Purchase;
@@ -284,6 +285,10 @@ class PurchaseController extends Controller
         foreach ($user[0]['roles'] as $role){
             array_push($roleIds,$role['id']);
         }
+
+        if (in_array(Purchase::DIRECTOR_ROLE,$roleIds))
+            $userRole=Purchase::DIRECTOR_ROLE;
+
         if (in_array(8,$roleIds)){
             $purchase=Purchase::query()->findOrFail($id);
             if ($purchase->status===Purchase::STATUS_REJECTED)
@@ -295,8 +300,10 @@ class PurchaseController extends Controller
                 $archiveDocument=new ArchiveDocument();
                 $archiveDocument->document_id=$purchase->id;
                 $archiveDocument->document_type=ArchiveDocument::PURCHASE_TYPE;
-                $archiveDocument->from_id=$this->getEmployeeId($request->company_id);
+                $archiveDocument->employee_id=$this->getEmployeeId($request->company_id);
+                $archiveDocument->role_id=$userRole;
                 $archiveDocument->reason=$request->reason;
+                $archiveDocument->status=ArchiveDocument::REJECTED_STATUS;
                 $archiveDocument->save();
 
                 DB::commit();
@@ -304,7 +311,7 @@ class PurchaseController extends Controller
             }
             catch (\Exception $exception){
                 DB::rollback();
-                return $this->errorResponse($exception->getMessage(), \Illuminate\Http\Response::HTTP_BAD_REQUEST);
+                return $this->errorResponse($exception->getMessage(), \Symfony\Component\HttpFoundation\Response::HTTP_BAD_REQUEST);
             }
 
         }

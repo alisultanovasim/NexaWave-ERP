@@ -18,6 +18,7 @@ class CreateArchiveDocumentsTable extends Migration
             $table->unsignedBigInteger('document_id');
             $table->tinyInteger('document_type');
             $table->unsignedBigInteger('from_id');
+            $table->unsignedBigInteger('role_id');
             $table->string('reason',77);
             $table->tinyInteger('status');
             $table->timestamps();

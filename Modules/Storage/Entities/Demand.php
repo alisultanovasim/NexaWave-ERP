@@ -68,18 +68,14 @@ public function scopeCompany($q){
         return $this->hasMany(DemandCorrect::class);
 }
 
-    public function items()
+    public function items(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(DemandItem::class);
 }
 
-    public function delete()
-    {
-        DB::transaction(function()
-        {
-            $this->items()->delete();
-            parent::delete();
-        });
+    public function delete(){
+        $this->items()->delete();
+        return parent::delete();
     }
 
 

@@ -3,6 +3,7 @@
 namespace Modules\Storage\Http\Controllers;
 
 use App\Models\User;
+use App\Models\UserRole;
 use App\Traits\ApiResponse;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\Request;
@@ -70,9 +71,9 @@ class DemandController extends Controller
         $user=User::query()
             ->where('id',Auth::id())
             ->with('roles')
-            ->get();
+            ->first();
         $roleIds=[];
-        foreach ($user[0]['roles'] as $role){
+        foreach ($user['roles'] as $role){
             array_push($roleIds,$role['id']);
         }
         if(in_array(43,$roleIds))
@@ -133,7 +134,7 @@ class DemandController extends Controller
             'name' => ['required', 'string'],
             'description' => ['nullable', 'string'],
             'attachment' => ['required','mimes:pdf,docx'],
-            'productInfo'=>['required','array'],
+//            'productInfo'=>['required','array'],
             'productInfo.*.amount' => ['required', 'integer'],
             'productInfo.*.title' => ['nullable', 'string','min:1'],//
             'productInfo.*.title_id' => ['nullable', 'integer'],//
@@ -292,6 +293,17 @@ class DemandController extends Controller
         $this->validate($request,[
            'reason'=>'nullable|string'
         ]);
+        $roles=$this->getUserRoles();
+        $roleIds=[];
+        foreach ($roles[0]['roles'] as $role){
+            array_push($roleIds,$role['id']);
+        }
+        if (in_array(Demand::DIRECTOR_ROLE,$roleIds))
+            $userRole=Demand::DIRECTOR_ROLE;
+        else if (in_array(Demand::SUPPLIER_ROLE,$roleIds))
+            $userRole=Demand::SUPPLIER_ROLE;
+        else if (in_array(Demand::FINANCIER_ROLE,$roleIds))
+            $userRole=Demand::FINANCIER_ROLE;
         DB::beginTransaction();
 
         try {
@@ -302,15 +314,11 @@ class DemandController extends Controller
             $archiveDocument=new ArchiveDocument();
             $archiveDocument->document_id=$demand->id;
             $archiveDocument->document_type=ArchiveDocument::DEMAND_TYPE;
-            $archiveDocument->from_id=$this->getEmployeeId($request->company_id);
+            $archiveDocument->employee_id=$this->getEmployeeId($request->company_id);
+            $archiveDocument->role_id=$userRole;
             $archiveDocument->reason=$request->reason;
+            $archiveDocument->status=ArchiveDocument::REJECTED_STATUS;
             $archiveDocument->save();
-
-//            $archive=new ArchiveDemand();
-//            $archive->from_id=$this->getEmployeeId($request->company_id);
-//            $archive->demand_id=$id;
-//            $archive->reason=$request->reason;
-//            $archive->save();
             DB::commit();
             return $this->successResponse('The demand rejected!',200);
         } catch (\Exception $e) {
@@ -376,10 +384,7 @@ class DemandController extends Controller
     public function confirm(Request $request,$demandId)
     {
         $demand=Demand::query()->findOrFail($demandId);
-        $user=User::query()
-            ->where('id',Auth::id())
-            ->with('roles')
-            ->get();
+        $user=$this->getUserRoles();
         $roleIds=[];
         foreach ($user[0]['roles'] as $role){
             array_push($roleIds,$role['id']);
@@ -445,6 +450,14 @@ class DemandController extends Controller
                 'company_id'=>$companyId
             ])
             ->first()['id'];
+    }
+
+    public function getUserRoles()
+    {
+        return User::query()
+            ->where('id',Auth::id())
+            ->with('roles')
+            ->get();
     }
 
     public function uploadImage($company_id, $file, $str = 'documents')
