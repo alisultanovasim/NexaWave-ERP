@@ -130,19 +130,19 @@ class DemandController extends Controller
 
     public function store(Request $request)
     {
-        $this->validate($request,[
-            'name' => ['required', 'string'],
-            'description' => ['nullable', 'string'],
-            'attachment' => ['required','mimes:pdf,docx'],
+//        $this->validate($request,[
+//            'name' => ['required', 'string'],
+//            'description' => ['nullable', 'string'],
+//            'attachment' => ['required','mimes:pdf,docx'],
 //            'productInfo'=>['required','array'],
-            'productInfo.*.amount' => ['required', 'integer'],
-            'productInfo.*.title' => ['nullable', 'string','min:1'],//
-            'productInfo.*.title_id' => ['nullable', 'integer'],//
-            'productInfo.*.kind' => ['nullable', 'string', 'min:1'],//
-            'productInfo.*.kind_id' => ['nullable', 'integer'],//
-            'productInfo.*.model' => ['nullable', 'string','min:1'],
-            'productInfo.*.model_id' => ['nullable', 'integer'],
-        ]);
+//            'productInfo.*.amount' => ['required', 'integer'],
+//            'productInfo.*.title' => ['nullable', 'string','min:1'],//
+//            'productInfo.*.title_id' => ['nullable', 'integer'],//
+//            'productInfo.*.kind' => ['nullable', 'string', 'min:1'],//
+//            'productInfo.*.kind_id' => ['nullable', 'integer'],//
+//            'productInfo.*.model' => ['nullable', 'string','min:1'],
+//            'productInfo.*.model_id' => ['nullable', 'integer'],
+//        ]);
 
         $employee_id = Employee::where([
             ['user_id' , Auth::id()],
