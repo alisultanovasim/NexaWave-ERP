@@ -14,7 +14,7 @@ class PurchaseProduct extends Model
         'title_id',
         'kind_id',
         'mark_id',
-        'model',
+        'model_id',
         'color',
         'made_in',
         'custom_fee',

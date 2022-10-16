@@ -218,8 +218,7 @@ class ProposeController extends Controller
             try {
                 $propose->update(['status'=>ProposeDocument::STATUS_REJECTED]);
                 $archiveDocument=new ArchiveDocument();
-                $archiveDocument->document_id=$propose->id;
-                $archiveDocument->document_type=ArchiveDocument::PPROPOSE_TYPE;
+                $archiveDocument->propose_id=$propose->id;
                 $archiveDocument->employee_id=$this->getEmployeeId($request->company_id);
                 $archiveDocument->role_id=$userRole;
                 $archiveDocument->reason=$request->reason;

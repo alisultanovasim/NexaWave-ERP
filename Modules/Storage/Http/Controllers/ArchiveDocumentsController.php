@@ -11,7 +11,11 @@ class ArchiveDocumentsController extends Controller
     public function index(Request $request)
     {
         $per_page=$request->per_page ?? 10;
-        $archive=ArchiveDocument::query();
+        $archive=ArchiveDocument::query()->with([
+            'demands',
+            'proposes',
+            'purchases'
+        ]);
 
         if ($request->has('date')){
             if (isset($request->date[0]))
@@ -32,23 +36,6 @@ class ArchiveDocumentsController extends Controller
         if ($request->has('role_id'))
             $archive->where('role_id',$request->role_id);
 
-
-        $demands=$archive
-            ->where('document_type',ArchiveDocument::DEMAND_TYPE)
-            ->with('demands')
-            ->get()->toArray();
-
-        $proposes=$archive
-            ->where('document_type',ArchiveDocument::PPROPOSE_TYPE)
-            ->with('proposes')
-            ->get()->toArray();
-
-        $purchases=$archive
-            ->where('document_type',ArchiveDocument::PURCHASE_TYPE)
-            ->with('purchases')
-            ->get()->toArray();
-
-
-        return array_merge($purchases,array_merge($demands,$proposes));
+        return $archive->get();
     }
 }

@@ -19,7 +19,7 @@ class CreatePurchaseProductsTable extends Migration
             $table->unsignedBigInteger('title_id');
             $table->unsignedBigInteger('kind_id');
             $table->unsignedBigInteger('mark_id');
-            $table->string('model',50);
+            $table->unsignedBigInteger('model_id');
             $table->unsignedBigInteger('made_in');
             $table->string('color',55);
             $table->decimal('price');

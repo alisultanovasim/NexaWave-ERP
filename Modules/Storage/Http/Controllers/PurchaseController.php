@@ -47,7 +47,7 @@ class PurchaseController extends Controller
             'productInfo.*.title_id'=>['required','integer',Rule::exists('product_titles','id')],
             'productInfo.*.kind_id'=>['required','integer',Rule::exists('product_kinds','id')],
             'productInfo.*.mark_id'=>['required','integer',Rule::exists('product_models','id')],
-            'productInfo.*.model'=>['required','string'],
+            'productInfo.*.model_id'=>['required','integer'],
             'productInfo.*.color'=>['nullable','string'],
             'productInfo.*.made_in'=>['nullable','integer',Rule::exists('countries','id')],
             'productInfo.*.custom_fee'=>['required','numeric'],
@@ -57,8 +57,7 @@ class PurchaseController extends Controller
             'productInfo.*.discount'=>['nullable','numeric'],
             'productInfo.*.edv_percent'=>['nullable','numeric'],
             'productInfo.*.excise_percent'=>['nullable','numeric'],
-            'productInfo.*.total_price'=>['required','numeric'],
-            'total_price'=> 'required|numeric|gt:' . ($request->custom_fee + $request->transport_fee) .'',
+//            'total_price'=> 'nullable|numeric|gt:' . ($request->custom_fee + $request->transport_fee) .'',
         ]);
 
         DB::beginTransaction();
@@ -75,7 +74,7 @@ class PurchaseController extends Controller
                     'title_id'=>$value['title_id'],
                     'kind_id'=>$value['kind_id'],
                     'mark_id'=>$value['mark_id'],
-                    'model'=>$value['model'],
+                    'model_id'=>$value['model_id'],
                     'color'=>$value['color'],
                     'made_in'=>$value['made_in'],
                     'measure'=>$value['measure'],
@@ -298,8 +297,7 @@ class PurchaseController extends Controller
             try {
                 $purchase->update(['status'=>Purchase::STATUS_REJECTED]);
                 $archiveDocument=new ArchiveDocument();
-                $archiveDocument->document_id=$purchase->id;
-                $archiveDocument->document_type=ArchiveDocument::PURCHASE_TYPE;
+                $archiveDocument->purchase_id=$purchase->id;
                 $archiveDocument->employee_id=$this->getEmployeeId($request->company_id);
                 $archiveDocument->role_id=$userRole;
                 $archiveDocument->reason=$request->reason;

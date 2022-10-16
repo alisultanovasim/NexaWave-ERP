@@ -17,8 +17,9 @@ class ArchiveDocument extends Model
 
     protected $table='archive_documents';
     protected $fillable=[
-        'document_id',
-        'document_type',
+        'demand_id',
+        'propose_id',
+        'purchase_id',
         'from_id',
         'reason',
         'status',
@@ -26,16 +27,16 @@ class ArchiveDocument extends Model
 
     public function demands()
     {
-        return $this->hasMany(Demand::class,'id','document_id');
+        return $this->hasMany(Demand::class,'id','demand_id');
     }
 
     public function proposes()
     {
-        return $this->hasMany(ProposeDocument::class,'id','document_id');
+        return $this->hasMany(ProposeDocument::class,'id','propose_id');
     }
 
     public function purchases()
     {
-        return $this->hasMany(Purchase::class,'id','document_id');
+        return $this->hasMany(Purchase::class,'id','purchase_id');
     }
 }

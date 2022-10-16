@@ -312,8 +312,7 @@ class DemandController extends Controller
             $demand->save();
 
             $archiveDocument=new ArchiveDocument();
-            $archiveDocument->document_id=$demand->id;
-            $archiveDocument->document_type=ArchiveDocument::DEMAND_TYPE;
+            $archiveDocument->demand_id=$demand->id;
             $archiveDocument->employee_id=$this->getEmployeeId($request->company_id);
             $archiveDocument->role_id=$userRole;
             $archiveDocument->reason=$request->reason;
