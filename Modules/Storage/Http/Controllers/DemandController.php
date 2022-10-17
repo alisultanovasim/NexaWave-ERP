@@ -291,44 +291,6 @@ class DemandController extends Controller
 
     }
 
-    public function reject(Request $request,$id): \Illuminate\Http\JsonResponse
-    {
-        $this->validate($request,[
-           'reason'=>'nullable|string'
-        ]);
-        $roles=$this->getUserRoles();
-        $roleIds=[];
-        foreach ($roles[0]['roles'] as $role){
-            array_push($roleIds,$role['id']);
-        }
-        if (in_array(Demand::DIRECTOR_ROLE,$roleIds))
-            $userRole=Demand::DIRECTOR_ROLE;
-        else if (in_array(Demand::SUPPLIER_ROLE,$roleIds))
-            $userRole=Demand::SUPPLIER_ROLE;
-        else if (in_array(Demand::FINANCIER_ROLE,$roleIds))
-            $userRole=Demand::FINANCIER_ROLE;
-        DB::beginTransaction();
-
-        try {
-            $demand=Demand::query()->findOrFail($id);
-            $demand->status=Demand::STATUS_REJECTED;
-            $demand->save();
-
-            $archiveDocument=new ArchiveDocument();
-            $archiveDocument->demand_id=$demand->id;
-            $archiveDocument->employee_id=$this->getEmployeeId($request->company_id);
-            $archiveDocument->role_id=$userRole;
-            $archiveDocument->reason=$request->reason;
-            $archiveDocument->status=ArchiveDocument::REJECTED_STATUS;
-            $archiveDocument->save();
-            DB::commit();
-            return $this->successResponse('The demand rejected!',200);
-        } catch (\Exception $e) {
-            DB::rollback();
-            return $this->errorResponse($e->getMessage(),Response::HTTP_BAD_REQUEST);
-        }
-
-    }
 
     public function send($id)
     {
@@ -383,40 +345,111 @@ class DemandController extends Controller
        return $this->successResponse(['message'=>trans('response.theDemandWasTookByPresentUser')]);
     }
 
-    public function confirm(Request $request,$demandId)
+    public function confirmOrReject(Request $request,$demandId)
     {
         $demand=Demand::query()->findOrFail($demandId);
         $user=$this->getUserRoles();
         $roleIds=[];
-        foreach ($user[0]['roles'] as $role){
+        foreach ($user['roles'] as $role){
             array_push($roleIds,$role['id']);
         }
-        if (in_array(Demand::DIRECTOR_ROLE,$roleIds)){
-            if ($demand->status==Demand::STATUS_WAIT){
-                $demand->update(['status'=>Demand::STATUS_CONFIRMED]);
 
-                $message=trans('response.theDemandAcceptedByDirector');
-                $code=200;
-            }
+        if ($request->status==0){
 
-            else{
-                $message=trans('response.theDemandAlreadyAccepted');
-                $code=400;
+            if (in_array(Demand::DIRECTOR_ROLE,$roleIds))
+                $userRole=Demand::DIRECTOR_ROLE;
+            else if (in_array(Demand::SUPPLIER_ROLE,$roleIds))
+                $userRole=Demand::SUPPLIER_ROLE;
+            else if (in_array(Demand::FINANCIER_ROLE,$roleIds))
+                $userRole=Demand::FINANCIER_ROLE;
+            DB::beginTransaction();
+
+            try {
+                $demand=Demand::query()->findOrFail($demandId);
+                $demand->status=Demand::STATUS_REJECTED;
+                $demand->save();
+
+                $archiveDocument=new ArchiveDocument();
+                $archiveDocument->demand_id=$demand->id;
+                $archiveDocument->employee_id=$this->getEmployeeId($request->company_id);
+                $archiveDocument->role_id=$userRole;
+                $archiveDocument->reason=$request->reason;
+                $archiveDocument->status=ArchiveDocument::REJECTED_STATUS;
+                $archiveDocument->save();
+                DB::commit();
+                return $this->successResponse('The demand rejected!',200);
+            } catch (\Exception $e) {
+                DB::rollback();
+                return $this->errorResponse($e->getMessage(),Response::HTTP_BAD_REQUEST);
             }
-        }
-          else if (in_array(Demand::SUPPLIER_ROLE,$roleIds)){
-            $demand->update(['type_of_doc'=>Demand::NOT_DRAFT]);
-            $message=trans('response.theDemandConfirmedBySailor');
-            $code=200;
         }
         else{
-            $message=trans('response.theDemandAlreadyConfirmed');
-            $code=200;
+            if (in_array(Demand::DIRECTOR_ROLE,$roleIds)){
+                if ($demand->status==Demand::STATUS_WAIT){
+                    $demand->update(['status'=>Demand::STATUS_CONFIRMED]);
+                    $demand->progress_status=4;
+                    $demand->save();
+
+                    $message=trans('response.theDemandAcceptedByDirector');
+                    $code=200;
+                }
+
+                else{
+                    $message=trans('response.theDemandAlreadyAccepted');
+                    $code=400;
+                }
+            }
+            else if (in_array(Demand::SUPPLIER_ROLE,$roleIds)){
+                $demand->update(['type_of_doc'=>Demand::NOT_DRAFT]);
+                $message=trans('response.theDemandConfirmedBySailor');
+                $code=200;
+            }
+            else{
+                $message=trans('response.theDemandAlreadyConfirmed');
+                $code=200;
+            }
+            return $this->successResponse($message,$code);
         }
-        $demand->progress_status=4;
-        $demand->save();
-      return $this->successResponse($message,$code);
     }
+
+//    public function reject(Request $request,$id): \Illuminate\Http\JsonResponse
+//    {
+//        $this->validate($request,[
+//            'reason'=>'nullable|string'
+//        ]);
+//        $roles=$this->getUserRoles();
+//        $roleIds=[];
+//        foreach ($roles['roles'] as $role){
+//            array_push($roleIds,$role['id']);
+//        }
+//        if (in_array(Demand::DIRECTOR_ROLE,$roleIds))
+//            $userRole=Demand::DIRECTOR_ROLE;
+//        else if (in_array(Demand::SUPPLIER_ROLE,$roleIds))
+//            $userRole=Demand::SUPPLIER_ROLE;
+//        else if (in_array(Demand::FINANCIER_ROLE,$roleIds))
+//            $userRole=Demand::FINANCIER_ROLE;
+//        DB::beginTransaction();
+//
+//        try {
+//            $demand=Demand::query()->findOrFail($id);
+//            $demand->status=Demand::STATUS_REJECTED;
+//            $demand->save();
+//
+//            $archiveDocument=new ArchiveDocument();
+//            $archiveDocument->demand_id=$demand->id;
+//            $archiveDocument->employee_id=$this->getEmployeeId($request->company_id);
+//            $archiveDocument->role_id=$userRole;
+//            $archiveDocument->reason=$request->reason;
+//            $archiveDocument->status=ArchiveDocument::REJECTED_STATUS;
+//            $archiveDocument->save();
+//            DB::commit();
+//            return $this->successResponse('The demand rejected!',200);
+//        } catch (\Exception $e) {
+//            DB::rollback();
+//            return $this->errorResponse($e->getMessage(),Response::HTTP_BAD_REQUEST);
+//        }
+//
+//    }
 
 //    public function editBySupplier(Request $request,$id)
 //    {
@@ -459,7 +492,7 @@ class DemandController extends Controller
         return User::query()
             ->where('id',Auth::id())
             ->with('roles')
-            ->get();
+            ->first();
     }
 
     public function uploadImage($company_id, $file, $str = 'documents')

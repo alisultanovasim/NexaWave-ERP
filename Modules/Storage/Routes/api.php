@@ -126,8 +126,8 @@ Route::group([
         Route::post('/send/{id}/',  'DemandController@send');
         Route::post('/take-demand/{id}', 'DemandController@takeDemand');
         Route::post('/send-to-correction/{id}', 'DemandController@sendToCorrection');
-        Route::patch('/{id}', 'DemandController@confirm');
-        Route::post('/reject/{id}', 'DemandController@reject');
+        Route::patch('/{id}', 'DemandController@confirmOrReject');
+//        Route::post('/reject/{id}', 'DemandController@reject');
         Route::post('/{id}', 'DemandController@update');
 //        Route::post('/edit-by-supplier/{id}', 'DemandController@editBySupplier');
         Route::delete('/{id}', 'DemandController@delete');
