@@ -43,7 +43,10 @@ class DemandController extends Controller
         $per_page=$request->per_page ?? 10;
 
         $demandCreatedByUser=Demand::query()
-            ->with(['items'])
+            ->with([
+                'items',
+                'employee.user:id,name'
+            ])
             ->where([
                 'employee_id'=>$this->getEmployeeId($request->company_id),
                 'company_id'=>$request->company_id,
@@ -57,7 +60,7 @@ class DemandController extends Controller
     {
         $per_page=$request->per_page ?? 10;
         $demands=Demand::query()
-            ->with(['items'])
+            ->with(['items','employee.user:id,name'])
             ->whereHas('corrects',function ($q) use ($request){
                 $q->where('to_id',$this->getEmployeeId($request->company_id));
             })
@@ -76,16 +79,16 @@ class DemandController extends Controller
         foreach ($user['roles'] as $role){
             array_push($roleIds,$role['id']);
         }
-        if(in_array(43,$roleIds))
-            $progress_status=2;
-        else if(in_array(25,$roleIds))
+//        if(in_array(43,$roleIds))
+//            $progress_status=2;
+         if(in_array(25,$roleIds))
             $progress_status=3;
         else if(in_array(8,$roleIds))
             $progress_status=4;
         else if(in_array(42,$roleIds))
             $progress_status=5;
         $demands=Demand::query()
-            ->with(['items'])
+            ->with(['items','employee.user:id,name'])
             ->where([
                 'progress_status'=>$progress_status
             ])
@@ -98,7 +101,7 @@ class DemandController extends Controller
     {
         $per_page=$request->per_page ?? 10;
         $demands=Demand::query()
-            ->with(['items'])
+            ->with(['items','employee.user:id,name'])
             ->where([
                 'took_by'=>$this->getEmployeeId($request->company_id),
                 'progress_status'=>1
@@ -112,14 +115,14 @@ class DemandController extends Controller
         $user=User::query()
             ->where('id',Auth::id())
             ->with('roles')
-            ->get();
+            ->first();
         $roleIds=[];
-        foreach ($user[0]['roles'] as $role){
+        foreach ($user['roles'] as $role){
             array_push($roleIds,$role['id']);
         }
         if (in_array(43,$roleIds)){
             $demands=Demand::query()
-                ->with(['items'])
+                ->with(['items','employee.user:id,name'])
                 ->where([
                     'is_sent'=>2
                 ])->get();
