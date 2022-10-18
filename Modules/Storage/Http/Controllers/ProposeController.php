@@ -198,11 +198,11 @@ class ProposeController extends Controller
         $user=User::query()
             ->where('id',Auth::id())
             ->with('roles')
-            ->get();
+            ->first();
 
         $roleIds=[];
 
-        foreach ($user[0]['roles'] as $role){
+        foreach ($user['roles'] as $role){
             array_push($roleIds,$role['id']);
         }
 

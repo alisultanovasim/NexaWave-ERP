@@ -3,7 +3,6 @@
 namespace Modules\Storage\Http\Controllers;
 
 use App\Models\User;
-use App\Models\UserRole;
 use App\Traits\ApiResponse;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\Request;
@@ -11,22 +10,11 @@ use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\Rule;
 use Modules\Hr\Entities\Employee\Employee;
-use Modules\Plaza\Entities\Kind;
-use Modules\Storage\Entities\ArchiveDemand;
 use Modules\Storage\Entities\ArchiveDocument;
 use Modules\Storage\Entities\Demand;
-use Modules\Storage\Entities\DemandAssignment;
 use Modules\Storage\Entities\DemandCorrect;
 use Modules\Storage\Entities\DemandItem;
-use Modules\Storage\Entities\Product;
-use Modules\Storage\Entities\ProductColor;
-use Modules\Storage\Entities\ProductKind;
-use Modules\Storage\Entities\ProductModel;
-use Modules\Storage\Entities\ProductTitle;
-use Modules\Storage\Entities\PurchaseProduct;
-use Modules\Storage\Entities\Unit;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class DemandController extends Controller
@@ -79,17 +67,27 @@ class DemandController extends Controller
         foreach ($user['roles'] as $role){
             array_push($roleIds,$role['id']);
         }
-//        if(in_array(43,$roleIds))
-//            $progress_status=2;
-         if(in_array(25,$roleIds))
+        if(in_array(43,$roleIds)){
+            $progress_status=1;
+            $docType=Demand::DRAFT;
+        }
+         if(in_array(25,$roleIds)){
+             $progress_status=2;
+             $docType=Demand::NOT_DRAFT;
+         }
+        else if(in_array(8,$roleIds)){
             $progress_status=3;
-        else if(in_array(8,$roleIds))
+            $docType=Demand::NOT_DRAFT;
+        }
+
+        else if(in_array(42,$roleIds)){
             $progress_status=4;
-        else if(in_array(42,$roleIds))
-            $progress_status=5;
+            $docType=Demand::NOT_DRAFT;
+        }
         $demands=Demand::query()
             ->with(['items','employee.user:id,name'])
             ->where([
+                'type_of_doc'=>$docType,
                 'progress_status'=>$progress_status
             ])
             ->paginate($per_page);
@@ -292,15 +290,40 @@ class DemandController extends Controller
     }
 
 
-    public function send($id)
+    public function send(Request $request,$id)
     {
         $demand=Demand::query()->findOrFail($id);
-        $demand->update([
-           'is_sent'=>2,
-            'edit_status'=>false
-        ]);
-        return $this->successResponse(['message'=>trans('response.theDemandWasSentSuccessfully')],Response::HTTP_OK);
-    }
+        $roles=$this->getUserRoles();
+
+        $roleIds=[];
+
+        foreach ($roles['roles'] as $role){
+            array_push($roleIds,$role['id']);
+        }
+
+        if ($this->getEmployeeId($request->company_id)==$demand->employee_id){
+            $demand->update([
+                'is_sent'=>2,
+                'edit_status'=>false
+            ]);
+            return $this->successResponse(['message'=>trans('response.theDemandWasSentSuccessfully')],Response::HTTP_OK);
+        }
+
+        else if(in_array(Demand::SUPPLIER_ROLE,$roleIds)){
+           $demand->progress_status=2;
+           $demand->save();
+            return $this->successResponse(['message'=>trans('response.theDemandWasSentSuccessfullyBySupplier')],Response::HTTP_OK);
+
+        }
+
+        else if(in_array(Demand::FINANCIER_ROLE,$roleIds)){
+            $demand->progress_status=3;
+            $demand->save();
+            return $this->successResponse(['message'=>trans('response.theDemandWasSentSuccessfullyByFinancier')],Response::HTTP_OK);
+
+        }
+
+        }
 
     public function sendToCorrection(Request $request,$id)
     {
