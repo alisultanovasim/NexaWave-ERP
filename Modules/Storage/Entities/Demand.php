@@ -37,9 +37,6 @@ public function proposes()
 public function employee(){
     return $this->belongsTo(Employee::class);
 }
-public function assignment(){
-    return $this->hasOne(DemandAssignment::class);
-}
 
 
 public function scopeCompany($q){

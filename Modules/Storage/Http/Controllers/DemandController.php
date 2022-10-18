@@ -102,7 +102,8 @@ class DemandController extends Controller
             ->with(['items','employee.user:id,name'])
             ->where([
                 'took_by'=>$this->getEmployeeId($request->company_id),
-                'progress_status'=>1
+                'progress_status'=>1,
+                'type_of_doc'=>Demand::DRAFT
             ])
             ->paginate($per_page);
         return $this->dataResponse($demands,200);
@@ -110,10 +111,7 @@ class DemandController extends Controller
     }
     public function getSentToEquipmentDemands()
     {
-        $user=User::query()
-            ->where('id',Auth::id())
-            ->with('roles')
-            ->first();
+        $user=$this->getUserRoles();
         $roleIds=[];
         foreach ($user['roles'] as $role){
             array_push($roleIds,$role['id']);
@@ -122,6 +120,7 @@ class DemandController extends Controller
             $demands=Demand::query()
                 ->with(['items','employee.user:id,name'])
                 ->where([
+                    'progress_status'=>1,
                     'is_sent'=>2
                 ])->get();
         }
@@ -195,10 +194,6 @@ class DemandController extends Controller
     {
         $demands = Demand::with([
             'items',
-            'employee',
-            'assignment',
-            'assignment.employee',
-            'assignment.items',
             'employee.user',
         ])
             ->where('company_id', $request->get('company_id'))
@@ -342,12 +337,9 @@ class DemandController extends Controller
             $correction->description=$request->description;
             $correction->save();
 
-            $demand=Demand::query()
+            Demand::query()
                 ->where('id',$id)
-                ->where('employee_id',$request->employee_id)->first();
-
-            $demand->update(['progress_status'=>2]);
-
+                ->decrement('progress_status');
 
             DB::commit();
             return $this->successResponse($correction,201);
