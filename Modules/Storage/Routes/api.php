@@ -114,6 +114,19 @@ Route::group([
     }); //units
 
     Route::group([
+       'prefix'=>'demand-drafts'
+    ],function (){
+        Route::get('/','DemandDraftController@index');
+        Route::get('/{id}','DemandDraftController@show');
+        Route::get('/get-sent', 'DemandDraftController@getSent');
+        Route::post('/','DemandDraftController@store');
+        Route::post('/send/{id}','DemandDraftController@send');
+        Route::post('/{id}','DemandDraftController@update');
+        Route::delete('/{id}','DemandDraftController@delete');
+        Route::patch('/{id}', 'DemandDraftController@confirmOrReject');
+    });//demand-drafts
+
+    Route::group([
         'prefix' => 'demands'
     ], function () {
         Route::get('/', 'DemandController@index');
@@ -161,11 +174,11 @@ Route::group([
         Route::get('/get-sent-back-proposes','ProposeController@getAllSentBackProposes');
         Route::get('/get-all-confirmed-proposes','ProposeController@getAllConfirmedProposes');
         Route::post('/','ProposeController@store');
-        Route::post('/confirm-propose/{id}','ProposeController@confirm');
+        Route::patch('/confirm-or-reject/{id}','ProposeController@confirmOrReject');
         Route::post('/send-back/{id}','ProposeController@sendBack');
         Route::post('/send-propose/{id}','ProposeController@sendPropose');
         Route::post('/send-proposes','ProposeController@sendProposes');
-        Route::post('/reject/{id}','ProposeController@reject');
+//        Route::post('/reject/{id}','ProposeController@reject');
         Route::delete('/{id}','ProposeController@delete');
         Route::post('/{id}','ProposeController@update');
     });//proposes
@@ -176,10 +189,10 @@ Route::group([
         Route::get('/get-all-confirmed','PurchaseController@getAllConfirmed');
         Route::post('/','PurchaseController@store');
         Route::post('/{id}','PurchaseController@update');
-        Route::post('/confirm/{id}','PurchaseController@confirm');
+        Route::patch('/confirm-or-reject/{id}','PurchaseController@confirmOrReject');
         Route::post('/send-back/{id}','PurchaseController@sendBack');
         Route::delete('/{id}','PurchaseController@delete');
-        Route::post('/reject/{id}','PurchaseController@reject');
+//        Route::post('/reject/{id}','PurchaseController@reject');
         Route::post('/send-to-director/{id}','PurchaseController@sendToDirector');
 //        Route::post('/addtostorage/{id}','PurchaseController@addToStorage')->where('id','[0-9]+');
 //        Route::post('/add-to-archive/{id}','PurchaseController@addToArchive')->where('id','[0-9]+');

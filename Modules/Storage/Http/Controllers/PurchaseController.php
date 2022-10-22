@@ -143,14 +143,11 @@ class PurchaseController extends Controller
 
     public function delete($id)
     {
-        $user=User::query()
-            ->where('id',Auth::id())
-            ->with('roles')
-            ->get();
+        $roles=$this->getUserRoles();
 
         $roleIds=[];
 
-        foreach ($user[0]['roles'] as $role){
+        foreach ($roles['roles'] as $role){
             array_push($roleIds,$role['id']);
         }
 
@@ -175,14 +172,11 @@ class PurchaseController extends Controller
 
     public function sendToDirector($id)
     {
-        $user=User::query()
-            ->where('id',Auth::id())
-            ->with('roles')
-            ->get();
+        $roles=$this->getUserRoles();
 
         $roleIds=[];
 
-        foreach ($user[0]['roles'] as $role){
+        foreach ($roles['roles'] as $role){
             array_push($roleIds,$role['id']);
         }
 
@@ -198,13 +192,10 @@ class PurchaseController extends Controller
 
     public function sendBack($id)
     {
-        $user=User::query()
-            ->where('id',Auth::id())
-            ->with('roles')
-            ->get();
+        $roles=$this->getUserRoles();
 
         $roleIds=[];
-        foreach ($user[0]['roles'] as $role){
+        foreach ($roles['roles'] as $role){
             array_push($roleIds,$role['id']);
         }
 
@@ -227,39 +218,74 @@ class PurchaseController extends Controller
         return $this->dataResponse($purchases);
     }
 
-    public function confirm(Request $request,$id)
+    public function confirmOrReject(Request $request,$id)
     {
         $purchase=Purchase::query()->findOrFail($id);
-        $user=User::query()
-            ->where('id',Auth::id())
-            ->with('roles')
-            ->get();
+        $roles=$this->getUserRoles();
         $roleIds=[];
-        foreach ($user[0]['roles'] as $role){
+        foreach ($roles['roles'] as $role){
             array_push($roleIds,$role['id']);
         }
-        if (in_array(Purchase::DIRECTOR_ROLE,$roleIds)){
-            if ($purchase->status==Purchase::STATUS_WAIT){
-                $purchase->update(['status'=>Purchase::STATUS_ACCEPTED]);
-                $archiveDocument=new ArchiveDocument();
-                $archiveDocument->document_id=$purchase->id;
-                $archiveDocument->document_type=ArchiveDocument::PURCHASE_TYPE;
-                $archiveDocument->from_id=$this->getEmployeeId($request->company_id);
-                $archiveDocument->save();
-                $message=trans('response.thePurchaseAcceptedByDirector');
-                $code=200;
+
+        if ($request->status==1){
+
+            if (in_array(Purchase::DIRECTOR_ROLE,$roleIds)){
+                if ($purchase->status==Purchase::STATUS_WAIT){
+                    $purchase->update(['status'=>Purchase::STATUS_ACCEPTED]);
+                    $archiveDocument=new ArchiveDocument();
+                    $archiveDocument->document_id=$purchase->id;
+                    $archiveDocument->document_type=ArchiveDocument::PURCHASE_TYPE;
+                    $archiveDocument->from_id=$this->getEmployeeId($request->company_id);
+                    $archiveDocument->save();
+                    $message=trans('response.thePurchaseAcceptedByDirector');
+                    $code=200;
+                }
+
+                else{
+                    $message=trans('response.thePurchaseAlreadyAccepted');
+                    $code=400;
+                }
             }
 
-            else{
-                $message=trans('response.thePurchaseAlreadyAccepted');
-                $code=400;
+            $purchase->progress_status=3;
+            $purchase->save();
+
+            return $this->successResponse($message,$code);
+        }
+        else{
+            if (in_array(Purchase::DIRECTOR_ROLE,$roleIds))
+                $userRole=Purchase::DIRECTOR_ROLE;
+
+            if (in_array(8,$roleIds)){
+                if ($purchase->status===Purchase::STATUS_REJECTED)
+                    return $this->errorResponse(trans('response.thePurchaseAlreadyRejected'), \Symfony\Component\HttpFoundation\Response::HTTP_BAD_REQUEST);
+
+                DB::beginTransaction();
+                try {
+                    $purchase->update(['status'=>Purchase::STATUS_REJECTED]);
+                    $archiveDocument=new ArchiveDocument();
+                    $archiveDocument->purchase_id=$purchase->id;
+                    $archiveDocument->employee_id=$this->getEmployeeId($request->company_id);
+                    $archiveDocument->role_id=$userRole;
+                    $archiveDocument->reason=$request->reason;
+                    $archiveDocument->status=ArchiveDocument::REJECTED_STATUS;
+                    $archiveDocument->save();
+
+                    DB::commit();
+                    return $this->successResponse('The purchase rejected!',200);
+                }
+                catch (\Exception $exception){
+                    DB::rollback();
+                    return $this->errorResponse($exception->getMessage(), \Symfony\Component\HttpFoundation\Response::HTTP_BAD_REQUEST);
+                }
+
             }
+
+            return $this->errorResponse(trans('response.youDontHaveAccess'),\Symfony\Component\HttpFoundation\Response::HTTP_BAD_REQUEST);
+
         }
 
-        $purchase->progress_status=3;
-        $purchase->save();
 
-        return $this->successResponse($message,$code);
     }
 
     public function getAllConfirmed()
@@ -270,51 +296,6 @@ class PurchaseController extends Controller
             ->get();
 
         return $this->dataResponse($purchases);
-    }
-
-    public function reject(Request $request,$id)
-    {
-        $user=User::query()
-            ->where('id',Auth::id())
-            ->with('roles')
-            ->get();
-
-        $roleIds=[];
-
-        foreach ($user[0]['roles'] as $role){
-            array_push($roleIds,$role['id']);
-        }
-
-        if (in_array(Purchase::DIRECTOR_ROLE,$roleIds))
-            $userRole=Purchase::DIRECTOR_ROLE;
-
-        if (in_array(8,$roleIds)){
-            $purchase=Purchase::query()->findOrFail($id);
-            if ($purchase->status===Purchase::STATUS_REJECTED)
-                return $this->errorResponse(trans('response.thePurchaseAlreadyRejected'), \Symfony\Component\HttpFoundation\Response::HTTP_BAD_REQUEST);
-
-            DB::beginTransaction();
-            try {
-                $purchase->update(['status'=>Purchase::STATUS_REJECTED]);
-                $archiveDocument=new ArchiveDocument();
-                $archiveDocument->purchase_id=$purchase->id;
-                $archiveDocument->employee_id=$this->getEmployeeId($request->company_id);
-                $archiveDocument->role_id=$userRole;
-                $archiveDocument->reason=$request->reason;
-                $archiveDocument->status=ArchiveDocument::REJECTED_STATUS;
-                $archiveDocument->save();
-
-                DB::commit();
-                return $this->successResponse('The purchase rejected!',200);
-            }
-            catch (\Exception $exception){
-                DB::rollback();
-                return $this->errorResponse($exception->getMessage(), \Symfony\Component\HttpFoundation\Response::HTTP_BAD_REQUEST);
-            }
-
-        }
-
-        return $this->errorResponse(trans('response.youDontHaveAccess'),\Symfony\Component\HttpFoundation\Response::HTTP_BAD_REQUEST);
     }
 
     /**
@@ -346,5 +327,13 @@ class PurchaseController extends Controller
                 'company_id'=>$companyId
             ])
             ->first()['id'];
+    }
+
+    public function getUserRoles()
+    {
+        return User::query()
+            ->where('id',Auth::id())
+            ->with('roles')
+            ->first();
     }
 }

@@ -11,10 +11,6 @@
     {
         use SoftDeletes;
 
-        const REJECTED = 0;
-        const ACCEPTED = 1;
-        const WAIT = 2;
-
         protected $guarded = ["id"];
         protected $fillable = [
             'amount',

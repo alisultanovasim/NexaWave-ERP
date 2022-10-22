@@ -23,7 +23,6 @@ class Demand extends Model
 protected $fillable=[
     'name',
     'description',
-    'type_of_doc',
     'attachment',
     'employee_id',
     'company_id',

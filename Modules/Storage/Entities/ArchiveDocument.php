@@ -20,6 +20,7 @@ class ArchiveDocument extends Model
         'demand_id',
         'propose_id',
         'purchase_id',
+        'demand_draft_id',
         'from_id',
         'reason',
         'status',
@@ -28,6 +29,11 @@ class ArchiveDocument extends Model
     public function demands()
     {
         return $this->hasMany(Demand::class,'id','demand_id');
+    }
+
+    public function demandDrafts()
+    {
+        return $this->hasMany(DemandDraft::class,'id','demand_draft_id');
     }
 
     public function proposes()

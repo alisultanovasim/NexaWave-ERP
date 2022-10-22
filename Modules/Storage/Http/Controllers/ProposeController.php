@@ -46,14 +46,11 @@ class ProposeController extends Controller
     public function getDirectedToUserProposeList(Request $request)
     {
         $per_page=$request->per_page ?? 10;
-        $user=User::query()
-            ->where('id',Auth::id())
-            ->with('roles')
-            ->get();
+        $roles=$this->getUserRoles();
 
         $roleIds=[];
 
-        foreach ($user[0]['roles'] as $role){
+        foreach ($roles['roles'] as $role){
             array_push($roleIds,$role['id']);
         }
 
@@ -102,7 +99,7 @@ class ProposeController extends Controller
             $proposeDocument->company_id=$proposeRequest->company_id;
 
             if ($proposeRequest->hasFile('offer_file')){
-                $proposeDocument->offer_file=$this->uploadImage($proposeRequest->company_id,$proposeRequest->offer_file);
+                $proposeDocument->offer_file=$this->uploadFile($proposeRequest->company_id,$proposeRequest->file('offer_file'));
             }
             $proposeDocument->save();
 
@@ -193,80 +190,68 @@ class ProposeController extends Controller
         return $this->successResponse(['message'=>trans('response.theProposesWereSent')],200);
     }
 
-    public function reject(Request $request,$id)
-    {
-        $user=User::query()
-            ->where('id',Auth::id())
-            ->with('roles')
-            ->first();
 
-        $roleIds=[];
-
-        foreach ($user['roles'] as $role){
-            array_push($roleIds,$role['id']);
-        }
-
-        if (in_array(ProposeDocument::DIRECTOR_ROLE,$roleIds))
-            $userRole=ProposeDocument::DIRECTOR_ROLE;
-
-        if (in_array(8,$roleIds)){
-            $propose=ProposeDocument::query()->findOrFail($id);
-            if ($propose->status===ProposeDocument::STATUS_REJECTED)
-                return $this->errorResponse(trans('response.theProposeAlreadyRejected'),Response::HTTP_BAD_REQUEST);
-
-            DB::beginTransaction();
-            try {
-                $propose->update(['status'=>ProposeDocument::STATUS_REJECTED]);
-                $archiveDocument=new ArchiveDocument();
-                $archiveDocument->propose_id=$propose->id;
-                $archiveDocument->employee_id=$this->getEmployeeId($request->company_id);
-                $archiveDocument->role_id=$userRole;
-                $archiveDocument->reason=$request->reason;
-                $archiveDocument->status=ArchiveDocument::REJECTED_STATUS;
-                $archiveDocument->save();
-
-                DB::commit();
-                return $this->successResponse('The propose rejected!',200);
-            }
-            catch (\Exception $exception){
-                DB::rollback();
-                return $this->errorResponse($exception->getMessage(), \Illuminate\Http\Response::HTTP_BAD_REQUEST);
-            }
-
-        }
-
-        return $this->errorResponse(trans('response.youDontHaveAccess'),Response::HTTP_BAD_REQUEST);
-
-    }
-
-    public function confirm($id)
+    public function confirmOrReject(Request $request,$id)
     {
         $propose=ProposeDocument::query()->findOrFail($id);
-        $user=User::query()
-            ->where('id',Auth::id())
-            ->with('roles')
-            ->get();
+        $roles=$this->getUserRoles();
         $roleIds=[];
-        foreach ($user[0]['roles'] as $role){
+        foreach ($roles['roles'] as $role){
             array_push($roleIds,$role['id']);
         }
-        if (in_array(ProposeDocument::DIRECTOR_ROLE,$roleIds)){
-            if ($propose->status==ProposeDocument::STATUS_WAIT){
-                $propose->update(['status'=>ProposeDocument::STATUS_CONFIRMED]);
+        if ($request->status==1){
 
-                $message=trans('response.theProposeAcceptedByDirector');
-                $code=200;
-            }
+            if (in_array(ProposeDocument::DIRECTOR_ROLE,$roleIds)){
+                if ($propose->status==ProposeDocument::STATUS_WAIT){
+                    $propose->update(['status'=>ProposeDocument::STATUS_CONFIRMED]);
 
-            else{
-                $message=trans('response.theProposeAlreadyAccepted');
-                $code=400;
+                    $message=trans('response.theProposeAcceptedByDirector');
+                    $code=200;
+                }
+
+                else{
+                    $message=trans('response.theProposeAlreadyAccepted');
+                    $code=400;
+                }
             }
+            $propose->progress_status=4;
+            $propose->save();
+
+            return $this->successResponse($message,$code);
         }
-        $propose->progress_status=4;
-        $propose->save();
 
-        return $this->successResponse($message,$code);
+        else{
+            if (in_array(ProposeDocument::DIRECTOR_ROLE,$roleIds))
+                $userRole=ProposeDocument::DIRECTOR_ROLE;
+
+            if (in_array(8,$roleIds)){
+                if ($propose->status===ProposeDocument::STATUS_REJECTED)
+                    return $this->errorResponse(trans('response.theProposeAlreadyRejected'),Response::HTTP_BAD_REQUEST);
+
+                DB::beginTransaction();
+                try {
+                    $propose->update(['status'=>ProposeDocument::STATUS_REJECTED]);
+                    $archiveDocument=new ArchiveDocument();
+                    $archiveDocument->propose_id=$propose->id;
+                    $archiveDocument->employee_id=$this->getEmployeeId($request->company_id);
+                    $archiveDocument->role_id=$userRole;
+                    $archiveDocument->reason=$request->reason;
+                    $archiveDocument->status=ArchiveDocument::REJECTED_STATUS;
+                    $archiveDocument->save();
+
+                    DB::commit();
+                    return $this->successResponse('The propose rejected!',200);
+                }
+                catch (\Exception $exception){
+                    DB::rollback();
+                    return $this->errorResponse($exception->getMessage(), \Illuminate\Http\Response::HTTP_BAD_REQUEST);
+                }
+
+            }
+
+            return $this->errorResponse(trans('response.youDontHaveAccess'),Response::HTTP_BAD_REQUEST);
+        }
+
     }
 
     public function getAllConfirmedProposes(Request $request)
@@ -285,7 +270,7 @@ class ProposeController extends Controller
         if ($id->send_back==1){
             return $this->errorResponse(trans('response.theProposeDocAlreadySentBack'),Response::HTTP_BAD_REQUEST);
         }
-            $id->progress_status=2;
+            $id->progress_status=1;
             $id->send_back=1;
             $id->save();
         return $this->successResponse(['message'=>'The propose was sent back!'],200);
@@ -295,8 +280,22 @@ class ProposeController extends Controller
     {
         $per_page=$request->per_page ?? 10;
 
+        $roles=$this->getUserRoles();
+
+        $roleIds=[];
+
+        foreach ($roles['roles'] as $role){
+            array_push($roleIds,$role['id']);
+        }
+
+        if(in_array(42,$roleIds))
+            $progressStatus=1;
+        else{
+            return $this->errorResponse(trans('response.notFound'),404);
+        }
+
         $proposes=ProposeDocument::query()
-            ->where(['send_back'=>1,'status'=>ProposeDocument::STATUS_WAIT,'progress_status'=>2])
+            ->where(['send_back'=>1,'status'=>ProposeDocument::STATUS_WAIT,'progress_status'=>$progressStatus])
             ->with('proposes')
             ->paginate($per_page);
         return $this->dataResponse($proposes,200);
@@ -315,7 +314,7 @@ class ProposeController extends Controller
             ]);
 
             if ($request->hasFile('offer_file')){
-                $proposeDoc->offer_file=$this->uploadImage($request->company_id,$request->offer_file);
+                $proposeDoc->offer_file=$this->uploadFile($request->company_id,$request->file('offer_file'));
             }
             $proposeDoc->save();
 
@@ -335,7 +334,7 @@ class ProposeController extends Controller
                     'value'=>$item['value'],
                 ];
 
-                $proposeCompanyDetail=ProposeCompanyDetail::query()->where(['propose_company_id'=>$item['company_id'],'id'=>$item['company_detail_id']])->first();
+                $proposeCompanyDetail=ProposeCompanyDetail::query()->where(['propose_company_id'=>$item['propose_company_id'],'id'=>$item['company_detail_id']])->first();
                 $proposeCompanyDetail->update($detail);
             }
 
@@ -371,7 +370,7 @@ class ProposeController extends Controller
         return response()->json(['message'=>trans('response.proposeDeleted')],200);
     }
 
-    public function uploadImage($company_id, $file, $str = 'storages')
+    public function uploadFile($company_id, $file, $str = 'storages')
     {
         if ($file instanceof UploadedFile) {
             return $file->store("/propose_documents/$company_id/$str");
@@ -387,5 +386,13 @@ class ProposeController extends Controller
                 'company_id'=>$companyId
             ])
             ->first()['id'];
+    }
+
+    public function getUserRoles()
+    {
+        return User::query()
+            ->where('id',Auth::id())
+            ->with('roles')
+            ->first();
     }
 }

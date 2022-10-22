@@ -16,6 +16,7 @@ class CreateArchiveDocumentsTable extends Migration
         Schema::create('archive_documents', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('demand_id');
+            $table->unsignedBigInteger('demand_draft_id');
             $table->unsignedBigInteger('propose_id');
             $table->unsignedBigInteger('purchase_id');
             $table->tinyInteger('document_type');

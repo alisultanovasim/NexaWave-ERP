@@ -30,7 +30,6 @@ class CreateDemandItemsTable extends Migration
                     ->references('id')
                     ->on('demands')
                     ->onDelete('cascade');
-
         });
     }
 

@@ -19,8 +19,7 @@ class CreateDemandsTable extends Migration
             $table->text('description');
             $table->unsignedBigInteger('took_by');
             $table->tinyInteger('is_took')->default(false);
-            $table->tinyInteger('type_of_doc')->default(\Modules\Storage\Entities\Demand::DRAFT);
-            $table->integer('attachment');
+            $table->string('attachment');
             $table->unsignedBigInteger('employee_id');
             $table->unsignedTinyInteger('status')->default(\Modules\Storage\Entities\Demand::STATUS_WAIT);
             $table->tinyInteger('progress_status')->default(1);

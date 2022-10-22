@@ -17,6 +17,7 @@ class CreateDemandCorrectsTable extends Migration
             $table->id();
             $table->unsignedBigInteger('from_id');
             $table->unsignedBigInteger('to_id');
+            $table->unsignedBigInteger('role_id');
             $table->unsignedBigInteger('demand_id');
             $table->text('description');
             $table->tinyInteger('is_active')->default(true);
