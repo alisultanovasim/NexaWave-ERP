@@ -124,6 +124,14 @@ class DemandDraftController extends Controller
 
     public function getSent()
     {
+//        $roles=$this->getUserRoles();
+//        $roleIds=[];
+//        foreach ($roles['roles'] as $role){
+//            array_push($roleIds,$role['id']);
+//        }
+//        if (!in_array(DemandDraft::SUPPLIER_ROLE,$roleIds)){
+//            $this->errorResponse(trans('response.youDontHaveAccess'),Response::HTTP_BAD_REQUEST);
+//        }
 
             $demands=DemandDraft::query()
                 ->with(['items','employee.user:id,name'])

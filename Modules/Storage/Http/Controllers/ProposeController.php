@@ -54,22 +54,18 @@ class ProposeController extends Controller
             array_push($roleIds,$role['id']);
         }
 
-        if(in_array(25,$roleIds)){
+        $proposes=ProposeDocument::query()
+            ->with(['proposes']);
+
+        if(in_array(ProposeDocument::FINANCIER_ROLE,$roleIds)){
             $progress_status=2;
-            $proposes=ProposeDocument::query()
-                ->with(['proposes'])
-                ->where(['employee_id'=>$this->getEmployeeId($request->company_id),'progress_status'=>1])
-                ->orWhere('progress_status',$progress_status)
-                ->paginate($per_page);
+            $proposes->where('progress_status',$progress_status);
         }
-        else if (in_array(8,$roleIds)){
+        else if (in_array(ProposeDocument::DIRECTOR_ROLE,$roleIds)){
             $progress_status=3;
-            $proposes=ProposeDocument::query()
-                ->with(['proposes'])
-                ->where('progress_status',$progress_status)
-                ->paginate($per_page);
+            $proposes->where('progress_status',$progress_status);
         }
-        return $this->dataResponse($proposes,200);
+        return $this->dataResponse($proposes->paginate($per_page),200);
 
     }
 
@@ -164,7 +160,7 @@ class ProposeController extends Controller
     {
         $propose=ProposeDocument::query()->findOrFail($id);
         if($propose->progress_status==1){
-                $propose->progress_status=3;
+                $propose->progress_status=2;
                 $propose->send_back=0;
                 $propose->save();
             return $this->successResponse(['message'=>'Sent successfully'],200);
@@ -204,6 +200,7 @@ class ProposeController extends Controller
             if (in_array(ProposeDocument::DIRECTOR_ROLE,$roleIds)){
                 if ($propose->status==ProposeDocument::STATUS_WAIT){
                     $propose->update(['status'=>ProposeDocument::STATUS_CONFIRMED]);
+                    $propose->progress_status=4;
 
                     $message=trans('response.theProposeAcceptedByDirector');
                     $code=200;
@@ -214,17 +211,18 @@ class ProposeController extends Controller
                     $code=400;
                 }
             }
-            $propose->progress_status=4;
+            else if (in_array(ProposeDocument::FINANCIER_ROLE,$roleIds)){
+                $propose->progress_status=3;
+            }
             $propose->save();
 
             return $this->successResponse($message,$code);
         }
 
         else{
-            if (in_array(ProposeDocument::DIRECTOR_ROLE,$roleIds))
-                $userRole=ProposeDocument::DIRECTOR_ROLE;
 
-            if (in_array(8,$roleIds)){
+            if (in_array(ProposeDocument::DIRECTOR_ROLE,$roleIds)){
+                $userRole=ProposeDocument::DIRECTOR_ROLE;
                 if ($propose->status===ProposeDocument::STATUS_REJECTED)
                     return $this->errorResponse(trans('response.theProposeAlreadyRejected'),Response::HTTP_BAD_REQUEST);
 
@@ -288,7 +286,7 @@ class ProposeController extends Controller
             array_push($roleIds,$role['id']);
         }
 
-        if(in_array(42,$roleIds))
+        if(in_array(ProposeDocument::PURCHASED_ROLE,$roleIds))
             $progressStatus=1;
         else{
             return $this->errorResponse(trans('response.notFound'),404);

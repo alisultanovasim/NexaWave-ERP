@@ -15,6 +15,8 @@ class Purchase extends Model
     const STATUS_FINISHED=4;
 
     const DIRECTOR_ROLE=8;
+    const PURCHASED_ROLE=42;
+    const FINANCIER_ROLE=25;
 
     protected $fillable=[
         'propose_document_id',

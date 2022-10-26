@@ -151,7 +151,7 @@ class PurchaseController extends Controller
             array_push($roleIds,$role['id']);
         }
 
-        if(!in_array(8,$roleIds)){
+        if(!in_array(Purchase::DIRECTOR_ROLE,$roleIds)){
             return $this->errorResponse(trans('response.youDontHaveAccess'),\Symfony\Component\HttpFoundation\Response::HTTP_BAD_REQUEST);
         }
         DB::beginTransaction();
@@ -170,7 +170,7 @@ class PurchaseController extends Controller
 
     }
 
-    public function sendToDirector($id)
+    public function send($id)
     {
         $roles=$this->getUserRoles();
 
@@ -199,7 +199,7 @@ class PurchaseController extends Controller
             array_push($roleIds,$role['id']);
         }
 
-        if(!in_array(8,$roleIds)){
+        if(!in_array(Purchase::DIRECTOR_ROLE,$roleIds)){
             return $this->errorResponse(trans('response.youDontHaveAccess'),\Symfony\Component\HttpFoundation\Response::HTTP_BAD_REQUEST);
         }
         $purchase=Purchase::query()->findOrFail($id);
@@ -232,11 +232,14 @@ class PurchaseController extends Controller
             if (in_array(Purchase::DIRECTOR_ROLE,$roleIds)){
                 if ($purchase->status==Purchase::STATUS_WAIT){
                     $purchase->update(['status'=>Purchase::STATUS_ACCEPTED]);
-                    $archiveDocument=new ArchiveDocument();
-                    $archiveDocument->document_id=$purchase->id;
-                    $archiveDocument->document_type=ArchiveDocument::PURCHASE_TYPE;
-                    $archiveDocument->from_id=$this->getEmployeeId($request->company_id);
-                    $archiveDocument->save();
+                    $purchase->progress_status=3;
+
+//                    $archiveDocument=new ArchiveDocument();
+//                    $archiveDocument->document_id=$purchase->id;
+//                    $archiveDocument->document_type=ArchiveDocument::PURCHASE_TYPE;
+//                    $archiveDocument->from_id=$this->getEmployeeId($request->company_id);
+//                    $archiveDocument->save();
+
                     $message=trans('response.thePurchaseAcceptedByDirector');
                     $code=200;
                 }
@@ -246,17 +249,22 @@ class PurchaseController extends Controller
                     $code=400;
                 }
             }
+            else if (in_array(Purchase::FINANCIER_ROLE,$roleIds)){
+                $purchase->progress_status=4;
 
-            $purchase->progress_status=3;
+                $message=trans('response.thePurchaseAcceptedByFinancier');
+                $code=200;
+            }
+
             $purchase->save();
 
             return $this->successResponse($message,$code);
         }
         else{
-            if (in_array(Purchase::DIRECTOR_ROLE,$roleIds))
-                $userRole=Purchase::DIRECTOR_ROLE;
 
-            if (in_array(8,$roleIds)){
+
+            if (in_array(Purchase::DIRECTOR_ROLE,$roleIds)){
+                $userRole=Purchase::DIRECTOR_ROLE;
                 if ($purchase->status===Purchase::STATUS_REJECTED)
                     return $this->errorResponse(trans('response.thePurchaseAlreadyRejected'), \Symfony\Component\HttpFoundation\Response::HTTP_BAD_REQUEST);
 

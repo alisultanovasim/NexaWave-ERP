@@ -38,6 +38,7 @@ class DemandController extends Controller
                 'employee_id'=>$this->getEmployeeId($request->company_id),
                 'company_id'=>$request->company_id,
                 'status'=>Demand::STATUS_WAIT,
+                'edits_tatus'=>true,
             ])
             ->paginate($per_page);
         return $this->dataResponse(['createdByUserDemands'=>$demandCreatedByUser],200);
@@ -54,54 +55,48 @@ class DemandController extends Controller
         foreach ($user['roles'] as $role){
             array_push($roleIds,$role['id']);
         }
-        if(in_array(43,$roleIds)){
-            $progress_status=1;
-            $docType=Demand::DRAFT;
-        }
          if(in_array(25,$roleIds)){
              $progress_status=2;
-             $docType=Demand::NOT_DRAFT;
          }
         else if(in_array(8,$roleIds)){
             $progress_status=3;
-            $docType=Demand::NOT_DRAFT;
         }
 
         else if(in_array(42,$roleIds)){
             $progress_status=4;
-            $docType=Demand::NOT_DRAFT;
         }
         $demands=Demand::query()
             ->with(['items','employee.user:id,name'])
             ->where([
-                'type_of_doc'=>$docType,
-                'progress_status'=>$progress_status
+                'progress_status'=>$progress_status,
+                'status'=>Demand::STATUS_WAIT,
+                'edit_status'=>true
             ])
             ->paginate($per_page);
 
         return $this->dataResponse($demands,200);
     }
 
-    public function getSentToEquipmentDemands()
-    {
-
-        $user=$this->getUserRoles();
-        $roleIds=[];
-        foreach ($user['roles'] as $role){
-            array_push($roleIds,$role['id']);
-        }
-
-        if (in_array(Demand::SUPPLIER_ROLE,$roleIds)){
-            $demands=Demand::query()
-                ->with(['items','employee.user:id,name'])
-                ->where([
-                    'progress_status'=>1,
-                    'is_sent'=>2
-                ])->get();
-        }
-        return $this->dataResponse($demands,200);
-
-    }
+//    public function getSentToEquipmentDemands()
+//    {
+//
+//        $user=$this->getUserRoles();
+//        $roleIds=[];
+//        foreach ($user['roles'] as $role){
+//            array_push($roleIds,$role['id']);
+//        }
+//
+//        if (in_array(Demand::SUPPLIER_ROLE,$roleIds)){
+//            $demands=Demand::query()
+//                ->with(['items','employee.user:id,name'])
+//                ->where([
+//                    'progress_status'=>1,
+//                    'is_sent'=>2
+//                ])->get();
+//        }
+//        return $this->dataResponse($demands,200);
+//
+//    }
 
     public function store(Request $request)
     {
@@ -119,16 +114,14 @@ class DemandController extends Controller
 //            'productInfo.*.model_id' => ['nullable', 'integer'],
 //        ]);
 
-        $employee_id = $this->getEmployeeId($request->company_id);
 
         DB::beginTransaction();
 
         try {
             $demand=Demand::create([
                 'name' => $request->name,
-                'type_of_doc' => Demand::DRAFT,
                 'description' => $request->description,
-                'employee_id' => $employee_id->id,
+                'employee_id' => $this->getEmployeeId($request->company_id),
                 'company_id' => $request->company_id,
                 'status' =>Demand::STATUS_WAIT,
                 'progress_status' =>1,
@@ -270,26 +263,25 @@ class DemandController extends Controller
         }
 
         if ($this->getEmployeeId($request->company_id)==$demand->employee_id){
-            $demand->update([
-                'is_sent'=>2,
-                'edit_status'=>false
-            ]);
+            $demand->is_sent=2;
+            $demand->progress_status=2;
+            $demand->edit_status=false;
+            $demand->save();
             return $this->successResponse(['message'=>trans('response.theDemandWasSentSuccessfully')],Response::HTTP_OK);
         }
-
-        else if(in_array(Demand::SUPPLIER_ROLE,$roleIds)){
-           $demand->progress_status=2;
-           $demand->save();
-            return $this->successResponse(['message'=>trans('response.theDemandWasSentSuccessfullyBySupplier')],Response::HTTP_OK);
-
-        }
-
-        else if(in_array(Demand::FINANCIER_ROLE,$roleIds)){
-            $demand->progress_status=3;
-            $demand->save();
-            return $this->successResponse(['message'=>trans('response.theDemandWasSentSuccessfullyByFinancier')],Response::HTTP_OK);
-
-        }
+//        else if(in_array(Demand::FINANCIER_ROLE,$roleIds)){
+//            $demand->progress_status=3;
+//            $demand->save();
+//            return $this->successResponse(['message'=>trans('response.theDemandWasSentSuccessfullyByFinancier')],Response::HTTP_OK);
+//
+//        }
+//
+//        else if(in_array(Demand::DIRECTOR_ROLE,$roleIds)){
+//            $demand->progress_status=4;
+//            $demand->save();
+//            return $this->successResponse(['message'=>trans('response.theDemandWasSentSuccessfullyByDirector')],Response::HTTP_OK);
+//
+//        }
 
         }
 
@@ -299,32 +291,19 @@ class DemandController extends Controller
            'description'=>'string|nullable',
            'employee_id'=>'integer|required',
         ]);
-
         $demand=Demand::query()->findOrFail($id);
-        $employee_id=$demand->took_by ?? $demand->employee_id;
-        if ($demand->is_took && $demand->progress_status==3)
-            $role_id=Demand::SUPPLIER_ROLE;
-        else if ($demand->is_took && $demand->progress_status==2)
-            $role_id=Demand::SUPPLIER_ROLE;
-        if (!is_null($role_id))
-            $employee_id=null;
+
         DB::beginTransaction();
 
         try {
+            $demand->update(['edit_status'=>false]);
+
             $correction=new DemandCorrect();
             $correction->from_id=$this->getEmployeeId($request->company_id);
-            $correction->to_id=$employee_id;
-            $correction->role_id=$role_id;
+            $correction->role_id=Demand::SUPPLIER_ROLE;
             $correction->demand_id=$id;
             $correction->description=$request->description;
             $correction->save();
-
-            if ($demand->type_of_doc == Demand::NOT_DRAFT){
-                    Demand::query()
-                        ->where('id',$id)
-                        ->decrement('progress_status');
-            }
-
 
             DB::commit();
             return $this->successResponse($correction,200);
@@ -343,45 +322,37 @@ class DemandController extends Controller
         foreach ($roles['roles'] as $role){
             array_push($roleIds,$role['id']);
         }
-        if (in_array(Demand::SUPPLIER_ROLE,$roleIds))
-            $role_id=Demand::SUPPLIER_ROLE;
-        elseif (in_array(Demand::FINANCIER_ROLE,$roleIds))
-            $role_id=Demand::FINANCIER_ROLE;
-
-        $demands=Demand::query()
-            ->with(['items','employee.user:id,name'])
-            ->whereHas('corrects',function ($q) use ($request,$role_id){
-                $q->where('to_id',$this->getEmployeeId($request->company_id));
-                $q->orWhere('role_id',$role_id);
-            })
+        $demands=DemandCorrect::query()
+            ->with(['demand','demand.employee.user:id,name'])
+            ->where('role_id',Demand::SUPPLIER_ROLE)
             ->paginate($per_page);
         return $this->dataResponse($demands,Response::HTTP_OK);
     }
 
-    public function takeDemand(Request $request,$id)
-    {
-       $demand= Demand::query()->findOrFail($id);
-       $demand->is_took=true;
-       $demand->took_by=$this->getEmployeeId($request->company_id);
-       $demand->save();
+//    public function takeDemand(Request $request,$id)
+//    {
+//       $demand= Demand::query()->findOrFail($id);
+//       $demand->is_took=true;
+//       $demand->took_by=$this->getEmployeeId($request->company_id);
+//       $demand->save();
+//
+//       return $this->successResponse(['message'=>trans('response.theDemandWasTookByPresentUser')]);
+//    }
 
-       return $this->successResponse(['message'=>trans('response.theDemandWasTookByPresentUser')]);
-    }
-
-    public function getTakenDemands(Request $request)
-    {
-        $per_page=$request->per_page ?? 10;
-        $demands=Demand::query()
-            ->with(['items','employee.user:id,name'])
-            ->where([
-                'took_by'=>$this->getEmployeeId($request->company_id),
-                'progress_status'=>1,
-                'type_of_doc'=>Demand::DRAFT
-            ])
-            ->paginate($per_page);
-        return $this->dataResponse($demands,200);
-
-    }
+//    public function getTakenDemands(Request $request)
+//    {
+//        $per_page=$request->per_page ?? 10;
+//        $demands=Demand::query()
+//            ->with(['items','employee.user:id,name'])
+//            ->where([
+//                'took_by'=>$this->getEmployeeId($request->company_id),
+//                'progress_status'=>1,
+//                'type_of_doc'=>Demand::DRAFT
+//            ])
+//            ->paginate($per_page);
+//        return $this->dataResponse($demands,200);
+//
+//    }
 
     public function confirmOrReject(Request $request,$demandId)
     {
@@ -396,8 +367,6 @@ class DemandController extends Controller
 
             if (in_array(Demand::DIRECTOR_ROLE,$roleIds))
                 $userRole=Demand::DIRECTOR_ROLE;
-            else if (in_array(Demand::SUPPLIER_ROLE,$roleIds))
-                $userRole=Demand::SUPPLIER_ROLE;
             else if (in_array(Demand::FINANCIER_ROLE,$roleIds))
                 $userRole=Demand::FINANCIER_ROLE;
             DB::beginTransaction();
@@ -437,9 +406,10 @@ class DemandController extends Controller
                     $code=400;
                 }
             }
-            else if (in_array(Demand::SUPPLIER_ROLE,$roleIds)){
-                $demand->update(['type_of_doc'=>Demand::NOT_DRAFT]);
-                $message=trans('response.theDemandConfirmedBySailor');
+            else if (in_array(Demand::FINANCIER_ROLE,$roleIds)){
+                $demand->progress_status=3;
+                $demand->save();
+                $message=trans('response.theDemandConfirmedByFinancier');
                 $code=200;
             }
             else{

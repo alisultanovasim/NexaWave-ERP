@@ -13,7 +13,6 @@ class Demand extends Model
     const STATUS_CONFIRMED=2;
     const STATUS_REJECTED=3;
     const DRAFT=1;
-    const NOT_DRAFT=2;
     const DIRECTOR_ROLE=8;
     const SUPPLIER_ROLE=43;
     const FINANCIER_ROLE=25;
@@ -26,6 +25,8 @@ protected $fillable=[
     'attachment',
     'employee_id',
     'company_id',
+    'progress_status',
+    'edit_status',
     'status',
 ];
 

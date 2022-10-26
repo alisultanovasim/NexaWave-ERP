@@ -16,7 +16,6 @@ class CreateDemandCorrectsTable extends Migration
         Schema::create('demand_corrects', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('from_id');
-            $table->unsignedBigInteger('to_id');
             $table->unsignedBigInteger('role_id');
             $table->unsignedBigInteger('demand_id');
             $table->text('description');

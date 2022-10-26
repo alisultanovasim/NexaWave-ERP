@@ -22,6 +22,8 @@ class ProposeDocument extends Model
     const STATUS_CONFIRMED=3;
 
     const DIRECTOR_ROLE=8;
+    const FINANCIER_ROLE=25;
+    const PURCHASED_ROLE=42;
 
     public function proposes()
     {
