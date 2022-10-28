@@ -368,10 +368,10 @@ class ProposeController extends Controller
         return response()->json(['message'=>trans('response.proposeDeleted')],200);
     }
 
-    public function uploadFile($company_id, $file, $str = 'storages')
+    public function uploadFile($company_id, $file, $str = 'documents')
     {
         if ($file instanceof UploadedFile) {
-            return $file->store("/propose_documents/$company_id/$str");
+            return $file->store("/propose-documents/$company_id/$str");
         }
 
         return null;

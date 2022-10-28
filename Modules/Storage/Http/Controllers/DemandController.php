@@ -38,7 +38,7 @@ class DemandController extends Controller
                 'employee_id'=>$this->getEmployeeId($request->company_id),
                 'company_id'=>$request->company_id,
                 'status'=>Demand::STATUS_WAIT,
-                'edits_tatus'=>true,
+                'edit_status'=>true,
             ])
             ->paginate($per_page);
         return $this->dataResponse(['createdByUserDemands'=>$demandCreatedByUser],200);
@@ -55,14 +55,14 @@ class DemandController extends Controller
         foreach ($user['roles'] as $role){
             array_push($roleIds,$role['id']);
         }
-         if(in_array(25,$roleIds)){
+         if(in_array(Demand::FINANCIER_ROLE,$roleIds)){
              $progress_status=2;
          }
-        else if(in_array(8,$roleIds)){
+        else if(in_array(Demand::DIRECTOR_ROLE,$roleIds)){
             $progress_status=3;
         }
 
-        else if(in_array(42,$roleIds)){
+        else if(in_array(Demand::PURCHASED_ROLE,$roleIds)){
             $progress_status=4;
         }
         $demands=Demand::query()
@@ -510,5 +510,28 @@ class DemandController extends Controller
         }
 
         return null;
+    }
+
+    public function filePath($path)
+    {
+        return storage_path('app/public/') .$path;
+    }
+
+    public function downloadAttachmentFile(Request $request)
+    {
+        // Check if file exists in app/storage/file folder
+        $file_path = $this->filePath($request->path);
+        if (file_exists($file_path))
+        {
+            // Send Download
+            return \response()->download($file_path, $request->attachment, [
+                'Content-Length: '. filesize($file_path)
+            ]);
+        }
+        else
+        {
+            // Error
+            exit('Requested file does not exist on our server!');
+        }
     }
 }
