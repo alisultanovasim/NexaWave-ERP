@@ -4,11 +4,15 @@ namespace Modules\Storage\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Modules\Esd\Entities\Archive;
+use Modules\Hr\Entities\Employee\Employee;
 use Modules\Storage\Entities\ArchiveDemand;
+use Modules\Storage\Entities\ArchiveDocument;
 use Modules\Storage\Entities\Product;
 use Modules\Storage\Entities\Purchase;
+use Modules\Storage\Entities\PurchaseProduct;
 use Modules\Storage\Entities\StorageProduct;
 use Modules\Storage\Entities\StoragePurchase;
 
@@ -61,8 +65,24 @@ class PurchaseStorageController extends Controller
                 }
 
                 $storage->save();
+
+                $totalAmountInStorage=StoragePurchase::query()->where('purchase_id',$id)->sum('amount');
+                $totalAmountInPurchase=PurchaseProduct::query()->where('purchase_id',$id)->sum('amount');
+
+                if ($totalAmountInStorage>=$totalAmountInPurchase){
+                    $data=[
+                        'role_id'=>Purchase::SUPPLIER_ROLE,
+                        'employee_id'=>$this->getEmployeeId($request->company_id),
+                        'completed_doc_id'=>$storage->id,
+                        'created_at'=>now(),
+                        'updated_at'=>now(),
+                    ];
+                    ArchiveDocument::query()->insert($data);
+                }
+
             }
             DB::commit();
+
             return $this->successResponse($storage);
         } catch (\Exception $e) {
             DB::rollback();
@@ -70,5 +90,15 @@ class PurchaseStorageController extends Controller
         }
 
 
+
+    }
+    public function getEmployeeId($companyId)
+    {
+        return Employee::query()
+            ->where([
+                'user_id'=>Auth::id(),
+                'company_id'=>$companyId
+            ])
+            ->first()['id'];
     }
 }

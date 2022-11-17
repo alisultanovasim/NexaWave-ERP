@@ -10,17 +10,28 @@ class ProposeDetail extends Model
     use SoftDeletes;
     protected $table='propose_details';
     protected $fillable=[
-      'propose_id',
+      'propose_company_id',
+      'propose_document_id',
       'price',
       'amount',
     ];
 
-    public function propose()
-    {
-        return $this->belongsTo(Propose::class);
-    }
+//    public function propose()
+//    {
+//        return $this->belongsTo(Propose::class);
+//    }
 
     public function demandItem(){
         return $this->belongsTo(DemandItem::class);
+    }
+
+    public function proposeCompany()
+    {
+        $this->belongsToMany(ProposeCompany::class);
+    }
+
+    public function proposeDocument()
+    {
+        $this->belongsToMany(ProposeDocument::class);
     }
 }

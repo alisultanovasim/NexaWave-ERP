@@ -4,6 +4,7 @@ namespace Modules\Storage\Http\Controllers;
 
 use App\Models\User;
 use App\Traits\ApiResponse;
+use App\Traits\UserInfo;
 use http\Env\Response;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\Request;
@@ -13,20 +14,13 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Modules\Hr\Entities\Employee\Employee;
 use Modules\Storage\Entities\ArchiveDocument;
-use Modules\Storage\Entities\ArchivePropose;
-use Modules\Storage\Entities\ArchivePurchase;
-use Modules\Storage\Entities\Demand;
-use Modules\Storage\Entities\ProposeArchive;
-use Modules\Storage\Entities\ProposeDocument;
 use Modules\Storage\Entities\Purchase;
-use Modules\Storage\Entities\PurchaseArchive;
 use Modules\Storage\Entities\PurchaseProduct;
-use Modules\Storage\Entities\StorageDocyment;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class PurchaseController extends Controller
 {
-    use ApiResponse, ValidatesRequests;
+    use ApiResponse, ValidatesRequests,UserInfo;
 
     public function index(Request $request)
     {
@@ -326,22 +320,5 @@ class PurchaseController extends Controller
         }
 
         return null;
-    }
-    public function getEmployeeId($companyId)
-    {
-        return Employee::query()
-            ->where([
-                'user_id'=>Auth::id(),
-                'company_id'=>$companyId
-            ])
-            ->first()['id'];
-    }
-
-    public function getUserRoles()
-    {
-        return User::query()
-            ->where('id',Auth::id())
-            ->with('roles')
-            ->first();
     }
 }

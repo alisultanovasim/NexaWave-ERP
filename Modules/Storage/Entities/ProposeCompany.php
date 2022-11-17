@@ -19,6 +19,11 @@ class ProposeCompany extends Model
         return $this->hasMany(ProposeCompanyDetail::class);
     }
 
+    public function proposeDetails()
+    {
+        return $this->hasMany(ProposeDetail::class);
+    }
+
     public function proposes()
     {
         return $this->hasMany(Propose::class);

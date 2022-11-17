@@ -25,6 +25,11 @@ class ProposeDocument extends Model
     const FINANCIER_ROLE=25;
     const PURCHASED_ROLE=42;
 
+    public function proposeDetails()
+    {
+        return $this->hasMany(ProposeDetail::class);
+    }
+
     public function proposes()
     {
         return $this->hasMany(Propose::class);

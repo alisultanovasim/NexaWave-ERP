@@ -16,6 +16,7 @@ class Purchase extends Model
 
     const DIRECTOR_ROLE=8;
     const PURCHASED_ROLE=42;
+    const SUPPLIER_ROLE=43;
     const FINANCIER_ROLE=25;
 
     protected $fillable=[

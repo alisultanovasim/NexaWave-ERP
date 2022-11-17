@@ -4,6 +4,7 @@ namespace Modules\Storage\Http\Controllers;
 
 use App\Models\User;
 use App\Traits\ApiResponse;
+use App\Traits\UserInfo;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -19,7 +20,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class DemandController extends Controller
 {
-    use ApiResponse, ValidatesRequests;
+    use ApiResponse, ValidatesRequests,UserInfo;
 
     public function index(Request $request)
     {
@@ -52,6 +53,7 @@ class DemandController extends Controller
             ->with('roles')
             ->first();
         $roleIds=[];
+        $progress_status=2;
         foreach ($user['roles'] as $role){
             array_push($roleIds,$role['id']);
         }
@@ -420,88 +422,6 @@ class DemandController extends Controller
         }
     }
 
-//    public function reject(Request $request,$id): \Illuminate\Http\JsonResponse
-//    {
-//        $this->validate($request,[
-//            'reason'=>'nullable|string'
-//        ]);
-//        $roles=$this->getUserRoles();
-//        $roleIds=[];
-//        foreach ($roles['roles'] as $role){
-//            array_push($roleIds,$role['id']);
-//        }
-//        if (in_array(Demand::DIRECTOR_ROLE,$roleIds))
-//            $userRole=Demand::DIRECTOR_ROLE;
-//        else if (in_array(Demand::SUPPLIER_ROLE,$roleIds))
-//            $userRole=Demand::SUPPLIER_ROLE;
-//        else if (in_array(Demand::FINANCIER_ROLE,$roleIds))
-//            $userRole=Demand::FINANCIER_ROLE;
-//        DB::beginTransaction();
-//
-//        try {
-//            $demand=Demand::query()->findOrFail($id);
-//            $demand->status=Demand::STATUS_REJECTED;
-//            $demand->save();
-//
-//            $archiveDocument=new ArchiveDocument();
-//            $archiveDocument->demand_id=$demand->id;
-//            $archiveDocument->employee_id=$this->getEmployeeId($request->company_id);
-//            $archiveDocument->role_id=$userRole;
-//            $archiveDocument->reason=$request->reason;
-//            $archiveDocument->status=ArchiveDocument::REJECTED_STATUS;
-//            $archiveDocument->save();
-//            DB::commit();
-//            return $this->successResponse('The demand rejected!',200);
-//        } catch (\Exception $e) {
-//            DB::rollback();
-//            return $this->errorResponse($e->getMessage(),Response::HTTP_BAD_REQUEST);
-//        }
-//
-//    }
-
-//    public function editBySupplier(Request $request,$id)
-//    {
-//        $this->validate($request,[
-//            'description' => ['nullable', 'string'],
-//            'amount' => ['nullable', 'numeric'],
-//            'attachment' => ['nullable','mimes:pdf,docx'],
-//            'productInfo'=>['nullable','array'],
-//            'productInfo.*.title_id' => ['nullable', 'integer'],
-//            'productInfo.*.kind_id' => ['nullable', 'integer'],
-//            'productInfo.*.model_id' => ['nullable', 'integer'],
-//            'productInfo.*.mark' => ['nullable', 'string','min:3'],
-//        ]);
-//
-//        $demand=Demand::query()->findOrFail($id);
-//        $demand->description=$request->description;
-//        $demand->attachment=$request->attachment;
-//        $demand->title_id=$request->productInfo[0]['title_id'];
-//        $demand->amount=$request->productInfo[0]['amount'];
-//        $demand->kind_id=$request->productInfo[0]['kind_id'];
-//        $demand->model_id=$request->productInfo[0]['model_id'];
-//        $demand->mark=$request->productInfo[0]['mark'];
-//        $demand->save();
-//
-//        return $this->successResponse($demand,Response::HTTP_OK);
-//    }
-
-    public function getEmployeeId($companyId)
-    {
-        return Employee::query()
-            ->where([
-                'user_id'=>Auth::id(),
-                'company_id'=>$companyId
-            ])
-            ->first()['id'];
-    }
-
-    public function getUserRoles()
-    {
-        return User::query()
-            ->where('id',Auth::id())
-            ->with('roles')
-            ->first();
-    }
 
     public function uploadFile($company_id, $file, $str = 'documents')
     {
@@ -533,5 +453,22 @@ class DemandController extends Controller
             // Error
             exit('Requested file does not exist on our server!');
         }
+    }
+
+    public function getUserRoles()
+    {
+        return User::query()
+            ->where('id',Auth::id())
+            ->with('roles')
+            ->first();
+    }
+
+    function getEmployeeId($companyId){
+        return Employee::query()
+            ->where([
+                'user_id'=>Auth::id(),
+                'company_id'=>$companyId
+            ])
+            ->first()['id'];
     }
 }

@@ -1,6 +1,8 @@
 <?php
 
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use Modules\Hr\Entities\Employee\Employee;
 
 if (!function_exists('createNewPhotoName')) {
 

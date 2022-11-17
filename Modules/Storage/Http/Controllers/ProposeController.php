@@ -6,6 +6,7 @@ use App\Http\Requests\ProposeRequest;
 use App\Models\User;
 use App\Models\UserRole;
 use App\Traits\ApiResponse;
+use App\Traits\UserInfo;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -30,7 +31,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ProposeController extends Controller
 {
-    use  ApiResponse, ValidatesRequests;
+    use  ApiResponse, ValidatesRequests,UserInfo;
     public function index(Request $request)
     {
         $per_page=$request->per_page ?? 10;
@@ -93,54 +94,47 @@ class ProposeController extends Controller
             $proposeDocument->description=$proposeRequest->description;
             $proposeDocument->employee_id=$this->getEmployeeId($proposeRequest->company_id);
             $proposeDocument->company_id=$proposeRequest->company_id;
-
             if ($proposeRequest->hasFile('offer_file')){
                 $proposeDocument->offer_file=$this->uploadFile($proposeRequest->company_id,$proposeRequest->file('offer_file'));
             }
             $proposeDocument->save();
-
             $company_ids=[];
-
-            foreach ($proposeRequest->proposeCompanyDetails as $detail){
-                $proposeCompany=ProposeCompany::query()->firstOrCreate(['company_name'=>$detail['company_name']]);
-
-                ProposeCompanyDetail::query()
-                    ->firstOrCreate([
-                        'propose_company_id'=>$proposeCompany->id,
-                        'indicator'=>$detail['indicator'],
-                        'value'=>$detail['value'],
-                    ]);
-
+            foreach ($proposeRequest->proposeDetails as $proposeDetail){
+                $proposeCompany=ProposeCompany::query()->firstOrCreate(['company_name'=>$proposeDetail['company_name']]);
                 array_push($company_ids,$proposeCompany->id);
-            }
-
-            $propose_ids=[];
-            foreach ($company_ids as $company_id){
-                $propose=new Propose();
-                $propose->propose_document_id=$proposeDocument->id;
-                $propose->propose_company_id=$company_id;
-                $propose->save();
-                array_push($propose_ids,$propose->id);
-            }
+                foreach ($proposeDetail['companyDetails'] as $companyDetail){
+                    ProposeCompanyDetail::query()
+                        ->firstOrCreate([
+                            'propose_company_id'=>$proposeCompany->id,
+                            'indicator'=>$companyDetail['indicator'],
+                            'value'=>$companyDetail['value'],
+                        ]);
+                }
 
 
-            foreach ($proposeRequest->demandProductDetails as $productDetail){
-                $product=DemandItem::query()
-                    ->where([
-                        'title_id'=>$productDetail['title_id'],
-                        'kind_id'=>$productDetail['kind_id'],
-                        'model_id'=>$productDetail['model_id']
-                    ])
-                    ->firstOrFail('id');
-
-                foreach ($propose_ids as $propose_id) {
+                foreach ($proposeDetail['companyProposeDetails'] as $companyProposeDetail) {
+                    $product=DemandItem::query()
+                        ->where([
+                            'title_id'=>$companyProposeDetail['title_id'],
+                            'kind_id'=>$companyProposeDetail['kind_id'],
+                            'model_id'=>$companyProposeDetail['model_id']
+                        ])
+                        ->firstOrFail('id');
                     $proposeDetails=new ProposeDetail();
-                    $proposeDetails->amount=$productDetail['amount'];
-                    $proposeDetails->price=$productDetail['price'];
+                    $proposeDetails->amount=$companyProposeDetail['amount'];
+                    $proposeDetails->price=$companyProposeDetail['price'];
                     $proposeDetails->demand_item_id=$product->id;
-                    $proposeDetails->propose_id=$propose_id;
+                    $proposeDetails->propose_document_id=$proposeDocument->id;
+                    $proposeDetails->propose_company_id=$proposeCompany->id;
                     $proposeDetails->save();
                 }
+            }
+
+            foreach ($company_ids as $id){
+                $propose=new Propose();
+                $propose->propose_document_id=$proposeDocument->id;
+                $propose->propose_company_id=$id;
+                $propose->save();
             }
 
             DB::commit();
@@ -160,9 +154,9 @@ class ProposeController extends Controller
     {
         $propose=ProposeDocument::query()->findOrFail($id);
         if($propose->progress_status==1){
-                $propose->progress_status=2;
-                $propose->send_back=0;
-                $propose->save();
+            $propose->progress_status=2;
+            $propose->send_back=0;
+            $propose->save();
             return $this->successResponse(['message'=>'Sent successfully'],200);
         }
         else{
@@ -173,8 +167,8 @@ class ProposeController extends Controller
     public function sendProposes(Request $request)
     {
         $this->validate($request,[
-           'proposes'=>'array|required',
-           'proposes.*'=>'integer|required'
+            'proposes'=>'array|required',
+            'proposes.*'=>'integer|required'
         ]);
 
         foreach ($request->proposes as $item){
@@ -268,9 +262,9 @@ class ProposeController extends Controller
         if ($id->send_back==1){
             return $this->errorResponse(trans('response.theProposeDocAlreadySentBack'),Response::HTTP_BAD_REQUEST);
         }
-            $id->progress_status=1;
-            $id->send_back=1;
-            $id->save();
+        $id->progress_status=1;
+        $id->send_back=1;
+        $id->save();
         return $this->successResponse(['message'=>'The propose was sent back!'],200);
     }
 
@@ -323,7 +317,7 @@ class ProposeController extends Controller
                 ];
 
                 $proposeDetail=ProposeDetail::query()->where(['propose_id'=>$value['propose_id'],'id'=>$value['propose_detail_id']])->first();
-                    $proposeDetail->update($propose);
+                $proposeDetail->update($propose);
             }
 
             foreach ($request->get('proposeCompanyDetails') as $item){
@@ -386,11 +380,5 @@ class ProposeController extends Controller
             ->first()['id'];
     }
 
-    public function getUserRoles()
-    {
-        return User::query()
-            ->where('id',Auth::id())
-            ->with('roles')
-            ->first();
-    }
+
 }

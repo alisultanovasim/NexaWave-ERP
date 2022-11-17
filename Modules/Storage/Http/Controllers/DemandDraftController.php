@@ -118,7 +118,7 @@ class DemandDraftController extends Controller
             'return_status'=>false
         ]);
 
-        return $this->successResponse(trans('response.sentSuccessfully'),\Symfony\Component\HttpFoundation\Response::HTTP_BAD_REQUEST);
+        return $this->successResponse(trans('response.sentSuccessfully'),\Symfony\Component\HttpFoundation\Response::HTTP_OK);
 
     }
 
