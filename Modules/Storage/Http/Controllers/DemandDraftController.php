@@ -86,11 +86,11 @@ class DemandDraftController extends Controller
                 $demandItem->demand_draft_id=$demanddraft->id;
                 $demandItem->amount=$item['amount'];
                 $demandItem->title=$item['title'];
-                $demandItem->title_id=$item['title_id'];
+//                $demandItem->title_id=$item['title_id'];
                 $demandItem->kind=$item['kind'];
-                $demandItem->kind_id=$item['kind_id'];
+//                $demandItem->kind_id=$item['kind_id'];
                 $demandItem->model=$item['model'];
-                $demandItem->model_id=$item['model_id'];
+//                $demandItem->model_id=$item['model_id'];
                 $demandItem->mark=$item['mark'];
                 $demandItem->save();
             }
@@ -137,6 +137,7 @@ class DemandDraftController extends Controller
                 ->with(['items','employee.user:id,name'])
                 ->where([
                     'status'=>DemandDraft::STATUS_WAIT,
+                    'return_status'=>0,
                     'is_sent'=>true
                 ])->get();
 
@@ -156,6 +157,7 @@ class DemandDraftController extends Controller
         try {
             $demandDraft=DemandDraft::query()->findOrFail($id);
             $demandDraft->return_status=true;
+            $demandDraft->is_sent=false;
             $demandDraft->save();
 
             DB::commit();
@@ -165,6 +167,27 @@ class DemandDraftController extends Controller
             return $this->errorResponse($e->getMessage(),Response::HTTP_BAD_REQUEST);
         }
 
+    }
+
+    public function getSentToCorrectionDrafts(Request $request)
+    {
+        try {
+            $demandDraft=DemandDraft::query()->where([
+                'return_status'=>true,
+                'status'=>DemandDraft::STATUS_WAIT,
+                'is_sent'=>false,
+                'employee_id'=>$this->getEmployeeId($request->company_id)
+            ])->with([
+                'items',
+                'employee'
+            ])->get();
+
+            DB::commit();
+            return $this->dataResponse($demandDraft,Response::HTTP_OK);
+        } catch (\Exception $e) {
+            DB::rollback();
+            return $this->errorResponse($e->getMessage(),Response::HTTP_BAD_REQUEST);
+        }
     }
 
     public function delete(Request $request,$id)
@@ -250,37 +273,29 @@ class DemandDraftController extends Controller
             array_push($roleIds,$role['id']);
         }
 
-        if ($request->status==0){
+        if (in_array(DemandDraft::SUPPLIER_ROLE,$roleIds)){
+            if ($request->status==0){
+                DB::beginTransaction();
 
-            if (in_array(DemandDraft::SUPPLIER_ROLE,$roleIds))
-                $userRole=DemandDraft::SUPPLIER_ROLE;
-            DB::beginTransaction();
+                try {
+                    $demandDraft->status=DemandDraft::STATUS_REJECTED;
+                    $demandDraft->save();
 
-            try {
-                $demandDraft->status=DemandDraft::STATUS_REJECTED;
-                $demandDraft->save();
-
-                $archiveDocument=new ArchiveDocument();
-                $archiveDocument->demand_draft_id=$demandDraft->id;
-                $archiveDocument->employee_id=$this->getEmployeeId($request->company_id);
-                $archiveDocument->role_id=$userRole;
-                $archiveDocument->reason=$request->reason;
-                $archiveDocument->status=ArchiveDocument::REJECTED_STATUS;
-                $archiveDocument->save();
-                DB::commit();
-                return $this->successResponse('The demand rejected!',200);
-            } catch (\Exception $e) {
-                DB::rollback();
-                return $this->errorResponse($e->getMessage(),Response::HTTP_BAD_REQUEST);
+                    $archiveDocument=new ArchiveDocument();
+                    $archiveDocument->demand_draft_id=$demandDraft->id;
+                    $archiveDocument->employee_id=$this->getEmployeeId($request->company_id);
+                    $archiveDocument->role_id=DemandDraft::SUPPLIER_ROLE;
+                    $archiveDocument->reason=$request->reason;
+                    $archiveDocument->status=ArchiveDocument::REJECTED_STATUS;
+                    $archiveDocument->save();
+                    DB::commit();
+                    return $this->successResponse('The demand rejected!',200);
+                } catch (\Exception $e) {
+                    DB::rollback();
+                    return $this->errorResponse($e->getMessage(),Response::HTTP_BAD_REQUEST);
+                }
             }
-        }
-        else{
-            if (!in_array(DemandDraft::SUPPLIER_ROLE,$roleIds)){
-
-                $message=trans('response.youDontHaveAccess');
-                $code=200;
-            }
-            else{
+            else if ($request->status==1){
                 if ($demandDraft->status==DemandDraft::STATUS_WAIT){
                     $demandDraft->update(['status'=>DemandDraft::STATUS_CONFIRMED]);
                     $demandDraft->save();
@@ -288,14 +303,17 @@ class DemandDraftController extends Controller
                     $message=trans('response.theDemandDraftAcceptedBySupplier');
                     $code=200;
                 }
-
                 else{
                     $message=trans('response.theDemandDraftAlreadyAccepted');
                     $code=400;
                 }
             }
-            return $this->successResponse($message,$code);
         }
+        else{
+            $message=trans('response.youDontHaveAccess');
+            $code=200;
+        }
+        return $this->successResponse($message,$code);
     }
 
     public function getEmployeeId($companyId)

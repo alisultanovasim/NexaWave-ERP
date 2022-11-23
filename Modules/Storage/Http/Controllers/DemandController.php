@@ -138,11 +138,11 @@ class DemandController extends Controller
                 $demandItem=new DemandItem();
                 $demandItem->demand_id=$demand->id;
                 $demandItem->amount=$item['amount'];
-                $demandItem->title=$item['title'];
+//                $demandItem->title=$item['title'];
                 $demandItem->title_id=$item['title_id'];
-                $demandItem->kind=$item['kind'];
+//                $demandItem->kind=$item['kind'];
                 $demandItem->kind_id=$item['kind_id'];
-                $demandItem->model=$item['model'];
+//                $demandItem->model=$item['model'];
                 $demandItem->model_id=$item['model_id'];
                 $demandItem->mark=$item['mark'];
                 $demandItem->save();

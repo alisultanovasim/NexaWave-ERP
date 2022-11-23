@@ -100,7 +100,11 @@ class ProposeController extends Controller
             $proposeDocument->save();
             $company_ids=[];
             foreach ($proposeRequest->proposeDetails as $proposeDetail){
-                $proposeCompany=ProposeCompany::query()->firstOrCreate(['company_name'=>$proposeDetail['company_name']]);
+                $proposeCompany=ProposeCompany::query()->firstOrCreate([
+                    'company_name'=>$proposeDetail['company_name'],
+                    'total_value'=>$proposeDetail['total_value'],
+                ]);
+
                 array_push($company_ids,$proposeCompany->id);
                 foreach ($proposeDetail['companyDetails'] as $companyDetail){
                     ProposeCompanyDetail::query()

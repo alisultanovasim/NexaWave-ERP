@@ -16,6 +16,7 @@ class CreateProposeCompaniesTable extends Migration
         Schema::create('propose_companies', function (Blueprint $table) {
             $table->id();
             $table->string('company_name',55);
+            $table->double('total_value');
             $table->softDeletes();
             $table->timestamps();
         });

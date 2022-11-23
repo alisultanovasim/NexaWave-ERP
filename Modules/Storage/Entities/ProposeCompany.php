@@ -11,7 +11,8 @@ class ProposeCompany extends Model
     protected $table='propose_companies';
 
     protected $fillable=[
-      'company_name'
+      'company_name',
+       'total_value'
     ];
 
     public function datils()

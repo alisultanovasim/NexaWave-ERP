@@ -119,6 +119,8 @@ Route::group([
         Route::get('/','DemandDraftController@index');
         Route::get('/{id}','DemandDraftController@show');
         Route::get('/get-sent', 'DemandDraftController@getSent');
+        Route::get('/get-sent-to-corrections', 'DemandDraftController@getSentToCorrectionDrafts');
+        Route::post('/send-to-correction/{id}', 'DemandDraftController@sendToCorrection');
         Route::post('/','DemandDraftController@store');
         Route::post('/send/{id}','DemandDraftController@send');
         Route::post('/{id}','DemandDraftController@update');
