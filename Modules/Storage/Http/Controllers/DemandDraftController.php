@@ -316,6 +316,15 @@ class DemandDraftController extends Controller
         return $this->successResponse($message,$code);
     }
 
+    public function getAccepted()
+    {
+        $drafts=DemandDraft::query()
+            ->with(['items'])
+            ->where(['status'=>DemandDraft::STATUS_CONFIRMED])
+            ->get();
+        return response()->json(['data'=>$drafts],Response::HTTP_OK);
+    }
+
     public function getEmployeeId($companyId)
     {
         return Employee::query()

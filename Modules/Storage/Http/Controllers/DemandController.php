@@ -53,9 +53,9 @@ class DemandController extends Controller
             ->with('roles')
             ->first();
         $roleIds=[];
-        $progress_status=2;
+        $progress_status=1;
         foreach ($user['roles'] as $role){
-            array_push($roleIds,$role['id']);
+            $roleIds[] = $role['id'];
         }
          if(in_array(Demand::FINANCIER_ROLE,$roleIds)){
              $progress_status=2;
@@ -63,10 +63,10 @@ class DemandController extends Controller
         else if(in_array(Demand::DIRECTOR_ROLE,$roleIds)){
             $progress_status=3;
         }
-
         else if(in_array(Demand::PURCHASED_ROLE,$roleIds)){
             $progress_status=4;
         }
+
         $demands=Demand::query()
             ->with(['items','employee.user:id,name'])
             ->where([
@@ -126,6 +126,7 @@ class DemandController extends Controller
                 'employee_id' => $this->getEmployeeId($request->company_id),
                 'company_id' => $request->company_id,
                 'status' =>Demand::STATUS_WAIT,
+                'edit_status' =>Demand::STATUS_WAIT,
                 'progress_status' =>1,
             ]);
 
@@ -267,10 +268,12 @@ class DemandController extends Controller
         if ($this->getEmployeeId($request->company_id)==$demand->employee_id){
             $demand->is_sent=2;
             $demand->progress_status=2;
-            $demand->edit_status=false;
+            $demand->edit_status=true;
             $demand->save();
-            return $this->successResponse(['message'=>trans('response.theDemandWasSentSuccessfully')],Response::HTTP_OK);
         }
+
+        return $this->successResponse(['message'=>trans('response.theDemandWasSentSuccessfully')],Response::HTTP_OK);
+
 //        else if(in_array(Demand::FINANCIER_ROLE,$roleIds)){
 //            $demand->progress_status=3;
 //            $demand->save();
@@ -420,6 +423,17 @@ class DemandController extends Controller
             }
             return $this->successResponse($message,$code);
         }
+    }
+
+    public function getAccepted()
+    {
+        $demands=Demand::query()
+            ->with(['items'])
+            ->where(['status'=>Demand::STATUS_CONFIRMED])
+            ->get();
+
+        return $this->dataResponse($demands,Response::HTTP_OK);
+
     }
 
 
