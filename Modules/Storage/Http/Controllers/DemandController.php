@@ -54,6 +54,7 @@ class DemandController extends Controller
             ->first();
         $roleIds=[];
         $progress_status=1;
+        $status=Demand::STATUS_WAIT;
         foreach ($user['roles'] as $role){
             $roleIds[] = $role['id'];
         }
@@ -65,13 +66,14 @@ class DemandController extends Controller
         }
         else if(in_array(Demand::PURCHASED_ROLE,$roleIds)){
             $progress_status=4;
+            $status=Demand::STATUS_CONFIRMED;
         }
 
         $demands=Demand::query()
             ->with(['items','employee.user:id,name'])
             ->where([
                 'progress_status'=>$progress_status,
-                'status'=>Demand::STATUS_WAIT,
+                'status'=>$status,
                 'edit_status'=>true
             ])
             ->paginate($per_page);
