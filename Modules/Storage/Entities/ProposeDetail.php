@@ -27,11 +27,11 @@ class ProposeDetail extends Model
 
     public function proposeCompany()
     {
-        $this->belongsToMany(ProposeCompany::class);
+       return $this->belongsTo(ProposeCompany::class);
     }
 
     public function proposeDocument()
     {
-        $this->belongsToMany(ProposeDocument::class);
+       return $this->belongsTo(ProposeDocument::class);
     }
 }

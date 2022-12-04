@@ -15,7 +15,7 @@ class ProposeCompany extends Model
        'total_value'
     ];
 
-    public function datils()
+    public function details()
     {
         return $this->hasMany(ProposeCompanyDetail::class);
     }

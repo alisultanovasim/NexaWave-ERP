@@ -36,7 +36,9 @@ class ProposeController extends Controller
     {
         $per_page=$request->per_page ?? 10;
         $proposes=ProposeDocument::query()
-            ->with('proposes')
+            ->with([
+                'proposeDetails.proposeCompany.details'
+            ])
             ->where(['employee_id'=>$this->getEmployeeId($request->company_id),
 //                'progress_status'=>1
             ])
@@ -72,7 +74,11 @@ class ProposeController extends Controller
 
     public function show( $id)
     {
-        $propose=ProposeDocument::query()->where(['id'=>$id])->with('proposes')->get();
+        $propose=ProposeDocument::query()
+            ->with([
+                'proposeDetails.proposeCompany.details'
+            ])
+            ->findOrFail($id);
         return $this->dataResponse($propose,200);
     }
 
