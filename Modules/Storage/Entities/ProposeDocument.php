@@ -4,6 +4,7 @@ namespace Modules\Storage\Entities;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Modules\Hr\Entities\Employee\Employee;
 
 class ProposeDocument extends Model
 {
@@ -48,5 +49,10 @@ class ProposeDocument extends Model
     public function archive()
     {
         return $this->belongsTo(ArchiveDocument::class);
+    }
+
+    public function employee()
+    {
+        return $this->hasOne(Employee::class,'id','employee_id')->with(['user:id,name']);
     }
 }

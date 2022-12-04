@@ -37,7 +37,10 @@ class ProposeController extends Controller
         $per_page=$request->per_page ?? 10;
         $proposes=ProposeDocument::query()
             ->with([
-                'proposeDetails.proposeCompany.details'
+                'employee:id,user_id',
+                'proposeDetails',
+                'proposeDetails.proposeCompany:id,company_name,total_value',
+                'proposeDetails.proposeCompany.details:id,propose_company_id,indicator,value'
             ])
             ->where(['employee_id'=>$this->getEmployeeId($request->company_id),
 //                'progress_status'=>1
@@ -58,7 +61,12 @@ class ProposeController extends Controller
         }
 
         $proposes=ProposeDocument::query()
-            ->with(['proposes']);
+            ->with([
+                'employee:id,user_id',
+                'proposeDetails',
+                'proposeDetails.proposeCompany:id,company_name,total_value',
+                'proposeDetails.proposeCompany.details:id,propose_company_id,indicator,value'
+            ]);
 
         if(in_array(ProposeDocument::FINANCIER_ROLE,$roleIds)){
             $progress_status=2;
@@ -76,7 +84,10 @@ class ProposeController extends Controller
     {
         $propose=ProposeDocument::query()
             ->with([
-                'proposeDetails.proposeCompany.details'
+                'employee:id,user_id',
+                'proposeDetails',
+                'proposeDetails.proposeCompany:id,company_name,total_value',
+                'proposeDetails.proposeCompany.details:id,propose_company_id,indicator,value'
             ])
             ->findOrFail($id);
         return $this->dataResponse($propose,200);
