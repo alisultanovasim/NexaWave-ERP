@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ProposeDetail extends Model
 {
+    const SELECTED=1;
     use SoftDeletes;
     protected $table='propose_details';
     protected $fillable=[

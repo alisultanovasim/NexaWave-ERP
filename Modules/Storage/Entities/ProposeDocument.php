@@ -26,6 +26,11 @@ class ProposeDocument extends Model
     const FINANCIER_ROLE=25;
     const PURCHASED_ROLE=42;
 
+    public function selectedProposeDetails()
+    {
+        return $this->hasMany(ProposeDetail::class)->where('selected',1);
+    }
+
     public function proposeDetails()
     {
         return $this->hasMany(ProposeDetail::class);

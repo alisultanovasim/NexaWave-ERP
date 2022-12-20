@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Propose extends Model
 {
-    const SELECTED=1;
+
     const STATUS_REJECTED=3;
     use SoftDeletes;
 
@@ -18,7 +18,7 @@ class Propose extends Model
 
     public function company()
     {
-        return $this->belongsTo(ProposeCompany::class);
+        return $this->belongsTo(ProposeCompany::class,'propose_company_id','id');
     }
 
     public function detail()

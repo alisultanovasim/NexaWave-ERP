@@ -62,19 +62,28 @@ class ProposeController extends Controller
 
         $proposes=ProposeDocument::query()
             ->with([
-                'employee:id,user_id',
-                'proposeDetails',
-                'proposeDetails.proposeCompany:id,company_name,total_value',
-                'proposeDetails.proposeCompany.details:id,propose_company_id,indicator,value'
+                'employee:id,user_id'
             ]);
 
         if(in_array(ProposeDocument::FINANCIER_ROLE,$roleIds)){
             $progress_status=2;
-            $proposes->where('progress_status',$progress_status);
+            $proposes
+                ->where('progress_status',$progress_status)
+                ->with([
+                    'proposeDetails',
+                    'proposeDetails.proposeCompany:id,company_name,total_value',
+                    'proposeDetails.proposeCompany.details:id,propose_company_id,indicator,value'
+                ]);
         }
         else if (in_array(ProposeDocument::DIRECTOR_ROLE,$roleIds)){
             $progress_status=3;
-            $proposes->where('progress_status',$progress_status);
+            $proposes
+                ->where('progress_status',$progress_status)
+                ->with([
+                    'selectedProposeDetails',
+                    'selectedProposeDetails.proposeCompany:id,company_name,total_value',
+                    'selectedProposeDetails.proposeCompany.details:id,propose_company_id,indicator,value'
+                ]);
         }
         return $this->dataResponse($proposes->paginate($per_page),200);
 
@@ -85,9 +94,11 @@ class ProposeController extends Controller
         $propose=ProposeDocument::query()
             ->with([
                 'employee:id,user_id',
-                'proposeDetails',
-                'proposeDetails.proposeCompany:id,company_name,total_value',
-                'proposeDetails.proposeCompany.details:id,propose_company_id,indicator,value'
+                'proposes',
+                'proposes.company',
+                'proposes.company.details',
+                'proposes.company.proposeDetails',
+                'proposes.company.proposeDetails.demandItem:id,title,kind,model,mark',
             ])
             ->findOrFail($id);
         return $this->dataResponse($propose,200);
@@ -193,8 +204,8 @@ class ProposeController extends Controller
         ]);
 
         foreach ($request->proposes as $item){
-            $propose=Propose::query()->findOrFail($item);
-            $propose->selected=Propose::SELECTED;
+            $propose=ProposeDetail::query()->findOrFail($item);
+            $propose->selected=ProposeDetail::SELECTED;
             $propose->save();
         }
 
