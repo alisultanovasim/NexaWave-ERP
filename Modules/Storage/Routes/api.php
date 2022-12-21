@@ -180,7 +180,7 @@ Route::group([
         Route::patch('/confirm-or-reject/{id}','ProposeController@confirmOrReject');
         Route::post('/send-back/{id}','ProposeController@sendBack');
         Route::post('/send-propose/{id}','ProposeController@sendPropose');
-        Route::post('/send-proposes','ProposeController@sendProposes');
+        Route::post('/send-proposes/{id}','ProposeController@sendProposes');
 //        Route::post('/reject/{id}','ProposeController@reject');
         Route::delete('/{id}','ProposeController@delete');
         Route::post('/{id}','ProposeController@update');

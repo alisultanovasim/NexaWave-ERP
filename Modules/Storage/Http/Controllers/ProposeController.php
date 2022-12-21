@@ -196,7 +196,7 @@ class ProposeController extends Controller
         }
     }
 
-    public function sendProposes(Request $request)
+    public function sendProposes(Request $request,$id)
     {
         $this->validate($request,[
             'proposes'=>'array|required',
@@ -204,7 +204,13 @@ class ProposeController extends Controller
         ]);
 
         foreach ($request->proposes as $item){
-            $propose=ProposeDetail::query()->findOrFail($item);
+            $propose=ProposeDetail::query()
+                ->where([
+                    'propose_document_id'=>$id,
+                    'id'=>$item
+                ])
+                ->first();
+//            dd($propose[0]->selected);
             $propose->selected=ProposeDetail::SELECTED;
             $propose->save();
         }
