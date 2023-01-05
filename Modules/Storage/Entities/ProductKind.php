@@ -10,6 +10,7 @@ class ProductKind extends Model
 
     protected $guarded = ['id'];
     protected $fillable = ['name', 'title_id', 'company_id','unit_id'];
+
     public function title(){
         return $this->belongsTo(ProductTitle::class);
     }
@@ -26,6 +27,11 @@ class ProductKind extends Model
     public function demands()
     {
         return $this->hasMany(Demand::class);
+    }
+
+    public function demandItem()
+    {
+        return $this->hasOne(DemandItem::class,'kind_id');
     }
 
 

@@ -44,7 +44,7 @@ class PurchaseStorageController extends Controller
                 $storage->company_name=$value['company_name'];
                 $storage->title_id=$value['title_id'];
                 $storage->kind_id=$value['kind_id'];
-                $storage->mark_id=$value['mark_id'];
+                $storage->mark=$value['mark'];
                 $storage->model_id=$value['model_id'];
                 $storage->unit_id=$value['unit_id'];
                 $storage->color=$value['color'];

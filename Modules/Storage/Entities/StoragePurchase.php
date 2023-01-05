@@ -16,7 +16,7 @@ class StoragePurchase extends Model
       'product_id',
       'title_id',
       'kind_id',
-      'model_id',
+      'model',
       'mark_id',
       'unit_id',
       'color',

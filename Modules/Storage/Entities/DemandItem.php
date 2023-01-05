@@ -50,4 +50,19 @@
             return $this->hasMany(ProposeDetail::class);
         }
 
+        public function kind()
+        {
+            return $this->belongsTo(ProductKind::class);
+        }
+
+        public function title()
+        {
+            return $this->belongsTo(ProductTitle::class);
+        }
+
+        public function model()
+        {
+            return $this->belongsTo(ProductModel::class);
+        }
+
     }

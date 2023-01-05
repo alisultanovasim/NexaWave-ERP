@@ -16,7 +16,8 @@ class ProposeDocument extends Model
       'company_id',
       'offer_file',
       'description',
-      'send_back'
+      'send_back',
+      'progress_status'
     ];
     const STATUS_WAIT=1;
     const STATUS_REJECTED=2;

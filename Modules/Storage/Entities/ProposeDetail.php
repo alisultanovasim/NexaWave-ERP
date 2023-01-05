@@ -15,6 +15,7 @@ class ProposeDetail extends Model
       'propose_document_id',
       'price',
       'amount',
+      'selected'
     ];
 
 //    public function propose()

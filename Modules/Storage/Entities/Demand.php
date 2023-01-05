@@ -30,6 +30,7 @@ protected $fillable=[
     'edit_status',
     'status',
 ];
+protected $table='demands';
 
 public function proposes()
 {

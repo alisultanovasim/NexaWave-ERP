@@ -36,6 +36,6 @@ class ArchiveDocumentsController extends Controller
         if ($request->has('role_id'))
             $archive->where('role_id',$request->role_id);
 
-        return $archive->get();
+        return $archive->paginate($per_page);
     }
 }

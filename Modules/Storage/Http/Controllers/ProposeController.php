@@ -98,7 +98,10 @@ class ProposeController extends Controller
                 'proposes.company',
                 'proposes.company.details',
                 'proposes.company.proposeDetails',
-                'proposes.company.proposeDetails.demandItem:id,title,kind,model,mark',
+//                'proposes.company.proposeDetails.demandItem:id,title_id,kind_id,model_id,mark',
+                'proposes.company.proposeDetails.demandItem.kind',
+                'proposes.company.proposeDetails.demandItem.title',
+                'proposes.company.proposeDetails.demandItem.model'
             ])
             ->findOrFail($id);
         return $this->dataResponse($propose,200);
@@ -202,20 +205,27 @@ class ProposeController extends Controller
             'proposes'=>'array|required',
             'proposes.*'=>'integer|required'
         ]);
-
-        foreach ($request->proposes as $item){
-            $propose=ProposeDetail::query()
-                ->where([
-                    'propose_document_id'=>$id,
-                    'id'=>$item
-                ])
-                ->first();
+        $proposeDoc=ProposeDocument::query()->find($id);
+        if (!$proposeDoc){
+            return $this->errorResponse('Bu id-li teklif senedi bazada movcud deyil!',Response::HTTP_NOT_FOUND);
+        }
+        else{
+            foreach ($request->proposes as $item){
+                ProposeDetail::query()
+                    ->where([
+                        'propose_document_id'=>$proposeDoc->id,
+                        'id'=>$item
+                    ])
+                    ->update(['selected'=>ProposeDetail::SELECTED]);
 //            dd($propose[0]->selected);
-            $propose->selected=ProposeDetail::SELECTED;
-            $propose->save();
+//            $propose->selected=ProposeDetail::SELECTED;
+//            $propose->save();
+            }
+            $proposeDoc->update(['progress_status'=>3]);
+
+            return $this->successResponse(['message'=>trans('response.theProposesWereSent')],200);
         }
 
-        return $this->successResponse(['message'=>trans('response.theProposesWereSent')],200);
     }
 
 

@@ -19,5 +19,10 @@ class   ProductModel extends Model
     {
         return $this->hasMany(Demand::class);
     }
+
+    public function demandItem()
+    {
+        return $this->hasMany(DemandItem::class,'model_id');
+    }
 //    protected $guarded = [];
 }
