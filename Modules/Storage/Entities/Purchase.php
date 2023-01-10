@@ -19,11 +19,14 @@ class Purchase extends Model
     const SUPPLIER_ROLE=43;
     const FINANCIER_ROLE=25;
 
+    protected $table='purchases';
+
     protected $fillable=[
         'propose_document_id',
         'company_name',
         'supplier_id',
         'sender_id',
+        'total_price',
         'company_id',
         'progress_status',
         'send_back',

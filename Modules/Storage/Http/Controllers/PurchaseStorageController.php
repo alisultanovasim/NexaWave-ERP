@@ -15,6 +15,8 @@ use Modules\Storage\Entities\Purchase;
 use Modules\Storage\Entities\PurchaseProduct;
 use Modules\Storage\Entities\StorageProduct;
 use Modules\Storage\Entities\StoragePurchase;
+use Modules\Storage\Entities\StoragePurchaseItem;
+use Symfony\Component\HttpFoundation\Response;
 
 class PurchaseStorageController extends Controller
 {
@@ -32,58 +34,61 @@ class PurchaseStorageController extends Controller
 
     public function store(Request $request,$id)
     {
+
+
         DB::beginTransaction();
         try {
-            foreach ($request->productInfo as $value){
-                $productStorage=StorageProduct::query()
-                    ->firstOrCreate(['name'=>$value['storage_name']]);
+            $purchase=Purchase::query()->findOrFail($id);
+            $strPurchase=new StoragePurchase();
+            $strPurchase->purchase_id=$id;
+            $strPurchase->company_name=$purchase->company_name;
+            $strPurchase->save();
 
-                $storage=new StoragePurchase();
-                $storage->purchase_id=$id;
-                $storage->storage_name=$productStorage->name;
-                $storage->company_name=$value['company_name'];
-                $storage->title_id=$value['title_id'];
-                $storage->kind_id=$value['kind_id'];
-                $storage->mark=$value['mark'];
-                $storage->model_id=$value['model_id'];
-                $storage->unit_id=$value['unit_id'];
-                $storage->color=$value['color'];
-                $storage->price=$value['price'];
-                $storage->amount=$value['amount'];
-                $storage->situation=$value['situation'];
+            $productStorage = StorageProduct::query()->firstOrCreate(['name' => $request['storage_name']]);
 
-                $product=Product::query()
+            foreach ($request->productInfo as $value) {
+
+                $storagePItem = new StoragePurchaseItem();
+                $storagePItem->storage_purchase_id = $strPurchase->id;
+                $storagePItem->purchase_product_id = $value['purchase_product_id'];
+                $storagePItem->storage_id = $productStorage->id;
+                $storagePItem->measure = $value['measure'];
+                $storagePItem->amount = $value['amount'];
+                $storagePItem->situation = $value['situation'];
+
+                $purchaseProduct = PurchaseProduct::query()->findOrFail($value['purchase_product_id']);
+//            dd($purchaseProduct);
+                $product = Product::query()
                     ->where([
-                        'title_id'=>$value['title_id'],
-                        'kind_id'=>$value['kind_id'],
+                        'title_id' => $purchaseProduct->title_id,
+                        'kind_id' => $purchaseProduct->kind_id,
 //                    'mark_id'=>$value['mark_id'],
-                        'model_id'=>$value['model_id']
+                        'model_id' => $purchaseProduct->mark_id
                     ])
                     ->first();
-                if ($product){
-                    $storage->product_id=$product->id;
+                if ($product) {
+                    $storagePItem->product_id = $product->id;
                 }
 
-                $storage->save();
-
-                $totalAmountInStorage=StoragePurchase::query()->where('purchase_id',$id)->sum('amount');
-                $totalAmountInPurchase=PurchaseProduct::query()->where('purchase_id',$id)->sum('amount');
-
-                if ($totalAmountInStorage>=$totalAmountInPurchase){
+                $storagePItem->save();
+            }
+//        dd($strPurchase->id);
+            $totalAmountInStorage=StoragePurchaseItem::query()->where('storage_purchase_id',$strPurchase->id)->sum('amount');
+            $totalAmountInPurchase=PurchaseProduct::query()->where('purchase_id',$id)->sum('amount');
+            if ($totalAmountInStorage >= $totalAmountInPurchase){
+                $strPurchase->update(['is_completed'=>true]);
                     $data=[
                         'role_id'=>Purchase::SUPPLIER_ROLE,
                         'employee_id'=>$this->getEmployeeId($request->company_id),
-                        'completed_doc_id'=>$storage->id,
+                        'completed_doc_id'=>$strPurchase->id,
                         'created_at'=>now(),
                         'updated_at'=>now(),
                     ];
                     ArchiveDocument::query()->insert($data);
-                }
-
             }
             DB::commit();
 
-            return $this->successResponse($storage);
+            return $this->successResponse('Completed',Response::HTTP_OK);
         } catch (\Exception $e) {
             DB::rollback();
             return $this->errorResponse($e->getMessage());

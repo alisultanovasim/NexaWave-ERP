@@ -11,28 +11,17 @@ class StoragePurchase extends Model
     protected $table='storage_purchases';
     protected $fillable=[
       'purchase_id',
-      'storage_name',
       'company_name',
-      'product_id',
-      'title_id',
-      'kind_id',
-      'model',
-      'mark_id',
-      'unit_id',
-      'color',
-      'price',
-      'amount',
-      'situation',
       'is_completed',
     ];
-
-    public function product()
-    {
-        return $this->belongsTo(Product::class);
-    }
 
     public function purchase()
     {
         return $this->belongsTo(Purchase::class);
+    }
+
+    public function items()
+    {
+        return $this->hasMany(StoragePurchaseItem::class,'storage_purchase_id','id');
     }
 }

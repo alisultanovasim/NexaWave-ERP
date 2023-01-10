@@ -29,19 +29,43 @@ class PurchaseController extends Controller
             'company_id' => ['required', 'integer']
         ]);
 
-        return $this->dataResponse(Purchase::query()->where(['send_back'=>0,'status'=>Purchase::STATUS_WAIT])->with('purchaseProducts')->paginate($request->per_page ?? 10));
+        $roles=$this->getUserRoles();
+        $roleIds=[];
+        foreach ($roles['roles'] as $role){
+            array_push($roleIds,$role['id']);
+        }
+        if(in_array(Purchase::DIRECTOR_ROLE,$roleIds)){
+            return $this->dataResponse(Purchase::query()
+                ->where([
+                    'send_back'=>0,
+                    'status'=>Purchase::STATUS_WAIT,
+                    'progress_status'=>2
+                ])
+                ->with('purchaseProducts')
+                ->paginate($request->per_page ?? 10),\Symfony\Component\HttpFoundation\Response::HTTP_OK);
+        }
+        else{
+            return $this->dataResponse(Purchase::query()
+                ->where([
+                    'send_back'=>0,
+                    'status'=>Purchase::STATUS_WAIT,
+                    'progress_status'=>1,
+                    'sender_id'=>$this->getEmployeeId($request->company_id)
+                ])->with('purchaseProducts')->paginate($request->per_page ?? 10));
+        }
 
     }
 
     public function store(Request $request)
     {
+        $totalSumPrice=0;
         $this->validate($request,[
             $this->valdiatePurchase(),
             'productInfo'=>['required','array'],
             'productInfo.*.title_id'=>['required','integer',Rule::exists('product_titles','id')],
             'productInfo.*.kind_id'=>['required','integer',Rule::exists('product_kinds','id')],
             'productInfo.*.mark_id'=>['required','integer',Rule::exists('product_models','id')],
-            'productInfo.*.model_id'=>['required','integer'],
+            'productInfo.*.model'=>['required','string'],
             'productInfo.*.color'=>['nullable','string'],
             'productInfo.*.made_in'=>['nullable','integer',Rule::exists('countries','id')],
             'productInfo.*.custom_fee'=>['required','numeric'],
@@ -68,7 +92,7 @@ class PurchaseController extends Controller
                     'title_id'=>$value['title_id'],
                     'kind_id'=>$value['kind_id'],
                     'mark_id'=>$value['mark_id'],
-                    'model_id'=>$value['model_id'],
+                    'model'=>$value['model'],
                     'color'=>$value['color'],
                     'made_in'=>$value['made_in'],
                     'measure'=>$value['measure'],
@@ -87,9 +111,12 @@ class PurchaseController extends Controller
                             -$value['discount'])
                             *$value['amount']
                 ];
+                $totalSumPrice+=$product['total_price'];
                 PurchaseProduct::query()->insert($product);
             }
-
+//            dd($totalSumPrice);
+            $lastPurchase=Purchase::query()->findOrFail($purchase->id);
+            $lastPurchase->update(['total_price'=>$totalSumPrice]);
             DB::commit();
             return $this->successResponse(trans('response.purchaseAddedSuccessfully'),201);
         }
@@ -174,7 +201,7 @@ class PurchaseController extends Controller
             array_push($roleIds,$role['id']);
         }
 
-        if(!in_array(42,$roleIds)){
+        if(!in_array(Purchase::PURCHASED_ROLE,$roleIds)){
             return $this->errorResponse(trans('response.youDontHaveAccess'),\Symfony\Component\HttpFoundation\Response::HTTP_BAD_REQUEST);
         }
             $purchase=Purchase::query()->findOrFail($id);
@@ -290,13 +317,35 @@ class PurchaseController extends Controller
 
     }
 
-    public function getAllConfirmed()
+    public function getAllConfirmed(Request $request)
     {
+        $per_page=$request->per_page ?? 10;
         $purchases=Purchase::query()
             ->with('purchaseProducts')
             ->where(['status'=>Purchase::STATUS_ACCEPTED,'progress_status'=>3])
-            ->get();
+            ->paginate($per_page);
 
+        return $this->dataResponse($purchases);
+    }
+
+    public function pay($id)
+    {
+        $purchase=Purchase::query()->findOrFail($id);
+        $purchase->progress_status=4;
+        $purchase->save();
+        return $this->dataResponse($purchase);
+    }
+
+    public function getAllPayed(Request $request)
+    {
+        $per_page=$request->per_page ?? 10;
+        $purchases=Purchase::query()
+            ->where([
+                'status'=>Purchase::STATUS_ACCEPTED,
+                'progress_status'=>4,
+                'send_back'=>0
+            ])
+            ->paginate($per_page);
         return $this->dataResponse($purchases);
     }
 

@@ -190,7 +190,9 @@ Route::group([
         Route::get('/','PurchaseController@index');
         Route::get('/get-all-sent-back','PurchaseController@getAllSentBack');
         Route::get('/get-all-confirmed','PurchaseController@getAllConfirmed');
+        Route::get('/get-all-payed','PurchaseController@getAllPayed');
         Route::post('/','PurchaseController@store');
+        Route::patch('/pay/{id}','PurchaseController@pay');
         Route::post('/{id}','PurchaseController@update');
         Route::patch('/confirm-or-reject/{id}','PurchaseController@confirmOrReject');
         Route::post('/send-back/{id}','PurchaseController@sendBack');

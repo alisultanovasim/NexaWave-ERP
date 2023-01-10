@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class PurchaseProduct extends Model
 {
     use SoftDeletes;
+    protected $table='purchase_products';
 
     protected $fillable=[
         'purchase_id',
@@ -31,5 +32,10 @@ class PurchaseProduct extends Model
     public function purchase(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Purchase::class);
+    }
+
+    public function storagePurchaseItem()
+    {
+        return $this->hasOne(StoragePurchaseItem::class,'purchase_product_id','id');
     }
 }

@@ -147,6 +147,6 @@ class Product extends Model
 
     public function purchaseAdditions()
     {
-        return $this->hasMany(StoragePurchase::class);
+        return $this->hasMany(StoragePurchaseItem::class,'product_id','id');
     }
 }
