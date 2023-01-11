@@ -188,6 +188,7 @@ Route::group([
 
     Route::group(['prefix'=>'purchase'],function (){
         Route::get('/','PurchaseController@index');
+        Route::get('/{id}','PurchaseController@show');
         Route::get('/get-all-sent-back','PurchaseController@getAllSentBack');
         Route::get('/get-all-confirmed','PurchaseController@getAllConfirmed');
         Route::get('/get-all-payed','PurchaseController@getAllPayed');

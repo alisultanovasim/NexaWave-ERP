@@ -31,7 +31,7 @@ class ArchiveDocument extends Model
         return $this->hasMany(Demand::class,'id','demand_id');
     }
 
-    public function demandDrafts()
+    public function drafts()
     {
         return $this->hasMany(DemandDraft::class,'id','demand_draft_id');
     }
@@ -45,4 +45,11 @@ class ArchiveDocument extends Model
     {
         return $this->hasMany(Purchase::class,'id','purchase_id');
     }
+
+    public function completedDocs()
+    {
+        return $this->hasMany(StoragePurchase::class,'id','completed_doc_id');
+    }
+
+
 }

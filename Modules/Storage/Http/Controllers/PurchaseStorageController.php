@@ -34,8 +34,6 @@ class PurchaseStorageController extends Controller
 
     public function store(Request $request,$id)
     {
-
-
         DB::beginTransaction();
         try {
             $purchase=Purchase::query()->findOrFail($id);
@@ -66,6 +64,7 @@ class PurchaseStorageController extends Controller
                         'model_id' => $purchaseProduct->mark_id
                     ])
                     ->first();
+
                 if ($product) {
                     $storagePItem->product_id = $product->id;
                 }
@@ -75,6 +74,7 @@ class PurchaseStorageController extends Controller
 //        dd($strPurchase->id);
             $totalAmountInStorage=StoragePurchaseItem::query()->where('storage_purchase_id',$strPurchase->id)->sum('amount');
             $totalAmountInPurchase=PurchaseProduct::query()->where('purchase_id',$id)->sum('amount');
+
             if ($totalAmountInStorage >= $totalAmountInPurchase){
                 $strPurchase->update(['is_completed'=>true]);
                     $data=[

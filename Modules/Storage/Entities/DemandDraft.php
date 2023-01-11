@@ -36,6 +36,11 @@ class DemandDraft extends Model
         return $this->belongsTo(Employee::class);
     }
 
+    public function archive()
+    {
+        return $this->belongsTo(ArchiveDocument::class);
+    }
+
     public function delete(){
         $this->items()->delete();
         return parent::delete();

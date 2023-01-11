@@ -14,7 +14,9 @@ class ArchiveDocumentsController extends Controller
         $archive=ArchiveDocument::query()->with([
             'demands',
             'proposes',
-            'purchases'
+            'purchases',
+            'drafts',
+            'completedDocs'
         ]);
 
         if ($request->has('date')){
@@ -22,7 +24,6 @@ class ArchiveDocumentsController extends Controller
                 $archive->whereDate('created_at','>=',$request->date[0]);
             if (isset($request->date[1]))
                 $archive->whereDate('created_at','<=',$request->date[1]);
-
         }
 
         if ($request->has('status')){

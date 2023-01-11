@@ -56,6 +56,13 @@ class PurchaseController extends Controller
 
     }
 
+    public function show($id)
+    {
+        return $this->dataResponse(Purchase::query()
+            ->with('purchaseProducts')
+            ->findOrFail($id),200);
+    }
+
     public function store(Request $request)
     {
         $totalSumPrice=0;
