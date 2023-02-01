@@ -45,6 +45,7 @@ class ProposeController extends Controller
             ->where(['employee_id'=>$this->getEmployeeId($request->company_id),
 //                'progress_status'=>1
             ])
+            ->orderBy('id','desc')
             ->paginate($per_page);
         return $this->dataResponse($proposes,200);
     }
@@ -73,7 +74,7 @@ class ProposeController extends Controller
                     'proposeDetails',
                     'proposeDetails.proposeCompany:id,company_name,total_value',
                     'proposeDetails.proposeCompany.details:id,propose_company_id,indicator,value'
-                ]);
+                ])->orderBy('id','desc');
         }
         else if (in_array(ProposeDocument::DIRECTOR_ROLE,$roleIds)){
             $progress_status=3;
@@ -83,7 +84,7 @@ class ProposeController extends Controller
                     'selectedProposeDetails',
                     'selectedProposeDetails.proposeCompany:id,company_name,total_value',
                     'selectedProposeDetails.proposeCompany.details:id,propose_company_id,indicator,value'
-                ]);
+                ])->orderBy('id','desc');
         }
         return $this->dataResponse($proposes->paginate($per_page),200);
 
@@ -300,6 +301,7 @@ class ProposeController extends Controller
         $proposes=ProposeDocument::query()
             ->with('proposes')
             ->where(['progress_status'=>4,'status'=>ProposeDocument::STATUS_CONFIRMED])
+            ->orderBy('id','desc')
             ->paginate($per_page);
 
         return $this->dataResponse($proposes,200);
@@ -337,6 +339,7 @@ class ProposeController extends Controller
         $proposes=ProposeDocument::query()
             ->where(['send_back'=>1,'status'=>ProposeDocument::STATUS_WAIT,'progress_status'=>$progressStatus])
             ->with('proposes')
+            ->orderBy('id','desc')
             ->paginate($per_page);
         return $this->dataResponse($proposes,200);
     }

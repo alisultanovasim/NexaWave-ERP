@@ -10,6 +10,7 @@ class DemandDraftItem extends Model
     use SoftDeletes;
     protected $table='demand_draft_items';
     protected $fillable=[
+        'demand_draft_id',
         'amount',
         'title',
         'title_id',

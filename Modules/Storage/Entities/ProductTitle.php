@@ -29,4 +29,9 @@ class ProductTitle extends Model
     {
         return $this->hasOne(DemandItem::class,'title_id');
     }
+
+    public function purchaseProduct()
+    {
+        return $this->hasOne(PurchaseProduct::class,'title_id','id');
+    }
 }

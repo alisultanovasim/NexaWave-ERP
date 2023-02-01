@@ -38,4 +38,19 @@ class PurchaseProduct extends Model
     {
         return $this->hasOne(StoragePurchaseItem::class,'purchase_product_id','id');
     }
+
+    public function kind()
+    {
+        return $this->belongsTo(ProductKind::class);
+    }
+
+    public function title()
+    {
+        return $this->belongsTo(ProductTitle::class);
+    }
+
+    public function mark()
+    {
+        return $this->belongsTo(ProductModel::class);
+    }
 }

@@ -39,6 +39,7 @@ class DemandDraftController extends Controller
                 'status'=>DemandDraft::STATUS_WAIT,
                 'return_status'=>false,
             ])
+            ->orderBy('id','desc')
             ->paginate($per_page);
         return $this->dataResponse(['createdByUserDemands'=>$demandCreatedByUser],200);
     }
@@ -139,7 +140,9 @@ class DemandDraftController extends Controller
                     'status'=>DemandDraft::STATUS_WAIT,
                     'return_status'=>0,
                     'is_sent'=>true
-                ])->get();
+                ])
+                ->orderBy('id','desc')
+                ->get();
 
         return $this->dataResponse($demands,200);
 
@@ -180,7 +183,7 @@ class DemandDraftController extends Controller
             ])->with([
                 'items',
                 'employee'
-            ])->get();
+            ])->orderBy('id','desc')->get();
 
             DB::commit();
             return $this->dataResponse($demandDraft,Response::HTTP_OK);
@@ -245,7 +248,12 @@ class DemandDraftController extends Controller
             $demandDraft->save();
 
             foreach ($request->get('productInfo') as $value){
+                if (isset($value['productId']))
+                    $item=DemandDraftItem::query()->find($value['productId']);
+                if ($item)
+                    $item->delete();
                 $product=[
+                    'demand_draft_id'=>$id,
                     'title_id'=>$value['title'],
                     'title'=>$value['title'],
                     'kind'=>$value['kind'],
@@ -254,8 +262,9 @@ class DemandDraftController extends Controller
                     'amount'=>$value['amount'],
                 ];
 
-                DemandDraftItem::query()->findOrFail($value['productId'])->update($product);
+                DemandDraftItem::query()->create($product);
             }
+
             DB::commit();
             return $this->successResponse($demandDraft,\Symfony\Component\HttpFoundation\Response::HTTP_OK);
         } catch (\Exception $e) {
@@ -321,6 +330,7 @@ class DemandDraftController extends Controller
         $drafts=DemandDraft::query()
             ->with(['items'])
             ->where(['status'=>DemandDraft::STATUS_CONFIRMED])
+            ->orderBy('id','desc')
             ->get();
         return response()->json(['data'=>$drafts],Response::HTTP_OK);
     }

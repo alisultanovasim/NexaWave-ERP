@@ -24,5 +24,10 @@ class   ProductModel extends Model
     {
         return $this->hasMany(DemandItem::class,'model_id');
     }
+
+    public function purchaseProduct()
+    {
+        return $this->hasOne(PurchaseProduct::class,'mark_id','id');
+    }
 //    protected $guarded = [];
 }

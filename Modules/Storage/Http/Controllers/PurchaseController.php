@@ -2,21 +2,18 @@
 
 namespace Modules\Storage\Http\Controllers;
 
-use App\Models\User;
 use App\Traits\ApiResponse;
 use App\Traits\UserInfo;
-use http\Env\Response;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
-use Modules\Hr\Entities\Employee\Employee;
 use Modules\Storage\Entities\ArchiveDocument;
 use Modules\Storage\Entities\Purchase;
 use Modules\Storage\Entities\PurchaseProduct;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\Response;
 
 class PurchaseController extends Controller
 {
@@ -51,7 +48,9 @@ class PurchaseController extends Controller
                     'status'=>Purchase::STATUS_WAIT,
                     'progress_status'=>1,
                     'sender_id'=>$this->getEmployeeId($request->company_id)
-                ])->with('purchaseProducts')->paginate($request->per_page ?? 10));
+                ])
+                ->orderBy('id','desc')
+                ->with('purchaseProducts')->paginate($request->per_page ?? 10));
         }
 
     }
@@ -59,7 +58,12 @@ class PurchaseController extends Controller
     public function show($id)
     {
         return $this->dataResponse(Purchase::query()
-            ->with('purchaseProducts')
+            ->with([
+                'purchaseProducts',
+//                'purchaseProducts.kind',
+//                'purchaseProducts.title',
+//                'purchaseProducts.mark',
+            ])
             ->findOrFail($id),200);
     }
 
@@ -131,8 +135,6 @@ class PurchaseController extends Controller
             DB::rollBack();
             return $this->errorResponse($exception->getMessage());
         }
-
-
     }
 
     public function update(Request $request,$id)
@@ -241,9 +243,10 @@ class PurchaseController extends Controller
         $purchases=Purchase::query()
             ->with('purchaseProducts')
             ->where(['send_back'=>1,'status'=>Purchase::STATUS_WAIT])
+            ->orderBy('id','desc')
             ->paginate($request->per_page ?? 10);
 
-        return $this->dataResponse($purchases);
+        return $this->dataResponse($purchases,Response::HTTP_OK);
     }
 
     public function confirmOrReject(Request $request,$id)
@@ -330,6 +333,7 @@ class PurchaseController extends Controller
         $purchases=Purchase::query()
             ->with('purchaseProducts')
             ->where(['status'=>Purchase::STATUS_ACCEPTED,'progress_status'=>3])
+            ->orderBy('id','desc')
             ->paginate($per_page);
 
         return $this->dataResponse($purchases);
@@ -352,6 +356,7 @@ class PurchaseController extends Controller
                 'progress_status'=>4,
                 'send_back'=>0
             ])
+            ->orderBy('id','desc')
             ->paginate($per_page);
         return $this->dataResponse($purchases);
     }

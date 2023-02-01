@@ -22,6 +22,7 @@ class StorageController extends Controller
         $storage = Storage::withCount('products')
             ->where('company_id', $request->get('company_id'))
             ->orderBy('id', 'DESC')
+            ->orderBy('id','desc')
             ->paginate($request->get('per_page'));
 
         return $this->successResponse($storage);

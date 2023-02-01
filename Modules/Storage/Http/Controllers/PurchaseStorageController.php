@@ -28,12 +28,14 @@ class PurchaseStorageController extends Controller
                 'purchaseProducts',
                 'proposeDocument.proposes.detail.demandItem'
             ])
+            ->orderBy('id','desc')
             ->paginate($request->per_page ?? 10)
         );
     }
 
     public function store(Request $request,$id)
     {
+//        dd($request->productInfo);
         DB::beginTransaction();
         try {
             $purchase=Purchase::query()->findOrFail($id);
@@ -42,9 +44,9 @@ class PurchaseStorageController extends Controller
             $strPurchase->company_name=$purchase->company_name;
             $strPurchase->save();
 
-            $productStorage = StorageProduct::query()->firstOrCreate(['name' => $request['storage_name']]);
-
             foreach ($request->productInfo as $value) {
+
+                $productStorage = StorageProduct::query()->firstOrCreate(['name' => $value['storage_name']]);
 
                 $storagePItem = new StoragePurchaseItem();
                 $storagePItem->storage_purchase_id = $strPurchase->id;
@@ -88,7 +90,7 @@ class PurchaseStorageController extends Controller
             }
             DB::commit();
 
-            return $this->successResponse('Completed',Response::HTTP_OK);
+            return $this->successResponse(['status'=>'ok','code'=>Response::HTTP_OK],Response::HTTP_OK);
         } catch (\Exception $e) {
             DB::rollback();
             return $this->errorResponse($e->getMessage());

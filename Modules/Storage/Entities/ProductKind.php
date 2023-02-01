@@ -34,6 +34,11 @@ class ProductKind extends Model
         return $this->hasOne(DemandItem::class,'kind_id');
     }
 
+    public function purchaseProduct()
+    {
+        return $this->hasOne(PurchaseProduct::class,'kind_id','id');
+    }
+
 
     public function scopeCompany($q)
     {

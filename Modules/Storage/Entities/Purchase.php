@@ -38,7 +38,7 @@ class Purchase extends Model
     }
     public function purchaseProducts(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
-        return $this->hasMany(PurchaseProduct::class);
+        return $this->hasMany(PurchaseProduct::class)->with(['kind:id,name','title:id,name','mark:id,name']);
     }
 
     public function proposeDocument()

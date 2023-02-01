@@ -41,6 +41,7 @@ class DemandController extends Controller
                 'status'=>Demand::STATUS_WAIT,
                 'edit_status'=>true,
             ])
+            ->orderBy('id','desc')
             ->paginate($per_page);
         return $this->dataResponse(['createdByUserDemands'=>$demandCreatedByUser],200);
     }
@@ -164,6 +165,9 @@ class DemandController extends Controller
     {
         $demands = Demand::with([
             'items',
+            'items.title',
+            'items.kind',
+            'items.model',
             'employee.user',
         ])
             ->where('company_id', $request->get('company_id'))
@@ -332,6 +336,7 @@ class DemandController extends Controller
         $demands=DemandCorrect::query()
             ->with(['demand','demand.employee.user:id,name'])
             ->where('role_id',Demand::SUPPLIER_ROLE)
+            ->orderBy('id','desc')
             ->paginate($per_page);
         return $this->dataResponse($demands,Response::HTTP_OK);
     }
@@ -432,6 +437,7 @@ class DemandController extends Controller
         $demands=Demand::query()
             ->with(['items'])
             ->where(['status'=>Demand::STATUS_CONFIRMED])
+            ->orderBy('id','desc')
             ->get();
 
         return $this->dataResponse($demands,Response::HTTP_OK);
