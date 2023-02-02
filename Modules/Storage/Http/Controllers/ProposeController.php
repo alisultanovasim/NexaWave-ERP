@@ -43,7 +43,7 @@ class ProposeController extends Controller
                 'proposeDetails.proposeCompany.details:id,propose_company_id,indicator,value'
             ])
             ->where(['employee_id'=>$this->getEmployeeId($request->company_id),
-//                'progress_status'=>1
+                    'progress_status'=>1
             ])
             ->orderBy('id','desc')
             ->paginate($per_page);
@@ -333,7 +333,7 @@ class ProposeController extends Controller
         if(in_array(ProposeDocument::PURCHASED_ROLE,$roleIds))
             $progressStatus=1;
         else{
-            return $this->errorResponse(trans('response.notFound'),404);
+            return $this->errorResponse([],200);
         }
 
         $proposes=ProposeDocument::query()
