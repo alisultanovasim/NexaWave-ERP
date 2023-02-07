@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\UserRole;
 use App\Traits\ApiResponse;
 use App\Traits\UserInfo;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -63,7 +64,15 @@ class ProposeController extends Controller
 
         $proposes=ProposeDocument::query()
             ->with([
-                'employee:id,user_id'
+                'employee:id,user_id',
+                'proposes',
+                'proposes.company',
+                'proposes.company.details',
+                'proposes.company.proposeDetails',
+//                'proposes.company.proposeDetails.demandItem:id,title_id,kind_id,model_id,mark',
+                'proposes.company.proposeDetails.demandItem.kind',
+                'proposes.company.proposeDetails.demandItem.title',
+                'proposes.company.proposeDetails.demandItem.model'
             ]);
 
         if(in_array(ProposeDocument::FINANCIER_ROLE,$roleIds)){
@@ -245,12 +254,18 @@ class ProposeController extends Controller
                     $propose->update(['status'=>ProposeDocument::STATUS_CONFIRMED]);
                     $propose->progress_status=4;
 
+                    ProposeDetail::query()
+                        ->where([
+                            'propose_company_id'=>$request->cmp_id,
+                            'propose_document_id'=>$propose->id
+                        ])->update(['selected'=>2]);
+
                     $message=trans('response.theProposeAcceptedByDirector');
                     $code=200;
                 }
 
                 else{
-                    $message=trans('response.theProposeAlreadyAccepted');
+                    $message=trans('response.theProposeAlreadyAcceptedOrRejected');
                     $code=400;
                 }
             }
@@ -299,7 +314,20 @@ class ProposeController extends Controller
     {
         $per_page=$request->per_page ?? 10;
         $proposes=ProposeDocument::query()
-            ->with('proposes')
+            ->with([
+                'employee:id,user_id',
+                'proposes',
+                'proposes.company',
+                'proposes.company.details',
+                'proposes.company.proposeDetails',
+//                'proposes.company.proposeDetails.demandItem:id,title_id,kind_id,model_id,mark',
+                'proposes.company.proposeDetails.demandItem.kind',
+                'proposes.company.proposeDetails.demandItem.title',
+                'proposes.company.proposeDetails.demandItem.model'
+            ])
+            ->whereHas('proposes.company.proposeDetails', function ($query){
+                $query->where('selected', '=',2);
+            })
             ->where(['progress_status'=>4,'status'=>ProposeDocument::STATUS_CONFIRMED])
             ->orderBy('id','desc')
             ->paginate($per_page);

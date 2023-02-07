@@ -177,7 +177,7 @@ Route::group([
         Route::get('/get-sent-back-proposes','ProposeController@getAllSentBackProposes');
         Route::get('/get-all-confirmed-proposes','ProposeController@getAllConfirmedProposes');
         Route::post('/','ProposeController@store');
-        Route::patch('/confirm-or-reject/{id}','ProposeController@confirmOrReject');
+        Route::post('/confirm-or-reject/{id}','ProposeController@confirmOrReject');
         Route::post('/send-back/{id}','ProposeController@sendBack');
         Route::post('/send-propose/{id}','ProposeController@sendPropose');
         Route::post('/send-proposes/{id}','ProposeController@sendProposes');
